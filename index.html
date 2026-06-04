@@ -487,7 +487,6 @@ footer{
   <div class="nav-logo">fab.games</div>
   <ul class="nav-links">
     <li><a href="#games">Games</a></li>
-    <li><a href="#filters">Filters</a></li>
     <li><a href="#world">World</a></li>
     <li><a href="#pricing" class="nav-cta">Join · $4.99</a></li>
   </ul>
@@ -534,20 +533,12 @@ footer{
 <section id="games">
   <div class="section-badge">— Games Collection</div>
   <h2 class="section-title">Play the <em>World</em></h2>
-  <p class="section-sub">From Hawaii's volcanic shores to wherever we go next — games that celebrate the world's most extraordinary places and cultures.</p>
+  <p class="section-sub">From addictive card games to volcanic arcade action, Hawaiian trivia to vintage film photography — something fabulous for everyone.</p>
   <div class="divider"></div>
   <div class="games-grid" id="gamesGrid"></div>
 </section>
 
-<!-- FILTERS SECTION -->
-<section id="filters" style="background:linear-gradient(180deg,var(--black),#0a0907,var(--black));">
-  <div class="section-badge">— Photography Collection</div>
-  <h2 class="section-title">See Through <em>Time</em></h2>
-  <p class="section-sub">34 authentic vintage film looks inspired by Hawaii's golden eras — from 1920s sepia to 1990s disposable. Turn your camera into a time machine.</p>
-  <div class="divider"></div>
-  <a href="/camera" class="btn-primary" style="margin-bottom:60px;display:inline-block;">Open Vintage Camera →</a>
-  <div class="filters-showcase" id="filtersGrid"></div>
-</section>
+
 
 <!-- WORLD SECTION -->
 <section id="world">
@@ -671,7 +662,7 @@ const GAMES=[
   {emoji:'🔮',cat:'Fortune · Fun',title:'Fortune Roulette',desc:'222 unique fortunes. Spin the wheel of destiny.',href:'/fortune',color:'rgba(155,89,182,0.12)'},
   {emoji:'🎭',cat:'Personality · Fun',title:'Who Are You?',desc:'222 wild personalities. Which one are you today?',href:'/humor',color:'rgba(255,80,80,0.12)'},
   {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists Factory',desc:'Mix infinite colour combinations. Create your masterpiece.',href:'/slime',color:'rgba(0,220,80,0.12)'},
-  {emoji:'📷',cat:'Camera · Filter',title:'Vintage Camera',desc:'34 film filters from Hawaii\'s golden eras. Capture time.',href:'/camera',color:'rgba(212,168,67,0.12)'},
+  {emoji:'🎞️',cat:'Photography · Creative',title:'Film Lab',desc:'Step into the darkroom. 34 authentic film looks from Hawaii\'s golden eras. Transform your camera into a time machine.',href:'/camera',color:'rgba(212,168,67,0.12)'},
 ];
 
 const grid=document.getElementById('gamesGrid');
@@ -692,43 +683,7 @@ GAMES.forEach(g=>{
   grid.appendChild(card);
 });
 
-// ── FILTERS DATA ──────────────────────────────────
-const FILTERS=[
-  {era:'1920s',name:'The Duke',color:'#3d2b1a'},
-  {era:'1930s',name:'Royal Hawaiian Pink',color:'#2a1820'},
-  {era:'1930s',name:'Canoe Club',color:'#1a2218'},
-  {era:'1940s',name:'Coconut Wireless',color:'#1a1a1a'},
-  {era:'1940s',name:'Honolulu Swing',color:'#1a1208'},
-  {era:'1950s',name:'Kodachrome Waikiki',color:'#0a1a2a'},
-  {era:'1950s',name:'Diamond Head Chrome',color:'#0a1530'},
-  {era:'1960s',name:'Blue Hawaii',color:'#08152a'},
-  {era:'1960s',name:'Surf Rider',color:'#1a1508'},
-  {era:'1970s',name:"North Shore '74",color:'#1a1205'},
-  {era:'1970s',name:'Hibiscus Haze',color:'#1a0818'},
-  {era:'1980s',name:'Waikiki Neon',color:'#080818'},
-  {era:'1980s',name:'Island VHS',color:'#101018'},
-  {era:'1990s',name:'Disposable Aloha',color:'#1a1510'},
-  {era:'⭐ Bonus',name:'Chicken Skin Sunset',color:'#1a0800'},
-  {era:'⭐ Bonus',name:'Pau Hana',color:'#1a1205'},
-  {era:'⭐ Bonus',name:"Pele's Glow",color:'#150500'},
-  {era:'⭐ Bonus',name:'Da Kine Classic',color:'#0a1018'},
-];
 
-const fgrid=document.getElementById('filtersGrid');
-FILTERS.forEach(f=>{
-  const card=document.createElement('a');
-  card.href='/camera';
-  card.className='filter-card';
-  card.style.cssText='text-decoration:none;';
-  card.innerHTML=`
-    <div class="filter-card-inner" style="background:${f.color};">
-      <div class="filter-card-info">
-        <div class="filter-card-era">${f.era}</div>
-        <div class="filter-card-name">${f.name}</div>
-      </div>
-    </div>`;
-  fgrid.appendChild(card);
-});
 
 // ── SMOOTH SCROLL ─────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
