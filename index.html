@@ -2,35 +2,742 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>fab.games — Coming Soon!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>fab.games — The World's Most Fabulous Games & Filters</title>
+<meta name="description" content="Premium games and vintage photography filters from around the world. Play, create, capture. $4.99/month.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300;1,600&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#070708;
+  --dark:#0d0d0f;
+  --card:#131316;
+  --border:rgba(255,255,255,0.07);
+  --gold:#c9a84c;
+  --gold2:#e8c96a;
+  --white:#f0efe8;
+  --muted:rgba(240,239,232,0.45);
+  --accent:#c9a84c;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+html{scroll-behavior:smooth;}
+
 body{
-  background:#0a0a0a;
-  font-family:system-ui,sans-serif;
-  color:#fff;
-  height:100vh;
+  background:var(--black);
+  color:var(--white);
+  font-family:'Inter',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:default;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:1000;opacity:0.4;
+}
+
+/* ── CUSTOM CURSOR ── */
+*{cursor:none !important;}
+.cursor{
+  position:fixed;width:8px;height:8px;
+  background:var(--gold);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width 0.2s,height 0.2s,background 0.2s;
+  mix-blend-mode:difference;
+}
+.cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(201,168,76,0.5);
+  border-radius:50%;pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:all 0.15s ease;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 48px;
+  background:linear-gradient(180deg,rgba(7,7,8,0.95),transparent);
+  backdrop-filter:blur(0px);
+  transition:all 0.4s;
+}
+nav.scrolled{
+  background:rgba(7,7,8,0.97);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:14px 48px;
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-links{
+  display:flex;gap:36px;align-items:center;
+  list-style:none;
+}
+.nav-links a{
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--white);}
+.nav-cta{
+  padding:10px 24px;
+  border:1px solid rgba(201,168,76,0.4);
+  border-radius:2px;
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold) !important;
+  transition:all 0.2s !important;
+}
+.nav-cta:hover{
+  background:rgba(201,168,76,0.1) !important;
+  border-color:var(--gold) !important;
+  color:var(--gold2) !important;
+}
+.nav-mobile-btn{display:none;background:none;border:none;color:var(--white);font-size:22px;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:120px 24px 80px;
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%,rgba(201,168,76,0.06),transparent),
+    radial-gradient(ellipse 40% 40% at 20% 80%,rgba(201,168,76,0.04),transparent),
+    radial-gradient(ellipse 40% 40% at 80% 20%,rgba(201,168,76,0.03),transparent);
+}
+.hero-line{
+  width:1px;height:80px;
+  background:linear-gradient(180deg,transparent,var(--gold),transparent);
+  margin:0 auto 40px;
+  animation:lineGrow 1.5s ease forwards;
+}
+@keyframes lineGrow{0%{height:0;opacity:0;}100%{height:80px;opacity:1;}}
+
+.hero-badge{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:24px;
+  animation:fadeUp 0.8s 0.3s ease both;
+}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(52px,10vw,120px);
+  font-weight:300;line-height:0.95;
+  letter-spacing:-2px;
+  margin-bottom:8px;
+  animation:fadeUp 0.8s 0.5s ease both;
+}
+.hero-title span{
+  font-style:italic;
+  background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-title-games{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,10vw,120px);
+  letter-spacing:8px;
+  color:var(--white);
+  animation:fadeUp 0.8s 0.6s ease both;
+}
+.hero-sub{
+  font-size:clamp(13px,2vw,16px);
+  color:var(--muted);
+  max-width:500px;
+  line-height:1.8;
+  margin:24px auto 48px;
+  animation:fadeUp 0.8s 0.7s ease both;
+}
+.hero-btns{
+  display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp 0.8s 0.9s ease both;
+}
+.btn-primary{
+  padding:16px 40px;
+  background:linear-gradient(135deg,var(--gold),#a87d2a);
+  color:#000;
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  font-weight:600;border:none;border-radius:2px;
+  box-shadow:0 0 40px rgba(201,168,76,0.25);
+  transition:all 0.2s;text-decoration:none;
+  display:inline-block;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  box-shadow:0 0 60px rgba(201,168,76,0.4);
+  transform:translateY(-2px);
+}
+.btn-secondary{
+  padding:16px 40px;
+  background:transparent;
+  color:var(--white);
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,0.2);border-radius:2px;
+  transition:all 0.2s;text-decoration:none;
+  display:inline-block;
+}
+.btn-secondary:hover{
+  border-color:rgba(255,255,255,0.5);
+  background:rgba(255,255,255,0.04);
+}
+.hero-stats{
+  display:flex;gap:60px;justify-content:center;
+  margin-top:80px;padding-top:60px;
+  border-top:1px solid var(--border);
+  animation:fadeUp 0.8s 1.1s ease both;
+  flex-wrap:wrap;gap:40px;
+}
+.hero-stat-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(32px,5vw,48px);
+  font-weight:600;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-stat-lbl{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);margin-top:4px;
+}
+
+@keyframes fadeUp{
+  0%{opacity:0;transform:translateY(24px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+
+/* ── SECTION COMMON ── */
+section{padding:100px 48px;max-width:1400px;margin:0 auto;}
+.section-badge{
+  font-size:9px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,6vw,72px);
+  font-weight:300;line-height:1.05;
+  margin-bottom:16px;
+}
+.section-title em{font-style:italic;color:var(--gold);}
+.section-sub{
+  font-size:15px;color:var(--muted);
+  max-width:560px;line-height:1.8;
+  margin-bottom:60px;
+}
+
+/* ── GAMES GRID ── */
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:2px;
+}
+.game-card{
+  position:relative;overflow:hidden;
+  aspect-ratio:9/14;
+  background:var(--card);
+  transition:all 0.4s cubic-bezier(0.23,1,0.32,1);
+}
+.game-card:hover{transform:scale(1.02);z-index:2;}
+.game-card-bg{
+  position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
+  font-size:80px;
+  transition:transform 0.6s ease;
+}
+.game-card:hover .game-card-bg{transform:scale(1.1);}
+.game-card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(7,7,8,0) 0%,
+    rgba(7,7,8,0.3) 40%,
+    rgba(7,7,8,0.85) 70%,
+    rgba(7,7,8,0.97) 100%
+  );
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+  padding:24px 20px 20px;
+}
+.game-card-cat{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:6px;
+}
+.game-card-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:600;
+  line-height:1.2;margin-bottom:8px;
+}
+.game-card-desc{
+  font-size:11px;color:var(--muted);
+  line-height:1.6;margin-bottom:14px;
+  display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+.game-card-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);
+  transition:gap 0.2s;
+}
+.game-card:hover .game-card-btn{gap:14px;}
+.game-live-badge{
+  position:absolute;top:16px;right:16px;
+  font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  padding:4px 10px;
+  background:rgba(201,168,76,0.15);
+  border:1px solid rgba(201,168,76,0.3);
+  border-radius:2px;color:var(--gold);
+}
+
+/* ── FILTERS SECTION ── */
+.filters-showcase{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:2px;
+  margin-top:60px;
+}
+.filter-card{
+  position:relative;overflow:hidden;
+  aspect-ratio:3/4;
+  transition:all 0.4s;
+}
+.filter-card:hover{transform:scale(1.03);z-index:2;}
+.filter-card-inner{
+  width:100%;height:100%;
+  display:flex;align-items:flex-end;
+  padding:20px 16px;
+  background:var(--card);
+}
+.filter-card-info{position:relative;z-index:2;}
+.filter-card-era{
+  font-size:8px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:4px;
+}
+.filter-card-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;font-weight:600;color:var(--white);
+}
+
+/* ── PRICING ── */
+.pricing-wrap{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:2px;max-width:800px;margin:0 auto;
+}
+.price-card{
+  padding:48px 40px;
+  background:var(--card);
+  border:1px solid var(--border);
+  position:relative;
+}
+.price-card.featured{
+  background:linear-gradient(160deg,#1a1810,#13130e);
+  border-color:rgba(201,168,76,0.3);
+  box-shadow:0 0 60px rgba(201,168,76,0.08);
+}
+.price-featured-badge{
+  position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  font-size:8px;letter-spacing:3px;text-transform:uppercase;
+  padding:6px 20px;
+  background:var(--gold);color:#000;font-weight:600;
+}
+.price-tier{
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:20px;
+}
+.price-amount{
+  font-family:'Cormorant Garamond',serif;
+  font-size:64px;font-weight:300;line-height:1;
+  margin-bottom:4px;
+}
+.price-amount span{font-size:20px;vertical-align:super;}
+.price-amount small{font-size:18px;color:var(--muted);}
+.price-desc{
+  font-size:13px;color:var(--muted);
+  margin-bottom:32px;line-height:1.6;
+}
+.price-features{list-style:none;margin-bottom:40px;}
+.price-features li{
+  font-size:13px;padding:10px 0;
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
+  display:flex;align-items:center;gap:10px;
+}
+.price-features li::before{
+  content:'—';color:var(--gold);font-size:12px;
+}
+.price-features li.active{color:var(--white);}
+
+/* ── WORLD SECTION ── */
+.world-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:1px;margin-top:60px;
+}
+.world-item{
+  padding:28px 20px;
+  background:var(--card);
+  text-align:center;
+  border:1px solid transparent;
+  transition:all 0.3s;
+}
+.world-item:hover{border-color:rgba(201,168,76,0.2);background:#1a1a1d;}
+.world-item-flag{font-size:32px;margin-bottom:8px;}
+.world-item-name{
+  font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:60px 48px 40px;
   text-align:center;
 }
-.logo{font-size:clamp(48px,12vw,96px);font-weight:900;
-  background:linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff);
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:36px;letter-spacing:4px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  letter-spacing:-2px;}
-.sub{font-size:clamp(14px,3vw,20px);color:rgba(255,255,255,0.5);
-  margin-top:12px;letter-spacing:2px;}
-.badge{margin-top:24px;display:inline-block;
-  padding:8px 20px;border-radius:99px;
-  border:1px solid rgba(255,255,255,0.15);
-  font-size:13px;color:rgba(255,255,255,0.4);}
+  margin-bottom:16px;
+}
+.footer-tagline{
+  font-size:13px;color:var(--muted);
+  font-style:italic;font-family:'Cormorant Garamond',serif;
+  margin-bottom:40px;
+}
+.footer-links{
+  display:flex;gap:32px;justify-content:center;
+  flex-wrap:wrap;margin-bottom:40px;
+}
+.footer-links a{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;transition:color 0.2s;
+}
+.footer-links a:hover{color:var(--gold);}
+.footer-copy{
+  font-size:11px;color:rgba(240,239,232,0.2);
+  letter-spacing:1px;
+}
+
+/* ── SCROLL INDICATOR ── */
+.scroll-indicator{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  animation:fadeUp 1s 1.5s ease both;
+}
+.scroll-indicator span{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--muted);
+}
+.scroll-line{
+  width:1px;height:40px;
+  background:linear-gradient(180deg,var(--gold),transparent);
+  animation:scrollPulse 2s ease infinite;
+}
+@keyframes scrollPulse{
+  0%{transform:scaleY(0);transform-origin:top;}
+  50%{transform:scaleY(1);transform-origin:top;}
+  51%{transform:scaleY(1);transform-origin:bottom;}
+  100%{transform:scaleY(0);transform-origin:bottom;}
+}
+
+/* ── DIVIDER ── */
+.divider{
+  width:60px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:0 auto 40px;
+}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  nav{padding:16px 20px;}
+  nav.scrolled{padding:12px 20px;}
+  .nav-links{display:none;}
+  .nav-mobile-btn{display:block;}
+  section{padding:70px 20px;}
+  .hero{padding:100px 20px 60px;}
+  .hero-stats{gap:30px;}
+  .pricing-wrap{grid-template-columns:1fr;max-width:400px;}
+  .games-grid{grid-template-columns:repeat(2,1fr);}
+  .filters-showcase{grid-template-columns:repeat(2,1fr);}
+}
 </style>
 </head>
 <body>
-<div>
-  <div class="logo">fab.games</div>
-  <div class="sub">THE WORLD'S MOST FABULOUS GAMES</div>
-  <div class="badge">🚀 Launching Soon</div>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-logo">fab.games</div>
+  <ul class="nav-links">
+    <li><a href="#games">Games</a></li>
+    <li><a href="#filters">Filters</a></li>
+    <li><a href="#world">World</a></li>
+    <li><a href="#pricing" class="nav-cta">Join · $4.99</a></li>
+  </ul>
+  <button class="nav-mobile-btn">☰</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <div class="hero-badge">Launching 2026 — The World Awaits</div>
+  <div class="hero-title">The World's Most <span>Fabulous</span></div>
+  <div class="hero-title-games">Games & Filters</div>
+  <p class="hero-sub">Premium games and vintage photography filters inspired by the world's most extraordinary places. Play, create, capture.</p>
+  <div class="hero-btns">
+    <a href="#pricing" class="btn-primary">Join for $4.99 / month</a>
+    <a href="#games" class="btn-secondary">Explore Games</a>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">13</div>
+      <div class="hero-stat-lbl">Games Live</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">34</div>
+      <div class="hero-stat-lbl">Film Filters</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">∞</div>
+      <div class="hero-stat-lbl">More Coming</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">$4.99</div>
+      <div class="hero-stat-lbl">Per Month</div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
 </div>
+
+<!-- GAMES SECTION -->
+<section id="games">
+  <div class="section-badge">— Games Collection</div>
+  <h2 class="section-title">Play the <em>World</em></h2>
+  <p class="section-sub">From Hawaii's volcanic shores to wherever we go next — games that celebrate the world's most extraordinary places and cultures.</p>
+  <div class="divider"></div>
+  <div class="games-grid" id="gamesGrid"></div>
+</section>
+
+<!-- FILTERS SECTION -->
+<section id="filters" style="background:linear-gradient(180deg,var(--black),#0a0907,var(--black));">
+  <div class="section-badge">— Photography Collection</div>
+  <h2 class="section-title">See Through <em>Time</em></h2>
+  <p class="section-sub">34 authentic vintage film looks inspired by Hawaii's golden eras — from 1920s sepia to 1990s disposable. Turn your camera into a time machine.</p>
+  <div class="divider"></div>
+  <a href="/camera" class="btn-primary" style="margin-bottom:60px;display:inline-block;">Open Vintage Camera →</a>
+  <div class="filters-showcase" id="filtersGrid"></div>
+</section>
+
+<!-- WORLD SECTION -->
+<section id="world">
+  <div class="section-badge">— Coming to the World</div>
+  <h2 class="section-title">Every <em>Country</em><br>Every <em>Culture</em></h2>
+  <p class="section-sub">We're just getting started. Games and filters inspired by extraordinary places worldwide — coming soon.</p>
+  <div class="divider"></div>
+  <div class="world-grid">
+    <div class="world-item"><div class="world-item-flag">🌺</div><div class="world-item-name">Hawaii</div></div>
+    <div class="world-item"><div class="world-item-flag">🗼</div><div class="world-item-name">Paris</div></div>
+    <div class="world-item"><div class="world-item-flag">🗽</div><div class="world-item-name">New York</div></div>
+    <div class="world-item"><div class="world-item-flag">⛩️</div><div class="world-item-name">Tokyo</div></div>
+    <div class="world-item"><div class="world-item-flag">🎭</div><div class="world-item-name">Venice</div></div>
+    <div class="world-item"><div class="world-item-flag">🏔️</div><div class="world-item-name">Alps</div></div>
+    <div class="world-item"><div class="world-item-flag">🦁</div><div class="world-item-name">Safari</div></div>
+    <div class="world-item"><div class="world-item-flag">🎪</div><div class="world-item-name">Barcelona</div></div>
+    <div class="world-item"><div class="world-item-flag">🏛️</div><div class="world-item-name">Rome</div></div>
+    <div class="world-item"><div class="world-item-flag">🌅</div><div class="world-item-name">Bali</div></div>
+    <div class="world-item"><div class="world-item-flag">🎸</div><div class="world-item-name">Nashville</div></div>
+    <div class="world-item"><div class="world-item-flag">✨</div><div class="world-item-name">More...</div></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" style="text-align:center;">
+  <div class="section-badge">— Simple Pricing</div>
+  <h2 class="section-title">One Price.<br><em>Everything</em> Included.</h2>
+  <p class="section-sub" style="margin:0 auto 60px;">No tricks. No tiers. $4.99 a month gets you every game, every filter, every new release.</p>
+  <div class="divider"></div>
+  <div class="pricing-wrap">
+    <div class="price-card">
+      <div class="price-tier">Free Preview</div>
+      <div class="price-amount"><span></span>0<small>/mo</small></div>
+      <p class="price-desc">Try before you subscribe. No credit card needed.</p>
+      <ul class="price-features">
+        <li class="active">3 Games to try</li>
+        <li class="active">5 Camera filters</li>
+        <li class="active">Global leaderboards</li>
+        <li>All 13+ games</li>
+        <li>All 34+ filters</li>
+        <li>New releases monthly</li>
+      </ul>
+      <a href="#" class="btn-secondary" style="width:100%;text-align:center;display:block;">Play Free</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-featured-badge">Most Popular</div>
+      <div class="price-tier">Premium</div>
+      <div class="price-amount" style="background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+        <span>$</span>4.99<small>/mo</small>
+      </div>
+      <p class="price-desc">Everything. Every game. Every filter. Every new drop.</p>
+      <ul class="price-features">
+        <li class="active">All 13+ games</li>
+        <li class="active">All 34+ film filters</li>
+        <li class="active">New games monthly</li>
+        <li class="active">New filter packs monthly</li>
+        <li class="active">Global leaderboards</li>
+        <li class="active">Cancel anytime</li>
+      </ul>
+      <a href="#" class="btn-primary" style="width:100%;text-align:center;display:block;">Join for $4.99 / month</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">fab.games</div>
+  <div class="footer-tagline">"The world's most fabulous games & filters"</div>
+  <div class="footer-links">
+    <a href="#games">Games</a>
+    <a href="#filters">Filters</a>
+    <a href="#world">Coming Soon</a>
+    <a href="#pricing">Pricing</a>
+    <a href="https://todayinhawaii.com">Today in Hawaii</a>
+  </div>
+  <div class="footer-copy">© 2026 fab.games — All rights reserved</div>
+</footer>
+
+<script>
+// ── CURSOR ────────────────────────────────────────
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.width='16px';cursor.style.height='16px';
+    ring.style.width='60px';ring.style.height='60px';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.width='8px';cursor.style.height='8px';
+    ring.style.width='36px';ring.style.height='36px';
+  });
+});
+
+// ── NAV SCROLL ────────────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// ── GAMES DATA ────────────────────────────────────
+const GAMES=[
+  {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',desc:'Flip the full 52-card deck across 2 rounds. Find every pair to win.',href:'/dolphins',color:'rgba(34,211,238,0.12)'},
+  {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",desc:'Stack the lava rocks, trigger eruptions. Hawaii\'s own Tetris.',href:'/lava',color:'rgba(255,60,0,0.12)'},
+  {emoji:'🐢',cat:'Strategy · AI',title:'Turtle Checkers',desc:'Classic checkers with Hawaiian sea turtles. Beat the AI.',href:'/turtles',color:'rgba(34,197,94,0.12)'},
+  {emoji:'♛',cat:'Strategy · AI',title:'Mermaid Chess',desc:'Full chess vs AI. 4 difficulty levels. Stunning ocean backdrop.',href:'/chess',color:'rgba(148,163,184,0.12)'},
+  {emoji:'🌺',cat:'Trivia · Knowledge',title:'Hawaii Trivia',desc:'222 questions about the islands. How well do you know Hawaii?',href:'/trivia',color:'rgba(251,191,36,0.12)'},
+  {emoji:'🧠',cat:'Memory · Speed',title:'Aloha Memory',desc:'222 Hawaiian memory challenges. Train your brain.',href:'/memorygame',color:'rgba(255,100,200,0.12)'},
+  {emoji:'🔤',cat:'Word · Puzzle',title:'Hawaii Word Search',desc:'222 Hawaiian word puzzles. Find them all.',href:'/wordsearch',color:'rgba(167,139,250,0.12)'},
+  {emoji:'🎰',cat:'Word · Strategy',title:'Aloha Letters',desc:'148,000+ word dictionary. Build the highest score.',href:'/scrabble',color:'rgba(255,200,0,0.12)'},
+  {emoji:'🎈',cat:'Action · Fun',title:'Pop That Balloon!',desc:'Pop every balloon before time runs out!',href:'/balloons',color:'rgba(255,105,180,0.12)'},
+  {emoji:'🔮',cat:'Fortune · Fun',title:'Fortune Roulette',desc:'222 unique fortunes. Spin the wheel of destiny.',href:'/fortune',color:'rgba(155,89,182,0.12)'},
+  {emoji:'🎭',cat:'Personality · Fun',title:'Who Are You?',desc:'222 wild personalities. Which one are you today?',href:'/humor',color:'rgba(255,80,80,0.12)'},
+  {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists Factory',desc:'Mix infinite colour combinations. Create your masterpiece.',href:'/slime',color:'rgba(0,220,80,0.12)'},
+  {emoji:'📷',cat:'Camera · Filter',title:'Vintage Camera',desc:'34 film filters from Hawaii\'s golden eras. Capture time.',href:'/camera',color:'rgba(212,168,67,0.12)'},
+];
+
+const grid=document.getElementById('gamesGrid');
+GAMES.forEach(g=>{
+  const card=document.createElement('a');
+  card.href=g.href;
+  card.className='game-card';
+  card.style.cssText='text-decoration:none;';
+  card.innerHTML=`
+    <div class="game-card-bg" style="background:${g.color};">${g.emoji}</div>
+    <div class="game-card-overlay">
+      <div class="game-card-cat">${g.cat}</div>
+      <div class="game-card-title">${g.title}</div>
+      <div class="game-card-desc">${g.desc}</div>
+      <div class="game-card-btn">Play Now →</div>
+    </div>
+    <div class="game-live-badge">Live</div>`;
+  grid.appendChild(card);
+});
+
+// ── FILTERS DATA ──────────────────────────────────
+const FILTERS=[
+  {era:'1920s',name:'The Duke',color:'#3d2b1a'},
+  {era:'1930s',name:'Royal Hawaiian Pink',color:'#2a1820'},
+  {era:'1930s',name:'Canoe Club',color:'#1a2218'},
+  {era:'1940s',name:'Coconut Wireless',color:'#1a1a1a'},
+  {era:'1940s',name:'Honolulu Swing',color:'#1a1208'},
+  {era:'1950s',name:'Kodachrome Waikiki',color:'#0a1a2a'},
+  {era:'1950s',name:'Diamond Head Chrome',color:'#0a1530'},
+  {era:'1960s',name:'Blue Hawaii',color:'#08152a'},
+  {era:'1960s',name:'Surf Rider',color:'#1a1508'},
+  {era:'1970s',name:"North Shore '74",color:'#1a1205'},
+  {era:'1970s',name:'Hibiscus Haze',color:'#1a0818'},
+  {era:'1980s',name:'Waikiki Neon',color:'#080818'},
+  {era:'1980s',name:'Island VHS',color:'#101018'},
+  {era:'1990s',name:'Disposable Aloha',color:'#1a1510'},
+  {era:'⭐ Bonus',name:'Chicken Skin Sunset',color:'#1a0800'},
+  {era:'⭐ Bonus',name:'Pau Hana',color:'#1a1205'},
+  {era:'⭐ Bonus',name:"Pele's Glow",color:'#150500'},
+  {era:'⭐ Bonus',name:'Da Kine Classic',color:'#0a1018'},
+];
+
+const fgrid=document.getElementById('filtersGrid');
+FILTERS.forEach(f=>{
+  const card=document.createElement('a');
+  card.href='/camera';
+  card.className='filter-card';
+  card.style.cssText='text-decoration:none;';
+  card.innerHTML=`
+    <div class="filter-card-inner" style="background:${f.color};">
+      <div class="filter-card-info">
+        <div class="filter-card-era">${f.era}</div>
+        <div class="filter-card-name">${f.name}</div>
+      </div>
+    </div>`;
+  fgrid.appendChild(card);
+});
+
+// ── SMOOTH SCROLL ─────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
 </body>
 </html>
