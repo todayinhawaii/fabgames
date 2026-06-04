@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — fab.games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Inter:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{--black:#070708;--gold:#c9a84c;--gold2:#e8c96a;--white:#f0efe8;--muted:rgba(240,239,232,0.5);--border:rgba(255,255,255,0.07);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:300;line-height:1.8;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.nav-back{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.nav-back:hover{color:var(--gold);}
+.hero{padding:120px 48px 80px;max-width:900px;margin:0 auto;text-align:center;}
+.badge{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+h1{font-family:'Cormorant Garamond',serif;font-size:clamp(42px,8vw,80px);font-weight:300;line-height:1.05;margin-bottom:24px;}
+h1 em{font-style:italic;color:var(--gold);}
+.hero-p{font-size:clamp(15px,2vw,18px);color:var(--muted);max-width:600px;margin:0 auto;line-height:1.9;}
+.divider{width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:60px auto;}
+.wrap{max-width:720px;margin:0 auto;padding:0 48px 100px;}
+h2{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:48px 0 16px;}
+p{font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.9;}
+.big-quote{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(24px,4vw,36px);font-weight:300;font-style:italic;
+  color:var(--white);line-height:1.4;
+  border-left:2px solid var(--gold);
+  padding:24px 0 24px 32px;
+  margin:48px 0;
+}
+a{color:var(--gold);text-decoration:none;}
+a:hover{text-decoration:underline;}
+.values{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px;margin:40px 0;}
+.value{padding:32px 24px;background:#0d0d0f;}
+.value-icon{font-size:28px;margin-bottom:12px;}
+.value-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.value-desc{font-size:13px;color:var(--muted);line-height:1.7;}
+footer{text-align:center;padding:40px;border-top:1px solid var(--border);font-size:11px;color:rgba(240,239,232,0.2);letter-spacing:1px;}
+@media(max-width:768px){nav{padding:16px 20px;}.hero{padding:80px 20px 60px;}.wrap{padding:0 20px 80px;}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">fab.games</a>
+  <a href="/" class="nav-back">← Back to Home</a>
+</nav>
+
+<div class="hero">
+  <div class="badge">— Our Story</div>
+  <h1>Built for the <em>Joy</em><br>of Playing</h1>
+  <p class="hero-p">fab.games was born in Hawaii with one simple idea — the world needs more fabulous games.</p>
+</div>
+
+<div class="wrap">
+  <div class="divider"></div>
+
+  <div class="big-quote">"We believe games should be beautiful, fun and something the whole family can enjoy — wherever in the world they are."</div>
+
+  <h2>How It Started</h2>
+  <p>It started with a love of Hawaii — the islands, the culture, the spirit of aloha. We wanted to build games that captured that magic and share it with the world.</p>
+  <p>What began as a small collection of Hawaiian-themed games quickly became something bigger — a vision for a global platform where every country, every culture and every era could be celebrated through play.</p>
+
+  <h2>What We Build</h2>
+  <p>We build games that are genuinely fun — not pay-to-win, not full of ads, not designed to trap you. Just pure, honest, addictive fun for the whole family.</p>
+  <p>We also build creative tools like Film Lab — our vintage camera that lets you see the world through the lens of a different era. Because creativity is just another form of play.</p>
+
+  <h2>Where We're Going</h2>
+  <p>Hawaii is just the beginning. We're building games and experiences inspired by the world's most extraordinary places — Tokyo, Paris, New York, Bali, the African savanna and beyond.</p>
+  <p>Every month something new arrives at fab.games. A new game, a new film collection, a new corner of the world to explore.</p>
+
+  <div class="values">
+    <div class="value">
+      <div class="value-icon">🎮</div>
+      <div class="value-title">Pure Fun</div>
+      <div class="value-desc">No ads. No pay-to-win. Just games that are genuinely fun.</div>
+    </div>
+    <div class="value">
+      <div class="value-icon">👨‍👩‍👧‍👦</div>
+      <div class="value-title">Family First</div>
+      <div class="value-desc">Everything we build is safe, wholesome and fun for all ages.</div>
+    </div>
+    <div class="value">
+      <div class="value-icon">🌍</div>
+      <div class="value-title">World Class</div>
+      <div class="value-desc">Inspired by the world's most extraordinary places and cultures.</div>
+    </div>
+    <div class="value">
+      <div class="value-icon">✨</div>
+      <div class="value-title">Always Fresh</div>
+      <div class="value-desc">New games and experiences added every single month.</div>
+    </div>
+  </div>
+
+  <h2>Say Hello</h2>
+  <p>We love hearing from players. Ideas, feedback, game requests — we read every single email. Drop us a line at <a href="mailto:fun@fab.games">fun@fab.games</a> and we'll write back!</p>
+
+  <div class="divider"></div>
+  <p style="font-size:13px;">Made with 🌺 in Hawaii — © 2026 fab.games</p>
+</div>
+
+<footer>© 2026 fab.games — All rights reserved</footer>
+</body>
+</html>
