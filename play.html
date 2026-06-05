@@ -269,6 +269,7 @@ footer{
   .hero{padding:40px 20px 30px;}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -298,35 +299,25 @@ footer{
 <footer>© 2026 fab.games — Made with 🌺 in Hawaii · <a href="/" style="color:var(--gold);text-decoration:none;">Home</a></footer>
 
 <script>
-// ── ACCESS CHECK ──────────────────────────────────
+// ── ACCESS CHECK via SUPABASE ─────────────────────
+let supabase;
 async function checkAccess(){
-  const email = localStorage.getItem('fabEmail');
-  if(!email){
-    window.location.href='/join';
-    return false;
-  }
   try{
-    const res = await fetch('/api/check-access',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email})
-    });
-    const data = await res.json();
-    if(!data.access){
-      window.location.href='/join';
-      return false;
+    const res = await fetch('/api/config');
+    const config = await res.json();
+    supabase = window.supabase.createClient(config.supabase_url, config.supabase_anon_key);
+    const { data:{ session } } = await supabase.auth.getSession();
+    if(!session){
+      window.location.href='/login';
+      return;
     }
-    // Show trial days remaining if on trial
-    if(data.status==='trial' && data.days_left<=5){
-      const bar = document.createElement('div');
-      bar.style.cssText='position:fixed;bottom:0;left:0;right:0;background:rgba(201,168,76,0.15);border-top:1px solid rgba(201,168,76,0.3);padding:12px;text-align:center;font-size:12px;color:var(--gold);z-index:999;letter-spacing:1px;';
-      bar.innerHTML=`⏰ Your free trial ends in <strong>${data.days_left} day${data.days_left===1?'':'s'}</strong> — <a href="/join?tab=paid" style="color:var(--gold2);font-weight:700;">Subscribe now to keep playing →</a>`;
-      document.body.appendChild(bar);
-    }
-    return true;
+    // Save name for welcome message
+    const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
+    localStorage.setItem('fabName', name);
+    localStorage.setItem('fabEmail', session.user.email);
   }catch(e){
-    // If server error let them in — don't punish for our mistake
-    return true;
+    // Server error — let them in
+    console.log('Auth check error:', e);
   }
 }
 checkAccess();
