@@ -326,7 +326,7 @@ const DATA = [
    benefits:['Builds strong bones','Fights anaemia with iron','Protects eyesight','Reduces blood pressure','Powerful anti-inflammatory'],
    fact:'Spinach has 483% of your daily Vitamin K in just 100g — the highest of any vegetable on Earth!'},
 
-  {name:'Kale',emoji:'🥗',type:'vegetable',color:'#166534',neon:'#4ade80',
+  {name:'Kale',emoji:'🍃',img:'kale.png',type:'vegetable',color:'#166534',neon:'#4ade80',
    score:98,
    nutrition:{
      'Vitamin K':'680% of your daily needs per 100g 🏆 #1 Absolute',
@@ -975,7 +975,18 @@ function renderCards(){
 
     const emoji = document.createElement('div');
     emoji.className = 'vcard-emoji';
-    emoji.textContent = d.emoji;
+    if(d.img){
+      const img = document.createElement('img');
+      img.src = d.img;
+      img.alt = d.name;
+      img.style.cssText='width:72px;height:72px;object-fit:cover;border-radius:50%;border:2px solid '+d.neon+';box-shadow:0 0 12px '+d.neon+';';
+      img.onerror = function(){ 
+        emoji.textContent = d.emoji; 
+      };
+      emoji.appendChild(img);
+    } else {
+      emoji.textContent = d.emoji;
+    }
 
     const name = document.createElement('div');
     name.className = 'vcard-name';
@@ -1029,7 +1040,18 @@ function filterCards(){
 let currentModalFood = null;
 function openModal(d){
   currentModalFood = d;
-  document.getElementById('mEmoji').textContent = d.emoji;
+  const mEmojiEl = document.getElementById('mEmoji');
+  if(d.img){
+    mEmojiEl.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = d.img;
+    img.alt = d.name;
+    img.style.cssText='width:100px;height:100px;object-fit:cover;border-radius:50%;border:3px solid '+d.neon+';box-shadow:0 0 20px '+d.neon+';display:block;margin:0 auto;';
+    mEmojiEl.appendChild(img);
+  } else {
+    mEmojiEl.innerHTML = '';
+    mEmojiEl.textContent = d.emoji;
+  }
   document.getElementById('mName').textContent = d.name;
   document.getElementById('mName').style.color = d.neon;
   document.getElementById('mType').textContent = d.type==='vegetable'?'🥦 Vegetable':'🍎 Fruit';
@@ -1438,7 +1460,7 @@ function buildRankings(){
      ]},
     {title:'🦴 Vitamin K Champions',color:'#a78bfa',
      items:[
-       {emoji:'🥗',name:'Kale',val:'680% of your daily needs per 100g',num:1,neon:'#4ade80'},
+       {emoji:'🍃',name:'Kale',val:'680% of your daily needs per 100g',num:1,neon:'#4ade80'},
        {emoji:'🌿',name:'Spinach',val:'483% of your daily needs per 100g',num:2,neon:'#86efac'},
        {emoji:'🥦',name:'Bruss. Sprouts',val:'177% of your daily needs per 100g',num:3,neon:'#4ade80'},
        {emoji:'🌱',name:'Asparagus',val:'57% of your daily needs per 100g',num:4,neon:'#86efac'},
@@ -1446,7 +1468,7 @@ function buildRankings(){
      ]},
     {title:'👁️ Vitamin A Champions',color:'#f97316',
      items:[
-       {emoji:'🥗',name:'Kale',val:'206% of your daily needs per 100g',num:1,neon:'#4ade80'},
+       {emoji:'🍃',name:'Kale',val:'206% of your daily needs per 100g',num:1,neon:'#4ade80'},
        {emoji:'🌿',name:'Spinach',val:'188% of your daily needs per 100g',num:2,neon:'#86efac'},
        {emoji:'🍠',name:'Sweet Potato',val:'283% of your daily needs per 100g',num:3,neon:'#fb923c'},
        {emoji:'🥕',name:'Carrot',val:'334% of your daily needs per 100g',num:4,neon:'#fb923c'},
@@ -1457,7 +1479,7 @@ function buildRankings(){
        {emoji:'🫛',name:'Peas',val:'5.4g per 100g',num:1,neon:'#86efac'},
        {emoji:'🌿',name:'Spinach',val:'2.9g per 100g',num:2,neon:'#4ade80'},
        {emoji:'🥦',name:'Broccoli',val:'2.8g per 100g',num:3,neon:'#22c55e'},
-       {emoji:'🥗',name:'Kale',val:'4.3g per 100g',num:4,neon:'#4ade80'},
+       {emoji:'🍃',name:'Kale',val:'4.3g per 100g',num:4,neon:'#4ade80'},
        {emoji:'🌽',name:'Corn',val:'3.4g per 100g',num:5,neon:'#fde047'},
      ]},
     {title:'🔥 Lowest Calories',color:'#818cf8',
