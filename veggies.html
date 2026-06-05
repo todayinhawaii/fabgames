@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🥕 Veggie & Fruit Bible — fab.games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;800&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#050506;--dark:#0d0d0f;--border:rgba(255,255,255,0.08);
+  --white:#f0efe8;--muted:rgba(240,239,232,0.5);
+  --gold:#c9a84c;--gold2:#e8c96a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* STARS */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.1;}50%{opacity:0.7;}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:rgba(5,5,6,0.97);border-bottom:1px solid rgba(201,168,76,0.2);backdrop-filter:blur(20px);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.nav-back{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;border:1px solid rgba(201,168,76,0.3);padding:6px 14px;border-radius:2px;transition:all 0.2s;}
+.nav-back:hover{color:var(--gold);border-color:var(--gold);}
+
+/* HERO */
+.hero{text-align:center;padding:50px 20px 30px;position:relative;z-index:2;}
+.hero-emoji{font-size:clamp(48px,8vw,72px);margin-bottom:12px;animation:bounce 2s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,72px);letter-spacing:4px;background:linear-gradient(135deg,#22c55e,#86efac,#22c55e);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:greenShimmer 3s ease infinite;margin-bottom:8px;}
+@keyframes greenShimmer{0%{background-position:0%;}100%{background-position:200%;}}
+.hero-sub{font-size:14px;color:var(--muted);margin-bottom:24px;}
+
+/* TAB SWITCHER */
+.tab-switch{display:flex;gap:3px;justify-content:center;margin-bottom:32px;background:rgba(255,255,255,0.04);padding:4px;border-radius:4px;max-width:400px;margin:0 auto 32px;}
+.tab-btn{flex:1;padding:12px;text-align:center;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-radius:3px;transition:all 0.2s;border:none;background:none;}
+.tab-btn.active{background:linear-gradient(135deg,var(--gold),#a87d2a);color:#000;}
+
+/* SEARCH */
+.search-wrap{max-width:500px;margin:0 auto 32px;padding:0 20px;position:relative;z-index:2;}
+.search-input{width:100%;padding:14px 20px 14px 44px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:99px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;}
+.search-input:focus{border-color:rgba(201,168,76,0.5);}
+.search-input::placeholder{color:rgba(240,239,232,0.25);}
+.search-icon{position:absolute;left:36px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;}
+
+/* FILTER PILLS */
+.filter-wrap{display:flex;gap:8px;overflow-x:auto;padding:0 20px 16px;scrollbar-width:none;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto;position:relative;z-index:2;}
+.filter-pill{flex-shrink:0;padding:6px 16px;border-radius:99px;font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;border:1px solid;transition:all 0.2s;text-transform:uppercase;}
+.filter-pill.active{color:#000;}
+
+/* CARDS GRID */
+.cards-section{position:relative;z-index:2;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:3px;max-width:1400px;margin:0 auto;padding:0 3px;}
+
+/* VEGGIE CARD */
+.vcard{
+  background:#0d0d10;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:4px;
+  padding:20px 14px 16px;
+  cursor:pointer;
+  transition:all 0.3s cubic-bezier(0.23,1,0.32,1);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+}
+.vcard::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.3s;}
+.vcard:hover{transform:translateY(-6px) scale(1.02);z-index:5;}
+.vcard:hover::before{opacity:1;}
+.vcard-emoji{font-size:48px;margin-bottom:10px;transition:transform 0.3s;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5));}
+.vcard:hover .vcard-emoji{transform:scale(1.2) rotate(5deg);}
+.vcard-name{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;padding:4px 10px;border-radius:3px;border:1px solid currentColor;animation:neonFlicker 3s ease-in-out infinite;}
+@keyframes neonFlicker{0%,18%,20%,52%,54%,100%{opacity:1;}19%,53%{opacity:0.6;}}
+.vcard-vitamins{font-size:10px;color:rgba(240,239,232,0.5);line-height:1.6;margin-bottom:8px;}
+.vcard-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid;margin-top:auto;}
+
+/* EXPANDED CARD MODAL */
+.modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;padding:20px;}
+.modal.show{display:flex;}
+.modal-card{background:#0d0d10;border-radius:8px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;padding:32px 28px;position:relative;border:1px solid rgba(255,255,255,0.1);}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;}
+.modal-emoji{font-size:64px;text-align:center;margin-bottom:16px;display:block;}
+.modal-name{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;text-align:center;margin-bottom:4px;}
+.modal-type{font-size:10px;letter-spacing:3px;text-transform:uppercase;text-align:center;margin-bottom:24px;}
+.modal-section{margin-bottom:20px;}
+.modal-section-title{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.modal-section-title::after{content:'';flex:1;height:1px;background:rgba(201,168,76,0.2);}
+.vitamin-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;font-size:11px;font-weight:600;margin:3px;border:1px solid;}
+.benefit-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--muted);padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);line-height:1.6;}
+.benefit-item::before{content:'→';color:var(--gold);flex-shrink:0;margin-top:1px;}
+.fun-fact{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:14px;font-size:13px;color:var(--muted);line-height:1.7;font-style:italic;}
+.quiz-this-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),#a87d2a);color:#000;border:none;border-radius:3px;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:16px;font-family:'Inter',sans-serif;transition:all 0.2s;}
+.quiz-this-btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(201,168,76,0.4);}
+
+/* QUIZ SECTION */
+.quiz-section{max-width:700px;margin:0 auto;padding:20px;position:relative;z-index:2;display:none;}
+.quiz-header{text-align:center;margin-bottom:32px;}
+.quiz-score{display:flex;gap:20px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;}
+.score-box{padding:12px 24px;background:#0d0d10;border:1px solid rgba(201,168,76,0.2);border-radius:4px;text-align:center;}
+.score-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);}
+.score-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.q-card{background:#0d0d10;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:28px;margin-bottom:20px;animation:slideIn 0.4s ease;}
+@keyframes slideIn{0%{opacity:0;transform:translateY(20px);}100%{opacity:1;transform:translateY(0);}}
+.q-type{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.q-emoji{font-size:48px;display:block;text-align:center;margin-bottom:16px;}
+.q-text{font-size:18px;font-weight:600;line-height:1.5;margin-bottom:24px;text-align:center;}
+.q-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.q-option{padding:14px 16px;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:4px;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s;text-align:center;}
+.q-option:hover{border-color:rgba(201,168,76,0.5);background:rgba(201,168,76,0.08);}
+.q-option.correct{background:rgba(34,197,94,0.15);border-color:#22c55e;color:#86efac;}
+.q-option.wrong{background:rgba(239,68,68,0.15);border-color:#ef4444;color:#fca5a5;}
+.tf-options{display:flex;gap:12px;}
+.tf-btn{flex:1;padding:18px;font-size:16px;font-weight:800;letter-spacing:2px;border:2px solid;border-radius:4px;cursor:pointer;transition:all 0.2s;background:none;font-family:'Inter',sans-serif;}
+.tf-true{color:#22c55e;border-color:#22c55e;}
+.tf-true:hover{background:rgba(34,197,94,0.15);}
+.tf-false{color:#ef4444;border-color:#ef4444;}
+.tf-false:hover{background:rgba(239,68,68,0.15);}
+.q-feedback{padding:16px;border-radius:4px;font-size:14px;line-height:1.7;margin-top:16px;display:none;}
+.q-feedback.correct{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#86efac;}
+.q-feedback.wrong{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;}
+.next-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),#a87d2a);color:#000;border:none;border-radius:3px;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:12px;display:none;font-family:'Inter',sans-serif;transition:all 0.2s;box-shadow:0 4px 0 #5a3d08;}
+.next-btn:hover{transform:translateY(-2px);}
+.next-btn:active{transform:translateY(3px);}
+
+/* Progress bar */
+.q-progress{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;margin-bottom:24px;overflow:hidden;}
+.q-progress-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width 0.4s ease;}
+
+footer{text-align:center;padding:40px 20px;font-size:11px;color:rgba(240,239,232,0.2);position:relative;z-index:2;}
+
+@media(max-width:600px){
+  .cards-grid{grid-template-columns:repeat(2,1fr);}
+  .q-options{grid-template-columns:1fr;}
+  nav{padding:12px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<nav>
+  <a href="/play" class="nav-back">← Games</a>
+  <a href="/" class="nav-logo">fab.games</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-emoji">🥕</div>
+  <div class="hero-title">Veggie & Fruit Bible</div>
+  <p class="hero-sub">Your complete guide to nature's greatest superfoods — learn, explore and get quizzed!!</p>
+  <div class="tab-switch">
+    <button class="tab-btn active" onclick="switchTab('cards')">📚 Browse Cards</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">🧠 Take Quiz</button>
+  </div>
+</div>
+
+<!-- CARDS TAB -->
+<div id="cardsTab">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="searchInput" type="text" placeholder="Search vegetables and fruits..." oninput="filterCards()">
+  </div>
+  <div class="filter-wrap" id="filterWrap"></div>
+  <div class="cards-section">
+    <div class="cards-grid" id="cardsGrid"></div>
+  </div>
+</div>
+
+<!-- QUIZ TAB -->
+<div class="quiz-section" id="quizTab">
+  <div class="quiz-header">
+    <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">— Test Your Knowledge</div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,6vw,52px);letter-spacing:3px;margin-bottom:4px;">Nutrition Quiz</h2>
+    <p style="font-size:13px;color:var(--muted);">Multiple choice & true/false — how much do you know??</p>
+  </div>
+  <div class="quiz-score">
+    <div class="score-box"><div class="score-num" id="scoreCorrect">0</div><div class="score-lbl">Correct</div></div>
+    <div class="score-box"><div class="score-num" id="scoreTotal">0</div><div class="score-lbl">Total</div></div>
+    <div class="score-box"><div class="score-num" id="scoreStreak">0</div><div class="score-lbl">Streak 🔥</div></div>
+  </div>
+  <div class="q-progress"><div class="q-progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div id="quizContainer"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal" onclick="closeModal(event)">
+  <div class="modal-card" id="modalCard">
+    <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    <span class="modal-emoji" id="mEmoji"></span>
+    <div class="modal-name" id="mName"></div>
+    <div class="modal-type" id="mType"></div>
+    <div class="modal-section">
+      <div class="modal-section-title">Vitamins & Minerals</div>
+      <div id="mVitamins"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Health Benefits</div>
+      <div id="mBenefits"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Fun Fact</div>
+      <div class="fun-fact" id="mFact"></div>
+    </div>
+    <button class="quiz-this-btn" onclick="closeModalBtn();switchTab('quiz')">🧠 Quiz Me On This!!</button>
+  </div>
+</div>
+
+<footer>© 2026 fab.games — Veggie & Fruit Bible 🥕🍎🌺</footer>
+
+<script>
+// ── STARS ──────────────────────────────────────
+const sw=document.getElementById('stars');
+for(let i=0;i<60;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=0.5+Math.random()*1.5;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;`;
+  sw.appendChild(s);
+}
+
+// ── DATA ────────────────────────────────────────
+const DATA = [
+  // VEGETABLES
+  {name:'Carrot',emoji:'🥕',type:'vegetable',color:'#f97316',neon:'#fb923c',
+   vitamins:['Vitamin A','Vitamin C','Vitamin K','Potassium','Biotin'],
+   benefits:['Improves eyesight and night vision','Boosts immune system','Promotes healthy skin and hair','Supports heart health','Aids digestion'],
+   fact:'Carrots were originally purple! Orange carrots were developed in the Netherlands in the 17th century.'},
+  {name:'Broccoli',emoji:'🥦',type:'vegetable',color:'#16a34a',neon:'#22c55e',
+   vitamins:['Vitamin C','Vitamin K','Folate','Potassium','Iron','Fibre'],
+   benefits:['Powerful cancer-fighting antioxidants','Strengthens bones','Boosts immune system','Supports heart health','Reduces inflammation'],
+   fact:'Broccoli contains more Vitamin C than an orange! It\'s one of the most nutritious vegetables on the planet.'},
+  {name:'Spinach',emoji:'🌿',type:'vegetable',color:'#15803d',neon:'#4ade80',
+   vitamins:['Vitamin A','Vitamin C','Vitamin K','Iron','Calcium','Magnesium'],
+   benefits:['Builds strong bones','Fights anaemia with iron','Protects eyesight','Reduces blood pressure','Powerful anti-inflammatory'],
+   fact:'Popeye was right! Spinach has extraordinary iron content and was used to treat iron deficiency in WWI soldiers.'},
+  {name:'Tomato',emoji:'🍅',type:'vegetable',color:'#dc2626',neon:'#f87171',
+   vitamins:['Vitamin C','Vitamin K','Potassium','Lycopene','Folate'],
+   benefits:['Lycopene reduces cancer risk','Supports heart health','Protects skin from UV damage','Improves vision','Strengthens immune system'],
+   fact:'Tomatoes are technically a fruit but legally classified as a vegetable in the USA since an 1893 Supreme Court ruling!'},
+  {name:'Garlic',emoji:'🧄',type:'vegetable',color:'#d97706',neon:'#fbbf24',
+   vitamins:['Vitamin C','Vitamin B6','Manganese','Selenium','Allicin'],
+   benefits:['Powerful antibiotic properties','Reduces blood pressure','Lowers cholesterol','Boosts immune system','Fights the common cold'],
+   fact:'Garlic has been used as medicine for over 5,000 years. Ancient Egyptians gave it to pyramid builders for strength!'},
+  {name:'Onion',emoji:'🧅',type:'vegetable',color:'#a16207',neon:'#eab308',
+   vitamins:['Vitamin C','Vitamin B6','Folate','Quercetin','Potassium'],
+   benefits:['Powerful antioxidant quercetin','Reduces inflammation','Supports bone health','Fights bacteria','Regulates blood sugar'],
+   fact:'Onions make you cry because cutting them releases a gas that reacts with the water in your eyes to form sulphuric acid!'},
+  {name:'Sweet Potato',emoji:'🍠',type:'vegetable',color:'#ea580c',neon:'#fb923c',
+   vitamins:['Vitamin A','Vitamin C','Potassium','Manganese','Fibre'],
+   benefits:['Exceptionally high in Vitamin A','Regulates blood sugar','Promotes gut health','Boosts immune system','Supports healthy vision'],
+   fact:'Sweet potatoes are one of the oldest vegetables known to humans — evidence of their cultivation dates back 10,000 years!'},
+  {name:'Bell Pepper',emoji:'🫑',type:'vegetable',color:'#16a34a',neon:'#86efac',
+   vitamins:['Vitamin C','Vitamin B6','Vitamin A','Folate','Potassium'],
+   benefits:['Highest Vitamin C of any vegetable','Supports eye health','Fights anemia','Reduces inflammation','Boosts metabolism'],
+   fact:'Red bell peppers have 11x more beta-carotene and 3x more Vitamin C than green bell peppers!'},
+  {name:'Cucumber',emoji:'🥒',type:'vegetable',color:'#15803d',neon:'#4ade80',
+   vitamins:['Vitamin K','Vitamin C','Magnesium','Potassium','Silica'],
+   benefits:['96% water — supremely hydrating','Reduces bloating','Cools and soothes skin','Supports kidney health','Freshens breath'],
+   fact:'Cucumbers are 96% water — placing one on each eye really does reduce puffiness due to their cooling silica content!'},
+  {name:'Cauliflower',emoji:'🥛',type:'vegetable',color:'#e2e8f0',neon:'#f8fafc',
+   vitamins:['Vitamin C','Vitamin K','Folate','Choline','Fibre'],
+   benefits:['Fights cancer with sulforaphane','Supports brain health via choline','Reduces inflammation','Aids weight loss','Strengthens immune system'],
+   fact:'Cauliflower comes in purple, orange, and green varieties — each with slightly different nutritional profiles!'},
+  {name:'Zucchini',emoji:'🥬',type:'vegetable',color:'#16a34a',neon:'#22c55e',
+   vitamins:['Vitamin C','Vitamin B6','Potassium','Manganese','Folate'],
+   benefits:['Very low in calories','Supports heart health','Aids digestion','Improves vision','Boosts energy levels'],
+   fact:'Zucchini is technically a fruit botanically — it develops from a flower. Culinarily, it\'s treated as a vegetable!'},
+  {name:'Kale',emoji:'🥗',type:'vegetable',color:'#166534',neon:'#4ade80',
+   vitamins:['Vitamin A','Vitamin C','Vitamin K','Calcium','Iron','Omega-3'],
+   benefits:['Most nutrient-dense food on Earth','Powerful antioxidant','Lowers cholesterol','Supports bone health','Fights cancer'],
+   fact:'One cup of kale provides more Vitamin C than an orange and more Vitamin K than almost any other food!'},
+  {name:'Asparagus',emoji:'🌱',type:'vegetable',color:'#15803d',neon:'#86efac',
+   vitamins:['Vitamin K','Folate','Vitamin C','Vitamin E','Chromium'],
+   benefits:['Prebiotic for gut health','Essential folate for pregnancy','Natural diuretic','Fights ageing','Supports brain function'],
+   fact:'Asparagus grows so fast you can actually watch it grow — up to 10 inches in a single day in ideal conditions!'},
+  {name:'Beetroot',emoji:'🟣',type:'vegetable',color:'#9333ea',neon:'#c084fc',
+   vitamins:['Folate','Manganese','Potassium','Iron','Nitrates','Vitamin C'],
+   benefits:['Dramatically lowers blood pressure','Boosts athletic stamina','Supports liver detox','Fights inflammation','Improves brain blood flow'],
+   fact:'Beetroot juice can improve athletic performance by up to 16% — many Olympic athletes use it as a natural performance booster!'},
+  {name:'Pumpkin',emoji:'🎃',type:'vegetable',color:'#ea580c',neon:'#fb923c',
+   vitamins:['Vitamin A','Vitamin C','Potassium','Copper','Manganese'],
+   benefits:['Exceptional eye health support','Boosts immunity dramatically','Protects skin','Supports heart health','Aids weight loss'],
+   fact:'Pumpkin seeds are as nutritious as the flesh — packed with zinc, magnesium, and healthy fats!'},
+  {name:'Corn',emoji:'🌽',type:'vegetable',color:'#eab308',neon:'#fde047',
+   vitamins:['Vitamin B1','Vitamin B5','Folate','Phosphorus','Manganese'],
+   benefits:['High energy carbohydrate','Supports digestive health','Protects eye health','Promotes healthy skin','Boosts brain function'],
+   fact:'Corn is the most produced crop in the world. An ear of corn always has an even number of rows — usually 16!'},
+  {name:'Celery',emoji:'🌿',type:'vegetable',color:'#15803d',neon:'#4ade80',
+   vitamins:['Vitamin K','Vitamin C','Potassium','Folate','Phthalides'],
+   benefits:['Naturally lowers blood pressure','Anti-inflammatory properties','Aids digestion','Hydrates the body','Reduces cholesterol'],
+   fact:'Celery requires more calories to eat and digest than it actually contains — making it a true negative-calorie food!'},
+  {name:'Leek',emoji:'🧅',type:'vegetable',color:'#16a34a',neon:'#86efac',
+   vitamins:['Vitamin K','Vitamin A','Vitamin C','Folate','Manganese'],
+   benefits:['Supports heart health','Bone strengthening Vitamin K','Powerful antioxidants','Promotes healthy gut','Reduces cancer risk'],
+   fact:'Leeks are the national symbol of Wales — Welsh soldiers wore them in their hats to identify friends from enemies in battle!'},
+  {name:'Artichoke',emoji:'🌹',type:'vegetable',color:'#16a34a',neon:'#22c55e',
+   vitamins:['Vitamin C','Vitamin K','Folate','Magnesium','Cynarin'],
+   benefits:['Highest antioxidant of all vegetables','Supports liver function','Lowers cholesterol','Aids digestion dramatically','Regulates blood sugar'],
+   fact:'Artichokes are actually the flower buds of a thistle plant. If left unharvested, they bloom into beautiful purple flowers!'},
+  {name:'Brussels Sprout',emoji:'🥦',type:'vegetable',color:'#15803d',neon:'#4ade80',
+   vitamins:['Vitamin C','Vitamin K','Folate','Fibre','Glucosinolates'],
+   benefits:['Powerful cancer prevention','Strengthens immune system','Supports bone health','Aids digestive health','Reduces inflammation'],
+   fact:'Brussels sprouts taste bitter to some people due to a genetic variation — about 25% of people are "supertasters" who find them very bitter!'},
+  {name:'Mushroom',emoji:'🍄',type:'vegetable',color:'#92400e',neon:'#d97706',
+   vitamins:['Vitamin D','Vitamin B12','Selenium','Copper','Beta-Glucans'],
+   benefits:['Only plant source of Vitamin D','Powerful immune booster','Fights cancer cells','Supports brain health','Reduces inflammation'],
+   fact:'Mushrooms are more closely related to animals than plants! They share DNA with humans and can get a suntan when exposed to UV light!'},
+  {name:'Avocado',emoji:'🥑',type:'fruit',color:'#15803d',neon:'#4ade80',
+   vitamins:['Healthy Fats','Potassium','Vitamin K','Vitamin B5','Vitamin B6'],
+   benefits:['Loaded with heart-healthy fats','More potassium than bananas','Reduces cholesterol','Supports eye health','Fights arthritis'],
+   fact:'Avocados are technically berries! They contain more potassium than bananas and are one of the fattiest plant foods on Earth!'},
+  {name:'Peas',emoji:'🫛',type:'vegetable',color:'#16a34a',neon:'#86efac',
+   vitamins:['Vitamin C','Vitamin K','Vitamin A','Thiamine','Manganese'],
+   benefits:['High plant-based protein','Supports heart health','Controls blood sugar','Promotes gut health','Boosts immune system'],
+   fact:'Frozen peas are often MORE nutritious than fresh ones — they\'re frozen within hours of picking, locking in all their nutrients!'},
+
+  // FRUITS
+  {name:'Apple',emoji:'🍎',type:'fruit',color:'#dc2626',neon:'#f87171',
+   vitamins:['Vitamin C','Fibre','Quercetin','Catechin','Potassium'],
+   benefits:['Reduces risk of Type 2 diabetes','Promotes gut health','Lowers cholesterol','Protects heart','May prevent Alzheimer\'s'],
+   fact:'An apple a day really does keep the doctor away! The quercetin in apples is one of the most powerful antioxidants known to science.'},
+  {name:'Banana',emoji:'🍌',type:'fruit',color:'#eab308',neon:'#fde047',
+   vitamins:['Vitamin B6','Vitamin C','Potassium','Magnesium','Fibre'],
+   benefits:['Instant natural energy boost','Reduces muscle cramps','Supports brain function','Improves mood via serotonin','Aids digestion'],
+   fact:'Bananas are radioactive! They contain a tiny amount of potassium-40. You\'d need to eat 10 million bananas to get a dangerous dose!'},
+  {name:'Orange',emoji:'🍊',type:'fruit',color:'#ea580c',neon:'#fb923c',
+   vitamins:['Vitamin C','Fibre','Folate','Potassium','Thiamine'],
+   benefits:['One orange = 100% daily Vitamin C','Strengthens immune system','Reduces kidney stone risk','Protects skin','Supports heart health'],
+   fact:'The orange fruit was named after the colour — not the other way around! Before oranges arrived in Europe, there was no word for the colour orange!'},
+  {name:'Strawberry',emoji:'🍓',type:'fruit',color:'#dc2626',neon:'#f87171',
+   vitamins:['Vitamin C','Manganese','Folate','Potassium','Anthocyanins'],
+   benefits:['Highest Vitamin C of all berries','Whitens teeth naturally','Reduces blood pressure','Fights inflammation','Boosts HDL cholesterol'],
+   fact:'Strawberries are the only fruit with seeds on the outside. A single strawberry has about 200 seeds on its surface!'},
+  {name:'Mango',emoji:'🥭',type:'fruit',color:'#f59e0b',neon:'#fbbf24',
+   vitamins:['Vitamin C','Vitamin A','Vitamin B6','Folate','Copper'],
+   benefits:['Boosts immunity powerfully','Improves digestion','Supports eye health','Fights cancer','Promotes healthy skin'],
+   fact:'Mango is the most consumed fruit in the world! Over half the world\'s tropical fruits are mangoes. India produces 50% of the world\'s supply!'},
+  {name:'Blueberry',emoji:'🫐',type:'fruit',color:'#4f46e5',neon:'#818cf8',
+   vitamins:['Vitamin C','Vitamin K','Manganese','Anthocyanins','Fibre'],
+   benefits:['Highest antioxidant of all fruits','Improves memory and brain function','Reduces DNA damage','Lowers blood pressure','Fights ageing'],
+   fact:'Blueberries are one of very few naturally blue foods. The compound that gives them colour is one of the most powerful antioxidants known!'},
+  {name:'Grapes',emoji:'🍇',type:'fruit',color:'#7c3aed',neon:'#a78bfa',
+   vitamins:['Vitamin C','Vitamin K','Resveratrol','Copper','Thiamine'],
+   benefits:['Resveratrol fights cancer and ageing','Reduces heart disease risk','Fights inflammation','Supports eye health','Improves sleep quality'],
+   fact:'Resveratrol in red grapes is linked to longevity. The people of Sardinia Italy who drink local grape wine live exceptionally long lives!'},
+  {name:'Pineapple',emoji:'🍍',type:'fruit',color:'#eab308',neon:'#fde047',
+   vitamins:['Vitamin C','Manganese','Bromelain','Vitamin B6','Copper'],
+   benefits:['Bromelain reduces inflammation powerfully','Boosts immunity','Speeds wound healing','Aids digestion of proteins','Fights cancer cells'],
+   fact:'Pineapples contain bromelain which actually digests the proteins in your mouth — that\'s why your tongue tingles when you eat too much!'},
+  {name:'Watermelon',emoji:'🍉',type:'fruit',color:'#dc2626',neon:'#f87171',
+   vitamins:['Vitamin A','Vitamin C','Lycopene','Potassium','Citrulline'],
+   benefits:['92% water — ultimate hydration','Lycopene reduces cancer risk','Reduces muscle soreness','Supports heart health','Natural diuretic'],
+   fact:'Watermelon is actually a vegetable! It belongs to the same family as cucumber and pumpkin. Every part including the rind is edible!'},
+  {name:'Lemon',emoji:'🍋',type:'fruit',color:'#eab308',neon:'#fde047',
+   vitamins:['Vitamin C','Potassium','Vitamin B6','Folate','Limonene'],
+   benefits:['Alkalises the body despite acidity','Supports kidney stone prevention','Enhances iron absorption','Aids digestion','Promotes glowing skin'],
+   fact:'Lemons are a hybrid of sour orange and citron. They don\'t exist in nature — every lemon tree in the world was created by humans!'},
+  {name:'Kiwi',emoji:'🥝',type:'fruit',color:'#16a34a',neon:'#4ade80',
+   vitamins:['Vitamin C','Vitamin K','Vitamin E','Potassium','Folate'],
+   benefits:['More Vitamin C than oranges','Improves sleep quality significantly','Supports heart health','Aids digestion via actinidin','Boosts immunity'],
+   fact:'Eating 2 kiwis before bed improves sleep quality by 42%! They contain serotonin which regulates your sleep cycle naturally.'},
+  {name:'Pomegranate',emoji:'🍎',type:'fruit',color:'#9f1239',neon:'#fb7185',
+   vitamins:['Vitamin C','Vitamin K','Folate','Potassium','Punicalagins'],
+   benefits:['Punicalagins most powerful antioxidant known','Fights prostate cancer','Reduces blood pressure','Fights arthritis','Improves memory'],
+   fact:'Pomegranate juice has 3x more antioxidants than red wine and green tea! It\'s one of the healthiest substances on Earth.'},
+  {name:'Cherry',emoji:'🍒',type:'fruit',color:'#be123c',neon:'#fb7185',
+   vitamins:['Vitamin C','Potassium','Melatonin','Anthocyanins','Fibre'],
+   benefits:['Natural melatonin improves sleep','Reduces muscle pain after exercise','Fights gout','Lowers inflammation','Supports heart health'],
+   fact:'Tart cherries are one of the only foods that naturally contain melatonin — athletes use cherry juice to reduce muscle soreness by 22%!'},
+  {name:'Peach',emoji:'🍑',type:'fruit',color:'#fb923c',neon:'#fdba74',
+   vitamins:['Vitamin C','Vitamin A','Potassium','Niacin','Fibre'],
+   benefits:['Promotes eye health','Supports skin health via antioxidants','Reduces allergy symptoms','Aids digestion','Boosts immunity'],
+   fact:'Peaches are members of the rose family! They\'re related to almonds — the pit of a peach contains a seed similar to an almond.'},
+  {name:'Pear',emoji:'🍐',type:'fruit',color:'#84cc16',neon:'#bef264',
+   vitamins:['Vitamin C','Vitamin K','Potassium','Copper','Fibre'],
+   benefits:['Highest fibre content of all fruits','Supports gut microbiome','Reduces Type 2 diabetes risk','Anti-inflammatory','Promotes heart health'],
+   fact:'Pears are one of the few fruits that ripen BETTER off the tree. They are intentionally picked unripe and stored to develop perfect flavour!'},
+  {name:'Papaya',emoji:'🍈',type:'fruit',color:'#f97316',neon:'#fb923c',
+   vitamins:['Vitamin C','Vitamin A','Folate','Papain','Potassium'],
+   benefits:['Papain enzyme aids protein digestion','Reduces inflammation','Protects against cancer','Improves heart health','Supports eye health'],
+   fact:'Papaya was called "the fruit of the angels" by Christopher Columbus. The enzyme papain in papaya is used to tenderize meat commercially!'},
+  {name:'Fig',emoji:'🌸',type:'fruit',color:'#7c3aed',neon:'#a78bfa',
+   vitamins:['Potassium','Calcium','Magnesium','Iron','Vitamin B6'],
+   benefits:['Highest calcium of any fruit','Promotes bone health','Regulates blood sugar','Supports digestive health','Reduces blood pressure'],
+   fact:'Figs are not actually a fruit — they\'re an inverted flower! What you eat is technically a syconium containing hundreds of tiny flowers inside.'},
+  {name:'Raspberry',emoji:'🫐',type:'fruit',color:'#e11d48',neon:'#fb7185',
+   vitamins:['Vitamin C','Manganese','Vitamin K','Magnesium','Ellagic Acid'],
+   benefits:['Ellagic acid fights cancer','Reduces belly fat','Stabilises blood sugar','Boosts immune system','Anti-ageing properties'],
+   fact:'Raspberries are not actually berries botanically — they\'re aggregate fruits made up of many tiny drupelets, each containing one seed!'},
+  {name:'Coconut',emoji:'🥥',type:'fruit',color:'#78350f',neon:'#d97706',
+   vitamins:['MCT Fats','Iron','Copper','Manganese','Selenium'],
+   benefits:['MCTs boost brain function and energy','Kills harmful microorganisms','Reduces hunger and food intake','Improves cholesterol','Supports thyroid'],
+   fact:'A coconut can float in the ocean for months and remain viable for germination — they\'ve colonised tropical islands across the Pacific this way!'},
+  {name:'Passion Fruit',emoji:'🌺',type:'fruit',color:'#7c3aed',neon:'#c084fc',
+   vitamins:['Vitamin A','Vitamin C','Iron','Potassium','Piceatannol'],
+   benefits:['Reduces anxiety and improves sleep','Supports immune system','Promotes healthy skin','Improves insulin sensitivity','Fights cancer'],
+   fact:'Passion fruit gets its name from Christian missionaries who saw the flower as symbolising the Passion of Christ — not from the fruit\'s taste!'},
+  {name:'Dragon Fruit',emoji:'🍓',type:'fruit',color:'#e11d48',neon:'#fb7185',
+   vitamins:['Vitamin C','Iron','Magnesium','Fibre','Lycopene'],
+   benefits:['Prebiotic feeds good gut bacteria','Strengthens immune system','Boosts iron absorption','Reduces cancer risk','Promotes healthy skin'],
+   fact:'Dragon fruit flowers only bloom at night and are pollinated by bats and moths! Each flower lasts just one single night.'},
+  {name:'Grapefruit',emoji:'🍊',type:'fruit',color:'#f97316',neon:'#fb923c',
+   vitamins:['Vitamin C','Vitamin A','Potassium','Lycopene','Naringenin'],
+   benefits:['Aids weight loss significantly','Reduces insulin resistance','Fights kidney stones','Powerful immune booster','Reduces cholesterol'],
+   fact:'Grapefruit interacts with over 85 medications! The compound naringenin blocks enzymes that break down drugs — always check with your doctor!'},
+  {name:'Plum',emoji:'🫐',type:'fruit',color:'#581c87',neon:'#a855f7',
+   vitamins:['Vitamin C','Vitamin K','Vitamin A','Potassium','Sorbitol'],
+   benefits:['Prevents constipation naturally','Reduces risk of osteoporosis','Improves memory','Lowers blood sugar','Fights cell damage'],
+   fact:'Prunes are simply dried plums! They contain more than twice the nutrients by weight of fresh plums and have been used as medicine for centuries.'},
+  {name:'Lime',emoji:'🍈',type:'fruit',color:'#16a34a',neon:'#4ade80',
+   vitamins:['Vitamin C','Iron','Calcium','Vitamin B6','Folate'],
+   benefits:['Prevents scurvy effectively','Boosts iron absorption','Promotes glowing skin','Supports weight loss','Strengthens immune system'],
+   fact:'British sailors were called "Limeys" because the Royal Navy gave them limes to prevent scurvy on long voyages — a practice started in 1795!'},
+  {name:'Jackfruit',emoji:'🍈',type:'fruit',color:'#eab308',neon:'#fde047',
+   vitamins:['Vitamin C','Vitamin B6','Potassium','Magnesium','Fibre'],
+   benefits:['Excellent meat substitute','Regulates blood sugar','Prevents anaemia','Supports heart health','Boosts immunity'],
+   fact:'Jackfruit is the world\'s largest tree fruit — it can weigh up to 55kg! Its meaty texture makes it popular as a vegan pulled-pork substitute!'},
+  {name:'Guava',emoji:'🍈',type:'fruit',color:'#16a34a',neon:'#4ade80',
+   vitamins:['Vitamin C','Lycopene','Potassium','Folate','Fibre'],
+   benefits:['5x more Vitamin C than oranges','Reduces cancer risk dramatically','Lowers blood pressure','Improves digestion','Supports heart health'],
+   fact:'One guava contains 4x more fibre than a pineapple and more Vitamin C than the daily recommended intake — it\'s a tropical superfood!'},
+  {name:'Lychee',emoji:'🍒',type:'fruit',color:'#e11d48',neon:'#fb7185',
+   vitamins:['Vitamin C','Copper','Potassium','Epicatechin','Rutin'],
+   benefits:['Powerful antioxidant','Supports heart health','Boosts immune system','Fights liver disease','Promotes healthy skin'],
+   fact:'Lychees contain oligonol — a unique compound that improves blood flow, reduces fat storage, and has powerful anti-ageing properties!'},
+];
+
+// ── CATEGORIES ──────────────────────────────────
+const CATEGORIES = [
+  {label:'All',value:'all',color:'#c9a84c'},
+  {label:'🥦 Vegetables',value:'vegetable',color:'#22c55e'},
+  {label:'🍎 Fruits',value:'fruit',color:'#f87171'},
+];
+
+let currentFilter = 'all';
+let currentSearch = '';
+
+// ── BUILD FILTER PILLS ───────────────────────────
+const filterWrap = document.getElementById('filterWrap');
+CATEGORIES.forEach(cat=>{
+  const pill = document.createElement('div');
+  pill.className = 'filter-pill' + (cat.value==='all'?' active':'');
+  pill.textContent = cat.label;
+  pill.style.cssText = `color:${cat.color};border-color:${cat.color};`;
+  if(cat.value==='all') pill.style.background = 'rgba(201,168,76,0.15)';
+  pill.onclick = ()=>{
+    currentFilter = cat.value;
+    document.querySelectorAll('.filter-pill').forEach(p=>{
+      p.classList.remove('active');
+      p.style.background='';
+    });
+    pill.classList.add('active');
+    pill.style.background = `rgba(${hexToRgb(cat.color)},0.15)`;
+    renderCards();
+  };
+  filterWrap.appendChild(pill);
+});
+
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+// ── RENDER CARDS ─────────────────────────────────
+function renderCards(){
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '';
+  const filtered = DATA.filter(d=>{
+    const matchCat = currentFilter==='all' || d.type===currentFilter;
+    const matchSearch = currentSearch==='' ||
+      d.name.toLowerCase().includes(currentSearch) ||
+      d.vitamins.some(v=>v.toLowerCase().includes(currentSearch)) ||
+      d.benefits.some(b=>b.toLowerCase().includes(currentSearch));
+    return matchCat && matchSearch;
+  });
+
+  filtered.forEach((d,i)=>{
+    const card = document.createElement('div');
+    card.className = 'vcard';
+    card.style.animationDelay = (i*0.03)+'s';
+    card.style.setProperty('--hover-color', d.color);
+
+    const emoji = document.createElement('div');
+    emoji.className = 'vcard-emoji';
+    emoji.textContent = d.emoji;
+
+    const name = document.createElement('div');
+    name.className = 'vcard-name';
+    name.textContent = d.name;
+    name.style.color = d.neon;
+    name.style.borderColor = d.neon;
+    name.style.background = `rgba(${hexToRgb(d.color)},0.1)`;
+    name.style.textShadow = `0 0 8px ${d.neon}`;
+    name.style.animationDelay = (Math.random()*3)+'s';
+
+    const vitamins = document.createElement('div');
+    vitamins.className = 'vcard-vitamins';
+    vitamins.textContent = d.vitamins.slice(0,3).join(' · ');
+
+    const tag = document.createElement('div');
+    tag.className = 'vcard-tag';
+    tag.textContent = d.type === 'vegetable' ? '🥦 Vegetable' : '🍎 Fruit';
+    tag.style.color = d.type==='vegetable'?'#22c55e':'#f87171';
+    tag.style.borderColor = d.type==='vegetable'?'rgba(34,197,94,0.3)':'rgba(248,113,113,0.3)';
+
+    card.appendChild(emoji);
+    card.appendChild(name);
+    card.appendChild(vitamins);
+    card.appendChild(tag);
+    card.onclick = ()=> openModal(d);
+
+    grid.appendChild(card);
+  });
+}
+renderCards();
+
+function filterCards(){
+  currentSearch = document.getElementById('searchInput').value.toLowerCase();
+  renderCards();
+}
+
+// ── MODAL ────────────────────────────────────────
+function openModal(d){
+  document.getElementById('mEmoji').textContent = d.emoji;
+  document.getElementById('mName').textContent = d.name;
+  document.getElementById('mName').style.color = d.neon;
+  document.getElementById('mType').textContent = d.type==='vegetable'?'🥦 Vegetable':'🍎 Fruit';
+  document.getElementById('mType').style.color = d.neon;
+
+  const vDiv = document.getElementById('mVitamins');
+  vDiv.innerHTML = '';
+  d.vitamins.forEach(v=>{
+    const badge = document.createElement('span');
+    badge.className = 'vitamin-badge';
+    badge.textContent = v;
+    badge.style.color = d.neon;
+    badge.style.borderColor = `rgba(${hexToRgb(d.color)},0.4)`;
+    badge.style.background = `rgba(${hexToRgb(d.color)},0.1)`;
+    vDiv.appendChild(badge);
+  });
+
+  const bDiv = document.getElementById('mBenefits');
+  bDiv.innerHTML = '';
+  d.benefits.forEach(b=>{
+    const item = document.createElement('div');
+    item.className = 'benefit-item';
+    item.textContent = b;
+    bDiv.appendChild(item);
+  });
+
+  document.getElementById('mFact').textContent = d.fact;
+  document.getElementById('modal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(e){
+  if(e.target.id==='modal') closeModalBtn();
+}
+function closeModalBtn(){
+  document.getElementById('modal').classList.remove('show');
+  document.body.style.overflow='';
+}
+
+// ── QUIZ ─────────────────────────────────────────
+let quizScore=0, quizTotal=0, quizStreak=0, quizAnswered=false;
+const QUIZ_QUESTIONS = [];
+
+// Generate multiple choice questions
+DATA.forEach(d=>{
+  // MC: What vitamin is in X?
+  const vit = d.vitamins[0];
+  const wrongs = DATA.filter(x=>x.name!==d.name).map(x=>x.vitamins[0]);
+  const opts = shuffle([vit,...shuffle(wrongs).slice(0,3)]);
+  QUIZ_QUESTIONS.push({
+    type:'mc',emoji:d.emoji,
+    q:`Which vitamin or mineral is ${d.name} especially known for?`,
+    options:opts, answer:vit,
+    explanation:`${d.name} is an excellent source of ${vit}! ${d.benefits[0]}.`
+  });
+
+  // TF: Benefit statement
+  QUIZ_QUESTIONS.push({
+    type:'tf',emoji:d.emoji,
+    q:`TRUE or FALSE: ${d.name} ${d.benefits[0].toLowerCase()}.`,
+    answer:true,
+    explanation:`TRUE! ${d.name} really does ${d.benefits[0].toLowerCase()}. ${d.fact}`
+  });
+
+  // MC: Which food has this benefit?
+  if(Math.random()>0.5){
+    const others = shuffle(DATA.filter(x=>x.name!==d.name)).slice(0,3).map(x=>x.name);
+    QUIZ_QUESTIONS.push({
+      type:'mc',emoji:'🧠',
+      q:`Which food is best known for: "${d.benefits[1]}"?`,
+      options:shuffle([d.name,...others]),
+      answer:d.name,
+      explanation:`${d.name} is famous for this! ${d.fact}`
+    });
+  }
+});
+
+shuffle(QUIZ_QUESTIONS);
+let qIndex=0;
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function renderQuestion(){
+  if(qIndex>=QUIZ_QUESTIONS.length) qIndex=0;
+  const q = QUIZ_QUESTIONS[qIndex];
+  quizAnswered = false;
+
+  const progress = (qIndex/QUIZ_QUESTIONS.length)*100;
+  document.getElementById('progressBar').style.width = progress+'%';
+
+  const container = document.getElementById('quizContainer');
+  container.innerHTML='';
+
+  const card = document.createElement('div');
+  card.className='q-card';
+
+  const typeDiv = document.createElement('div');
+  typeDiv.className='q-type';
+  typeDiv.textContent = q.type==='mc'?'Multiple Choice':'True or False';
+  card.appendChild(typeDiv);
+
+  const emojiDiv = document.createElement('div');
+  emojiDiv.className='q-emoji';
+  emojiDiv.textContent = q.emoji;
+  card.appendChild(emojiDiv);
+
+  const qText = document.createElement('div');
+  qText.className='q-text';
+  qText.textContent = q.q;
+  card.appendChild(qText);
+
+  const optWrap = document.createElement('div');
+
+  if(q.type==='mc'){
+    optWrap.className='q-options';
+    q.options.forEach(opt=>{
+      const btn = document.createElement('div');
+      btn.className='q-option';
+      btn.textContent=opt;
+      btn.onclick=()=>answerMC(btn,opt,q);
+      optWrap.appendChild(btn);
+    });
+  } else {
+    optWrap.className='tf-options';
+    const tBtn=document.createElement('button');
+    tBtn.className='tf-btn tf-true';tBtn.textContent='✅ TRUE';
+    tBtn.onclick=()=>answerTF(true,q,tBtn,fBtn);
+    const fBtn=document.createElement('button');
+    fBtn.className='tf-btn tf-false';fBtn.textContent='❌ FALSE';
+    fBtn.onclick=()=>answerTF(false,q,tBtn,fBtn);
+    optWrap.appendChild(tBtn);
+    optWrap.appendChild(fBtn);
+  }
+  card.appendChild(optWrap);
+
+  const feedback = document.createElement('div');
+  feedback.className='q-feedback';
+  feedback.id='qFeedback';
+  card.appendChild(feedback);
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className='next-btn';
+  nextBtn.id='nextBtn';
+  nextBtn.textContent='Next Question →';
+  nextBtn.onclick=()=>{qIndex++;renderQuestion();};
+  card.appendChild(nextBtn);
+
+  container.appendChild(card);
+}
+
+function answerMC(btn,answer,q){
+  if(quizAnswered) return;
+  quizAnswered=true;
+  quizTotal++;
+  document.getElementById('scoreTotal').textContent=quizTotal;
+  const correct = answer===q.answer;
+
+  document.querySelectorAll('.q-option').forEach(b=>{
+    if(b.textContent===q.answer) b.classList.add('correct');
+    else if(b===btn && !correct) b.classList.add('wrong');
+    b.style.pointerEvents='none';
+  });
+
+  showFeedback(correct,q);
+}
+
+function answerTF(answer,q,tBtn,fBtn){
+  if(quizAnswered) return;
+  quizAnswered=true;
+  quizTotal++;
+  document.getElementById('scoreTotal').textContent=quizTotal;
+  const correct = answer===q.answer;
+
+  tBtn.style.pointerEvents='none';
+  fBtn.style.pointerEvents='none';
+  if(correct){
+    answer?tBtn.style.background='rgba(34,197,94,0.3)':fBtn.style.background='rgba(34,197,94,0.3)';
+  } else {
+    answer?tBtn.style.background='rgba(239,68,68,0.3)':fBtn.style.background='rgba(239,68,68,0.3)';
+    q.answer?tBtn.style.borderWidth='3px':fBtn.style.borderWidth='3px';
+  }
+
+  showFeedback(correct,q);
+}
+
+function showFeedback(correct,q){
+  if(correct){
+    quizScore++;quizStreak++;
+    document.getElementById('scoreCorrect').textContent=quizScore;
+    document.getElementById('scoreStreak').textContent=quizStreak;
+  } else {
+    quizStreak=0;
+    document.getElementById('scoreStreak').textContent=0;
+  }
+
+  const fb=document.getElementById('qFeedback');
+  fb.className='q-feedback '+(correct?'correct':'wrong');
+  fb.textContent=(correct?'🎉 Correct!! ':'😬 Not quite... ')+q.explanation;
+  fb.style.display='block';
+  document.getElementById('nextBtn').style.display='block';
+
+  // Confetti on correct
+  if(correct) spawnConfetti();
+}
+
+function spawnConfetti(){
+  for(let i=0;i<20;i++){
+    const c=document.createElement('div');
+    c.style.cssText=`position:fixed;top:40%;left:${20+Math.random()*60}%;width:8px;height:8px;background:${['#c9a84c','#22c55e','#f87171','#818cf8'][Math.floor(Math.random()*4)]};border-radius:2px;pointer-events:none;z-index:999;animation:confettiFall ${0.8+Math.random()*0.8}s ease forwards;`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),1600);
+  }
+}
+
+// Add confetti animation
+const style=document.createElement('style');
+style.textContent='@keyframes confettiFall{0%{transform:translateY(0) rotate(0);opacity:1;}100%{transform:translateY(200px) rotate(720deg);opacity:0;}}';
+document.head.appendChild(style);
+
+// ── TAB SWITCH ───────────────────────────────────
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',(i===0&&tab==='cards')||(i===1&&tab==='quiz'));
+  });
+  document.getElementById('cardsTab').style.display = tab==='cards'?'block':'none';
+  document.getElementById('quizTab').style.display = tab==='quiz'?'block':'none';
+
+  if(tab==='quiz' && quizTotal===0) renderQuestion();
+}
+</script>
+</body>
+</html>
