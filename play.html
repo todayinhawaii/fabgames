@@ -138,10 +138,9 @@ GAMES.forEach(function(g,i){
 });
 
 // Auth check AFTER games are rendered
-setTimeout(function(){
-  const email=localStorage.getItem('fabEmail');
-  if(!email) window.location.href='/login';
-}, 800);
+// Instant auth check
+const email=localStorage.getItem('fabEmail');
+if(!email) window.location.href='/login';
 </script>
 </body>
 </html>
