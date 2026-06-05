@@ -446,21 +446,24 @@ nav{
 }
 
 .quiz-this-btn{
-  width:100%;padding:14px;
-  background:transparent;
-  border:1px solid rgba(184,147,63,0.3);
-  color:var(--muted);
-  font-size:8px;font-weight:400;
+  width:100%;padding:15px;
+  background:linear-gradient(160deg,#1a3d1a,#0d2d0d,#1f4d1f);
+  border:1px solid rgba(34,197,94,0.5);
+  color:#86efac;
+  font-size:9px;font-weight:500;
   letter-spacing:4px;text-transform:uppercase;
   cursor:pointer;margin-top:24px;
   font-family:'Inter',sans-serif;
   transition:all 0.3s;
   display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 0 20px rgba(34,197,94,0.15),inset 0 1px 0 rgba(134,239,172,0.1);
 }
 .quiz-this-btn:hover{
-  border-color:rgba(184,147,63,0.6);
-  color:var(--gold);
-  background:rgba(184,147,63,0.05);
+  background:linear-gradient(160deg,#1f4d1f,#0d2d0d,#2d6b2d);
+  border-color:rgba(34,197,94,0.8);
+  box-shadow:0 0 30px rgba(34,197,94,0.3),inset 0 1px 0 rgba(134,239,172,0.2);
+  color:#bbf7d0;
+  transform:translateY(-1px);
 }
 
 /* ── QUIZ ── */
@@ -770,9 +773,12 @@ footer{
 <!-- QUIZ TAB -->
 <div class="quiz-section" id="quizTab">
   <div class="quiz-header">
-    <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">— Test Your Knowledge</div>
-    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,6vw,52px);letter-spacing:3px;margin-bottom:4px;">Nutrition Quiz</h2>
-    <p style="font-size:13px;color:var(--muted);">Multiple choice & true/false — how much do you know??</p>
+    <div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(184,147,63,0.5);margin-bottom:20px;">
+      <a href="#" id="backToBibleBtn" style="color:rgba(184,147,63,0.5);text-decoration:none;font-family:Inter,sans-serif;border:1px solid rgba(184,147,63,0.2);padding:6px 16px;transition:all 0.2s;letter-spacing:3px;">◂ Back to Bible</a>
+    </div>
+    <div style="font-size:8px;letter-spacing:5px;text-transform:uppercase;color:rgba(184,147,63,0.5);margin-bottom:12px;font-family:Inter,sans-serif;">— Test Your Knowledge</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,44px);font-weight:300;letter-spacing:5px;text-transform:uppercase;margin-bottom:8px;">Nutrition Quiz</h2>
+    <p style="font-size:12px;color:var(--muted);font-family:'Cormorant Garamond',serif;font-style:italic;">Multiple choice & true or false — how much do you know?</p>
   </div>
   <div class="quiz-score">
     <div class="score-box"><div class="score-num" id="scoreCorrect">0</div><div class="score-lbl">Correct</div></div>
@@ -2087,11 +2093,33 @@ function buildFoodQuiz(d){
   qIndex = 0;
   renderQuestion();
 
-  // Add food header
+  // Add elegant food header with SVG
   const container = document.getElementById('quizContainer');
   const header = document.createElement('div');
-  header.style.cssText='text-align:center;padding:16px;background:rgba(255,255,255,0.04);border-radius:4px;margin-bottom:20px;font-size:14px;color:var(--muted);';
-  header.innerHTML=`Quizzing you on ${d.emoji} <strong style="color:var(--white)">${d.name}</strong>! <a href="#" onclick="resetGeneralQuiz();return false;" style="color:var(--gold);font-size:12px;"> Play general quiz →</a>`;
+  header.style.cssText='text-align:center;padding:20px 16px;border:1px solid rgba(184,147,63,0.15);margin-bottom:20px;background:rgba(184,147,63,0.03);';
+
+  // SVG engraving in header
+  let headerSvg = '';
+  if(d.svg){
+    const tmpDiv = document.createElement('div');
+    tmpDiv.innerHTML = d.svg;
+    const svgEl = tmpDiv.querySelector('svg');
+    if(svgEl){
+      svgEl.style.cssText='width:48px;height:48px;display:block;margin:0 auto 12px;';
+      headerSvg = svgEl.outerHTML;
+    }
+  }
+
+  var latinName = d.latin || '';
+  var headerHTML = headerSvg;
+  headerHTML += '<div style="font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(184,147,63,0.5);margin-bottom:6px;font-family:Inter,sans-serif;">Now Quizzing</div>';
+  headerHTML += '<div style="font-family:Cormorant Garamond,serif;font-size:20px;letter-spacing:4px;text-transform:uppercase;color:#f0efe8;margin-bottom:4px;">' + d.name + '</div>';
+  headerHTML += '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:12px;color:rgba(240,239,232,0.5);margin-bottom:14px;">' + latinName + '</div>';
+  headerHTML += '<a href="#" id="allQuestionsLink" style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(184,147,63,0.5);text-decoration:none;font-family:Inter,sans-serif;border:1px solid rgba(184,147,63,0.2);padding:5px 14px;">All Questions</a>';
+  header.innerHTML = headerHTML;
+  var allQLink = header.querySelector('#allQuestionsLink');
+  if(allQLink) allQLink.onclick = function(e){ e.preventDefault(); resetGeneralQuiz(); };
+
   container.insertBefore(header, container.firstChild);
 }
 
