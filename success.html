@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to fab.games! 🎉</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600&family=Inter:wght@300;400;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{--black:#070708;--gold:#c9a84c;--gold2:#e8c96a;--white:#f0efe8;--muted:rgba(240,239,232,0.5);--border:rgba(255,255,255,0.07);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(201,168,76,0.08),transparent);pointer-events:none;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:48px;}
+.emoji{font-size:72px;margin-bottom:24px;animation:pop 0.5s cubic-bezier(0.23,1,0.32,1);}
+@keyframes pop{0%{transform:scale(0);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
+h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,7vw,64px);font-weight:300;margin-bottom:16px;}
+h1 em{font-style:italic;color:var(--gold);}
+p{font-size:16px;color:var(--muted);max-width:400px;line-height:1.8;margin-bottom:40px;}
+.btn{
+  padding:16px 48px;
+  background:linear-gradient(135deg,var(--gold),#a87d2a);
+  color:#000;font-size:13px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;
+  border:none;border-radius:2px;cursor:pointer;
+  text-decoration:none;display:inline-block;
+  box-shadow:0 0 40px rgba(201,168,76,0.3);
+  transition:all 0.2s;font-family:'Inter',sans-serif;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(201,168,76,0.5);}
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;overflow:hidden;}
+.c{position:absolute;width:8px;height:8px;border-radius:2px;animation:fall linear forwards;}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div class="confetti-wrap" id="confetti"></div>
+<div class="logo">fab.games</div>
+<div class="emoji">🎉</div>
+<h1>You're <em>In!</em></h1>
+<p>Welcome to fab.games Premium! Every game, every tool — all yours. Let's play!</p>
+<a href="/play" class="btn">Let's Play!! →</a>
+
+<script>
+// Confetti!
+const colors=['#c9a84c','#e8c96a','#ffffff','#ff6b6b','#4ecdc4'];
+const wrap=document.getElementById('confetti');
+for(let i=0;i<80;i++){
+  const c=document.createElement('div');
+  c.className='c';
+  c.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*1.5}s;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;`;
+  wrap.appendChild(c);
+}
+// Save to localStorage
+const params = new URLSearchParams(window.location.search);
+if(params.get('session_id')){
+  localStorage.setItem('fabPremium','true');
+}
+</script>
+</body>
+</html>
