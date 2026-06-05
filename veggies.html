@@ -15,13 +15,32 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
 
-/* STARS */
-.stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
-.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle ease-in-out infinite;}
-@keyframes twinkle{0%,100%{opacity:0.1;}50%{opacity:0.7;}}
+/* COLORFUL BACKGROUND */
+body{
+  background:linear-gradient(135deg,#0a1628 0%,#1a0a2e 25%,#0a2818 50%,#2e1a0a 75%,#0a1628 100%) !important;
+  background-size:400% 400% !important;
+  animation:bgShift 15s ease infinite !important;
+}
+@keyframes bgShift{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* FLOATING FOOD */
+.food-float{position:fixed;pointer-events:none;z-index:0;font-size:32px;animation:floatAround linear infinite;opacity:0.15;}
+@keyframes floatAround{
+  0%{transform:translateY(100vh) rotate(0deg) scale(0.8);}
+  50%{transform:translateY(50vh) rotate(180deg) scale(1.1);}
+  100%{transform:translateY(-10vh) rotate(360deg) scale(0.8);}
+}
+
+/* COLOR ORBS */
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:orbFloat ease-in-out infinite;}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-30px) scale(1.1);}}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:rgba(5,5,6,0.97);border-bottom:1px solid rgba(201,168,76,0.2);backdrop-filter:blur(20px);}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:rgba(5,5,10,0.92);border-bottom:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px);box-shadow:0 4px 30px rgba(0,0,0,0.3);}
 .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
 .nav-back{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;border:1px solid rgba(201,168,76,0.3);padding:6px 14px;border-radius:2px;transition:all 0.2s;}
 .nav-back:hover{color:var(--gold);border-color:var(--gold);}
@@ -30,8 +49,8 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 .hero{text-align:center;padding:50px 20px 30px;position:relative;z-index:2;}
 .hero-emoji{font-size:clamp(48px,8vw,72px);margin-bottom:12px;animation:bounce 2s ease-in-out infinite;}
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,72px);letter-spacing:4px;background:linear-gradient(135deg,#22c55e,#86efac,#22c55e);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:greenShimmer 3s ease infinite;margin-bottom:8px;}
-@keyframes greenShimmer{0%{background-position:0%;}100%{background-position:200%;}}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,72px);letter-spacing:4px;background:linear-gradient(135deg,#22c55e,#fbbf24,#f87171,#818cf8,#22c55e);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:rainbowShimmer 4s ease infinite;margin-bottom:8px;}
+@keyframes rainbowShimmer{0%{background-position:0%;}100%{background-position:300%;}}
 .hero-sub{font-size:14px;color:var(--muted);margin-bottom:24px;}
 
 /* TAB SWITCHER */
@@ -57,15 +76,16 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 
 /* VEGGIE CARD */
 .vcard{
-  background:#0d0d10;
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:4px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
   padding:20px 14px 16px;
   cursor:pointer;
   transition:all 0.3s cubic-bezier(0.23,1,0.32,1);
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;
   text-align:center;
+  backdrop-filter:blur(10px);
 }
 .vcard::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.3s;}
 .vcard:hover{transform:translateY(-6px) scale(1.02);z-index:5;}
@@ -80,7 +100,7 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 /* EXPANDED CARD MODAL */
 .modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;padding:20px;}
 .modal.show{display:flex;}
-.modal-card{background:#0d0d10;border-radius:8px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;padding:32px 28px;position:relative;border:1px solid rgba(255,255,255,0.1);}
+.modal-card{background:rgba(15,15,25,0.97);border-radius:16px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;padding:32px 28px;position:relative;border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(20px);box-shadow:0 25px 80px rgba(0,0,0,0.6);}
 .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;}
 .modal-emoji{font-size:64px;text-align:center;margin-bottom:16px;display:block;}
 .modal-name{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;text-align:center;margin-bottom:4px;}
@@ -102,7 +122,7 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 .score-box{padding:12px 24px;background:#0d0d10;border:1px solid rgba(201,168,76,0.2);border-radius:4px;text-align:center;}
 .score-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);}
 .score-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-.q-card{background:#0d0d10;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:28px;margin-bottom:20px;animation:slideIn 0.4s ease;}
+.q-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px;margin-bottom:20px;animation:slideIn 0.4s ease;backdrop-filter:blur(10px);}
 @keyframes slideIn{0%{opacity:0;transform:translateY(20px);}100%{opacity:1;transform:translateY(0);}}
 .q-type{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
 .q-emoji{font-size:48px;display:block;text-align:center;margin-bottom:16px;}
@@ -132,7 +152,7 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 /* RANKINGS */
 .rankings-section{max-width:900px;margin:0 auto;padding:40px 20px;position:relative;z-index:2;}
 .rankings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:3px;margin-top:24px;}
-.rank-card{background:#0d0d10;border:1px solid rgba(255,255,255,0.06);padding:20px;position:relative;}
+.rank-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px;position:relative;backdrop-filter:blur(10px);}
 .rank-title{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
 .rank-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
 .rank-num{font-family:'Bebas Neue',sans-serif;font-size:24px;width:28px;flex-shrink:0;line-height:1;}
@@ -152,7 +172,14 @@ footer{text-align:center;padding:40px 20px;font-size:11px;color:rgba(240,239,232
 </head>
 <body>
 
-<div class="stars" id="stars"></div>
+<!-- Colorful orbs -->
+<div class="orb" style="width:400px;height:400px;background:rgba(34,197,94,0.15);top:-100px;left:-100px;animation-duration:8s;"></div>
+<div class="orb" style="width:500px;height:500px;background:rgba(249,115,22,0.12);top:20%;right:-150px;animation-duration:11s;animation-delay:2s;"></div>
+<div class="orb" style="width:350px;height:350px;background:rgba(234,179,8,0.12);bottom:10%;left:10%;animation-duration:9s;animation-delay:4s;"></div>
+<div class="orb" style="width:450px;height:450px;background:rgba(239,68,68,0.1);bottom:-100px;right:10%;animation-duration:13s;animation-delay:1s;"></div>
+<div class="orb" style="width:300px;height:300px;background:rgba(99,102,241,0.12);top:50%;left:40%;animation-duration:10s;animation-delay:3s;"></div>
+<!-- Floating foods -->
+<div class="food-float" id="foodFloat"></div>
 
 <nav>
   <a href="/play" class="nav-back">← Games</a>
@@ -234,13 +261,23 @@ footer{text-align:center;padding:40px 20px;font-size:11px;color:rgba(240,239,232
 <footer>© 2026 fab.games — Veggie & Fruit Bible 🥕🍎🌺</footer>
 
 <script>
-// ── STARS ──────────────────────────────────────
-const sw=document.getElementById('stars');
-for(let i=0;i<60;i++){
-  const s=document.createElement('div');s.className='star';
-  const sz=0.5+Math.random()*1.5;
-  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;`;
-  sw.appendChild(s);
+// ── FLOATING FOOD ─────────────────────────────
+const FLOAT_FOODS = ['🥕','🥦','🍎','🍌','🍊','🥑','🍓','🫐','🥝','🍋',
+  '🌽','🍇','🍍','🥭','🍒','🍑','🥥','🧄','🧅','🍠',
+  '🫛','🍅','🥒','🎃','🌿','🥗','🫑','🍈','🍉','🌱'];
+
+const container = document.body;
+for(let i=0;i<25;i++){
+  const food = document.createElement('div');
+  food.className = 'food-float';
+  const size = 24 + Math.random()*28;
+  const left = Math.random()*100;
+  const duration = 8 + Math.random()*16;
+  const delay = Math.random()*12;
+  const emoji = FLOAT_FOODS[Math.floor(Math.random()*FLOAT_FOODS.length)];
+  food.style.cssText = `font-size:${size}px;left:${left}%;animation-duration:${duration}s;animation-delay:-${delay}s;`;
+  food.textContent = emoji;
+  container.appendChild(food);
 }
 
 // ── DATA ────────────────────────────────────────
