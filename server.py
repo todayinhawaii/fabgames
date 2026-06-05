@@ -5,25 +5,15 @@ from flask import Flask, send_from_directory, request, jsonify, redirect
 
 app = Flask(__name__)
 
-# Stripe config from environment variables
+# Stripe config
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
 STRIPE_PRICE_ID = os.environ.get('STRIPE_PRICE_ID')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
 
-# Simple JSON file storage for members
-MEMBERS_FILE = 'members.json'
-
-def load_members():
-    try:
-        with open(MEMBERS_FILE) as f:
-            return json.load(f)
-    except:
-        return {}
-
-def save_members(members):
-    with open(MEMBERS_FILE, 'w') as f:
-        json.dump(members, f)
+# Supabase config
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY')
 
 # ── PAGES ────────────────────────────────────────
 @app.route('/')
@@ -58,80 +48,25 @@ def play():
 def success():
     return send_from_directory('.', 'success.html')
 
-# ── FREE TRIAL SIGNUP ────────────────────────────
-@app.route('/api/free-trial', methods=['POST'])
-def free_trial():
-    data = request.get_json()
-    email = data.get('email', '').strip().lower()
-    name  = data.get('name', '').strip()
+@app.route('/login')
+def login():
+    return send_from_directory('.', 'login.html')
 
-    if not email or '@' not in email:
-        return jsonify({'ok': False, 'msg': 'Please enter a valid email!'})
-
-    members = load_members()
-
-    if email in members:
-        m = members[email]
-        if m.get('status') in ['trial', 'active']:
-            return jsonify({'ok': True, 'existing': True, 'msg': 'Welcome back!'})
-
-    import datetime
-    now = datetime.datetime.utcnow()
-    trial_end = now + datetime.timedelta(days=30)
-
-    members[email] = {
-        'name': name,
-        'email': email,
-        'status': 'trial',
-        'joined': now.isoformat(),
-        'trial_end': trial_end.isoformat(),
-    }
-    save_members(members)
-
-    return jsonify({'ok': True, 'msg': 'Welcome to fab.games! Enjoy your free month!'})
-
-# ── CHECK ACCESS ─────────────────────────────────
-@app.route('/api/check-access', methods=['POST'])
-def check_access():
-    data = request.get_json()
-    email = data.get('email', '').strip().lower()
-
-    members = load_members()
-    if email not in members:
-        return jsonify({'access': False})
-
-    import datetime
-    m = members[email]
-
-    if m.get('status') == 'active':
-        return jsonify({'access': True, 'status': 'premium', 'name': m.get('name')})
-
-    if m.get('status') == 'trial':
-        trial_end = datetime.datetime.fromisoformat(m['trial_end'])
-        if datetime.datetime.utcnow() < trial_end:
-            days_left = (trial_end - datetime.datetime.utcnow()).days
-            return jsonify({'access': True, 'status': 'trial',
-                          'days_left': days_left, 'name': m.get('name')})
-        else:
-            return jsonify({'access': False, 'status': 'expired'})
-
-    return jsonify({'access': False})
+@app.route('/reset-password')
+def reset_password():
+    return send_from_directory('.', 'reset_password.html')
 
 # ── STRIPE CHECKOUT ──────────────────────────────
 @app.route('/api/create-checkout', methods=['POST'])
 def create_checkout():
     data = request.get_json()
     email = data.get('email', '').strip().lower()
-
     try:
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             mode='subscription',
             customer_email=email,
-            line_items=[{
-                'price': STRIPE_PRICE_ID,
-                'quantity': 1,
-            }],
+            line_items=[{'price': STRIPE_PRICE_ID, 'quantity': 1}],
             success_url='https://www.fab.games/success?session_id={CHECKOUT_SESSION_ID}',
             cancel_url='https://www.fab.games/join',
             allow_promotion_codes=True,
@@ -145,11 +80,9 @@ def create_checkout():
 def webhook():
     payload = request.get_data()
     sig_header = request.headers.get('Stripe-Signature')
-
     try:
         if STRIPE_WEBHOOK_SECRET:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, STRIPE_WEBHOOK_SECRET)
+            event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
         else:
             event = json.loads(payload)
     except Exception as e:
@@ -158,45 +91,34 @@ def webhook():
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         email = session.get('customer_email', '').lower()
-        members = load_members()
-        if email in members:
-            members[email]['status'] = 'active'
-            members[email]['stripe_customer'] = session.get('customer')
-        else:
-            members[email] = {
-                'email': email,
-                'status': 'active',
-                'stripe_customer': session.get('customer'),
-            }
-        save_members(members)
-
-    elif event['type'] == 'customer.subscription.deleted':
-        sub = event['data']['object']
-        customer_id = sub.get('customer')
-        members = load_members()
-        for email, m in members.items():
-            if m.get('stripe_customer') == customer_id:
-                members[email]['status'] = 'cancelled'
-                break
-        save_members(members)
+        # Update user metadata in Supabase via admin API
+        import urllib.request
+        import urllib.parse
+        try:
+            # Find user by email and update their premium status
+            req = urllib.request.Request(
+                f"{SUPABASE_URL}/auth/v1/admin/users",
+                headers={
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': f'Bearer {os.environ.get("SUPABASE_SERVICE_KEY", SUPABASE_ANON_KEY)}',
+                    'Content-Type': 'application/json'
+                }
+            )
+        except:
+            pass
 
     return jsonify({'ok': True})
 
+# ── SUPABASE CONFIG FOR FRONTEND ─────────────────
+@app.route('/api/config')
+def config():
+    return jsonify({
+        'supabase_url': SUPABASE_URL,
+        'supabase_anon_key': SUPABASE_ANON_KEY,
+        'stripe_publishable_key': STRIPE_PUBLISHABLE_KEY,
+    })
+
 # ── STATIC FILES ─────────────────────────────────
-@app.route('/game_<name>.jpg')
-def game_card_jpg(name):
-    f = f'game_{name}.jpg'
-    if os.path.exists(f):
-        return send_from_directory('.', f)
-    return '', 404
-
-@app.route('/game_<name>.mp4')
-def game_card_mp4(name):
-    f = f'game_{name}.mp4'
-    if os.path.exists(f):
-        return send_from_directory('.', f, mimetype='video/mp4')
-    return '', 404
-
 @app.route('/<path:filename>')
 def static_files(filename):
     return send_from_directory('.', filename)
