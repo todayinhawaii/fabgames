@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Play — fab.games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{--black:#070708;--dark:#0d0d0f;--card:#131316;--border:rgba(255,255,255,0.07);--gold:#c9a84c;--gold2:#e8c96a;--white:#f0efe8;--muted:rgba(240,239,232,0.45);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 40% at 50% 0%,rgba(201,168,76,0.05),transparent);pointer-events:none;}
+
+nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 40px;
+  background:rgba(7,7,8,0.97);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(20px);
+}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.nav-welcome{font-size:12px;color:var(--muted);}
+.nav-welcome span{color:var(--gold);}
+
+.hero{text-align:center;padding:60px 20px 40px;}
+.hero-badge{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,6vw,56px);font-weight:300;margin-bottom:8px;}
+.hero-title em{font-style:italic;color:var(--gold);}
+.hero-sub{font-size:14px;color:var(--muted);line-height:1.8;}
+
+.section-label{
+  font-size:9px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:24px;
+  padding:0 40px;
+}
+
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:2px;padding:0;
+  max-width:1400px;margin:0 auto;
+}
+.game-card{
+  position:relative;overflow:hidden;
+  aspect-ratio:9/14;
+  background:var(--card);
+  text-decoration:none;
+  display:block;
+  transition:transform 0.3s ease;
+}
+.game-card:hover{transform:scale(1.02);z-index:2;}
+.game-card-bg{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:64px;
+  transition:transform 0.5s ease;
+}
+.game-card:hover .game-card-bg{transform:scale(1.1);}
+.game-card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(7,7,8,0) 30%,rgba(7,7,8,0.97) 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:20px 16px 16px;
+}
+.game-card-cat{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.game-card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;margin-bottom:6px;}
+.game-card-btn{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);transition:letter-spacing 0.2s;}
+.game-card:hover .game-card-btn{letter-spacing:4px;}
+
+.wrap{max-width:1400px;margin:0 auto;padding:40px 40px 80px;}
+
+footer{text-align:center;padding:40px;border-top:1px solid var(--border);font-size:11px;color:rgba(240,239,232,0.2);}
+
+@media(max-width:768px){
+  nav{padding:14px 20px;}
+  .wrap{padding:20px 0 60px;}
+  .section-label{padding:0 16px;}
+  .games-grid{grid-template-columns:repeat(2,1fr);}
+  .hero{padding:40px 20px 30px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">fab.games</a>
+  <div class="nav-welcome">Welcome back <span id="welcomeName">Player</span>! 🌺</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">— Your Games</div>
+  <h1 class="hero-title">Let's <em>Play!</em></h1>
+  <p class="hero-sub">Every game is yours. Pick one and have fun!</p>
+</div>
+
+<div class="wrap">
+  <div class="section-label">— All Games</div>
+  <div class="games-grid" id="gamesGrid"></div>
+</div>
+
+<footer>© 2026 fab.games — Made with 🌺 in Hawaii</footer>
+
+<script>
+// Welcome name
+const name = localStorage.getItem('fabName') || 'Player';
+document.getElementById('welcomeName').textContent = name.split(' ')[0];
+
+const GAMES=[
+  {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',href:'https://todayinhawaii.com/dolphins',color:'rgba(34,211,238,0.12)'},
+  {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",href:'https://todayinhawaii.com/lava',color:'rgba(255,60,0,0.12)'},
+  {emoji:'🐢',cat:'Strategy · AI',title:'Turtle Checkers',href:'https://todayinhawaii.com/turtles',color:'rgba(34,197,94,0.12)'},
+  {emoji:'♛',cat:'Strategy · AI',title:'Mermaid Chess',href:'https://todayinhawaii.com/chess',color:'rgba(148,163,184,0.12)'},
+  {emoji:'🌺',cat:'Trivia · Knowledge',title:'Hawaii Trivia',href:'https://todayinhawaii.com/trivia',color:'rgba(251,191,36,0.12)'},
+  {emoji:'🧠',cat:'Memory · Speed',title:'Aloha Memory',href:'https://todayinhawaii.com/memorygame',color:'rgba(255,100,200,0.12)'},
+  {emoji:'🔤',cat:'Word · Puzzle',title:'Hawaii Word Search',href:'https://todayinhawaii.com/wordsearch',color:'rgba(167,139,250,0.12)'},
+  {emoji:'🎰',cat:'Word · Strategy',title:'Aloha Letters',href:'https://todayinhawaii.com/scrabble',color:'rgba(255,200,0,0.12)'},
+  {emoji:'🎈',cat:'Action · Fun',title:'Pop That Balloon!',href:'https://todayinhawaii.com/balloons',color:'rgba(255,105,180,0.12)'},
+  {emoji:'🔮',cat:'Fortune · Fun',title:'Fortune Roulette',href:'https://todayinhawaii.com/fortune',color:'rgba(155,89,182,0.12)'},
+  {emoji:'🎭',cat:'Personality · Fun',title:'Who Are You?',href:'https://todayinhawaii.com/humor',color:'rgba(255,80,80,0.12)'},
+  {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists Factory',href:'https://todayinhawaii.com/slime',color:'rgba(0,220,80,0.12)'},
+  {emoji:'🎞️',cat:'Photography · Creative',title:'Film Lab',href:'https://todayinhawaii.com/camera',color:'rgba(212,168,67,0.12)'},
+];
+
+const grid=document.getElementById('gamesGrid');
+GAMES.forEach(g=>{
+  const card=document.createElement('a');
+  card.href=g.href;
+  card.className='game-card';
+  card.innerHTML=`
+    <div class="game-card-bg" style="background:${g.color};">${g.emoji}</div>
+    <div class="game-card-overlay">
+      <div class="game-card-cat">${g.cat}</div>
+      <div class="game-card-title">${g.title}</div>
+      <div class="game-card-btn">Play Now →</div>
+    </div>`;
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>
