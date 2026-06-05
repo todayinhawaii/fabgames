@@ -1,7 +1,10 @@
 import os
 import json
 import stripe
-from flask import Flask, send_from_directory, request, jsonify, redirect
+import urllib.request
+import urllib.parse
+from datetime import datetime, timedelta
+from flask import Flask, send_from_directory, request, jsonify
 
 app = Flask(__name__)
 
@@ -14,6 +17,26 @@ STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
 # Supabase config
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY')
+SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
+
+def supabase_request(method, path, data=None, use_service_key=False):
+    """Make a request to Supabase REST API"""
+    url = f"{SUPABASE_URL}/rest/v1/{path}"
+    key = SUPABASE_SERVICE_KEY if use_service_key else SUPABASE_ANON_KEY
+    headers = {
+        'apikey': key,
+        'Authorization': f'Bearer {key}',
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+    }
+    body = json.dumps(data).encode() if data else None
+    req = urllib.request.Request(url, data=body, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req) as res:
+            return json.loads(res.read().decode())
+    except urllib.error.HTTPError as e:
+        print(f"Supabase error: {e.read().decode()}")
+        return None
 
 # ── PAGES ────────────────────────────────────────
 @app.route('/')
@@ -56,6 +79,82 @@ def login():
 def reset_password():
     return send_from_directory('.', 'reset_password.html')
 
+# ── CONFIG FOR FRONTEND ──────────────────────────
+@app.route('/api/config')
+def config():
+    return jsonify({
+        'supabase_url': SUPABASE_URL,
+        'supabase_anon_key': SUPABASE_ANON_KEY,
+        'stripe_publishable_key': STRIPE_PUBLISHABLE_KEY,
+    })
+
+# ── FREE TRIAL SIGNUP ────────────────────────────
+@app.route('/api/free-trial', methods=['POST'])
+def free_trial():
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
+    name  = data.get('name', '').strip()
+
+    if not email or '@' not in email:
+        return jsonify({'ok': False, 'msg': 'Please enter a valid email!'})
+
+    trial_end = (datetime.utcnow() + timedelta(days=30)).isoformat()
+
+    # Check if member already exists
+    existing = supabase_request('GET',
+        f"members?email=eq.{urllib.parse.quote(email)}&select=*",
+        use_service_key=True)
+
+    if existing and len(existing) > 0:
+        m = existing[0]
+        if m.get('status') in ['trial', 'active']:
+            return jsonify({'ok': True, 'existing': True, 'msg': 'Welcome back!!'})
+
+    # Insert new member
+    result = supabase_request('POST', 'members', {
+        'email': email,
+        'name': name,
+        'status': 'trial',
+        'trial_end': trial_end
+    }, use_service_key=True)
+
+    if result is None:
+        # Try upsert
+        supabase_request('PATCH',
+            f"members?email=eq.{urllib.parse.quote(email)}",
+            {'status': 'trial', 'trial_end': trial_end, 'name': name},
+            use_service_key=True)
+
+    return jsonify({'ok': True, 'msg': 'Welcome to fab.games! Enjoy your free month!!'})
+
+# ── CHECK ACCESS ─────────────────────────────────
+@app.route('/api/check-access', methods=['POST'])
+def check_access():
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
+
+    members = supabase_request('GET',
+        f"members?email=eq.{urllib.parse.quote(email)}&select=*",
+        use_service_key=True)
+
+    if not members or len(members) == 0:
+        return jsonify({'access': False})
+
+    m = members[0]
+    if m.get('status') == 'active':
+        return jsonify({'access': True, 'status': 'premium', 'name': m.get('name')})
+
+    if m.get('status') == 'trial':
+        trial_end = datetime.fromisoformat(m['trial_end'].replace('Z',''))
+        if datetime.utcnow() < trial_end:
+            days_left = (trial_end - datetime.utcnow()).days
+            return jsonify({'access': True, 'status': 'trial',
+                          'days_left': days_left, 'name': m.get('name')})
+        else:
+            return jsonify({'access': False, 'status': 'expired'})
+
+    return jsonify({'access': False})
+
 # ── STRIPE CHECKOUT ──────────────────────────────
 @app.route('/api/create-checkout', methods=['POST'])
 def create_checkout():
@@ -91,32 +190,34 @@ def webhook():
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         email = session.get('customer_email', '').lower()
-        # Update user metadata in Supabase via admin API
-        import urllib.request
-        import urllib.parse
-        try:
-            # Find user by email and update their premium status
-            req = urllib.request.Request(
-                f"{SUPABASE_URL}/auth/v1/admin/users",
-                headers={
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': f'Bearer {os.environ.get("SUPABASE_SERVICE_KEY", SUPABASE_ANON_KEY)}',
-                    'Content-Type': 'application/json'
-                }
-            )
-        except:
-            pass
+        customer_id = session.get('customer')
+
+        # Update or insert member as active
+        existing = supabase_request('GET',
+            f"members?email=eq.{urllib.parse.quote(email)}&select=*",
+            use_service_key=True)
+
+        if existing and len(existing) > 0:
+            supabase_request('PATCH',
+                f"members?email=eq.{urllib.parse.quote(email)}",
+                {'status': 'active', 'stripe_customer': customer_id},
+                use_service_key=True)
+        else:
+            supabase_request('POST', 'members', {
+                'email': email,
+                'status': 'active',
+                'stripe_customer': customer_id
+            }, use_service_key=True)
+
+    elif event['type'] == 'customer.subscription.deleted':
+        sub = event['data']['object']
+        customer_id = sub.get('customer')
+        supabase_request('PATCH',
+            f"members?stripe_customer=eq.{customer_id}",
+            {'status': 'cancelled'},
+            use_service_key=True)
 
     return jsonify({'ok': True})
-
-# ── SUPABASE CONFIG FOR FRONTEND ─────────────────
-@app.route('/api/config')
-def config():
-    return jsonify({
-        'supabase_url': SUPABASE_URL,
-        'supabase_anon_key': SUPABASE_ANON_KEY,
-        'stripe_publishable_key': STRIPE_PUBLISHABLE_KEY,
-    })
 
 # ── STATIC FILES ─────────────────────────────────
 @app.route('/<path:filename>')
