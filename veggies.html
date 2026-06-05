@@ -477,11 +477,15 @@ nav{
 }
 .score-box{
   flex:1;padding:16px 12px;
-  background:var(--glass);text-align:center;
+  background:rgba(184,147,63,0.03);
+  border-right:1px solid var(--border);
+  text-align:center;
 }
+.score-box:last-child{border-right:none;}
 .score-num{
   font-family:'Cormorant Garamond',serif;
-  font-size:36px;font-weight:300;color:var(--gold);
+  font-size:36px;font-weight:300;
+  color:rgba(184,147,63,0.8);
   line-height:1;
 }
 .score-lbl{
@@ -503,9 +507,10 @@ nav{
   color:var(--gold);margin-bottom:16px;
 }
 .q-emoji{
-  font-size:48px;display:block;text-align:center;margin-bottom:20px;
-  filter:saturate(0) brightness(1.8) contrast(0.7) drop-shadow(0 0 4px rgba(184,147,63,0.6));
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;min-height:80px;
 }
+.q-emoji svg{width:72px;height:72px;}
 .q-text{
   font-family:'Cormorant Garamond',serif;
   font-size:20px;font-weight:400;
@@ -528,17 +533,18 @@ nav{
 
 .tf-options{display:flex;gap:1px;}
 .tf-btn{
-  flex:1;padding:18px;
-  font-size:11px;font-weight:500;
-  letter-spacing:3px;text-transform:uppercase;
+  flex:1;padding:16px;
+  font-size:9px;font-weight:400;
+  letter-spacing:4px;text-transform:uppercase;
   border:1px solid;cursor:pointer;
-  transition:all 0.2s;background:transparent;
+  transition:all 0.3s;background:transparent;
   font-family:'Inter',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:8px;
 }
-.tf-true{color:rgba(34,197,94,0.8);border-color:rgba(34,197,94,0.3);}
-.tf-true:hover{background:rgba(34,197,94,0.1);}
-.tf-false{color:rgba(239,68,68,0.8);border-color:rgba(239,68,68,0.3);}
-.tf-false:hover{background:rgba(239,68,68,0.1);}
+.tf-true{color:rgba(184,147,63,0.7);border-color:rgba(184,147,63,0.25);}
+.tf-true:hover{background:rgba(184,147,63,0.06);border-color:rgba(184,147,63,0.5);color:rgba(184,147,63,1);}
+.tf-false{color:var(--muted);border-color:var(--border);}
+.tf-false:hover{background:rgba(245,240,232,0.04);border-color:rgba(245,240,232,0.2);color:var(--white);}
 
 .q-feedback{
   padding:16px 20px;font-size:14px;line-height:1.7;
@@ -552,13 +558,14 @@ nav{
 .next-btn{
   width:100%;padding:14px;
   background:transparent;
-  border:1px solid var(--border2);
-  color:var(--gold);
-  font-size:9px;font-weight:500;letter-spacing:4px;text-transform:uppercase;
+  border:1px solid rgba(184,147,63,0.25);
+  color:var(--muted);
+  font-size:9px;font-weight:400;letter-spacing:4px;text-transform:uppercase;
   cursor:pointer;margin-top:12px;display:none;
   font-family:'Inter',sans-serif;transition:all 0.3s;
+  align-items:center;justify-content:center;gap:8px;
 }
-.next-btn:hover{background:rgba(184,147,63,0.1);}
+.next-btn:hover{background:rgba(184,147,63,0.06);border-color:rgba(184,147,63,0.5);color:var(--gold);}
 
 .q-progress{
   height:1px;background:var(--border);
@@ -1838,23 +1845,35 @@ function renderQuestion(){
   const card = document.createElement('div');
   card.className='q-card';
 
+  // ── TYPE LABEL (elegant) ──────────────────
   const typeDiv = document.createElement('div');
   typeDiv.className='q-type';
-  typeDiv.textContent = q.type==='mc'?'Multiple Choice':'True or False';
+  typeDiv.textContent = q.type==='mc'?'— Multiple Choice —':'— True or False —';
   card.appendChild(typeDiv);
 
+  // ── SVG ENGRAVING (find food data) ────────
+  const foodData = DATA.find(d=>d.name===q.foodName) || DATA.find(d=>d.emoji===q.emoji);
   const emojiDiv = document.createElement('div');
   emojiDiv.className='q-emoji';
-  emojiDiv.textContent = q.emoji;
+  if(foodData && foodData.svg){
+    emojiDiv.innerHTML = foodData.svg;
+    const svgEl = emojiDiv.querySelector('svg');
+    if(svgEl) svgEl.style.cssText='width:72px;height:72px;display:block;margin:0 auto;';
+  } else {
+    // Elegant fallback - desaturated emoji
+    emojiDiv.style.cssText='font-size:52px;display:block;text-align:center;filter:saturate(0) brightness(1.8) contrast(0.7);opacity:0.6;margin-bottom:16px;';
+    emojiDiv.textContent = q.emoji;
+  }
   card.appendChild(emojiDiv);
 
+  // ── QUESTION TEXT ─────────────────────────
   const qText = document.createElement('div');
   qText.className='q-text';
   qText.textContent = q.q;
   card.appendChild(qText);
 
+  // ── ANSWER OPTIONS ────────────────────────
   const optWrap = document.createElement('div');
-
   if(q.type==='mc'){
     optWrap.className='q-options';
     q.options.forEach(opt=>{
@@ -1867,25 +1886,29 @@ function renderQuestion(){
   } else {
     optWrap.className='tf-options';
     const tBtn=document.createElement('button');
-    tBtn.className='tf-btn tf-true';tBtn.textContent='✅ TRUE';
+    tBtn.className='tf-btn tf-true';
+    tBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> True';
     tBtn.onclick=()=>answerTF(true,q,tBtn,fBtn);
     const fBtn=document.createElement('button');
-    fBtn.className='tf-btn tf-false';fBtn.textContent='❌ FALSE';
+    fBtn.className='tf-btn tf-false';
+    fBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> False';
     fBtn.onclick=()=>answerTF(false,q,tBtn,fBtn);
     optWrap.appendChild(tBtn);
     optWrap.appendChild(fBtn);
   }
   card.appendChild(optWrap);
 
+  // ── FEEDBACK ──────────────────────────────
   const feedback = document.createElement('div');
   feedback.className='q-feedback';
   feedback.id='qFeedback';
   card.appendChild(feedback);
 
+  // ── NEXT BUTTON (elegant) ─────────────────
   const nextBtn = document.createElement('button');
   nextBtn.className='next-btn';
   nextBtn.id='nextBtn';
-  nextBtn.textContent='Next Question →';
+  nextBtn.innerHTML='Next <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
   nextBtn.onclick=()=>{qIndex++;renderQuestion();};
   card.appendChild(nextBtn);
 
@@ -2080,8 +2103,8 @@ function resetGeneralQuiz(){
     const vit = d.vitamins[0];
     const wrongs = DATA.filter(x=>x.name!==d.name).map(x=>x.vitamins[0]);
     const opts = shuffle([vit,...shuffle(wrongs).slice(0,3)]);
-    QUIZ_QUESTIONS.push({type:'mc',emoji:d.emoji,q:`Which vitamin is ${d.name} especially known for?`,options:opts,answer:vit,explanation:`${d.name} is an excellent source of ${vit}!`});
-    QUIZ_QUESTIONS.push({type:'tf',emoji:d.emoji,q:`TRUE or FALSE: ${d.name} ${d.benefits[0].toLowerCase()}.`,answer:true,explanation:`TRUE! ${d.name} ${d.benefits[0].toLowerCase()}.`});
+    QUIZ_QUESTIONS.push({type:'mc',emoji:d.emoji,foodName:d.name,q:`Which nutrient is ${d.name} especially known for?`,options:opts,answer:vit,explanation:`${d.name} is an excellent source of ${vit}!`});
+    QUIZ_QUESTIONS.push({type:'tf',emoji:d.emoji,foodName:d.name,q:`TRUE or FALSE: ${d.name} ${d.benefits[0].toLowerCase()}.`,answer:true,explanation:`TRUE! ${d.name} ${d.benefits[0].toLowerCase()}.`});
   });
   shuffle(QUIZ_QUESTIONS);
   qIndex=0;
