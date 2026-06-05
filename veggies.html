@@ -979,7 +979,7 @@ function renderCards(){
       const img = document.createElement('img');
       img.src = d.img;
       img.alt = d.name;
-      img.style.cssText='width:72px;height:72px;object-fit:cover;border-radius:50%;border:2px solid '+d.neon+';box-shadow:0 0 12px '+d.neon+';';
+      img.style.cssText='width:72px;height:72px;object-fit:contain;border-radius:8px;';
       img.onerror = function(){ 
         emoji.textContent = d.emoji; 
       };
@@ -1010,7 +1010,7 @@ function renderCards(){
     if(d.score){
       const scoreBadge = document.createElement('div');
       scoreBadge.style.cssText='font-size:10px;font-weight:800;margin-top:6px;padding:2px 8px;border-radius:99px;background:rgba(0,0,0,0.3);color:'+d.neon+';border:1px solid '+d.neon+';display:inline-block;';
-      scoreBadge.textContent='Score: '+d.score+'/100';
+      scoreBadge.textContent='Nutritional Score: '+d.score+'/100';
       vitamins.appendChild(scoreBadge);
     }
 
@@ -1046,7 +1046,7 @@ function openModal(d){
     const img = document.createElement('img');
     img.src = d.img;
     img.alt = d.name;
-    img.style.cssText='width:100px;height:100px;object-fit:cover;border-radius:50%;border:3px solid '+d.neon+';box-shadow:0 0 20px '+d.neon+';display:block;margin:0 auto;';
+    img.style.cssText='width:100px;height:100px;object-fit:contain;border-radius:12px;display:block;margin:0 auto;';
     mEmojiEl.appendChild(img);
   } else {
     mEmojiEl.innerHTML = '';
