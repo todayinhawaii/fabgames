@@ -9,6 +9,10 @@ def index():
 def about():
     return send_from_directory('.', 'about.html')
 
+@app.route('/contact')
+def contact():
+    return send_from_directory('.', 'contact.html')
+
 @app.route('/privacy')
 def privacy():
     return send_from_directory('.', 'privacy.html')
