@@ -129,6 +129,18 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 .q-progress{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;margin-bottom:24px;overflow:hidden;}
 .q-progress-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width 0.4s ease;}
 
+/* RANKINGS */
+.rankings-section{max-width:900px;margin:0 auto;padding:40px 20px;position:relative;z-index:2;}
+.rankings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:3px;margin-top:24px;}
+.rank-card{background:#0d0d10;border:1px solid rgba(255,255,255,0.06);padding:20px;position:relative;}
+.rank-title{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.rank-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.rank-num{font-family:'Bebas Neue',sans-serif;font-size:24px;width:28px;flex-shrink:0;line-height:1;}
+.rank-info{flex:1;}
+.rank-name{font-size:13px;font-weight:700;}
+.rank-val{font-size:11px;color:var(--muted);margin-top:1px;}
+.rank-emoji{font-size:24px;flex-shrink:0;}
+
 footer{text-align:center;padding:40px 20px;font-size:11px;color:rgba(240,239,232,0.2);position:relative;z-index:2;}
 
 @media(max-width:600px){
@@ -151,9 +163,10 @@ footer{text-align:center;padding:40px 20px;font-size:11px;color:rgba(240,239,232
   <div class="hero-emoji">🥕</div>
   <div class="hero-title">Veggie & Fruit Bible</div>
   <p class="hero-sub">Your complete guide to nature's greatest superfoods — learn, explore and get quizzed!!</p>
-  <div class="tab-switch">
-    <button class="tab-btn active" onclick="switchTab('cards')">📚 Browse Cards</button>
-    <button class="tab-btn" onclick="switchTab('quiz')">🧠 Take Quiz</button>
+  <div class="tab-switch" style="max-width:560px;">
+    <button class="tab-btn active" onclick="switchTab('cards')">📚 Browse</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">🧠 Quiz</button>
+    <button class="tab-btn" onclick="switchTab('rankings')">🏆 Rankings</button>
   </div>
 </div>
 
@@ -208,6 +221,16 @@ footer{text-align:center;padding:40px 20px;font-size:11px;color:rgba(240,239,232
   </div>
 </div>
 
+<!-- RANKINGS LEADERBOARD -->
+<div id="rankingsSection" class="rankings-section" style="display:none;">
+  <div style="text-align:center;margin-bottom:32px;">
+    <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">— Hall of Fame</div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,48px);letter-spacing:3px;">Nutrition Champions 🏆</h2>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px;">The top ranked foods for each vitamin and mineral</p>
+  </div>
+  <div class="rankings-grid" id="rankingsGrid"></div>
+</div>
+
 <footer>© 2026 fab.games — Veggie & Fruit Bible 🥕🍎🌺</footer>
 
 <script>
@@ -224,207 +247,495 @@ for(let i=0;i<60;i++){
 const DATA = [
   // VEGETABLES
   {name:'Carrot',emoji:'🥕',type:'vegetable',color:'#f97316',neon:'#fb923c',
-   vitamins:['Vitamin A','Vitamin C','Vitamin K','Potassium','Biotin'],
+   score:87,
+   nutrition:{
+     'Vitamin A':'334% DV per 100g 🏆 #1 Vegetable',
+     'Vitamin C':'9% DV (8mg)',
+     'Vitamin K':'16% DV',
+     'Potassium':'7% DV (320mg)',
+     'Fibre':'11% DV (2.8g)',
+     'Calories':'41 kcal per 100g'
+   },
+   vitamins:['Vitamin A 334%','Vitamin C 9%','Vitamin K 16%','Potassium 7%','Fibre 11%'],
    benefits:['Improves eyesight and night vision','Boosts immune system','Promotes healthy skin and hair','Supports heart health','Aids digestion'],
    fact:'Carrots were originally purple! Orange carrots were developed in the Netherlands in the 17th century.'},
+
   {name:'Broccoli',emoji:'🥦',type:'vegetable',color:'#16a34a',neon:'#22c55e',
-   vitamins:['Vitamin C','Vitamin K','Folate','Potassium','Iron','Fibre'],
+   score:95,
+   nutrition:{
+     'Vitamin C':'149% DV per 100g 🏆 #1 Vegetable',
+     'Vitamin K':'127% DV 🏆 Top 3',
+     'Folate':'16% DV',
+     'Potassium':'8% DV (316mg)',
+     'Iron':'6% DV',
+     'Calories':'34 kcal per 100g'
+   },
+   vitamins:['Vitamin C 149%','Vitamin K 127%','Folate 16%','Iron 6%','Potassium 8%'],
    benefits:['Powerful cancer-fighting antioxidants','Strengthens bones','Boosts immune system','Supports heart health','Reduces inflammation'],
-   fact:'Broccoli contains more Vitamin C than an orange! It\'s one of the most nutritious vegetables on the planet.'},
+   fact:'Broccoli contains MORE Vitamin C than an orange! One cup gives you 135% of your daily needs.'},
+
   {name:'Spinach',emoji:'🌿',type:'vegetable',color:'#15803d',neon:'#4ade80',
-   vitamins:['Vitamin A','Vitamin C','Vitamin K','Iron','Calcium','Magnesium'],
+   score:96,
+   nutrition:{
+     'Vitamin K':'483% DV per 100g 🏆 #1 ALL Foods',
+     'Vitamin A':'188% DV 🏆 Top 3',
+     'Iron':'15% DV',
+     'Calcium':'10% DV',
+     'Vitamin C':'47% DV',
+     'Calories':'23 kcal per 100g'
+   },
+   vitamins:['Vitamin K 483%','Vitamin A 188%','Vitamin C 47%','Iron 15%','Calcium 10%'],
    benefits:['Builds strong bones','Fights anaemia with iron','Protects eyesight','Reduces blood pressure','Powerful anti-inflammatory'],
-   fact:'Popeye was right! Spinach has extraordinary iron content and was used to treat iron deficiency in WWI soldiers.'},
-  {name:'Tomato',emoji:'🍅',type:'vegetable',color:'#dc2626',neon:'#f87171',
-   vitamins:['Vitamin C','Vitamin K','Potassium','Lycopene','Folate'],
-   benefits:['Lycopene reduces cancer risk','Supports heart health','Protects skin from UV damage','Improves vision','Strengthens immune system'],
-   fact:'Tomatoes are technically a fruit but legally classified as a vegetable in the USA since an 1893 Supreme Court ruling!'},
-  {name:'Garlic',emoji:'🧄',type:'vegetable',color:'#d97706',neon:'#fbbf24',
-   vitamins:['Vitamin C','Vitamin B6','Manganese','Selenium','Allicin'],
-   benefits:['Powerful antibiotic properties','Reduces blood pressure','Lowers cholesterol','Boosts immune system','Fights the common cold'],
-   fact:'Garlic has been used as medicine for over 5,000 years. Ancient Egyptians gave it to pyramid builders for strength!'},
-  {name:'Onion',emoji:'🧅',type:'vegetable',color:'#a16207',neon:'#eab308',
-   vitamins:['Vitamin C','Vitamin B6','Folate','Quercetin','Potassium'],
-   benefits:['Powerful antioxidant quercetin','Reduces inflammation','Supports bone health','Fights bacteria','Regulates blood sugar'],
-   fact:'Onions make you cry because cutting them releases a gas that reacts with the water in your eyes to form sulphuric acid!'},
-  {name:'Sweet Potato',emoji:'🍠',type:'vegetable',color:'#ea580c',neon:'#fb923c',
-   vitamins:['Vitamin A','Vitamin C','Potassium','Manganese','Fibre'],
-   benefits:['Exceptionally high in Vitamin A','Regulates blood sugar','Promotes gut health','Boosts immune system','Supports healthy vision'],
-   fact:'Sweet potatoes are one of the oldest vegetables known to humans — evidence of their cultivation dates back 10,000 years!'},
-  {name:'Bell Pepper',emoji:'🫑',type:'vegetable',color:'#16a34a',neon:'#86efac',
-   vitamins:['Vitamin C','Vitamin B6','Vitamin A','Folate','Potassium'],
-   benefits:['Highest Vitamin C of any vegetable','Supports eye health','Fights anemia','Reduces inflammation','Boosts metabolism'],
-   fact:'Red bell peppers have 11x more beta-carotene and 3x more Vitamin C than green bell peppers!'},
-  {name:'Cucumber',emoji:'🥒',type:'vegetable',color:'#15803d',neon:'#4ade80',
-   vitamins:['Vitamin K','Vitamin C','Magnesium','Potassium','Silica'],
-   benefits:['96% water — supremely hydrating','Reduces bloating','Cools and soothes skin','Supports kidney health','Freshens breath'],
-   fact:'Cucumbers are 96% water — placing one on each eye really does reduce puffiness due to their cooling silica content!'},
-  {name:'Cauliflower',emoji:'🥛',type:'vegetable',color:'#e2e8f0',neon:'#f8fafc',
-   vitamins:['Vitamin C','Vitamin K','Folate','Choline','Fibre'],
-   benefits:['Fights cancer with sulforaphane','Supports brain health via choline','Reduces inflammation','Aids weight loss','Strengthens immune system'],
-   fact:'Cauliflower comes in purple, orange, and green varieties — each with slightly different nutritional profiles!'},
-  {name:'Zucchini',emoji:'🥬',type:'vegetable',color:'#16a34a',neon:'#22c55e',
-   vitamins:['Vitamin C','Vitamin B6','Potassium','Manganese','Folate'],
-   benefits:['Very low in calories','Supports heart health','Aids digestion','Improves vision','Boosts energy levels'],
-   fact:'Zucchini is technically a fruit botanically — it develops from a flower. Culinarily, it\'s treated as a vegetable!'},
+   fact:'Spinach has 483% of your daily Vitamin K in just 100g — the highest of any vegetable on Earth!'},
+
   {name:'Kale',emoji:'🥗',type:'vegetable',color:'#166534',neon:'#4ade80',
-   vitamins:['Vitamin A','Vitamin C','Vitamin K','Calcium','Iron','Omega-3'],
+   score:98,
+   nutrition:{
+     'Vitamin K':'680% DV per 100g 🏆 #1 Absolute',
+     'Vitamin A':'206% DV 🏆 Top 2',
+     'Vitamin C':'200% DV 🏆 Top 2',
+     'Calcium':'15% DV',
+     'Iron':'9% DV',
+     'Calories':'49 kcal per 100g'
+   },
+   vitamins:['Vitamin K 680%','Vitamin C 200%','Vitamin A 206%','Calcium 15%','Iron 9%'],
    benefits:['Most nutrient-dense food on Earth','Powerful antioxidant','Lowers cholesterol','Supports bone health','Fights cancer'],
-   fact:'One cup of kale provides more Vitamin C than an orange and more Vitamin K than almost any other food!'},
-  {name:'Asparagus',emoji:'🌱',type:'vegetable',color:'#15803d',neon:'#86efac',
-   vitamins:['Vitamin K','Folate','Vitamin C','Vitamin E','Chromium'],
-   benefits:['Prebiotic for gut health','Essential folate for pregnancy','Natural diuretic','Fights ageing','Supports brain function'],
-   fact:'Asparagus grows so fast you can actually watch it grow — up to 10 inches in a single day in ideal conditions!'},
+   fact:'Kale scores 1000+ on the ANDI nutritional index — the highest score possible. It is officially the most nutritious food on Earth!'},
+
+  {name:'Bell Pepper',emoji:'🫑',type:'vegetable',color:'#16a34a',neon:'#86efac',
+   score:92,
+   nutrition:{
+     'Vitamin C':'213% DV per 100g 🏆 #1 All Vegetables',
+     'Vitamin B6':'20% DV',
+     'Vitamin A':'93% DV',
+     'Folate':'7% DV',
+     'Potassium':'6% DV',
+     'Calories':'31 kcal per 100g'
+   },
+   vitamins:['Vitamin C 213%','Vitamin A 93%','Vitamin B6 20%','Folate 7%','Potassium 6%'],
+   benefits:['Highest Vitamin C of any vegetable','Supports eye health','Fights anemia','Reduces inflammation','Boosts metabolism'],
+   fact:'Red bell peppers have 213% of your daily Vitamin C — that is MORE than any other vegetable. Green peppers have only 80%!'},
+
+  {name:'Sweet Potato',emoji:'🍠',type:'vegetable',color:'#ea580c',neon:'#fb923c',
+   score:91,
+   nutrition:{
+     'Vitamin A':'283% DV per 100g 🏆 #2 Vegetable',
+     'Vitamin C':'33% DV',
+     'Potassium':'10% DV (337mg)',
+     'Manganese':'28% DV',
+     'Fibre':'14% DV',
+     'Calories':'86 kcal per 100g'
+   },
+   vitamins:['Vitamin A 283%','Manganese 28%','Vitamin C 33%','Potassium 10%','Fibre 14%'],
+   benefits:['Exceptionally high in Vitamin A','Regulates blood sugar','Promotes gut health','Boosts immune system','Supports healthy vision'],
+   fact:'One medium sweet potato gives you 283% of your daily Vitamin A — almost 3x your daily needs in one vegetable!'},
+
+  {name:'Garlic',emoji:'🧄',type:'vegetable',color:'#d97706',neon:'#fbbf24',
+   score:88,
+   nutrition:{
+     'Manganese':'23% DV per 100g',
+     'Vitamin B6':'95% DV 🏆 Top 5',
+     'Vitamin C':'52% DV',
+     'Selenium':'14% DV',
+     'Allicin':'Most potent natural antibiotic',
+     'Calories':'149 kcal per 100g'
+   },
+   vitamins:['Vitamin B6 95%','Vitamin C 52%','Manganese 23%','Selenium 14%','Allicin'],
+   benefits:['Powerful natural antibiotic','Reduces blood pressure','Lowers cholesterol','Boosts immune system','Fights the common cold'],
+   fact:'A single clove of garlic has 95% of your daily Vitamin B6 AND contains allicin — the most powerful natural antibiotic known!'},
+
   {name:'Beetroot',emoji:'🟣',type:'vegetable',color:'#9333ea',neon:'#c084fc',
-   vitamins:['Folate','Manganese','Potassium','Iron','Nitrates','Vitamin C'],
-   benefits:['Dramatically lowers blood pressure','Boosts athletic stamina','Supports liver detox','Fights inflammation','Improves brain blood flow'],
-   fact:'Beetroot juice can improve athletic performance by up to 16% — many Olympic athletes use it as a natural performance booster!'},
-  {name:'Pumpkin',emoji:'🎃',type:'vegetable',color:'#ea580c',neon:'#fb923c',
-   vitamins:['Vitamin A','Vitamin C','Potassium','Copper','Manganese'],
-   benefits:['Exceptional eye health support','Boosts immunity dramatically','Protects skin','Supports heart health','Aids weight loss'],
-   fact:'Pumpkin seeds are as nutritious as the flesh — packed with zinc, magnesium, and healthy fats!'},
-  {name:'Corn',emoji:'🌽',type:'vegetable',color:'#eab308',neon:'#fde047',
-   vitamins:['Vitamin B1','Vitamin B5','Folate','Phosphorus','Manganese'],
-   benefits:['High energy carbohydrate','Supports digestive health','Protects eye health','Promotes healthy skin','Boosts brain function'],
-   fact:'Corn is the most produced crop in the world. An ear of corn always has an even number of rows — usually 16!'},
-  {name:'Celery',emoji:'🌿',type:'vegetable',color:'#15803d',neon:'#4ade80',
-   vitamins:['Vitamin K','Vitamin C','Potassium','Folate','Phthalides'],
-   benefits:['Naturally lowers blood pressure','Anti-inflammatory properties','Aids digestion','Hydrates the body','Reduces cholesterol'],
-   fact:'Celery requires more calories to eat and digest than it actually contains — making it a true negative-calorie food!'},
-  {name:'Leek',emoji:'🧅',type:'vegetable',color:'#16a34a',neon:'#86efac',
-   vitamins:['Vitamin K','Vitamin A','Vitamin C','Folate','Manganese'],
-   benefits:['Supports heart health','Bone strengthening Vitamin K','Powerful antioxidants','Promotes healthy gut','Reduces cancer risk'],
-   fact:'Leeks are the national symbol of Wales — Welsh soldiers wore them in their hats to identify friends from enemies in battle!'},
-  {name:'Artichoke',emoji:'🌹',type:'vegetable',color:'#16a34a',neon:'#22c55e',
-   vitamins:['Vitamin C','Vitamin K','Folate','Magnesium','Cynarin'],
-   benefits:['Highest antioxidant of all vegetables','Supports liver function','Lowers cholesterol','Aids digestion dramatically','Regulates blood sugar'],
-   fact:'Artichokes are actually the flower buds of a thistle plant. If left unharvested, they bloom into beautiful purple flowers!'},
-  {name:'Brussels Sprout',emoji:'🥦',type:'vegetable',color:'#15803d',neon:'#4ade80',
-   vitamins:['Vitamin C','Vitamin K','Folate','Fibre','Glucosinolates'],
-   benefits:['Powerful cancer prevention','Strengthens immune system','Supports bone health','Aids digestive health','Reduces inflammation'],
-   fact:'Brussels sprouts taste bitter to some people due to a genetic variation — about 25% of people are "supertasters" who find them very bitter!'},
+   score:86,
+   nutrition:{
+     'Folate':'20% DV per 100g',
+     'Manganese':'16% DV',
+     'Potassium':'9% DV (325mg)',
+     'Iron':'6% DV',
+     'Nitrates':'Highest of any vegetable 🏆',
+     'Calories':'43 kcal per 100g'
+   },
+   vitamins:['Nitrates Highest','Folate 20%','Manganese 16%','Potassium 9%','Iron 6%'],
+   benefits:['Dramatically lowers blood pressure','Boosts athletic stamina by 16%','Supports liver detox','Fights inflammation','Improves brain blood flow'],
+   fact:'Beetroot has the highest natural nitrate content of any vegetable — Olympic athletes use it to boost stamina by up to 16%!'},
+
+  {name:'Tomato',emoji:'🍅',type:'vegetable',color:'#dc2626',neon:'#f87171',
+   score:84,
+   nutrition:{
+     'Lycopene':'Most absorbable source 🏆',
+     'Vitamin C':'28% DV per 100g',
+     'Vitamin K':'10% DV',
+     'Potassium':'7% DV (237mg)',
+     'Folate':'5% DV',
+     'Calories':'18 kcal per 100g'
+   },
+   vitamins:['Lycopene Highest','Vitamin C 28%','Vitamin K 10%','Potassium 7%','Folate 5%'],
+   benefits:['Lycopene reduces cancer risk significantly','Supports heart health','Protects skin from UV damage','Improves vision','Strengthens immune system'],
+   fact:'Cooking tomatoes increases their lycopene content by 35%! Tomato sauce is actually MORE nutritious than raw tomatoes.'},
+
+  {name:'Asparagus',emoji:'🌱',type:'vegetable',color:'#15803d',neon:'#86efac',
+   score:83,
+   nutrition:{
+     'Folate':'34% DV per 100g 🏆 Top Vegetable',
+     'Vitamin K':'57% DV',
+     'Vitamin C':'12% DV',
+     'Vitamin E':'7% DV',
+     'Chromium':'Excellent source',
+     'Calories':'20 kcal per 100g'
+   },
+   vitamins:['Vitamin K 57%','Folate 34%','Vitamin C 12%','Vitamin E 7%','Chromium'],
+   benefits:['Prebiotic for gut health','Essential folate for pregnancy','Natural diuretic','Fights ageing','Supports brain function'],
+   fact:'Asparagus has 34% of your daily folate per serving — making it one of the most important vegetables for pregnant women!'},
+
   {name:'Mushroom',emoji:'🍄',type:'vegetable',color:'#92400e',neon:'#d97706',
-   vitamins:['Vitamin D','Vitamin B12','Selenium','Copper','Beta-Glucans'],
+   score:85,
+   nutrition:{
+     'Vitamin D':'Only plant source 🏆 Unique',
+     'Vitamin B12':'Only plant source 🏆 Unique',
+     'Selenium':'37% DV per 100g',
+     'Copper':'32% DV',
+     'Beta-Glucans':'Immune boosting',
+     'Calories':'22 kcal per 100g'
+   },
+   vitamins:['Vitamin D Unique','Vitamin B12 Unique','Selenium 37%','Copper 32%','Beta-Glucans'],
    benefits:['Only plant source of Vitamin D','Powerful immune booster','Fights cancer cells','Supports brain health','Reduces inflammation'],
-   fact:'Mushrooms are more closely related to animals than plants! They share DNA with humans and can get a suntan when exposed to UV light!'},
+   fact:'Mushrooms are the ONLY plant food with Vitamin D AND B12 — making them essential for vegans. Sun-dried mushrooms have 10x more Vitamin D!'},
+
+  {name:'Bruss. Sprouts',emoji:'🥦',type:'vegetable',color:'#15803d',neon:'#4ade80',
+   score:89,
+   nutrition:{
+     'Vitamin C':'142% DV per 100g 🏆 Top 3',
+     'Vitamin K':'177% DV 🏆 Top 3',
+     'Folate':'15% DV',
+     'Fibre':'14% DV',
+     'Glucosinolates':'Cancer fighting 🏆',
+     'Calories':'43 kcal per 100g'
+   },
+   vitamins:['Vitamin K 177%','Vitamin C 142%','Fibre 14%','Folate 15%','Glucosinolates'],
+   benefits:['Powerful cancer prevention via glucosinolates','Strengthens immune system','Supports bone health','Aids digestive health','Reduces inflammation'],
+   fact:'Brussels sprouts have 177% of your daily Vitamin K — making them one of the top 3 sources of Vitamin K of all vegetables!'},
+
+  {name:'Pumpkin',emoji:'🎃',type:'vegetable',color:'#ea580c',neon:'#fb923c',
+   score:82,
+   nutrition:{
+     'Vitamin A':'170% DV per 100g 🏆 Top 5',
+     'Vitamin C':'19% DV',
+     'Potassium':'10% DV',
+     'Copper':'12% DV',
+     'Fibre':'9% DV',
+     'Calories':'26 kcal per 100g'
+   },
+   vitamins:['Vitamin A 170%','Potassium 10%','Vitamin C 19%','Copper 12%','Fibre 9%'],
+   benefits:['Exceptional eye health support','Boosts immunity dramatically','Protects skin','Supports heart health','Aids weight loss'],
+   fact:'Pumpkin gives you 170% of your daily Vitamin A in just 100g — one of the richest orange-coloured sources on Earth!'},
+
+  {name:'Artichoke',emoji:'🌹',type:'vegetable',color:'#16a34a',neon:'#22c55e',
+   score:90,
+   nutrition:{
+     'Antioxidants':'#1 Highest of ALL vegetables 🏆',
+     'Fibre':'28% DV per 100g 🏆 Top 5',
+     'Vitamin C':'25% DV',
+     'Magnesium':'13% DV',
+     'Folate':'22% DV',
+     'Calories':'47 kcal per 100g'
+   },
+   vitamins:['Antioxidants #1','Fibre 28%','Folate 22%','Vitamin C 25%','Magnesium 13%'],
+   benefits:['Highest antioxidant content of ALL vegetables','Supports liver function dramatically','Lowers cholesterol','Aids digestion','Regulates blood sugar'],
+   fact:'Artichoke has the HIGHEST antioxidant content of any vegetable tested — beating even kale and spinach on ORAC antioxidant scores!'},
+
+  {name:'Onion',emoji:'🧅',type:'vegetable',color:'#a16207',neon:'#eab308',
+   score:79,
+   nutrition:{
+     'Quercetin':'#1 Highest dietary source 🏆',
+     'Vitamin C':'12% DV per 100g',
+     'Vitamin B6':'10% DV',
+     'Folate':'5% DV',
+     'Potassium':'4% DV',
+     'Calories':'40 kcal per 100g'
+   },
+   vitamins:['Quercetin #1','Vitamin C 12%','Vitamin B6 10%','Folate 5%','Potassium 4%'],
+   benefits:['Highest dietary quercetin source','Reduces inflammation powerfully','Supports bone health','Fights bacteria','Regulates blood sugar'],
+   fact:'Onions are the richest dietary source of quercetin — one of the most powerful anti-inflammatory and anti-cancer compounds known!'},
+
+  {name:'Cucumber',emoji:'🥒',type:'vegetable',color:'#15803d',neon:'#4ade80',
+   score:68,
+   nutrition:{
+     'Water Content':'96% water 🏆 Most hydrating',
+     'Vitamin K':'16% DV per 100g',
+     'Vitamin C':'4% DV',
+     'Potassium':'4% DV',
+     'Magnesium':'3% DV',
+     'Calories':'15 kcal per 100g'
+   },
+   vitamins:['Water 96%','Vitamin K 16%','Vitamin C 4%','Potassium 4%','Magnesium 3%'],
+   benefits:['Most hydrating food — 96% water','Reduces bloating','Cools and soothes skin','Supports kidney health','Lowest calorie vegetable'],
+   fact:'At just 15 calories per 100g and 96% water, cucumber is one of the most hydrating and lowest calorie foods in existence!'},
+
+  {name:'Corn',emoji:'🌽',type:'vegetable',color:'#eab308',neon:'#fde047',
+   score:72,
+   nutrition:{
+     'Lutein':'#1 Highest source 🏆 Eye health',
+     'Thiamine':'17% DV per 100g',
+     'Folate':'11% DV',
+     'Phosphorus':'12% DV',
+     'Fibre':'8% DV',
+     'Calories':'86 kcal per 100g'
+   },
+   vitamins:['Lutein #1','Thiamine 17%','Phosphorus 12%','Folate 11%','Fibre 8%'],
+   benefits:['Lutein protects eye health','Supports digestive health','Provides sustained energy','Promotes healthy skin','Boosts brain function'],
+   fact:'Corn is the #1 dietary source of lutein — the most important nutrient for protecting your eyes from macular degeneration!'},
+
   {name:'Avocado',emoji:'🥑',type:'fruit',color:'#15803d',neon:'#4ade80',
-   vitamins:['Healthy Fats','Potassium','Vitamin K','Vitamin B5','Vitamin B6'],
-   benefits:['Loaded with heart-healthy fats','More potassium than bananas','Reduces cholesterol','Supports eye health','Fights arthritis'],
-   fact:'Avocados are technically berries! They contain more potassium than bananas and are one of the fattiest plant foods on Earth!'},
+   score:93,
+   nutrition:{
+     'Healthy Fats':'30g per 100g 🏆 Most in fruit',
+     'Potassium':'14% DV per 100g 🏆 Beats banana',
+     'Vitamin K':'26% DV',
+     'Folate':'21% DV',
+     'Vitamin B5':'28% DV',
+     'Calories':'160 kcal per 100g'
+   },
+   vitamins:['Potassium 14%','Vitamin B5 28%','Vitamin K 26%','Folate 21%','Healthy Fats 30g'],
+   benefits:['More potassium than bananas','Loaded with heart-healthy fats','Reduces cholesterol','Supports eye health','Fights arthritis'],
+   fact:'Avocados have more potassium than bananas — 14% vs 10% DV per 100g. They are also the fattiest plant food on Earth!'},
+
   {name:'Peas',emoji:'🫛',type:'vegetable',color:'#16a34a',neon:'#86efac',
-   vitamins:['Vitamin C','Vitamin K','Vitamin A','Thiamine','Manganese'],
-   benefits:['High plant-based protein','Supports heart health','Controls blood sugar','Promotes gut health','Boosts immune system'],
-   fact:'Frozen peas are often MORE nutritious than fresh ones — they\'re frozen within hours of picking, locking in all their nutrients!'},
+   score:80,
+   nutrition:{
+     'Protein':'5.4g per 100g 🏆 Highest vegetable',
+     'Vitamin C':'40% DV per 100g',
+     'Vitamin K':'25% DV',
+     'Thiamine':'23% DV',
+     'Fibre':'22% DV',
+     'Calories':'81 kcal per 100g'
+   },
+   vitamins:['Protein 5.4g','Vitamin C 40%','Vitamin K 25%','Thiamine 23%','Fibre 22%'],
+   benefits:['Highest protein of any vegetable','Supports heart health','Controls blood sugar','Promotes gut health','Boosts immune system'],
+   fact:'Peas have 5.4g of protein per 100g — the highest protein content of any vegetable. They are a complete plant protein source!'},
 
   // FRUITS
-  {name:'Apple',emoji:'🍎',type:'fruit',color:'#dc2626',neon:'#f87171',
-   vitamins:['Vitamin C','Fibre','Quercetin','Catechin','Potassium'],
-   benefits:['Reduces risk of Type 2 diabetes','Promotes gut health','Lowers cholesterol','Protects heart','May prevent Alzheimer\'s'],
-   fact:'An apple a day really does keep the doctor away! The quercetin in apples is one of the most powerful antioxidants known to science.'},
-  {name:'Banana',emoji:'🍌',type:'fruit',color:'#eab308',neon:'#fde047',
-   vitamins:['Vitamin B6','Vitamin C','Potassium','Magnesium','Fibre'],
-   benefits:['Instant natural energy boost','Reduces muscle cramps','Supports brain function','Improves mood via serotonin','Aids digestion'],
-   fact:'Bananas are radioactive! They contain a tiny amount of potassium-40. You\'d need to eat 10 million bananas to get a dangerous dose!'},
-  {name:'Orange',emoji:'🍊',type:'fruit',color:'#ea580c',neon:'#fb923c',
-   vitamins:['Vitamin C','Fibre','Folate','Potassium','Thiamine'],
-   benefits:['One orange = 100% daily Vitamin C','Strengthens immune system','Reduces kidney stone risk','Protects skin','Supports heart health'],
-   fact:'The orange fruit was named after the colour — not the other way around! Before oranges arrived in Europe, there was no word for the colour orange!'},
-  {name:'Strawberry',emoji:'🍓',type:'fruit',color:'#dc2626',neon:'#f87171',
-   vitamins:['Vitamin C','Manganese','Folate','Potassium','Anthocyanins'],
-   benefits:['Highest Vitamin C of all berries','Whitens teeth naturally','Reduces blood pressure','Fights inflammation','Boosts HDL cholesterol'],
-   fact:'Strawberries are the only fruit with seeds on the outside. A single strawberry has about 200 seeds on its surface!'},
-  {name:'Mango',emoji:'🥭',type:'fruit',color:'#f59e0b',neon:'#fbbf24',
-   vitamins:['Vitamin C','Vitamin A','Vitamin B6','Folate','Copper'],
-   benefits:['Boosts immunity powerfully','Improves digestion','Supports eye health','Fights cancer','Promotes healthy skin'],
-   fact:'Mango is the most consumed fruit in the world! Over half the world\'s tropical fruits are mangoes. India produces 50% of the world\'s supply!'},
-  {name:'Blueberry',emoji:'🫐',type:'fruit',color:'#4f46e5',neon:'#818cf8',
-   vitamins:['Vitamin C','Vitamin K','Manganese','Anthocyanins','Fibre'],
-   benefits:['Highest antioxidant of all fruits','Improves memory and brain function','Reduces DNA damage','Lowers blood pressure','Fights ageing'],
-   fact:'Blueberries are one of very few naturally blue foods. The compound that gives them colour is one of the most powerful antioxidants known!'},
-  {name:'Grapes',emoji:'🍇',type:'fruit',color:'#7c3aed',neon:'#a78bfa',
-   vitamins:['Vitamin C','Vitamin K','Resveratrol','Copper','Thiamine'],
-   benefits:['Resveratrol fights cancer and ageing','Reduces heart disease risk','Fights inflammation','Supports eye health','Improves sleep quality'],
-   fact:'Resveratrol in red grapes is linked to longevity. The people of Sardinia Italy who drink local grape wine live exceptionally long lives!'},
-  {name:'Pineapple',emoji:'🍍',type:'fruit',color:'#eab308',neon:'#fde047',
-   vitamins:['Vitamin C','Manganese','Bromelain','Vitamin B6','Copper'],
-   benefits:['Bromelain reduces inflammation powerfully','Boosts immunity','Speeds wound healing','Aids digestion of proteins','Fights cancer cells'],
-   fact:'Pineapples contain bromelain which actually digests the proteins in your mouth — that\'s why your tongue tingles when you eat too much!'},
-  {name:'Watermelon',emoji:'🍉',type:'fruit',color:'#dc2626',neon:'#f87171',
-   vitamins:['Vitamin A','Vitamin C','Lycopene','Potassium','Citrulline'],
-   benefits:['92% water — ultimate hydration','Lycopene reduces cancer risk','Reduces muscle soreness','Supports heart health','Natural diuretic'],
-   fact:'Watermelon is actually a vegetable! It belongs to the same family as cucumber and pumpkin. Every part including the rind is edible!'},
-  {name:'Lemon',emoji:'🍋',type:'fruit',color:'#eab308',neon:'#fde047',
-   vitamins:['Vitamin C','Potassium','Vitamin B6','Folate','Limonene'],
-   benefits:['Alkalises the body despite acidity','Supports kidney stone prevention','Enhances iron absorption','Aids digestion','Promotes glowing skin'],
-   fact:'Lemons are a hybrid of sour orange and citron. They don\'t exist in nature — every lemon tree in the world was created by humans!'},
-  {name:'Kiwi',emoji:'🥝',type:'fruit',color:'#16a34a',neon:'#4ade80',
-   vitamins:['Vitamin C','Vitamin K','Vitamin E','Potassium','Folate'],
-   benefits:['More Vitamin C than oranges','Improves sleep quality significantly','Supports heart health','Aids digestion via actinidin','Boosts immunity'],
-   fact:'Eating 2 kiwis before bed improves sleep quality by 42%! They contain serotonin which regulates your sleep cycle naturally.'},
-  {name:'Pomegranate',emoji:'🍎',type:'fruit',color:'#9f1239',neon:'#fb7185',
-   vitamins:['Vitamin C','Vitamin K','Folate','Potassium','Punicalagins'],
-   benefits:['Punicalagins most powerful antioxidant known','Fights prostate cancer','Reduces blood pressure','Fights arthritis','Improves memory'],
-   fact:'Pomegranate juice has 3x more antioxidants than red wine and green tea! It\'s one of the healthiest substances on Earth.'},
-  {name:'Cherry',emoji:'🍒',type:'fruit',color:'#be123c',neon:'#fb7185',
-   vitamins:['Vitamin C','Potassium','Melatonin','Anthocyanins','Fibre'],
-   benefits:['Natural melatonin improves sleep','Reduces muscle pain after exercise','Fights gout','Lowers inflammation','Supports heart health'],
-   fact:'Tart cherries are one of the only foods that naturally contain melatonin — athletes use cherry juice to reduce muscle soreness by 22%!'},
-  {name:'Peach',emoji:'🍑',type:'fruit',color:'#fb923c',neon:'#fdba74',
-   vitamins:['Vitamin C','Vitamin A','Potassium','Niacin','Fibre'],
-   benefits:['Promotes eye health','Supports skin health via antioxidants','Reduces allergy symptoms','Aids digestion','Boosts immunity'],
-   fact:'Peaches are members of the rose family! They\'re related to almonds — the pit of a peach contains a seed similar to an almond.'},
-  {name:'Pear',emoji:'🍐',type:'fruit',color:'#84cc16',neon:'#bef264',
-   vitamins:['Vitamin C','Vitamin K','Potassium','Copper','Fibre'],
-   benefits:['Highest fibre content of all fruits','Supports gut microbiome','Reduces Type 2 diabetes risk','Anti-inflammatory','Promotes heart health'],
-   fact:'Pears are one of the few fruits that ripen BETTER off the tree. They are intentionally picked unripe and stored to develop perfect flavour!'},
-  {name:'Papaya',emoji:'🍈',type:'fruit',color:'#f97316',neon:'#fb923c',
-   vitamins:['Vitamin C','Vitamin A','Folate','Papain','Potassium'],
-   benefits:['Papain enzyme aids protein digestion','Reduces inflammation','Protects against cancer','Improves heart health','Supports eye health'],
-   fact:'Papaya was called "the fruit of the angels" by Christopher Columbus. The enzyme papain in papaya is used to tenderize meat commercially!'},
-  {name:'Fig',emoji:'🌸',type:'fruit',color:'#7c3aed',neon:'#a78bfa',
-   vitamins:['Potassium','Calcium','Magnesium','Iron','Vitamin B6'],
-   benefits:['Highest calcium of any fruit','Promotes bone health','Regulates blood sugar','Supports digestive health','Reduces blood pressure'],
-   fact:'Figs are not actually a fruit — they\'re an inverted flower! What you eat is technically a syconium containing hundreds of tiny flowers inside.'},
-  {name:'Raspberry',emoji:'🫐',type:'fruit',color:'#e11d48',neon:'#fb7185',
-   vitamins:['Vitamin C','Manganese','Vitamin K','Magnesium','Ellagic Acid'],
-   benefits:['Ellagic acid fights cancer','Reduces belly fat','Stabilises blood sugar','Boosts immune system','Anti-ageing properties'],
-   fact:'Raspberries are not actually berries botanically — they\'re aggregate fruits made up of many tiny drupelets, each containing one seed!'},
-  {name:'Coconut',emoji:'🥥',type:'fruit',color:'#78350f',neon:'#d97706',
-   vitamins:['MCT Fats','Iron','Copper','Manganese','Selenium'],
-   benefits:['MCTs boost brain function and energy','Kills harmful microorganisms','Reduces hunger and food intake','Improves cholesterol','Supports thyroid'],
-   fact:'A coconut can float in the ocean for months and remain viable for germination — they\'ve colonised tropical islands across the Pacific this way!'},
-  {name:'Passion Fruit',emoji:'🌺',type:'fruit',color:'#7c3aed',neon:'#c084fc',
-   vitamins:['Vitamin A','Vitamin C','Iron','Potassium','Piceatannol'],
-   benefits:['Reduces anxiety and improves sleep','Supports immune system','Promotes healthy skin','Improves insulin sensitivity','Fights cancer'],
-   fact:'Passion fruit gets its name from Christian missionaries who saw the flower as symbolising the Passion of Christ — not from the fruit\'s taste!'},
-  {name:'Dragon Fruit',emoji:'🍓',type:'fruit',color:'#e11d48',neon:'#fb7185',
-   vitamins:['Vitamin C','Iron','Magnesium','Fibre','Lycopene'],
-   benefits:['Prebiotic feeds good gut bacteria','Strengthens immune system','Boosts iron absorption','Reduces cancer risk','Promotes healthy skin'],
-   fact:'Dragon fruit flowers only bloom at night and are pollinated by bats and moths! Each flower lasts just one single night.'},
-  {name:'Grapefruit',emoji:'🍊',type:'fruit',color:'#f97316',neon:'#fb923c',
-   vitamins:['Vitamin C','Vitamin A','Potassium','Lycopene','Naringenin'],
-   benefits:['Aids weight loss significantly','Reduces insulin resistance','Fights kidney stones','Powerful immune booster','Reduces cholesterol'],
-   fact:'Grapefruit interacts with over 85 medications! The compound naringenin blocks enzymes that break down drugs — always check with your doctor!'},
-  {name:'Plum',emoji:'🫐',type:'fruit',color:'#581c87',neon:'#a855f7',
-   vitamins:['Vitamin C','Vitamin K','Vitamin A','Potassium','Sorbitol'],
-   benefits:['Prevents constipation naturally','Reduces risk of osteoporosis','Improves memory','Lowers blood sugar','Fights cell damage'],
-   fact:'Prunes are simply dried plums! They contain more than twice the nutrients by weight of fresh plums and have been used as medicine for centuries.'},
-  {name:'Lime',emoji:'🍈',type:'fruit',color:'#16a34a',neon:'#4ade80',
-   vitamins:['Vitamin C','Iron','Calcium','Vitamin B6','Folate'],
-   benefits:['Prevents scurvy effectively','Boosts iron absorption','Promotes glowing skin','Supports weight loss','Strengthens immune system'],
-   fact:'British sailors were called "Limeys" because the Royal Navy gave them limes to prevent scurvy on long voyages — a practice started in 1795!'},
-  {name:'Jackfruit',emoji:'🍈',type:'fruit',color:'#eab308',neon:'#fde047',
-   vitamins:['Vitamin C','Vitamin B6','Potassium','Magnesium','Fibre'],
-   benefits:['Excellent meat substitute','Regulates blood sugar','Prevents anaemia','Supports heart health','Boosts immunity'],
-   fact:'Jackfruit is the world\'s largest tree fruit — it can weigh up to 55kg! Its meaty texture makes it popular as a vegan pulled-pork substitute!'},
   {name:'Guava',emoji:'🍈',type:'fruit',color:'#16a34a',neon:'#4ade80',
-   vitamins:['Vitamin C','Lycopene','Potassium','Folate','Fibre'],
-   benefits:['5x more Vitamin C than oranges','Reduces cancer risk dramatically','Lowers blood pressure','Improves digestion','Supports heart health'],
-   fact:'One guava contains 4x more fibre than a pineapple and more Vitamin C than the daily recommended intake — it\'s a tropical superfood!'},
-  {name:'Lychee',emoji:'🍒',type:'fruit',color:'#e11d48',neon:'#fb7185',
-   vitamins:['Vitamin C','Copper','Potassium','Epicatechin','Rutin'],
-   benefits:['Powerful antioxidant','Supports heart health','Boosts immune system','Fights liver disease','Promotes healthy skin'],
-   fact:'Lychees contain oligonol — a unique compound that improves blood flow, reduces fat storage, and has powerful anti-ageing properties!'},
+   score:99,
+   nutrition:{
+     'Vitamin C':'381% DV per 100g 🏆 #1 ALL FOODS',
+     'Fibre':'21% DV 🏆 Top Fruit',
+     'Folate':'12% DV',
+     'Potassium':'9% DV',
+     'Lycopene':'High content',
+     'Calories':'68 kcal per 100g'
+   },
+   vitamins:['Vitamin C 381%','Fibre 21%','Folate 12%','Potassium 9%','Lycopene'],
+   benefits:['Most Vitamin C of any food on Earth','Reduces cancer risk dramatically','Lowers blood pressure','Improves digestion','Supports heart health'],
+   fact:'Guava has 381% of your daily Vitamin C per 100g — beating every other fruit and vegetable. It is officially the highest Vitamin C food on Earth!'},
+
+  {name:'Kiwi',emoji:'🥝',type:'fruit',color:'#16a34a',neon:'#4ade80',
+   score:94,
+   nutrition:{
+     'Vitamin C':'154% DV per 100g 🏆 Top 3 Fruit',
+     'Vitamin K':'38% DV',
+     'Vitamin E':'15% DV',
+     'Potassium':'7% DV',
+     'Folate':'7% DV',
+     'Calories':'61 kcal per 100g'
+   },
+   vitamins:['Vitamin C 154%','Vitamin K 38%','Vitamin E 15%','Folate 7%','Potassium 7%'],
+   benefits:['154% daily Vitamin C in one fruit','Improves sleep quality by 42%','Supports heart health','Aids digestion via actinidin','Boosts immunity'],
+   fact:'Two kiwis before bed improves sleep quality by 42%! They contain more Vitamin C than an orange by weight.'},
+
+  {name:'Papaya',emoji:'🍈',type:'fruit',color:'#f97316',neon:'#fb923c',
+   score:91,
+   nutrition:{
+     'Vitamin C':'103% DV per 100g 🏆 Top 5 Fruit',
+     'Vitamin A':'47% DV',
+     'Folate':'10% DV',
+     'Papain':'Unique enzyme 🏆',
+     'Potassium':'6% DV',
+     'Calories':'43 kcal per 100g'
+   },
+   vitamins:['Vitamin C 103%','Vitamin A 47%','Papain Unique','Folate 10%','Potassium 6%'],
+   benefits:['103% daily Vitamin C per 100g','Papain enzyme aids protein digestion uniquely','Reduces inflammation powerfully','Improves heart health','Supports eye health'],
+   fact:'Christopher Columbus called papaya "the fruit of the angels". Its enzyme papain is used in meat tenderisers commercially!'},
+
+  {name:'Strawberry',emoji:'🍓',type:'fruit',color:'#dc2626',neon:'#f87171',
+   score:88,
+   nutrition:{
+     'Vitamin C':'98% DV per 100g 🏆 Top Berry',
+     'Manganese':'20% DV 🏆 Top Fruit',
+     'Folate':'6% DV',
+     'Potassium':'4% DV',
+     'Anthocyanins':'Very high',
+     'Calories':'32 kcal per 100g'
+   },
+   vitamins:['Vitamin C 98%','Manganese 20%','Anthocyanins High','Folate 6%','Potassium 4%'],
+   benefits:['Nearly full daily Vitamin C in 100g','Highest Vitamin C of all berries','Whitens teeth naturally','Reduces blood pressure','Fights inflammation'],
+   fact:'100g of strawberries gives you 98% of your daily Vitamin C — and at only 32 calories, they are one of the most nutrient-dense low-calorie foods!'},
+
+  {name:'Pomegranate',emoji:'🍎',type:'fruit',color:'#9f1239',neon:'#fb7185',
+   score:96,
+   nutrition:{
+     'Punicalagins':'#1 Most powerful antioxidant 🏆',
+     'Vitamin C':'17% DV per 100g',
+     'Vitamin K':'16% DV',
+     'Folate':'10% DV',
+     'Potassium':'8% DV',
+     'Calories':'83 kcal per 100g'
+   },
+   vitamins:['Punicalagins #1','Vitamin C 17%','Vitamin K 16%','Folate 10%','Potassium 8%'],
+   benefits:['Punicalagins most powerful antioxidant known','Fights prostate cancer','Reduces blood pressure by 21%','Fights arthritis pain','Improves memory'],
+   fact:'Pomegranate juice has 3x more antioxidants than red wine and green tea. Punicalagins are found nowhere else in nature!'},
+
+  {name:'Blueberry',emoji:'🫐',type:'fruit',color:'#4f46e5',neon:'#818cf8',
+   score:95,
+   nutrition:{
+     'Antioxidants':'#1 Highest of ALL fruits 🏆',
+     'Vitamin C':'16% DV per 100g',
+     'Vitamin K':'24% DV',
+     'Manganese':'17% DV',
+     'Fibre':'10% DV',
+     'Calories':'57 kcal per 100g'
+   },
+   vitamins:['Antioxidants #1 Fruit','Vitamin K 24%','Manganese 17%','Vitamin C 16%','Fibre 10%'],
+   benefits:['Highest antioxidant content of ALL fruits','Improves memory and brain function','Reduces DNA damage','Lowers blood pressure','Fights ageing'],
+   fact:'Blueberries score highest of any fruit on ORAC antioxidant tests. Eating them regularly improves memory by up to 30% in older adults!'},
+
+  {name:'Orange',emoji:'🍊',type:'fruit',color:'#ea580c',neon:'#fb923c',
+   score:87,
+   nutrition:{
+     'Vitamin C':'89% DV per 100g 🏆 Most famous source',
+     'Thiamine':'11% DV',
+     'Folate':'9% DV',
+     'Potassium':'8% DV',
+     'Calcium':'5% DV',
+     'Calories':'47 kcal per 100g'
+   },
+   vitamins:['Vitamin C 89%','Thiamine 11%','Folate 9%','Potassium 8%','Calcium 5%'],
+   benefits:['One orange = nearly full daily Vitamin C','Strengthens immune system','Reduces kidney stone risk','Protects skin','Supports heart health'],
+   fact:'One medium orange provides 89% of your daily Vitamin C. Before oranges arrived in Europe there was literally no word for the colour orange!'},
+
+  {name:'Banana',emoji:'🍌',type:'fruit',color:'#eab308',neon:'#fde047',
+   score:82,
+   nutrition:{
+     'Vitamin B6':'25% DV per 100g 🏆 Top Fruit',
+     'Potassium':'10% DV (358mg)',
+     'Vitamin C':'15% DV',
+     'Magnesium':'7% DV',
+     'Fibre':'9% DV',
+     'Calories':'89 kcal per 100g'
+   },
+   vitamins:['Vitamin B6 25%','Potassium 10%','Vitamin C 15%','Magnesium 7%','Fibre 9%'],
+   benefits:['Instant natural energy boost','Reduces muscle cramps','Supports brain function','Improves mood via serotonin','Aids digestion'],
+   fact:'Bananas give you 25% of your daily Vitamin B6 — the highest of any fruit. They are naturally radioactive but completely safe to eat!'},
+
+  {name:'Mango',emoji:'🥭',type:'fruit',color:'#f59e0b',neon:'#fbbf24',
+   score:89,
+   nutrition:{
+     'Vitamin C':'67% DV per 100g',
+     'Vitamin A':'54% DV 🏆 Top 3 Fruit',
+     'Vitamin B6':'13% DV',
+     'Folate':'11% DV',
+     'Copper':'9% DV',
+     'Calories':'60 kcal per 100g'
+   },
+   vitamins:['Vitamin C 67%','Vitamin A 54%','Vitamin B6 13%','Folate 11%','Copper 9%'],
+   benefits:['67% daily Vitamin C in 100g','Improves digestion powerfully','Supports eye health via Vitamin A','Fights cancer cells','Promotes healthy skin'],
+   fact:'Mango is the most consumed fruit in the world! One mango gives you 67% Vitamin C AND 54% Vitamin A — an extraordinary combination!'},
+
+  {name:'Apple',emoji:'🍎',type:'fruit',color:'#dc2626',neon:'#f87171',
+   score:78,
+   nutrition:{
+     'Quercetin':'Excellent source',
+     'Vitamin C':'8% DV per 100g',
+     'Fibre':'9% DV',
+     'Potassium':'4% DV',
+     'Catechin':'High content',
+     'Calories':'52 kcal per 100g'
+   },
+   vitamins:['Quercetin High','Fibre 9%','Vitamin C 8%','Potassium 4%','Catechin'],
+   benefits:['Reduces risk of Type 2 diabetes','Promotes gut health','Lowers cholesterol','Protects heart','May prevent Alzheimer's'],
+   fact:'An apple a day really does work! The quercetin in apples is one of the most powerful antioxidants and has been linked to preventing Alzheimer's!'},
+
+  {name:'Pineapple',emoji:'🍍',type:'fruit',color:'#eab308',neon:'#fde047',
+   score:86,
+   nutrition:{
+     'Vitamin C':'80% DV per 100g',
+     'Manganese':'44% DV 🏆 #1 Fruit',
+     'Bromelain':'Unique enzyme 🏆',
+     'Vitamin B6':'8% DV',
+     'Copper':'8% DV',
+     'Calories':'50 kcal per 100g'
+   },
+   vitamins:['Manganese 44%','Vitamin C 80%','Bromelain Unique','Vitamin B6 8%','Copper 8%'],
+   benefits:['44% daily Manganese — highest of any fruit','Bromelain reduces inflammation powerfully','Boosts immunity','Speeds wound healing','Aids protein digestion'],
+   fact:'Pineapple has 44% of your daily Manganese — the highest of any fruit! Bromelain is so powerful it is used in medical treatments worldwide!'},
+
+  {name:'Watermelon',emoji:'🍉',type:'fruit',color:'#dc2626',neon:'#f87171',
+   score:77,
+   nutrition:{
+     'Lycopene':'Most bioavailable source 🏆',
+     'Vitamin A':'19% DV per 100g',
+     'Vitamin C':'21% DV',
+     'Citrulline':'#1 Natural source 🏆',
+     'Potassium':'4% DV',
+     'Calories':'30 kcal per 100g'
+   },
+   vitamins:['Lycopene #1','Citrulline #1','Vitamin C 21%','Vitamin A 19%','Potassium 4%'],
+   benefits:['92% water — ultimate hydration','Best lycopene source of any fruit','Reduces muscle soreness','Supports heart health','Only 30 calories per 100g'],
+   fact:'Watermelon has more lycopene than tomatoes AND contains citrulline — a compound that improves blood flow and reduces muscle soreness by 40%!'},
+
+  {name:'Lemon',emoji:'🍋',type:'fruit',color:'#eab308',neon:'#fde047',
+   score:81,
+   nutrition:{
+     'Vitamin C':'88% DV per 100g 🏆 Top 5',
+     'Limonene':'#1 Natural source 🏆',
+     'Potassium':'5% DV',
+     'Vitamin B6':'6% DV',
+     'Folate':'3% DV',
+     'Calories':'29 kcal per 100g'
+   },
+   vitamins:['Vitamin C 88%','Limonene #1','Potassium 5%','Vitamin B6 6%','Folate 3%'],
+   benefits:['88% daily Vitamin C per 100g','Alkalises the body despite being acidic','Prevents kidney stones','Enhances iron absorption','Only 29 calories per 100g'],
+   fact:'Lemons are the richest source of limonene — a compound that fights cancer cells, reduces anxiety, and gives lemons their distinctive scent!'},
+
+  {name:'Grapes',emoji:'🍇',type:'fruit',color:'#7c3aed',neon:'#a78bfa',
+   score:84,
+   nutrition:{
+     'Resveratrol':'#1 Highest source 🏆',
+     'Vitamin C':'18% DV per 100g',
+     'Vitamin K':'19% DV',
+     'Copper':'10% DV',
+     'Thiamine':'7% DV',
+     'Calories':'69 kcal per 100g'
+   },
+   vitamins:['Resveratrol #1','Vitamin K 19%','Vitamin C 18%','Copper 10%','Thiamine 7%'],
+   benefits:['Resveratrol fights cancer and ageing','Reduces heart disease risk','Fights inflammation','Supports eye health','Improves sleep quality'],
+   fact:'Red grapes are the #1 source of resveratrol — the compound linked to longevity in the Mediterranean. It literally slows the ageing process!'},
+
+  {name:'Cherry',emoji:'🍒',type:'fruit',color:'#be123c',neon:'#fb7185',
+   score:85,
+   nutrition:{
+     'Melatonin':'#1 Natural food source 🏆',
+     'Vitamin C':'16% DV per 100g',
+     'Potassium':'7% DV',
+     'Anthocyanins':'Very high',
+     'Fibre':'8% DV',
+     'Calories':'63 kcal per 100g'
+   },
+   vitamins:['Melatonin #1','Anthocyanins High','Vitamin C 16%','Potassium 7%','Fibre 8%'],
+   benefits:['#1 natural melatonin source improves sleep','Reduces muscle pain by 22%','Fights gout effectively','Lowers inflammation','Supports heart health'],
+   fact:'Tart cherries are the only food with significant natural melatonin. Athletes who drink cherry juice recover 22% faster from intense exercise!'},
+
+  {name:'Coconut',emoji:'🥥',type:'fruit',color:'#78350f',neon:'#d97706',
+   score:80,
+   nutrition:{
+     'MCT Fats':'Most concentrated source 🏆',
+     'Manganese':'75% DV per 100g 🏆 Extraordinary',
+     'Copper':'22% DV',
+     'Iron':'13% DV',
+     'Selenium':'14% DV',
+     'Calories':'354 kcal per 100g'
+   },
+   vitamins:['Manganese 75%','MCT Fats #1','Copper 22%','Iron 13%','Selenium 14%'],
+   benefits:['75% daily Manganese in 100g','MCTs boost brain function instantly','Kills harmful microorganisms','Reduces hunger powerfully','Supports thyroid function'],
+   fact:'100g of coconut gives you an extraordinary 75% of your daily Manganese! MCT fats go directly to the brain as instant fuel — unique among foods!'},
 ];
 
 // ── CATEGORIES ──────────────────────────────────
@@ -499,7 +810,17 @@ function renderCards(){
 
     const vitamins = document.createElement('div');
     vitamins.className = 'vcard-vitamins';
-    vitamins.textContent = d.vitamins.slice(0,3).join(' · ');
+    // Show top nutrition stat
+    const topStat = d.nutrition ? Object.values(d.nutrition)[0] : d.vitamins[0];
+    vitamins.textContent = topStat.length > 30 ? topStat.substring(0,30)+'...' : topStat;
+
+    // Score badge
+    if(d.score){
+      const scoreBadge = document.createElement('div');
+      scoreBadge.style.cssText=`font-size:10px;font-weight:800;margin-top:6px;padding:2px 8px;border-radius:99px;background:rgba(${hexToRgb(d.color)},0.15);color:${d.neon};border:1px solid rgba(${hexToRgb(d.color)},0.3);`;
+      scoreBadge.textContent='Score: '+d.score+'/100';
+      vitamins.appendChild(scoreBadge);
+    }
 
     const tag = document.createElement('div');
     tag.className = 'vcard-tag';
@@ -530,18 +851,49 @@ function openModal(d){
   document.getElementById('mName').style.color = d.neon;
   document.getElementById('mType').textContent = d.type==='vegetable'?'🥦 Vegetable':'🍎 Fruit';
   document.getElementById('mType').style.color = d.neon;
+  // Add score
+  const existingScore = document.getElementById('mScore');
+  if(existingScore) existingScore.remove();
+  if(d.score){
+    const scoreEl = document.createElement('div');
+    scoreEl.id='mScore';
+    scoreEl.style.cssText=`text-align:center;margin:12px 0;padding:10px;background:rgba(${hexToRgb(d.color)},0.1);border-radius:4px;border:1px solid rgba(${hexToRgb(d.color)},0.2);`;
+    scoreEl.innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${d.neon};line-height:1;">${d.score}<span style="font-size:18px;">/100</span></div><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">Nutrition Score</div>`;
+    document.getElementById('mType').after(scoreEl);
+  }
 
   const vDiv = document.getElementById('mVitamins');
   vDiv.innerHTML = '';
-  d.vitamins.forEach(v=>{
-    const badge = document.createElement('span');
-    badge.className = 'vitamin-badge';
-    badge.textContent = v;
-    badge.style.color = d.neon;
-    badge.style.borderColor = `rgba(${hexToRgb(d.color)},0.4)`;
-    badge.style.background = `rgba(${hexToRgb(d.color)},0.1)`;
-    vDiv.appendChild(badge);
-  });
+
+  // Show nutrition table
+  if(d.nutrition){
+    const table = document.createElement('div');
+    table.style.cssText='width:100%;';
+    Object.entries(d.nutrition).forEach(([key,val])=>{
+      const row = document.createElement('div');
+      row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);';
+      const k = document.createElement('span');
+      k.style.cssText='font-size:12px;color:var(--muted);';
+      k.textContent=key;
+      const v = document.createElement('span');
+      v.style.cssText=`font-size:12px;font-weight:700;color:${d.neon};text-align:right;max-width:60%;`;
+      v.textContent=val;
+      row.appendChild(k);
+      row.appendChild(v);
+      table.appendChild(row);
+    });
+    vDiv.appendChild(table);
+  } else {
+    d.vitamins.forEach(v=>{
+      const badge = document.createElement('span');
+      badge.className = 'vitamin-badge';
+      badge.textContent = v;
+      badge.style.color = d.neon;
+      badge.style.borderColor = `rgba(${hexToRgb(d.color)},0.4)`;
+      badge.style.background = `rgba(${hexToRgb(d.color)},0.1)`;
+      vDiv.appendChild(badge);
+    });
+  }
 
   const bDiv = document.getElementById('mBenefits');
   bDiv.innerHTML = '';
@@ -755,12 +1107,95 @@ document.head.appendChild(style);
 // ── TAB SWITCH ───────────────────────────────────
 function switchTab(tab){
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    b.classList.toggle('active',(i===0&&tab==='cards')||(i===1&&tab==='quiz'));
+    b.classList.toggle('active',
+      (i===0&&tab==='cards')||(i===1&&tab==='quiz')||(i===2&&tab==='rankings'));
   });
   document.getElementById('cardsTab').style.display = tab==='cards'?'block':'none';
   document.getElementById('quizTab').style.display = tab==='quiz'?'block':'none';
-
+  document.getElementById('rankingsSection').style.display = tab==='rankings'?'block':'none';
   if(tab==='quiz' && quizTotal===0) renderQuestion();
+  if(tab==='rankings') buildRankings();
+}
+
+function buildRankings(){
+  const grid = document.getElementById('rankingsGrid');
+  if(grid.children.length > 0) return; // already built
+
+  const RANKINGS = [
+    {title:'🏆 Top Nutrition Score',color:'#c9a84c',
+     items: [...DATA].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,5)
+       .map((d,i)=>({emoji:d.emoji,name:d.name,val:'Score: '+d.score+'/100',num:i+1,neon:d.neon}))},
+    {title:'🍊 Vitamin C Champions',color:'#fb923c',
+     items:[
+       {emoji:'🍈',name:'Guava',val:'381% DV per 100g',num:1,neon:'#4ade80'},
+       {emoji:'🫑',name:'Bell Pepper',val:'213% DV per 100g',num:2,neon:'#86efac'},
+       {emoji:'🥝',name:'Kiwi',val:'154% DV per 100g',num:3,neon:'#4ade80'},
+       {emoji:'🥦',name:'Broccoli',val:'149% DV per 100g',num:4,neon:'#22c55e'},
+       {emoji:'🍓',name:'Strawberry',val:'98% DV per 100g',num:5,neon:'#f87171'},
+     ]},
+    {title:'🦴 Vitamin K Champions',color:'#a78bfa',
+     items:[
+       {emoji:'🥗',name:'Kale',val:'680% DV per 100g',num:1,neon:'#4ade80'},
+       {emoji:'🌿',name:'Spinach',val:'483% DV per 100g',num:2,neon:'#86efac'},
+       {emoji:'🥦',name:'Bruss. Sprouts',val:'177% DV per 100g',num:3,neon:'#4ade80'},
+       {emoji:'🌱',name:'Asparagus',val:'57% DV per 100g',num:4,neon:'#86efac'},
+       {emoji:'🥝',name:'Kiwi',val:'38% DV per 100g',num:5,neon:'#4ade80'},
+     ]},
+    {title:'👁️ Vitamin A Champions',color:'#f97316',
+     items:[
+       {emoji:'🥗',name:'Kale',val:'206% DV per 100g',num:1,neon:'#4ade80'},
+       {emoji:'🌿',name:'Spinach',val:'188% DV per 100g',num:2,neon:'#86efac'},
+       {emoji:'🍠',name:'Sweet Potato',val:'283% DV per 100g',num:3,neon:'#fb923c'},
+       {emoji:'🥕',name:'Carrot',val:'334% DV per 100g',num:4,neon:'#fb923c'},
+       {emoji:'🥭',name:'Mango',val:'54% DV per 100g',num:5,neon:'#fbbf24'},
+     ]},
+    {title:'💪 Highest Protein',color:'#22c55e',
+     items:[
+       {emoji:'🫛',name:'Peas',val:'5.4g per 100g',num:1,neon:'#86efac'},
+       {emoji:'🌿',name:'Spinach',val:'2.9g per 100g',num:2,neon:'#4ade80'},
+       {emoji:'🥦',name:'Broccoli',val:'2.8g per 100g',num:3,neon:'#22c55e'},
+       {emoji:'🥗',name:'Kale',val:'4.3g per 100g',num:4,neon:'#4ade80'},
+       {emoji:'🌽',name:'Corn',val:'3.4g per 100g',num:5,neon:'#fde047'},
+     ]},
+    {title:'🔥 Lowest Calories',color:'#818cf8',
+     items:[
+       {emoji:'🥒',name:'Cucumber',val:'15 kcal per 100g',num:1,neon:'#4ade80'},
+       {emoji:'🍉',name:'Watermelon',val:'30 kcal per 100g',num:2,neon:'#f87171'},
+       {emoji:'🍋',name:'Lemon',val:'29 kcal per 100g',num:3,neon:'#fde047'},
+       {emoji:'🍅',name:'Tomato',val:'18 kcal per 100g',num:4,neon:'#f87171'},
+       {emoji:'🌱',name:'Asparagus',val:'20 kcal per 100g',num:5,neon:'#86efac'},
+     ]},
+  ];
+
+  RANKINGS.forEach(r=>{
+    const card = document.createElement('div');
+    card.className='rank-card';
+    const title=document.createElement('div');
+    title.className='rank-title';
+    title.textContent=r.title;
+    title.style.color=r.color;
+    card.appendChild(title);
+
+    r.items.forEach((item,i)=>{
+      const row=document.createElement('div');
+      row.className='rank-item';
+      const num=document.createElement('div');
+      num.className='rank-num';
+      num.textContent=['🥇','🥈','🥉','4','5'][i];
+      num.style.color=r.color;
+      const emoji=document.createElement('div');
+      emoji.className='rank-emoji';
+      emoji.textContent=item.emoji;
+      const info=document.createElement('div');
+      info.className='rank-info';
+      info.innerHTML=`<div class="rank-name" style="color:${item.neon}">${item.name}</div><div class="rank-val">${item.val}</div>`;
+      row.appendChild(num);
+      row.appendChild(emoji);
+      row.appendChild(info);
+      card.appendChild(row);
+    });
+    grid.appendChild(card);
+  });
 }
 </script>
 </body>
