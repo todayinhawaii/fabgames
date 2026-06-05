@@ -136,15 +136,17 @@ nav{
   overflow:hidden;
 }
 .tab-btn{
-  flex:1;padding:13px 20px;
+  flex:1;padding:12px 16px;
   text-align:center;
   font-size:9px;font-weight:500;
-  letter-spacing:3px;text-transform:uppercase;
+  letter-spacing:2px;text-transform:uppercase;
   color:var(--muted);cursor:pointer;
   background:transparent;border:none;
   transition:all 0.3s;
   font-family:'Inter',sans-serif;
   border-right:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  gap:7px;
 }
 .tab-btn:last-child{border-right:none;}
 .tab-btn.active{
@@ -358,12 +360,11 @@ nav{
 .modal-close:hover{color:var(--gold);}
 
 .modal-emoji{
-  font-size:72px;text-align:center;
-  display:block;margin-bottom:20px;
-  filter:
-    drop-shadow(0 0 3px rgba(184,147,63,0.8))
-    drop-shadow(0 0 10px rgba(184,147,63,0.4))
-    saturate(0) brightness(1.8) contrast(0.7);
+  display:block;margin:0 auto 20px;
+  width:100px;height:100px;
+}
+.modal-emoji svg{
+  width:100px;height:100px;
 }
 .modal-name{
   font-family:'Cormorant Garamond',serif;
@@ -648,13 +649,15 @@ footer{
 </nav>
 
 <div class="hero">
-  <div class="hero-emoji">🥕</div>
+  
   <div class="hero-title">Veggie & Fruit Bible</div>
   <p class="hero-sub">Your complete guide to natures greatest superfoods — learn, explore and get quizzed!!</p>
-  <div class="tab-switch" style="max-width:560px;">
-    <button class="tab-btn active" onclick="switchTab('cards')">📚 Browse</button>
-    <button class="tab-btn" onclick="switchTab('quiz')">🧠 Quiz</button>
-    <button class="tab-btn" onclick="switchTab('rankings')">🏆 Rankings</button>
+  <div class="tab-switch" style="max-width:680px;">
+    <button class="tab-btn active" onclick="switchTab('cards');setFilter('all')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> Browse All</button>
+    <button class="tab-btn" onclick="switchTab('cards');setFilter('vegetable')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Vegetables</button>
+    <button class="tab-btn" onclick="switchTab('cards');setFilter('fruit')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 0 1 7 7"/><path d="M12 2v4"/></svg> Fruits</button>
+    <button class="tab-btn" onclick="switchTab('quiz')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg> Quiz</button>
+    <button class="tab-btn" onclick="switchTab('rankings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L8 8H2l5 4-2 6 7-4 7 4-2-6 5-4h-6L12 2z"/></svg> Rankings</button>
   </div>
 </div>
 
@@ -1477,9 +1480,12 @@ const DATA = [
 
 // ── CATEGORIES ──────────────────────────────────
 const CATEGORIES = [
-  {label:'All',value:'all',color:'#c9a84c'},
-  {label:'🥦 Vegetables',value:'vegetable',color:'#22c55e'},
-  {label:'🍎 Fruits',value:'fruit',color:'#f87171'},
+  {label:'All',value:'all',color:'#c9a84c',
+   icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>'},
+  {label:'Vegetables',value:'vegetable',color:'#22c55e',
+   icon:'<svg width="14" height="14" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M40 70 C40 56 40 42 40 30"/><path d="M40 30 C28 18 14 16 8 22 C14 18 28 22 40 32"/><path d="M40 30 C52 18 66 16 72 22 C66 18 52 22 40 32"/><path d="M40 44 C30 36 18 34 12 40 C18 36 30 38 40 46"/><path d="M40 44 C50 36 62 34 68 40 C62 36 50 38 40 46"/></svg>'},
+  {label:'Fruits',value:'fruit',color:'#f87171',
+   icon:'<svg width="14" height="14" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="40" cy="46" r="26"/><path d="M40 20 C38 12 36 6 38 2"/><path d="M40 20 C44 12 48 8 46 2"/><path d="M26 32 C22 22 26 12 32 10"/></svg>'},
 ];
 
 let currentFilter = 'all';
@@ -1490,7 +1496,17 @@ const filterWrap = document.getElementById('filterWrap');
 CATEGORIES.forEach(cat=>{
   const pill = document.createElement('div');
   pill.className = 'filter-pill' + (cat.value==='all'?' active':'');
-  pill.textContent = cat.label;
+  pill.dataset.filter = cat.value;
+  pill.style.cssText='display:flex;align-items:center;gap:7px;';
+  if(cat.icon){
+    const iconWrap = document.createElement('span');
+    iconWrap.innerHTML = cat.icon;
+    iconWrap.style.cssText='display:flex;align-items:center;flex-shrink:0;';
+    pill.appendChild(iconWrap);
+  }
+  const label = document.createElement('span');
+  label.textContent = cat.label;
+  pill.appendChild(label);
   // elegant style handled by CSS
   pill.onclick = ()=>{
     currentFilter = cat.value;
@@ -1858,6 +1874,16 @@ style.textContent='@keyframes confettiFall{0%{transform:translateY(0) rotate(0);
 document.head.appendChild(style);
 
 // ── TAB SWITCH ───────────────────────────────────
+function setFilter(val){
+  currentFilter = val;
+  currentSearch = '';
+  document.getElementById('searchInput').value='';
+  document.querySelectorAll('.filter-pill').forEach(p=>{
+    p.classList.toggle('active', p.dataset.filter===val);
+  });
+  renderCards();
+}
+
 function quizThisFood(){
   if(!currentModalFood) return;
   closeModalBtn();
