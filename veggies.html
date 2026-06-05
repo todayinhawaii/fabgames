@@ -217,7 +217,7 @@ footer{text-align:center;padding:40px 20px;font-size:11px;color:rgba(240,239,232
       <div class="modal-section-title">Fun Fact</div>
       <div class="fun-fact" id="mFact"></div>
     </div>
-    <button class="quiz-this-btn" onclick="closeModalBtn();switchTab('quiz')">🧠 Quiz Me On This!!</button>
+    <button class="quiz-this-btn" id="quizThisBtn" onclick="quizThisFood()">🧠 Quiz Me On This!!</button>
   </div>
 </div>
 
@@ -249,11 +249,11 @@ const DATA = [
   {name:'Carrot',emoji:'🥕',type:'vegetable',color:'#f97316',neon:'#fb923c',
    score:87,
    nutrition:{
-     'Vitamin A':'334% DV per 100g 🏆 #1 Vegetable',
-     'Vitamin C':'9% DV (8mg)',
-     'Vitamin K':'16% DV',
-     'Potassium':'7% DV (320mg)',
-     'Fibre':'11% DV (2.8g)',
+     'Vitamin A':'334% of your daily needs per 100g 🏆 #1 Vegetable',
+     'Vitamin C':'9% of daily needs (8mg)',
+     'Vitamin K':'16% of daily needs',
+     'Potassium':'7% of daily needs (320mg)',
+     'Fibre':'11% of daily needs (2.8g)',
      'Calories':'41 kcal per 100g'
    },
    vitamins:['Vitamin A 334%','Vitamin C 9%','Vitamin K 16%','Potassium 7%','Fibre 11%'],
@@ -263,11 +263,11 @@ const DATA = [
   {name:'Broccoli',emoji:'🥦',type:'vegetable',color:'#16a34a',neon:'#22c55e',
    score:95,
    nutrition:{
-     'Vitamin C':'149% DV per 100g 🏆 #1 Vegetable',
-     'Vitamin K':'127% DV 🏆 Top 3',
-     'Folate':'16% DV',
-     'Potassium':'8% DV (316mg)',
-     'Iron':'6% DV',
+     'Vitamin C':'149% of your daily needs per 100g 🏆 #1 Vegetable',
+     'Vitamin K':'127% daily needs 🏆 Top 3',
+     'Folate':'16% of daily needs',
+     'Potassium':'8% of daily needs (316mg)',
+     'Iron':'6% of daily needs',
      'Calories':'34 kcal per 100g'
    },
    vitamins:['Vitamin C 149%','Vitamin K 127%','Folate 16%','Iron 6%','Potassium 8%'],
@@ -277,11 +277,11 @@ const DATA = [
   {name:'Spinach',emoji:'🌿',type:'vegetable',color:'#15803d',neon:'#4ade80',
    score:96,
    nutrition:{
-     'Vitamin K':'483% DV per 100g 🏆 #1 ALL Foods',
-     'Vitamin A':'188% DV 🏆 Top 3',
-     'Iron':'15% DV',
-     'Calcium':'10% DV',
-     'Vitamin C':'47% DV',
+     'Vitamin K':'483% of your daily needs per 100g 🏆 #1 ALL Foods',
+     'Vitamin A':'188% daily needs 🏆 Top 3',
+     'Iron':'15% of daily needs',
+     'Calcium':'10% of daily needs',
+     'Vitamin C':'47% of daily needs',
      'Calories':'23 kcal per 100g'
    },
    vitamins:['Vitamin K 483%','Vitamin A 188%','Vitamin C 47%','Iron 15%','Calcium 10%'],
@@ -291,11 +291,11 @@ const DATA = [
   {name:'Kale',emoji:'🥗',type:'vegetable',color:'#166534',neon:'#4ade80',
    score:98,
    nutrition:{
-     'Vitamin K':'680% DV per 100g 🏆 #1 Absolute',
-     'Vitamin A':'206% DV 🏆 Top 2',
-     'Vitamin C':'200% DV 🏆 Top 2',
-     'Calcium':'15% DV',
-     'Iron':'9% DV',
+     'Vitamin K':'680% of your daily needs per 100g 🏆 #1 Absolute',
+     'Vitamin A':'206% daily needs 🏆 Top 2',
+     'Vitamin C':'200% daily needs 🏆 Top 2',
+     'Calcium':'15% of daily needs',
+     'Iron':'9% of daily needs',
      'Calories':'49 kcal per 100g'
    },
    vitamins:['Vitamin K 680%','Vitamin C 200%','Vitamin A 206%','Calcium 15%','Iron 9%'],
@@ -305,11 +305,11 @@ const DATA = [
   {name:'Bell Pepper',emoji:'🫑',type:'vegetable',color:'#16a34a',neon:'#86efac',
    score:92,
    nutrition:{
-     'Vitamin C':'213% DV per 100g 🏆 #1 All Vegetables',
-     'Vitamin B6':'20% DV',
-     'Vitamin A':'93% DV',
-     'Folate':'7% DV',
-     'Potassium':'6% DV',
+     'Vitamin C':'213% of your daily needs per 100g 🏆 #1 All Vegetables',
+     'Vitamin B6':'20% of daily needs',
+     'Vitamin A':'93% of daily needs',
+     'Folate':'7% of daily needs',
+     'Potassium':'6% of daily needs',
      'Calories':'31 kcal per 100g'
    },
    vitamins:['Vitamin C 213%','Vitamin A 93%','Vitamin B6 20%','Folate 7%','Potassium 6%'],
@@ -319,11 +319,11 @@ const DATA = [
   {name:'Sweet Potato',emoji:'🍠',type:'vegetable',color:'#ea580c',neon:'#fb923c',
    score:91,
    nutrition:{
-     'Vitamin A':'283% DV per 100g 🏆 #2 Vegetable',
-     'Vitamin C':'33% DV',
-     'Potassium':'10% DV (337mg)',
-     'Manganese':'28% DV',
-     'Fibre':'14% DV',
+     'Vitamin A':'283% of your daily needs per 100g 🏆 #2 Vegetable',
+     'Vitamin C':'33% of daily needs',
+     'Potassium':'10% of daily needs (337mg)',
+     'Manganese':'28% of daily needs',
+     'Fibre':'14% of daily needs',
      'Calories':'86 kcal per 100g'
    },
    vitamins:['Vitamin A 283%','Manganese 28%','Vitamin C 33%','Potassium 10%','Fibre 14%'],
@@ -333,10 +333,10 @@ const DATA = [
   {name:'Garlic',emoji:'🧄',type:'vegetable',color:'#d97706',neon:'#fbbf24',
    score:88,
    nutrition:{
-     'Manganese':'23% DV per 100g',
-     'Vitamin B6':'95% DV 🏆 Top 5',
-     'Vitamin C':'52% DV',
-     'Selenium':'14% DV',
+     'Manganese':'23% of your daily needs per 100g',
+     'Vitamin B6':'95% daily needs 🏆 Top 5',
+     'Vitamin C':'52% of daily needs',
+     'Selenium':'14% of daily needs',
      'Allicin':'Most potent natural antibiotic',
      'Calories':'149 kcal per 100g'
    },
@@ -347,10 +347,10 @@ const DATA = [
   {name:'Beetroot',emoji:'🟣',type:'vegetable',color:'#9333ea',neon:'#c084fc',
    score:86,
    nutrition:{
-     'Folate':'20% DV per 100g',
-     'Manganese':'16% DV',
-     'Potassium':'9% DV (325mg)',
-     'Iron':'6% DV',
+     'Folate':'20% of your daily needs per 100g',
+     'Manganese':'16% of daily needs',
+     'Potassium':'9% of daily needs (325mg)',
+     'Iron':'6% of daily needs',
      'Nitrates':'Highest of any vegetable 🏆',
      'Calories':'43 kcal per 100g'
    },
@@ -362,10 +362,10 @@ const DATA = [
    score:84,
    nutrition:{
      'Lycopene':'Most absorbable source 🏆',
-     'Vitamin C':'28% DV per 100g',
-     'Vitamin K':'10% DV',
-     'Potassium':'7% DV (237mg)',
-     'Folate':'5% DV',
+     'Vitamin C':'28% of your daily needs per 100g',
+     'Vitamin K':'10% of daily needs',
+     'Potassium':'7% of daily needs (237mg)',
+     'Folate':'5% of daily needs',
      'Calories':'18 kcal per 100g'
    },
    vitamins:['Lycopene Highest','Vitamin C 28%','Vitamin K 10%','Potassium 7%','Folate 5%'],
@@ -375,10 +375,10 @@ const DATA = [
   {name:'Asparagus',emoji:'🌱',type:'vegetable',color:'#15803d',neon:'#86efac',
    score:83,
    nutrition:{
-     'Folate':'34% DV per 100g 🏆 Top Vegetable',
-     'Vitamin K':'57% DV',
-     'Vitamin C':'12% DV',
-     'Vitamin E':'7% DV',
+     'Folate':'34% of your daily needs per 100g 🏆 Top Vegetable',
+     'Vitamin K':'57% of daily needs',
+     'Vitamin C':'12% of daily needs',
+     'Vitamin E':'7% of daily needs',
      'Chromium':'Excellent source',
      'Calories':'20 kcal per 100g'
    },
@@ -391,8 +391,8 @@ const DATA = [
    nutrition:{
      'Vitamin D':'Only plant source 🏆 Unique',
      'Vitamin B12':'Only plant source 🏆 Unique',
-     'Selenium':'37% DV per 100g',
-     'Copper':'32% DV',
+     'Selenium':'37% of your daily needs per 100g',
+     'Copper':'32% of daily needs',
      'Beta-Glucans':'Immune boosting',
      'Calories':'22 kcal per 100g'
    },
@@ -403,10 +403,10 @@ const DATA = [
   {name:'Bruss. Sprouts',emoji:'🥦',type:'vegetable',color:'#15803d',neon:'#4ade80',
    score:89,
    nutrition:{
-     'Vitamin C':'142% DV per 100g 🏆 Top 3',
-     'Vitamin K':'177% DV 🏆 Top 3',
-     'Folate':'15% DV',
-     'Fibre':'14% DV',
+     'Vitamin C':'142% of your daily needs per 100g 🏆 Top 3',
+     'Vitamin K':'177% daily needs 🏆 Top 3',
+     'Folate':'15% of daily needs',
+     'Fibre':'14% of daily needs',
      'Glucosinolates':'Cancer fighting 🏆',
      'Calories':'43 kcal per 100g'
    },
@@ -417,11 +417,11 @@ const DATA = [
   {name:'Pumpkin',emoji:'🎃',type:'vegetable',color:'#ea580c',neon:'#fb923c',
    score:82,
    nutrition:{
-     'Vitamin A':'170% DV per 100g 🏆 Top 5',
-     'Vitamin C':'19% DV',
-     'Potassium':'10% DV',
-     'Copper':'12% DV',
-     'Fibre':'9% DV',
+     'Vitamin A':'170% of your daily needs per 100g 🏆 Top 5',
+     'Vitamin C':'19% of daily needs',
+     'Potassium':'10% of daily needs',
+     'Copper':'12% of daily needs',
+     'Fibre':'9% of daily needs',
      'Calories':'26 kcal per 100g'
    },
    vitamins:['Vitamin A 170%','Potassium 10%','Vitamin C 19%','Copper 12%','Fibre 9%'],
@@ -432,10 +432,10 @@ const DATA = [
    score:90,
    nutrition:{
      'Antioxidants':'#1 Highest of ALL vegetables 🏆',
-     'Fibre':'28% DV per 100g 🏆 Top 5',
-     'Vitamin C':'25% DV',
-     'Magnesium':'13% DV',
-     'Folate':'22% DV',
+     'Fibre':'28% of your daily needs per 100g 🏆 Top 5',
+     'Vitamin C':'25% of daily needs',
+     'Magnesium':'13% of daily needs',
+     'Folate':'22% of daily needs',
      'Calories':'47 kcal per 100g'
    },
    vitamins:['Antioxidants #1','Fibre 28%','Folate 22%','Vitamin C 25%','Magnesium 13%'],
@@ -446,10 +446,10 @@ const DATA = [
    score:79,
    nutrition:{
      'Quercetin':'#1 Highest dietary source 🏆',
-     'Vitamin C':'12% DV per 100g',
-     'Vitamin B6':'10% DV',
-     'Folate':'5% DV',
-     'Potassium':'4% DV',
+     'Vitamin C':'12% of your daily needs per 100g',
+     'Vitamin B6':'10% of daily needs',
+     'Folate':'5% of daily needs',
+     'Potassium':'4% of daily needs',
      'Calories':'40 kcal per 100g'
    },
    vitamins:['Quercetin #1','Vitamin C 12%','Vitamin B6 10%','Folate 5%','Potassium 4%'],
@@ -460,10 +460,10 @@ const DATA = [
    score:68,
    nutrition:{
      'Water Content':'96% water 🏆 Most hydrating',
-     'Vitamin K':'16% DV per 100g',
-     'Vitamin C':'4% DV',
-     'Potassium':'4% DV',
-     'Magnesium':'3% DV',
+     'Vitamin K':'16% of your daily needs per 100g',
+     'Vitamin C':'4% of daily needs',
+     'Potassium':'4% of daily needs',
+     'Magnesium':'3% of daily needs',
      'Calories':'15 kcal per 100g'
    },
    vitamins:['Water 96%','Vitamin K 16%','Vitamin C 4%','Potassium 4%','Magnesium 3%'],
@@ -474,10 +474,10 @@ const DATA = [
    score:72,
    nutrition:{
      'Lutein':'#1 Highest source 🏆 Eye health',
-     'Thiamine':'17% DV per 100g',
-     'Folate':'11% DV',
-     'Phosphorus':'12% DV',
-     'Fibre':'8% DV',
+     'Thiamine':'17% of your daily needs per 100g',
+     'Folate':'11% of daily needs',
+     'Phosphorus':'12% of daily needs',
+     'Fibre':'8% of daily needs',
      'Calories':'86 kcal per 100g'
    },
    vitamins:['Lutein #1','Thiamine 17%','Phosphorus 12%','Folate 11%','Fibre 8%'],
@@ -488,24 +488,24 @@ const DATA = [
    score:93,
    nutrition:{
      'Healthy Fats':'30g per 100g 🏆 Most in fruit',
-     'Potassium':'14% DV per 100g 🏆 Beats banana',
-     'Vitamin K':'26% DV',
-     'Folate':'21% DV',
-     'Vitamin B5':'28% DV',
+     'Potassium':'14% of your daily needs per 100g 🏆 Beats banana',
+     'Vitamin K':'26% of daily needs',
+     'Folate':'21% of daily needs',
+     'Vitamin B5':'28% of daily needs',
      'Calories':'160 kcal per 100g'
    },
    vitamins:['Potassium 14%','Vitamin B5 28%','Vitamin K 26%','Folate 21%','Healthy Fats 30g'],
    benefits:['More potassium than bananas','Loaded with heart-healthy fats','Reduces cholesterol','Supports eye health','Fights arthritis'],
-   fact:'Avocados have more potassium than bananas — 14% vs 10% DV per 100g. They are also the fattiest plant food on Earth!'},
+   fact:'Avocados have more potassium than bananas — 14% vs 10% of your daily needs per 100g. They are also the fattiest plant food on Earth!'},
 
   {name:'Peas',emoji:'🫛',type:'vegetable',color:'#16a34a',neon:'#86efac',
    score:80,
    nutrition:{
      'Protein':'5.4g per 100g 🏆 Highest vegetable',
-     'Vitamin C':'40% DV per 100g',
-     'Vitamin K':'25% DV',
-     'Thiamine':'23% DV',
-     'Fibre':'22% DV',
+     'Vitamin C':'40% of your daily needs per 100g',
+     'Vitamin K':'25% of daily needs',
+     'Thiamine':'23% of daily needs',
+     'Fibre':'22% of daily needs',
      'Calories':'81 kcal per 100g'
    },
    vitamins:['Protein 5.4g','Vitamin C 40%','Vitamin K 25%','Thiamine 23%','Fibre 22%'],
@@ -516,10 +516,10 @@ const DATA = [
   {name:'Guava',emoji:'🍈',type:'fruit',color:'#16a34a',neon:'#4ade80',
    score:99,
    nutrition:{
-     'Vitamin C':'381% DV per 100g 🏆 #1 ALL FOODS',
-     'Fibre':'21% DV 🏆 Top Fruit',
-     'Folate':'12% DV',
-     'Potassium':'9% DV',
+     'Vitamin C':'381% of your daily needs per 100g 🏆 #1 ALL FOODS',
+     'Fibre':'21% daily needs 🏆 Top Fruit',
+     'Folate':'12% of daily needs',
+     'Potassium':'9% of daily needs',
      'Lycopene':'High content',
      'Calories':'68 kcal per 100g'
    },
@@ -530,11 +530,11 @@ const DATA = [
   {name:'Kiwi',emoji:'🥝',type:'fruit',color:'#16a34a',neon:'#4ade80',
    score:94,
    nutrition:{
-     'Vitamin C':'154% DV per 100g 🏆 Top 3 Fruit',
-     'Vitamin K':'38% DV',
-     'Vitamin E':'15% DV',
-     'Potassium':'7% DV',
-     'Folate':'7% DV',
+     'Vitamin C':'154% of your daily needs per 100g 🏆 Top 3 Fruit',
+     'Vitamin K':'38% of daily needs',
+     'Vitamin E':'15% of daily needs',
+     'Potassium':'7% of daily needs',
+     'Folate':'7% of daily needs',
      'Calories':'61 kcal per 100g'
    },
    vitamins:['Vitamin C 154%','Vitamin K 38%','Vitamin E 15%','Folate 7%','Potassium 7%'],
@@ -544,11 +544,11 @@ const DATA = [
   {name:'Papaya',emoji:'🍈',type:'fruit',color:'#f97316',neon:'#fb923c',
    score:91,
    nutrition:{
-     'Vitamin C':'103% DV per 100g 🏆 Top 5 Fruit',
-     'Vitamin A':'47% DV',
-     'Folate':'10% DV',
+     'Vitamin C':'103% of your daily needs per 100g 🏆 Top 5 Fruit',
+     'Vitamin A':'47% of daily needs',
+     'Folate':'10% of daily needs',
      'Papain':'Unique enzyme 🏆',
-     'Potassium':'6% DV',
+     'Potassium':'6% of daily needs',
      'Calories':'43 kcal per 100g'
    },
    vitamins:['Vitamin C 103%','Vitamin A 47%','Papain Unique','Folate 10%','Potassium 6%'],
@@ -558,10 +558,10 @@ const DATA = [
   {name:'Strawberry',emoji:'🍓',type:'fruit',color:'#dc2626',neon:'#f87171',
    score:88,
    nutrition:{
-     'Vitamin C':'98% DV per 100g 🏆 Top Berry',
-     'Manganese':'20% DV 🏆 Top Fruit',
-     'Folate':'6% DV',
-     'Potassium':'4% DV',
+     'Vitamin C':'98% of your daily needs per 100g 🏆 Top Berry',
+     'Manganese':'20% daily needs 🏆 Top Fruit',
+     'Folate':'6% of daily needs',
+     'Potassium':'4% of daily needs',
      'Anthocyanins':'Very high',
      'Calories':'32 kcal per 100g'
    },
@@ -573,10 +573,10 @@ const DATA = [
    score:96,
    nutrition:{
      'Punicalagins':'#1 Most powerful antioxidant 🏆',
-     'Vitamin C':'17% DV per 100g',
-     'Vitamin K':'16% DV',
-     'Folate':'10% DV',
-     'Potassium':'8% DV',
+     'Vitamin C':'17% of your daily needs per 100g',
+     'Vitamin K':'16% of daily needs',
+     'Folate':'10% of daily needs',
+     'Potassium':'8% of daily needs',
      'Calories':'83 kcal per 100g'
    },
    vitamins:['Punicalagins #1','Vitamin C 17%','Vitamin K 16%','Folate 10%','Potassium 8%'],
@@ -587,10 +587,10 @@ const DATA = [
    score:95,
    nutrition:{
      'Antioxidants':'#1 Highest of ALL fruits 🏆',
-     'Vitamin C':'16% DV per 100g',
-     'Vitamin K':'24% DV',
-     'Manganese':'17% DV',
-     'Fibre':'10% DV',
+     'Vitamin C':'16% of your daily needs per 100g',
+     'Vitamin K':'24% of daily needs',
+     'Manganese':'17% of daily needs',
+     'Fibre':'10% of daily needs',
      'Calories':'57 kcal per 100g'
    },
    vitamins:['Antioxidants #1 Fruit','Vitamin K 24%','Manganese 17%','Vitamin C 16%','Fibre 10%'],
@@ -600,11 +600,11 @@ const DATA = [
   {name:'Orange',emoji:'🍊',type:'fruit',color:'#ea580c',neon:'#fb923c',
    score:87,
    nutrition:{
-     'Vitamin C':'89% DV per 100g 🏆 Most famous source',
-     'Thiamine':'11% DV',
-     'Folate':'9% DV',
-     'Potassium':'8% DV',
-     'Calcium':'5% DV',
+     'Vitamin C':'89% of your daily needs per 100g 🏆 Most famous source',
+     'Thiamine':'11% of daily needs',
+     'Folate':'9% of daily needs',
+     'Potassium':'8% of daily needs',
+     'Calcium':'5% of daily needs',
      'Calories':'47 kcal per 100g'
    },
    vitamins:['Vitamin C 89%','Thiamine 11%','Folate 9%','Potassium 8%','Calcium 5%'],
@@ -614,11 +614,11 @@ const DATA = [
   {name:'Banana',emoji:'🍌',type:'fruit',color:'#eab308',neon:'#fde047',
    score:82,
    nutrition:{
-     'Vitamin B6':'25% DV per 100g 🏆 Top Fruit',
-     'Potassium':'10% DV (358mg)',
-     'Vitamin C':'15% DV',
-     'Magnesium':'7% DV',
-     'Fibre':'9% DV',
+     'Vitamin B6':'25% of your daily needs per 100g 🏆 Top Fruit',
+     'Potassium':'10% of daily needs (358mg)',
+     'Vitamin C':'15% of daily needs',
+     'Magnesium':'7% of daily needs',
+     'Fibre':'9% of daily needs',
      'Calories':'89 kcal per 100g'
    },
    vitamins:['Vitamin B6 25%','Potassium 10%','Vitamin C 15%','Magnesium 7%','Fibre 9%'],
@@ -628,11 +628,11 @@ const DATA = [
   {name:'Mango',emoji:'🥭',type:'fruit',color:'#f59e0b',neon:'#fbbf24',
    score:89,
    nutrition:{
-     'Vitamin C':'67% DV per 100g',
-     'Vitamin A':'54% DV 🏆 Top 3 Fruit',
-     'Vitamin B6':'13% DV',
-     'Folate':'11% DV',
-     'Copper':'9% DV',
+     'Vitamin C':'67% of your daily needs per 100g',
+     'Vitamin A':'54% daily needs 🏆 Top 3 Fruit',
+     'Vitamin B6':'13% of daily needs',
+     'Folate':'11% of daily needs',
+     'Copper':'9% of daily needs',
      'Calories':'60 kcal per 100g'
    },
    vitamins:['Vitamin C 67%','Vitamin A 54%','Vitamin B6 13%','Folate 11%','Copper 9%'],
@@ -643,9 +643,9 @@ const DATA = [
    score:78,
    nutrition:{
      'Quercetin':'Excellent source',
-     'Vitamin C':'8% DV per 100g',
-     'Fibre':'9% DV',
-     'Potassium':'4% DV',
+     'Vitamin C':'8% of your daily needs per 100g',
+     'Fibre':'9% of daily needs',
+     'Potassium':'4% of daily needs',
      'Catechin':'High content',
      'Calories':'52 kcal per 100g'
    },
@@ -656,11 +656,11 @@ const DATA = [
   {name:'Pineapple',emoji:'🍍',type:'fruit',color:'#eab308',neon:'#fde047',
    score:86,
    nutrition:{
-     'Vitamin C':'80% DV per 100g',
-     'Manganese':'44% DV 🏆 #1 Fruit',
+     'Vitamin C':'80% of your daily needs per 100g',
+     'Manganese':'44% daily needs 🏆 #1 Fruit',
      'Bromelain':'Unique enzyme 🏆',
-     'Vitamin B6':'8% DV',
-     'Copper':'8% DV',
+     'Vitamin B6':'8% of daily needs',
+     'Copper':'8% of daily needs',
      'Calories':'50 kcal per 100g'
    },
    vitamins:['Manganese 44%','Vitamin C 80%','Bromelain Unique','Vitamin B6 8%','Copper 8%'],
@@ -671,10 +671,10 @@ const DATA = [
    score:77,
    nutrition:{
      'Lycopene':'Most bioavailable source 🏆',
-     'Vitamin A':'19% DV per 100g',
-     'Vitamin C':'21% DV',
+     'Vitamin A':'19% of your daily needs per 100g',
+     'Vitamin C':'21% of daily needs',
      'Citrulline':'#1 Natural source 🏆',
-     'Potassium':'4% DV',
+     'Potassium':'4% of daily needs',
      'Calories':'30 kcal per 100g'
    },
    vitamins:['Lycopene #1','Citrulline #1','Vitamin C 21%','Vitamin A 19%','Potassium 4%'],
@@ -684,11 +684,11 @@ const DATA = [
   {name:'Lemon',emoji:'🍋',type:'fruit',color:'#eab308',neon:'#fde047',
    score:81,
    nutrition:{
-     'Vitamin C':'88% DV per 100g 🏆 Top 5',
+     'Vitamin C':'88% of your daily needs per 100g 🏆 Top 5',
      'Limonene':'#1 Natural source 🏆',
-     'Potassium':'5% DV',
-     'Vitamin B6':'6% DV',
-     'Folate':'3% DV',
+     'Potassium':'5% of daily needs',
+     'Vitamin B6':'6% of daily needs',
+     'Folate':'3% of daily needs',
      'Calories':'29 kcal per 100g'
    },
    vitamins:['Vitamin C 88%','Limonene #1','Potassium 5%','Vitamin B6 6%','Folate 3%'],
@@ -699,10 +699,10 @@ const DATA = [
    score:84,
    nutrition:{
      'Resveratrol':'#1 Highest source 🏆',
-     'Vitamin C':'18% DV per 100g',
-     'Vitamin K':'19% DV',
-     'Copper':'10% DV',
-     'Thiamine':'7% DV',
+     'Vitamin C':'18% of your daily needs per 100g',
+     'Vitamin K':'19% of daily needs',
+     'Copper':'10% of daily needs',
+     'Thiamine':'7% of daily needs',
      'Calories':'69 kcal per 100g'
    },
    vitamins:['Resveratrol #1','Vitamin K 19%','Vitamin C 18%','Copper 10%','Thiamine 7%'],
@@ -713,10 +713,10 @@ const DATA = [
    score:85,
    nutrition:{
      'Melatonin':'#1 Natural food source 🏆',
-     'Vitamin C':'16% DV per 100g',
-     'Potassium':'7% DV',
+     'Vitamin C':'16% of your daily needs per 100g',
+     'Potassium':'7% of daily needs',
      'Anthocyanins':'Very high',
-     'Fibre':'8% DV',
+     'Fibre':'8% of daily needs',
      'Calories':'63 kcal per 100g'
    },
    vitamins:['Melatonin #1','Anthocyanins High','Vitamin C 16%','Potassium 7%','Fibre 8%'],
@@ -727,10 +727,10 @@ const DATA = [
    score:80,
    nutrition:{
      'MCT Fats':'Most concentrated source 🏆',
-     'Manganese':'75% DV per 100g 🏆 Extraordinary',
-     'Copper':'22% DV',
-     'Iron':'13% DV',
-     'Selenium':'14% DV',
+     'Manganese':'75% of your daily needs per 100g 🏆 Extraordinary',
+     'Copper':'22% of daily needs',
+     'Iron':'13% of daily needs',
+     'Selenium':'14% of daily needs',
      'Calories':'354 kcal per 100g'
    },
    vitamins:['Manganese 75%','MCT Fats #1','Copper 22%','Iron 13%','Selenium 14%'],
@@ -848,7 +848,9 @@ function filterCards(){
 }
 
 // ── MODAL ────────────────────────────────────────
+let currentModalFood = null;
 function openModal(d){
+  currentModalFood = d;
   document.getElementById('mEmoji').textContent = d.emoji;
   document.getElementById('mName').textContent = d.name;
   document.getElementById('mName').style.color = d.neon;
@@ -1108,6 +1110,126 @@ style.textContent='@keyframes confettiFall{0%{transform:translateY(0) rotate(0);
 document.head.appendChild(style);
 
 // ── TAB SWITCH ───────────────────────────────────
+function quizThisFood(){
+  if(!currentModalFood) return;
+  closeModalBtn();
+  // Filter questions to just this food
+  specificFoodQuiz = currentModalFood.name;
+  switchTab('quiz');
+  // Build quiz questions for this specific food
+  buildFoodQuiz(currentModalFood);
+}
+
+let specificFoodQuiz = null;
+
+function buildFoodQuiz(d){
+  // Reset scores
+  quizScore=0; quizTotal=0; quizStreak=0; quizAnswered=false;
+  document.getElementById('scoreCorrect').textContent='0';
+  document.getElementById('scoreTotal').textContent='0';
+  document.getElementById('scoreStreak').textContent='0';
+  document.getElementById('progressBar').style.width='0%';
+
+  // Build 5 questions specifically about this food
+  const foodQuestions = [];
+
+  // Q1: What is the top nutrient?
+  const topNutrient = Object.keys(d.nutrition)[0];
+  const topValue = Object.values(d.nutrition)[0];
+  const wrongFoods = DATA.filter(x=>x.name!==d.name);
+  const wrongNutrients = shuffle(wrongFoods.map(x=>Object.keys(x.nutrition)[0])).slice(0,3);
+  foodQuestions.push({
+    type:'mc', emoji:d.emoji,
+    q:`What is ${d.name} most famous for nutritionally?`,
+    options:shuffle([topNutrient,...wrongNutrients]),
+    answer:topNutrient,
+    explanation:`${d.name} is an exceptional source of ${topNutrient}! ${topValue}`
+  });
+
+  // Q2: True/False about a benefit
+  foodQuestions.push({
+    type:'tf', emoji:d.emoji,
+    q:`TRUE or FALSE: ${d.name} ${d.benefits[0].toLowerCase()}.`,
+    answer:true,
+    explanation:`TRUE! ${d.name} really does ${d.benefits[0].toLowerCase()}.`
+  });
+
+  // Q3: What type of food is it?
+  foodQuestions.push({
+    type:'mc', emoji:d.emoji,
+    q:`${d.emoji} ${d.name} is classified as a...`,
+    options:shuffle(['Vegetable','Fruit','Grain','Legume']),
+    answer:d.type==='vegetable'?'Vegetable':'Fruit',
+    explanation:`${d.name} is a ${d.type}! ${d.fact.split('.')[0]}.`
+  });
+
+  // Q4: Calories
+  const calEntry = Object.entries(d.nutrition).find(([k])=>k==='Calories');
+  if(calEntry){
+    const calVal = calEntry[1];
+    const wrongCals = ['10 kcal per 100g','250 kcal per 100g','450 kcal per 100g'];
+    foodQuestions.push({
+      type:'mc', emoji:d.emoji,
+      q:`How many calories does ${d.name} have per 100g?`,
+      options:shuffle([calVal,...wrongCals]),
+      answer:calVal,
+      explanation:`${d.name} has ${calVal}. This makes it ${parseInt(calVal)<50?'very low calorie and great for weight management!':'a moderate calorie food.'}`
+    });
+  }
+
+  // Q5: Fun fact true/false
+  foodQuestions.push({
+    type:'tf', emoji:d.emoji,
+    q:`TRUE or FALSE: ${d.fact.split('!')[0]}!`,
+    answer:true,
+    explanation:`TRUE! ${d.fact}`
+  });
+
+  // Q6: Benefit MC
+  const benefit = d.benefits[1];
+  const wrongBenefits = shuffle(DATA.filter(x=>x.name!==d.name).map(x=>x.benefits[0])).slice(0,3);
+  foodQuestions.push({
+    type:'mc', emoji:d.emoji,
+    q:`Which of these is a benefit of eating ${d.name}?`,
+    options:shuffle([benefit,...wrongBenefits]),
+    answer:benefit,
+    explanation:`${d.name} is great because it ${benefit.toLowerCase()}!`
+  });
+
+  // Override quiz questions with food-specific ones
+  QUIZ_QUESTIONS.length = 0;
+  foodQuestions.forEach(q=>QUIZ_QUESTIONS.push(q));
+  qIndex = 0;
+  renderQuestion();
+
+  // Add food header
+  const container = document.getElementById('quizContainer');
+  const header = document.createElement('div');
+  header.style.cssText='text-align:center;padding:16px;background:rgba(255,255,255,0.04);border-radius:4px;margin-bottom:20px;font-size:14px;color:var(--muted);';
+  header.innerHTML=`Quizzing you on ${d.emoji} <strong style="color:var(--white)">${d.name}</strong>! <a href="#" onclick="resetGeneralQuiz();return false;" style="color:var(--gold);font-size:12px;"> Play general quiz →</a>`;
+  container.insertBefore(header, container.firstChild);
+}
+
+function resetGeneralQuiz(){
+  specificFoodQuiz = null;
+  // Rebuild all questions
+  QUIZ_QUESTIONS.length = 0;
+  DATA.forEach(d=>{
+    const vit = d.vitamins[0];
+    const wrongs = DATA.filter(x=>x.name!==d.name).map(x=>x.vitamins[0]);
+    const opts = shuffle([vit,...shuffle(wrongs).slice(0,3)]);
+    QUIZ_QUESTIONS.push({type:'mc',emoji:d.emoji,q:`Which vitamin is ${d.name} especially known for?`,options:opts,answer:vit,explanation:`${d.name} is an excellent source of ${vit}!`});
+    QUIZ_QUESTIONS.push({type:'tf',emoji:d.emoji,q:`TRUE or FALSE: ${d.name} ${d.benefits[0].toLowerCase()}.`,answer:true,explanation:`TRUE! ${d.name} ${d.benefits[0].toLowerCase()}.`});
+  });
+  shuffle(QUIZ_QUESTIONS);
+  qIndex=0;
+  quizScore=0;quizTotal=0;quizStreak=0;
+  document.getElementById('scoreCorrect').textContent='0';
+  document.getElementById('scoreTotal').textContent='0';
+  document.getElementById('scoreStreak').textContent='0';
+  renderQuestion();
+}
+
 function switchTab(tab){
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
     b.classList.toggle('active',
@@ -1130,27 +1252,27 @@ function buildRankings(){
        .map((d,i)=>({emoji:d.emoji,name:d.name,val:'Score: '+d.score+'/100',num:i+1,neon:d.neon}))},
     {title:'🍊 Vitamin C Champions',color:'#fb923c',
      items:[
-       {emoji:'🍈',name:'Guava',val:'381% DV per 100g',num:1,neon:'#4ade80'},
-       {emoji:'🫑',name:'Bell Pepper',val:'213% DV per 100g',num:2,neon:'#86efac'},
-       {emoji:'🥝',name:'Kiwi',val:'154% DV per 100g',num:3,neon:'#4ade80'},
-       {emoji:'🥦',name:'Broccoli',val:'149% DV per 100g',num:4,neon:'#22c55e'},
-       {emoji:'🍓',name:'Strawberry',val:'98% DV per 100g',num:5,neon:'#f87171'},
+       {emoji:'🍈',name:'Guava',val:'381% of your daily needs per 100g',num:1,neon:'#4ade80'},
+       {emoji:'🫑',name:'Bell Pepper',val:'213% of your daily needs per 100g',num:2,neon:'#86efac'},
+       {emoji:'🥝',name:'Kiwi',val:'154% of your daily needs per 100g',num:3,neon:'#4ade80'},
+       {emoji:'🥦',name:'Broccoli',val:'149% of your daily needs per 100g',num:4,neon:'#22c55e'},
+       {emoji:'🍓',name:'Strawberry',val:'98% of your daily needs per 100g',num:5,neon:'#f87171'},
      ]},
     {title:'🦴 Vitamin K Champions',color:'#a78bfa',
      items:[
-       {emoji:'🥗',name:'Kale',val:'680% DV per 100g',num:1,neon:'#4ade80'},
-       {emoji:'🌿',name:'Spinach',val:'483% DV per 100g',num:2,neon:'#86efac'},
-       {emoji:'🥦',name:'Bruss. Sprouts',val:'177% DV per 100g',num:3,neon:'#4ade80'},
-       {emoji:'🌱',name:'Asparagus',val:'57% DV per 100g',num:4,neon:'#86efac'},
-       {emoji:'🥝',name:'Kiwi',val:'38% DV per 100g',num:5,neon:'#4ade80'},
+       {emoji:'🥗',name:'Kale',val:'680% of your daily needs per 100g',num:1,neon:'#4ade80'},
+       {emoji:'🌿',name:'Spinach',val:'483% of your daily needs per 100g',num:2,neon:'#86efac'},
+       {emoji:'🥦',name:'Bruss. Sprouts',val:'177% of your daily needs per 100g',num:3,neon:'#4ade80'},
+       {emoji:'🌱',name:'Asparagus',val:'57% of your daily needs per 100g',num:4,neon:'#86efac'},
+       {emoji:'🥝',name:'Kiwi',val:'38% of your daily needs per 100g',num:5,neon:'#4ade80'},
      ]},
     {title:'👁️ Vitamin A Champions',color:'#f97316',
      items:[
-       {emoji:'🥗',name:'Kale',val:'206% DV per 100g',num:1,neon:'#4ade80'},
-       {emoji:'🌿',name:'Spinach',val:'188% DV per 100g',num:2,neon:'#86efac'},
-       {emoji:'🍠',name:'Sweet Potato',val:'283% DV per 100g',num:3,neon:'#fb923c'},
-       {emoji:'🥕',name:'Carrot',val:'334% DV per 100g',num:4,neon:'#fb923c'},
-       {emoji:'🥭',name:'Mango',val:'54% DV per 100g',num:5,neon:'#fbbf24'},
+       {emoji:'🥗',name:'Kale',val:'206% of your daily needs per 100g',num:1,neon:'#4ade80'},
+       {emoji:'🌿',name:'Spinach',val:'188% of your daily needs per 100g',num:2,neon:'#86efac'},
+       {emoji:'🍠',name:'Sweet Potato',val:'283% of your daily needs per 100g',num:3,neon:'#fb923c'},
+       {emoji:'🥕',name:'Carrot',val:'334% of your daily needs per 100g',num:4,neon:'#fb923c'},
+       {emoji:'🥭',name:'Mango',val:'54% of your daily needs per 100g',num:5,neon:'#fbbf24'},
      ]},
     {title:'💪 Highest Protein',color:'#22c55e',
      items:[
