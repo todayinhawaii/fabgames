@@ -131,6 +131,18 @@ def free_trial():
 
     return jsonify({'ok': True, 'msg': 'Welcome to fab.games! Enjoy your free month!!'})
 
+# ── CHECK MEMBER ─────────────────────────────────
+@app.route('/api/check-member', methods=['POST'])
+def check_member():
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
+    members = supabase_request('GET',
+        f"members?email=eq.{urllib.parse.quote(email)}&select=*",
+        use_service_key=True)
+    if not members or len(members) == 0:
+        return jsonify({'exists': False, 'status': 'none'})
+    return jsonify({'exists': True, 'status': members[0].get('status','trial')})
+
 # ── CHECK ACCESS ─────────────────────────────────
 @app.route('/api/check-access', methods=['POST'])
 def check_access():
