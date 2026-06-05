@@ -298,11 +298,14 @@ nav{
 
 /* ── CARD TAG ── */
 .vcard-tag{
-  font-size:8px;letter-spacing:3px;text-transform:uppercase;
-  padding:4px 10px;border:1px solid;
-  margin-top:auto;color:var(--gold);
-  border-color:var(--border);
-  font-family:'Inter',sans-serif;
+  font-size:10px;
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  margin-top:6px;
+  color:var(--muted);
+  letter-spacing:0.5px;
+  border:none;
+  padding:0;
 }
 
 /* ── MODAL OVERLAY ── */
@@ -724,7 +727,7 @@ footer{
 // ── DATA ────────────────────────────────────────
 const DATA = [
   // VEGETABLES
-  {name:'Carrot',emoji:'🥕',type:'vegetable',color:'#f97316',neon:'#fb923c',
+  {name:'Carrot',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 22 C42 26 44 35 44 50 C44 65 41 76 40 82 C39 76 36 65 36 50 C36 35 38 26 40 22Z" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><line x1="38" y1="30" x2="38" y2="70" stroke-width="0.3" opacity="0.6"/><line x1="42" y1="30" x2="42" y2="70" stroke-width="0.3" opacity="0.6"/><line x1="36" y1="38" x2="44" y2="40" stroke-width="0.3" opacity="0.5"/><line x1="35" y1="48" x2="45" y2="50" stroke-width="0.3" opacity="0.5"/><line x1="35" y1="58" x2="45" y2="60" stroke-width="0.3" opacity="0.5"/><path d="M40 82 C40 88 40 94 40 96" stroke-width="0.7"/><path d="M39 21 C35 14 30 8 27 3" stroke-width="0.8"/><path d="M40 19 C39 11 39 5 40 1" stroke-width="0.8"/><path d="M41 21 C45 14 50 8 53 3" stroke-width="0.8"/><path d="M39 18 C37 12 35 7 33 4" stroke-width="0.5" opacity="0.6"/><path d="M41 18 C43 12 45 7 47 4" stroke-width="0.5" opacity="0.6"/></g></svg>`,latin:'Daucus carota',emoji:'🥕',type:'vegetable',color:'#f97316',neon:'#fb923c',
    score:87,
    nutrition:{
      'Vitamin A':'334% of your daily needs per 100g 🏆 #1 Vegetable',
@@ -738,7 +741,7 @@ const DATA = [
    benefits:['Improves eyesight and night vision','Boosts immune system','Promotes healthy skin and hair','Supports heart health','Aids digestion'],
    fact:'Carrots were originally purple! Orange carrots were developed in the Netherlands in the 17th century.'},
 
-  {name:'Broccoli',emoji:'🥦',type:'vegetable',color:'#16a34a',neon:'#22c55e',
+  {name:'Broccoli',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><rect x="37" y="58" width="6" height="28" rx="1" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><line x1="39" y1="62" x2="39" y2="84" stroke-width="0.3" opacity="0.6"/><line x1="43" y1="62" x2="43" y2="84" stroke-width="0.3" opacity="0.6"/><path d="M38 68 C30 66 24 62 22 57" stroke-width="0.7"/><path d="M42 70 C50 68 56 64 58 59" stroke-width="0.7"/><circle cx="32" cy="48" r="10" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><circle cx="40" cy="42" r="9" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><circle cx="48" cy="48" r="10" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><circle cx="36" cy="36" r="8" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><circle cx="44" cy="36" r="8" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><circle cx="32" cy="46" r="3" stroke-width="0.4" opacity="0.7"/><circle cx="40" cy="40" r="3" stroke-width="0.4" opacity="0.7"/><circle cx="48" cy="46" r="3" stroke-width="0.4" opacity="0.7"/><circle cx="36" cy="34" r="2.5" stroke-width="0.4" opacity="0.7"/><circle cx="44" cy="34" r="2.5" stroke-width="0.4" opacity="0.7"/><circle cx="28" cy="56" r="6" fill="rgba(201,169,110,0.06)" stroke-width="0.7"/><circle cx="52" cy="58" r="6" fill="rgba(201,169,110,0.06)" stroke-width="0.7"/><path d="M38 86 C28 92 18 90 12 83" stroke-width="0.8"/><path d="M42 85 C52 91 62 89 68 82" stroke-width="0.8"/></g></svg>`,latin:'Brassica oleracea',emoji:'🥦',type:'vegetable',color:'#16a34a',neon:'#22c55e',
    score:95,
    nutrition:{
      'Vitamin C':'149% of your daily needs per 100g 🏆 #1 Vegetable',
@@ -752,7 +755,7 @@ const DATA = [
    benefits:['Powerful cancer-fighting antioxidants','Strengthens bones','Boosts immune system','Supports heart health','Reduces inflammation'],
    fact:'Broccoli contains MORE Vitamin C than an orange! One cup gives you 135% of your daily needs.'},
 
-  {name:'Spinach',emoji:'🌿',type:'vegetable',color:'#15803d',neon:'#4ade80',
+  {name:'Spinach',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 85 C40 75 40 65 40 55" stroke-width="1.2"/><path d="M40 72 C32 65 22 60 15 58 C20 55 30 57 40 65" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><path d="M40 60 C48 53 58 48 65 46 C60 43 50 45 40 53" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><path d="M40 78 C30 72 20 70 12 72 C16 68 28 68 40 75" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><path d="M40 66 C50 60 60 62 68 66 C64 62 52 60 40 63" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><path d="M40 50 C35 42 30 35 28 26 C25 32 26 42 32 52" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><path d="M40 48 C45 40 50 33 52 24 C55 30 54 40 48 50" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><line x1="22" y1="60" x2="38" y2="68" stroke-width="0.3" opacity="0.5"/><line x1="50" y1="48" x2="42" y2="56" stroke-width="0.3" opacity="0.5"/><line x1="16" y1="70" x2="36" y2="76" stroke-width="0.3" opacity="0.5"/></g></svg>`,latin:'Spinacia oleracea',emoji:'🌿',type:'vegetable',color:'#15803d',neon:'#4ade80',
    score:96,
    nutrition:{
      'Vitamin K':'483% of your daily needs per 100g 🏆 #1 ALL Foods',
@@ -766,7 +769,7 @@ const DATA = [
    benefits:['Builds strong bones','Fights anaemia with iron','Protects eyesight','Reduces blood pressure','Powerful anti-inflammatory'],
    fact:'Spinach has 483% of your daily Vitamin K in just 100g — the highest of any vegetable on Earth!'},
 
-  {name:'Kale',emoji:'🍃',img:'kale.png',type:'vegetable',color:'#166534',neon:'#4ade80',
+  {name:'Kale',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 90 C40 78 40 66 40 54" stroke-width="1.2"/><path d="M40 54 C30 44 18 38 10 36 C14 30 26 34 38 46" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M40 42 C50 32 62 26 70 24 C66 18 54 22 42 34" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M40 66 C28 58 16 56 8 60 C12 54 24 54 38 62" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M40 76 C52 68 64 70 72 76 C68 70 56 68 42 72" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M12 36 C18 32 24 36 30 42" stroke-width="0.3" opacity="0.6"/><path d="M15 38 C20 35 25 38 28 44" stroke-width="0.3" opacity="0.4"/><path d="M68 24 C62 20 56 24 50 30" stroke-width="0.3" opacity="0.6"/><path d="M65 26 C60 22 55 26 52 32" stroke-width="0.3" opacity="0.4"/><path d="M10 60 C16 56 22 60 28 66" stroke-width="0.3" opacity="0.6"/></g></svg>`,latin:'Brassica oleracea var. acephala',emoji:'🍃',img:'kale.png',type:'vegetable',color:'#166534',neon:'#4ade80',
    score:98,
    nutrition:{
      'Vitamin K':'680% of your daily needs per 100g 🏆 #1 Absolute',
@@ -780,7 +783,7 @@ const DATA = [
    benefits:['Most nutrient-dense food on Earth','Powerful antioxidant','Lowers cholesterol','Supports bone health','Fights cancer'],
    fact:'Kale scores 1000+ on the ANDI nutritional index — the highest score possible. It is officially the most nutritious food on Earth!'},
 
-  {name:'Bell Pepper',emoji:'🫑',type:'vegetable',color:'#16a34a',neon:'#86efac',
+  {name:'Bell Pepper',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 18 C40 12 42 8 42 5" stroke-width="1"/><path d="M38 18 C34 14 30 12 28 14" stroke-width="0.8"/><path d="M26 16 C30 35 28 55 30 68 C32 78 36 84 40 86 C44 84 48 78 50 68 C52 55 50 35 54 16" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M26 16 C28 20 28 28 28 38 C28 55 30 70 34 78" stroke-width="0.4" opacity="0.6"/><path d="M54 16 C52 20 52 28 52 38 C52 55 50 70 46 78" stroke-width="0.4" opacity="0.6"/><path d="M34 20 C34 40 34 60 36 74" stroke-width="0.3" opacity="0.5"/><path d="M46 20 C46 40 46 60 44 74" stroke-width="0.3" opacity="0.5"/><path d="M26 40 C32 38 48 38 54 40" stroke-width="0.3" opacity="0.5"/><path d="M27 54 C32 52 48 52 53 54" stroke-width="0.3" opacity="0.5"/></g></svg>`,latin:'Capsicum annuum',emoji:'🫑',type:'vegetable',color:'#16a34a',neon:'#86efac',
    score:92,
    nutrition:{
      'Vitamin C':'213% of your daily needs per 100g 🏆 #1 All Vegetables',
@@ -794,7 +797,7 @@ const DATA = [
    benefits:['Highest Vitamin C of any vegetable','Supports eye health','Fights anemia','Reduces inflammation','Boosts metabolism'],
    fact:'Red bell peppers have 213% of your daily Vitamin C — that is MORE than any other vegetable. Green peppers have only 80%!'},
 
-  {name:'Sweet Potato',emoji:'🍠',type:'vegetable',color:'#ea580c',neon:'#fb923c',
+  {name:'Sweet Potato',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><ellipse cx="40" cy="55" rx="24" ry="16" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M16 55 C18 45 28 38 40 38 C52 38 62 45 64 55" stroke-width="0.4" opacity="0.6"/><line x1="20" y1="50" x2="38" y2="46" stroke-width="0.3" opacity="0.5"/><line x1="20" y1="56" x2="18" y2="60" stroke-width="0.3" opacity="0.5"/><line x1="60" y1="50" x2="42" y2="46" stroke-width="0.3" opacity="0.5"/><line x1="60" y1="56" x2="62" y2="60" stroke-width="0.3" opacity="0.5"/><line x1="24" y1="48" x2="56" y2="52" stroke-width="0.3" opacity="0.4"/><line x1="22" y1="54" x2="58" y2="58" stroke-width="0.3" opacity="0.4"/><path d="M34 38 C32 30 30 22 32 16" stroke-width="0.8"/><path d="M36 37 C35 28 36 20 38 14" stroke-width="0.8"/><path d="M40 37 C41 28 44 20 46 14" stroke-width="0.7"/><path d="M44 38 C47 30 50 24 50 18" stroke-width="0.7"/></g></svg>`,latin:'Ipomoea batatas',emoji:'🍠',type:'vegetable',color:'#ea580c',neon:'#fb923c',
    score:91,
    nutrition:{
      'Vitamin A':'283% of your daily needs per 100g 🏆 #2 Vegetable',
@@ -808,7 +811,7 @@ const DATA = [
    benefits:['Exceptionally high in Vitamin A','Regulates blood sugar','Promotes gut health','Boosts immune system','Supports healthy vision'],
    fact:'One medium sweet potato gives you 283% of your daily Vitamin A — almost 3x your daily needs in one vegetable!'},
 
-  {name:'Garlic',emoji:'🧄',type:'vegetable',color:'#d97706',neon:'#fbbf24',
+  {name:'Garlic',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 82 C40 72 40 62 40 52" stroke-width="1.2"/><ellipse cx="40" cy="44" rx="18" ry="14" fill="rgba(201,169,110,0.06)" stroke-width="0.8"/><path d="M28 48 C26 38 30 28 36 24 C38 30 36 40 34 50Z" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/><path d="M40 44 C40 34 42 24 46 20 C48 26 46 38 44 50Z" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/><path d="M52 48 C54 38 50 28 44 24 C42 30 44 40 46 50Z" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/><line x1="29" y1="44" x2="33" y2="36" stroke-width="0.3" opacity="0.5"/><line x1="41" y1="40" x2="43" y2="30" stroke-width="0.3" opacity="0.5"/><line x1="51" y1="44" x2="47" y2="36" stroke-width="0.3" opacity="0.5"/><path d="M38 50 C36 56 34 62 34 68 C36 72 44 72 46 68 C46 62 44 56 42 50" stroke-width="0.6"/><line x1="38" y1="55" x2="42" y2="55" stroke-width="0.3" opacity="0.5"/><line x1="37" y1="61" x2="43" y2="61" stroke-width="0.3" opacity="0.5"/></g></svg>`,latin:'Allium sativum',emoji:'🧄',type:'vegetable',color:'#d97706',neon:'#fbbf24',
    score:88,
    nutrition:{
      'Manganese':'23% of your daily needs per 100g',
@@ -822,7 +825,7 @@ const DATA = [
    benefits:['Powerful natural antibiotic','Reduces blood pressure','Lowers cholesterol','Boosts immune system','Fights the common cold'],
    fact:'A single clove of garlic has 95% of your daily Vitamin B6 AND contains allicin — the most powerful natural antibiotic known!'},
 
-  {name:'Beetroot',emoji:'🟣',type:'vegetable',color:'#9333ea',neon:'#c084fc',
+  {name:'Beetroot',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="56" r="22" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><line x1="20" y1="48" x2="60" y2="64" stroke-width="0.3" opacity="0.5"/><line x1="20" y1="56" x2="60" y2="56" stroke-width="0.3" opacity="0.5"/><line x1="20" y1="64" x2="60" y2="48" stroke-width="0.3" opacity="0.5"/><circle cx="40" cy="56" r="12" stroke-width="0.4" opacity="0.5"/><circle cx="40" cy="56" r="6" stroke-width="0.4" opacity="0.3"/><path d="M40 34 C40 26 40 18 40 10" stroke-width="1.2"/><path d="M38 14 C34 8 28 4 22 2" stroke-width="0.8"/><path d="M40 12 C40 6 42 2 44 -2" stroke-width="0.8"/><path d="M42 14 C46 8 52 4 58 2" stroke-width="0.8"/><path d="M40 78 C38 84 38 90 40 96" stroke-width="0.7"/></g></svg>`,latin:'Beta vulgaris',emoji:'🟣',type:'vegetable',color:'#9333ea',neon:'#c084fc',
    score:86,
    nutrition:{
      'Folate':'20% of your daily needs per 100g',
@@ -836,7 +839,7 @@ const DATA = [
    benefits:['Dramatically lowers blood pressure','Boosts athletic stamina by 16%','Supports liver detox','Fights inflammation','Improves brain blood flow'],
    fact:'Beetroot has the highest natural nitrate content of any vegetable — Olympic athletes use it to boost stamina by up to 16%!'},
 
-  {name:'Tomato',emoji:'🍅',type:'vegetable',color:'#dc2626',neon:'#f87171',
+  {name:'Tomato',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="55" r="24" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M26 42 C30 38 36 36 40 36 C44 36 50 38 54 42" stroke-width="0.4" opacity="0.6"/><line x1="32" y1="38" x2="34" y2="48" stroke-width="0.3" opacity="0.5"/><line x1="40" y1="36" x2="40" y2="46" stroke-width="0.3" opacity="0.5"/><line x1="48" y1="38" x2="46" y2="48" stroke-width="0.3" opacity="0.5"/><path d="M18 52 C20 44 28 38 40 38" stroke-width="0.4" opacity="0.5"/><path d="M62 52 C60 44 52 38 40 38" stroke-width="0.4" opacity="0.5"/><line x1="18" y1="55" x2="62" y2="55" stroke-width="0.3" opacity="0.4"/><path d="M38 36 C36 28 34 22 36 16" stroke-width="0.8"/><path d="M40 35 C40 27 40 20 40 14" stroke-width="0.8"/><path d="M42 36 C44 28 46 22 44 16" stroke-width="0.7"/><path d="M36 18 C32 14 28 12 26 10" stroke-width="0.6"/><path d="M44 18 C48 14 52 12 54 10" stroke-width="0.6"/></g></svg>`,latin:'Solanum lycopersicum',emoji:'🍅',type:'vegetable',color:'#dc2626',neon:'#f87171',
    score:84,
    nutrition:{
      'Lycopene':'Most absorbable source 🏆',
@@ -850,7 +853,7 @@ const DATA = [
    benefits:['Lycopene reduces cancer risk significantly','Supports heart health','Protects skin from UV damage','Improves vision','Strengthens immune system'],
    fact:'Cooking tomatoes increases their lycopene content by 35%! Tomato sauce is actually MORE nutritious than raw tomatoes.'},
 
-  {name:'Asparagus',emoji:'🌱',type:'vegetable',color:'#15803d',neon:'#86efac',
+  {name:'Asparagus',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M36 90 C36 50 34 20 36 5" stroke-width="1.2"/><path d="M36 5 C34 8 32 12 33 16 C34 12 37 10 36 5Z" fill="rgba(201,169,110,0.12)" stroke-width="0.8"/><line x1="34" y1="25" x2="30" y2="22" stroke-width="0.7"/><line x1="34" y1="35" x2="29" y2="31" stroke-width="0.7"/><line x1="35" y1="45" x2="30" y2="41" stroke-width="0.7"/><line x1="35" y1="55" x2="30" y2="51" stroke-width="0.7"/><line x1="35" y1="65" x2="30" y2="61" stroke-width="0.7"/><line x1="35" y1="75" x2="30" y2="71" stroke-width="0.6"/><path d="M40 90 C40 50 42 20 40 5" stroke-width="1.2"/><path d="M40 5 C38 8 36 12 37 16 C38 12 41 10 40 5Z" fill="rgba(201,169,110,0.12)" stroke-width="0.8"/><line x1="42" y1="25" x2="46" y2="22" stroke-width="0.7"/><line x1="42" y1="35" x2="47" y2="31" stroke-width="0.7"/><line x1="41" y1="45" x2="46" y2="41" stroke-width="0.7"/><line x1="41" y1="55" x2="46" y2="51" stroke-width="0.7"/><line x1="41" y1="65" x2="46" y2="61" stroke-width="0.7"/><path d="M44 90 C44 60 46 30 44 8" stroke-width="0.8" opacity="0.5"/></g></svg>`,latin:'Asparagus officinalis',emoji:'🌱',type:'vegetable',color:'#15803d',neon:'#86efac',
    score:83,
    nutrition:{
      'Folate':'34% of your daily needs per 100g 🏆 Top Vegetable',
@@ -864,7 +867,7 @@ const DATA = [
    benefits:['Prebiotic for gut health','Essential folate for pregnancy','Natural diuretic','Fights ageing','Supports brain function'],
    fact:'Asparagus has 34% of your daily folate per serving — making it one of the most important vegetables for pregnant women!'},
 
-  {name:'Mushroom',emoji:'🍄',type:'vegetable',color:'#92400e',neon:'#d97706',
+  {name:'Mushroom',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><rect x="34" y="58" width="12" height="28" rx="2" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><line x1="37" y1="62" x2="37" y2="84" stroke-width="0.3" opacity="0.5"/><line x1="43" y1="62" x2="43" y2="84" stroke-width="0.3" opacity="0.5"/><path d="M20 58 C20 40 28 26 40 22 C52 26 60 40 60 58Z" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><path d="M20 58 C26 52 36 50 40 50 C44 50 54 52 60 58" stroke-width="0.4" opacity="0.6"/><path d="M22 52 C26 42 32 34 40 30" stroke-width="0.4" opacity="0.5"/><path d="M58 52 C54 42 48 34 40 30" stroke-width="0.4" opacity="0.5"/><circle cx="32" cy="38" r="3" stroke-width="0.5" opacity="0.7"/><circle cx="40" cy="30" r="3" stroke-width="0.5" opacity="0.7"/><circle cx="48" cy="38" r="3" stroke-width="0.5" opacity="0.7"/><circle cx="35" cy="46" r="2" stroke-width="0.5" opacity="0.5"/><circle cx="45" cy="46" r="2" stroke-width="0.5" opacity="0.5"/></g></svg>`,latin:'Agaricus bisporus',emoji:'🍄',type:'vegetable',color:'#92400e',neon:'#d97706',
    score:85,
    nutrition:{
      'Vitamin D':'Only plant source 🏆 Unique',
@@ -878,7 +881,7 @@ const DATA = [
    benefits:['Only plant source of Vitamin D','Powerful immune booster','Fights cancer cells','Supports brain health','Reduces inflammation'],
    fact:'Mushrooms are the ONLY plant food with Vitamin D AND B12 — making them essential for vegans. Sun-dried mushrooms have 10x more Vitamin D!'},
 
-  {name:'Bruss. Sprouts',emoji:'🥦',type:'vegetable',color:'#15803d',neon:'#4ade80',
+  {name:'Bruss. Sprouts',latin:'Brassica oleracea gemmifera',emoji:'🥦',type:'vegetable',color:'#15803d',neon:'#4ade80',
    score:89,
    nutrition:{
      'Vitamin C':'142% of your daily needs per 100g 🏆 Top 3',
@@ -892,7 +895,7 @@ const DATA = [
    benefits:['Powerful cancer prevention via glucosinolates','Strengthens immune system','Supports bone health','Aids digestive health','Reduces inflammation'],
    fact:'Brussels sprouts have 177% of your daily Vitamin K — making them one of the top 3 sources of Vitamin K of all vegetables!'},
 
-  {name:'Pumpkin',emoji:'🎃',type:'vegetable',color:'#ea580c',neon:'#fb923c',
+  {name:'Pumpkin',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 20 C40 14 42 10 44 7" stroke-width="1"/><path d="M40 20 C34 22 26 28 22 40 C18 52 20 64 26 72 C30 78 36 82 40 82 C44 82 50 78 54 72 C60 64 62 52 58 40 C54 28 46 22 40 20Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M40 20 C38 24 36 34 36 50 C36 64 38 76 40 82" stroke-width="0.6"/><path d="M40 20 C42 24 44 34 44 50 C44 64 42 76 40 82" stroke-width="0.6"/><path d="M28 30 C26 38 24 52 26 64" stroke-width="0.3" opacity="0.5"/><path d="M52 30 C54 38 56 52 54 64" stroke-width="0.3" opacity="0.5"/><line x1="22" y1="50" x2="58" y2="50" stroke-width="0.3" opacity="0.4"/><line x1="23" y1="42" x2="57" y2="42" stroke-width="0.3" opacity="0.4"/><line x1="23" y1="58" x2="57" y2="58" stroke-width="0.3" opacity="0.4"/><path d="M44 8 C48 6 52 8 54 12" stroke-width="0.8"/></g></svg>`,latin:'Cucurbita maxima',emoji:'🎃',type:'vegetable',color:'#ea580c',neon:'#fb923c',
    score:82,
    nutrition:{
      'Vitamin A':'170% of your daily needs per 100g 🏆 Top 5',
@@ -906,7 +909,7 @@ const DATA = [
    benefits:['Exceptional eye health support','Boosts immunity dramatically','Protects skin','Supports heart health','Aids weight loss'],
    fact:'Pumpkin gives you 170% of your daily Vitamin A in just 100g — one of the richest orange-coloured sources on Earth!'},
 
-  {name:'Artichoke',emoji:'🌹',type:'vegetable',color:'#16a34a',neon:'#22c55e',
+  {name:'Artichoke',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 85 C40 75 40 65 40 55" stroke-width="1.2"/><path d="M34 60 C30 56 28 50 30 44 C32 56 36 60 40 58" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/><path d="M46 60 C50 56 52 50 50 44 C48 56 44 60 40 58" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/><path d="M32 50 C28 44 28 36 32 30 C34 42 38 50 40 48" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/><path d="M48 50 C52 44 52 36 48 30 C46 42 42 50 40 48" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/><path d="M34 40 C30 34 30 24 36 18 C36 30 38 40 40 38" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M46 40 C50 34 50 24 44 18 C44 30 42 40 40 38" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M38 36 C36 28 36 18 40 12 C44 18 44 28 42 36" fill="rgba(201,169,110,0.12)" stroke-width="0.8"/><path d="M40 12 C38 8 36 4 36 1" stroke-width="0.8"/><path d="M40 12 C42 8 44 4 44 1" stroke-width="0.7"/></g></svg>`,latin:'Cynara cardunculus',emoji:'🌹',type:'vegetable',color:'#16a34a',neon:'#22c55e',
    score:90,
    nutrition:{
      'Antioxidants':'#1 Highest of ALL vegetables 🏆',
@@ -920,7 +923,7 @@ const DATA = [
    benefits:['Highest antioxidant content of ALL vegetables','Supports liver function dramatically','Lowers cholesterol','Aids digestion','Regulates blood sugar'],
    fact:'Artichoke has the HIGHEST antioxidant content of any vegetable tested — beating even kale and spinach on ORAC antioxidant scores!'},
 
-  {name:'Onion',emoji:'🧅',type:'vegetable',color:'#a16207',neon:'#eab308',
+  {name:'Onion',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><ellipse cx="40" cy="60" rx="22" ry="26" fill="rgba(201,169,110,0.06)" stroke-width="0.9"/><ellipse cx="40" cy="60" rx="16" ry="20" stroke-width="0.4" opacity="0.5"/><ellipse cx="40" cy="60" rx="10" ry="14" stroke-width="0.4" opacity="0.4"/><path d="M34 34 C32 24 32 14 34 6" stroke-width="0.8"/><path d="M37 33 C36 22 37 12 38 4" stroke-width="0.8"/><path d="M40 33 C40 22 42 12 44 5" stroke-width="0.7"/><path d="M43 34 C46 24 48 14 46 6" stroke-width="0.7"/><path d="M18 52 C18 44 22 36 28 32 C30 40 26 50 22 60" stroke-width="0.4" opacity="0.5"/><path d="M62 52 C62 44 58 36 52 32 C50 40 54 50 58 60" stroke-width="0.4" opacity="0.5"/></g></svg>`,latin:'Allium cepa',emoji:'🧅',type:'vegetable',color:'#a16207',neon:'#eab308',
    score:79,
    nutrition:{
      'Quercetin':'#1 Highest dietary source 🏆',
@@ -934,7 +937,7 @@ const DATA = [
    benefits:['Highest dietary quercetin source','Reduces inflammation powerfully','Supports bone health','Fights bacteria','Regulates blood sugar'],
    fact:'Onions are the richest dietary source of quercetin — one of the most powerful anti-inflammatory and anti-cancer compounds known!'},
 
-  {name:'Cucumber',emoji:'🥒',type:'vegetable',color:'#15803d',neon:'#4ade80',
+  {name:'Cucumber',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 8 C46 8 52 16 54 28 C56 40 56 56 54 68 C52 80 46 88 40 88 C34 88 28 80 26 68 C24 56 24 40 26 28 C28 16 34 8 40 8Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><line x1="32" y1="20" x2="48" y2="22" stroke-width="0.3" opacity="0.5"/><line x1="30" y1="32" x2="50" y2="34" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="44" x2="52" y2="44" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="56" x2="52" y2="56" stroke-width="0.3" opacity="0.5"/><line x1="30" y1="68" x2="50" y2="68" stroke-width="0.3" opacity="0.5"/><line x1="32" y1="78" x2="48" y2="78" stroke-width="0.3" opacity="0.5"/><path d="M34 10 C36 10 38 8 38 6" stroke-width="0.8"/><path d="M40 9 C40 7 40 5 42 3" stroke-width="0.8"/><path d="M46 12 C48 10 50 8 52 7" stroke-width="0.7"/></g></svg>`,latin:'Cucumis sativus',emoji:'🥒',type:'vegetable',color:'#15803d',neon:'#4ade80',
    score:68,
    nutrition:{
      'Water Content':'96% water 🏆 Most hydrating',
@@ -948,7 +951,7 @@ const DATA = [
    benefits:['Most hydrating food — 96% water','Reduces bloating','Cools and soothes skin','Supports kidney health','Lowest calorie vegetable'],
    fact:'At just 15 calories per 100g and 96% water, cucumber is one of the most hydrating and lowest calorie foods in existence!'},
 
-  {name:'Corn',emoji:'🌽',type:'vegetable',color:'#eab308',neon:'#fde047',
+  {name:'Corn',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 8 C46 10 52 20 52 40 C52 60 48 80 40 90 C32 80 28 60 28 40 C28 20 34 10 40 8Z" fill="rgba(201,169,110,0.06)" stroke-width="0.9"/><line x1="34" y1="18" x2="34" y2="82" stroke-width="0.3" opacity="0.5"/><line x1="37" y1="14" x2="37" y2="86" stroke-width="0.3" opacity="0.5"/><line x1="40" y1="12" x2="40" y2="88" stroke-width="0.3" opacity="0.5"/><line x1="43" y1="14" x2="43" y2="86" stroke-width="0.3" opacity="0.5"/><line x1="46" y1="18" x2="46" y2="82" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="30" x2="52" y2="30" stroke-width="0.3" opacity="0.4"/><line x1="28" y1="40" x2="52" y2="40" stroke-width="0.3" opacity="0.4"/><line x1="28" y1="50" x2="52" y2="50" stroke-width="0.3" opacity="0.4"/><line x1="28" y1="60" x2="52" y2="60" stroke-width="0.3" opacity="0.4"/><line x1="28" y1="70" x2="52" y2="70" stroke-width="0.3" opacity="0.4"/><path d="M28 18 C20 14 14 8 12 2" stroke-width="0.8"/><path d="M36 10 C32 4 30 -2 32 -6" stroke-width="0.8"/><path d="M46 12 C50 6 54 2 56 -2" stroke-width="0.7"/></g></svg>`,latin:'Zea mays',emoji:'🌽',type:'vegetable',color:'#eab308',neon:'#fde047',
    score:72,
    nutrition:{
      'Lutein':'#1 Highest source 🏆 Eye health',
@@ -962,7 +965,7 @@ const DATA = [
    benefits:['Lutein protects eye health','Supports digestive health','Provides sustained energy','Promotes healthy skin','Boosts brain function'],
    fact:'Corn is the #1 dietary source of lutein — the most important nutrient for protecting your eyes from macular degeneration!'},
 
-  {name:'Avocado',emoji:'🥑',type:'fruit',color:'#15803d',neon:'#4ade80',
+  {name:'Avocado',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 5 C46 8 54 20 56 38 C58 56 54 74 48 84 C44 90 36 90 32 84 C26 74 22 56 24 38 C26 20 34 8 40 5Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M35 16 C32 22 30 30 30 38 C30 52 32 66 36 76" stroke-width="0.3" opacity="0.5"/><path d="M45 16 C48 22 50 30 50 38 C50 52 48 66 44 76" stroke-width="0.3" opacity="0.5"/><ellipse cx="40" cy="56" rx="12" ry="16" fill="rgba(201,169,110,0.12)" stroke-width="0.8"/><ellipse cx="40" cy="56" rx="7" ry="10" stroke-width="0.4" opacity="0.6"/><line x1="30" y1="50" x2="50" y2="62" stroke-width="0.3" opacity="0.4"/><line x1="30" y1="56" x2="50" y2="56" stroke-width="0.3" opacity="0.4"/><line x1="30" y1="62" x2="50" y2="50" stroke-width="0.3" opacity="0.4"/><path d="M40 5 C40 3 42 1 44 0" stroke-width="0.8"/></g></svg>`,latin:'Persea americana',emoji:'🥑',type:'fruit',color:'#15803d',neon:'#4ade80',
    score:93,
    nutrition:{
      'Healthy Fats':'30g per 100g 🏆 Most in fruit',
@@ -976,7 +979,7 @@ const DATA = [
    benefits:['More potassium than bananas','Loaded with heart-healthy fats','Reduces cholesterol','Supports eye health','Fights arthritis'],
    fact:'Avocados have more potassium than bananas — 14% vs 10% of your daily needs per 100g. They are also the fattiest plant food on Earth!'},
 
-  {name:'Peas',emoji:'🫛',type:'vegetable',color:'#16a34a',neon:'#86efac',
+  {name:'Peas',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M15 45 C18 35 25 28 35 26 C50 24 62 32 64 45 C66 54 62 64 55 68 C48 72 36 72 28 68 C20 64 13 56 15 45Z" fill="rgba(201,169,110,0.06)" stroke-width="0.9"/><circle cx="28" cy="50" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.8"/><circle cx="40" cy="48" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.8"/><circle cx="52" cy="50" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.8"/><circle cx="28" cy="50" r="4" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="48" r="4" stroke-width="0.4" opacity="0.6"/><circle cx="52" cy="50" r="4" stroke-width="0.4" opacity="0.6"/><path d="M15 46 C12 38 14 28 18 22" stroke-width="0.8"/><path d="M64 46 C67 38 65 28 61 22" stroke-width="0.8"/><path d="M18 22 C25 14 35 10 40 10 C46 10 56 14 62 22" stroke-width="0.7"/><path d="M30 10 C28 6 26 2 26 -2" stroke-width="0.7"/><path d="M50 10 C52 6 54 2 54 -2" stroke-width="0.7"/></g></svg>`,latin:'Pisum sativum',emoji:'🫛',type:'vegetable',color:'#16a34a',neon:'#86efac',
    score:80,
    nutrition:{
      'Protein':'5.4g per 100g 🏆 Highest vegetable',
@@ -991,7 +994,7 @@ const DATA = [
    fact:'Peas have 5.4g of protein per 100g — the highest protein content of any vegetable. They are a complete plant protein source!'},
 
   // FRUITS
-  {name:'Guava',emoji:'🍈',type:'fruit',color:'#16a34a',neon:'#4ade80',
+  {name:'Guava',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M18 50 C18 32 28 16 40 14 C52 16 62 32 62 50 C62 68 52 84 40 86 C28 84 18 68 18 50Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M34 18 C30 24 26 32 24 42" stroke-width="0.3" opacity="0.5"/><path d="M46 18 C50 24 54 32 56 42" stroke-width="0.3" opacity="0.5"/><line x1="18" y1="50" x2="62" y2="50" stroke-width="0.3" opacity="0.4"/><circle cx="40" cy="48" r="10" stroke-width="0.5" opacity="0.5"/><line x1="34" y1="42" x2="40" y2="48" stroke-width="0.4" opacity="0.6"/><line x1="46" y1="42" x2="40" y2="48" stroke-width="0.4" opacity="0.6"/><line x1="40" y1="38" x2="40" y2="48" stroke-width="0.4" opacity="0.6"/><line x1="40" y1="58" x2="40" y2="48" stroke-width="0.4" opacity="0.6"/><line x1="34" y1="54" x2="40" y2="48" stroke-width="0.4" opacity="0.6"/><line x1="46" y1="54" x2="40" y2="48" stroke-width="0.4" opacity="0.6"/><path d="M38 14 C37 8 36 4 38 1" stroke-width="0.8"/><path d="M42 14 C44 8 46 6 46 2" stroke-width="0.7"/></g></svg>`,latin:'Psidium guajava',emoji:'🍈',type:'fruit',color:'#16a34a',neon:'#4ade80',
    score:99,
    nutrition:{
      'Vitamin C':'381% of your daily needs per 100g 🏆 #1 ALL FOODS',
@@ -1005,7 +1008,7 @@ const DATA = [
    benefits:['Most Vitamin C of any food on Earth','Reduces cancer risk dramatically','Lowers blood pressure','Improves digestion','Supports heart health'],
    fact:'Guava has 381% of your daily Vitamin C per 100g — beating every other fruit and vegetable. It is officially the highest Vitamin C food on Earth!'},
 
-  {name:'Kiwi',emoji:'🥝',type:'fruit',color:'#16a34a',neon:'#4ade80',
+  {name:'Kiwi',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><ellipse cx="40" cy="52" rx="28" ry="22" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><circle cx="40" cy="52" r="14" stroke-width="0.5" opacity="0.5"/><line x1="26" y1="52" x2="54" y2="52" stroke-width="0.4" opacity="0.6"/><line x1="40" y1="38" x2="40" y2="66" stroke-width="0.4" opacity="0.6"/><line x1="28" y1="42" x2="52" y2="62" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="62" x2="52" y2="42" stroke-width="0.3" opacity="0.5"/><line x1="30" y1="46" x2="50" y2="58" stroke-width="0.3" opacity="0.4"/><line x1="30" y1="58" x2="50" y2="46" stroke-width="0.3" opacity="0.4"/><circle cx="40" cy="52" r="3" fill="rgba(201,169,110,0.3)" stroke-width="0.6"/><path d="M12 48 C14 42 18 36 22 32" stroke-width="0.4" opacity="0.4"/><path d="M68 48 C66 42 62 36 58 32" stroke-width="0.4" opacity="0.4"/></g></svg>`,latin:'Actinidia deliciosa',emoji:'🥝',type:'fruit',color:'#16a34a',neon:'#4ade80',
    score:94,
    nutrition:{
      'Vitamin C':'154% of your daily needs per 100g 🏆 Top 3 Fruit',
@@ -1019,7 +1022,7 @@ const DATA = [
    benefits:['154% daily Vitamin C in one fruit','Improves sleep quality by 42%','Supports heart health','Aids digestion via actinidin','Boosts immunity'],
    fact:'Two kiwis before bed improves sleep quality by 42%! They contain more Vitamin C than an orange by weight.'},
 
-  {name:'Papaya',emoji:'🍈',type:'fruit',color:'#f97316',neon:'#fb923c',
+  {name:'Papaya',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M28 20 C28 12 32 6 36 4 C40 6 46 12 46 20 C50 24 54 36 54 52 C54 68 48 84 40 88 C32 84 26 68 26 52 C26 36 28 24 28 20Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M32 24 C30 34 28 46 28 56" stroke-width="0.3" opacity="0.5"/><path d="M48 24 C50 34 52 46 52 56" stroke-width="0.3" opacity="0.5"/><line x1="26" y1="52" x2="54" y2="52" stroke-width="0.3" opacity="0.4"/><circle cx="40" cy="52" r="8" stroke-width="0.4" opacity="0.5"/><circle cx="36" cy="48" r="2" fill="rgba(201,169,110,0.3)" stroke-width="0.5"/><circle cx="44" cy="48" r="2" fill="rgba(201,169,110,0.3)" stroke-width="0.5"/><circle cx="40" cy="56" r="2" fill="rgba(201,169,110,0.3)" stroke-width="0.5"/><path d="M36 4 C34 -2 30 -6 28 -8" stroke-width="0.8"/><path d="M38 3 C38 -4 40 -8 42 -10" stroke-width="0.7"/></g></svg>`,latin:'Carica papaya',emoji:'🍈',type:'fruit',color:'#f97316',neon:'#fb923c',
    score:91,
    nutrition:{
      'Vitamin C':'103% of your daily needs per 100g 🏆 Top 5 Fruit',
@@ -1033,7 +1036,7 @@ const DATA = [
    benefits:['103% daily Vitamin C per 100g','Papain enzyme aids protein digestion uniquely','Reduces inflammation powerfully','Improves heart health','Supports eye health'],
    fact:'Christopher Columbus called papaya "the fruit of the angels". Its enzyme papain is used in meat tenderisers commercially!'},
 
-  {name:'Strawberry',emoji:'🍓',type:'fruit',color:'#dc2626',neon:'#f87171',
+  {name:'Strawberry',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 20 C50 20 62 32 64 48 C66 62 60 78 50 86 C46 90 34 90 30 86 C20 78 14 62 16 48 C18 32 30 20 40 20Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><circle cx="30" cy="40" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="40" cy="36" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="50" cy="40" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="26" cy="52" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="36" cy="48" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="46" cy="50" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="56" cy="52" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="30" cy="64" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="42" cy="62" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="52" cy="64" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="36" cy="76" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="46" cy="76" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><path d="M34 20 C32 12 28 8 26 4" stroke-width="0.8"/><path d="M37 19 C36 10 36 4 38 0" stroke-width="0.8"/><path d="M40 19 C42 10 44 4 44 0" stroke-width="0.7"/><path d="M44 20 C46 12 52 8 54 4" stroke-width="0.7"/></g></svg>`,latin:'Fragaria ananassa',emoji:'🍓',type:'fruit',color:'#dc2626',neon:'#f87171',
    score:88,
    nutrition:{
      'Vitamin C':'98% of your daily needs per 100g 🏆 Top Berry',
@@ -1047,7 +1050,7 @@ const DATA = [
    benefits:['Nearly full daily Vitamin C in 100g','Highest Vitamin C of all berries','Whitens teeth naturally','Reduces blood pressure','Fights inflammation'],
    fact:'100g of strawberries gives you 98% of your daily Vitamin C — and at only 32 calories, they are one of the most nutrient-dense low-calorie foods!'},
 
-  {name:'Pomegranate',emoji:'🍎',type:'fruit',color:'#9f1239',neon:'#fb7185',
+  {name:'Pomegranate',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="56" r="26" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M36 30 C36 26 38 22 40 20 C42 22 44 26 44 30" stroke-width="0.8"/><path d="M36 30 C32 28 28 28 26 30" stroke-width="0.7"/><path d="M44 30 C48 28 52 28 54 30" stroke-width="0.7"/><line x1="40" y1="32" x2="40" y2="82" stroke-width="0.4" opacity="0.5"/><line x1="16" y1="56" x2="64" y2="56" stroke-width="0.4" opacity="0.5"/><line x1="20" y1="42" x2="60" y2="70" stroke-width="0.3" opacity="0.4"/><line x1="20" y1="70" x2="60" y2="42" stroke-width="0.3" opacity="0.4"/><circle cx="32" cy="48" r="3" fill="rgba(201,169,110,0.3)" stroke-width="0.5"/><circle cx="48" cy="48" r="3" fill="rgba(201,169,110,0.3)" stroke-width="0.5"/><circle cx="36" cy="60" r="3" fill="rgba(201,169,110,0.3)" stroke-width="0.5"/><circle cx="46" cy="62" r="3" fill="rgba(201,169,110,0.3)" stroke-width="0.5"/><circle cx="40" cy="44" r="2.5" fill="rgba(201,169,110,0.3)" stroke-width="0.5"/><circle cx="40" cy="68" r="2.5" fill="rgba(201,169,110,0.3)" stroke-width="0.5"/></g></svg>`,latin:'Punica granatum',emoji:'🍎',type:'fruit',color:'#9f1239',neon:'#fb7185',
    score:96,
    nutrition:{
      'Punicalagins':'#1 Most powerful antioxidant 🏆',
@@ -1061,7 +1064,7 @@ const DATA = [
    benefits:['Punicalagins most powerful antioxidant known','Fights prostate cancer','Reduces blood pressure by 21%','Fights arthritis pain','Improves memory'],
    fact:'Pomegranate juice has 3x more antioxidants than red wine and green tea. Punicalagins are found nowhere else in nature!'},
 
-  {name:'Blueberry',emoji:'🫐',type:'fruit',color:'#4f46e5',neon:'#818cf8',
+  {name:'Blueberry',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="52" r="20" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M24 46 C26 38 32 32 40 30 C48 32 54 38 56 46" stroke-width="0.4" opacity="0.5"/><line x1="24" y1="52" x2="56" y2="52" stroke-width="0.3" opacity="0.4"/><path d="M36 32 C36 28 38 24 40 22" stroke-width="0.3" opacity="0.5"/><path d="M44 32 C44 28 42 24 40 22" stroke-width="0.3" opacity="0.5"/><path d="M40 32 C40 32 38 30 36 32 C38 30 42 30 44 32 C42 30 40 32 40 32Z" stroke-width="0.6" fill="rgba(201,169,110,0.15)"/><circle cx="26" cy="38" r="7" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/><circle cx="54" cy="38" r="7" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/><circle cx="26" cy="65" r="7" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/><circle cx="54" cy="65" r="7" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/></g></svg>`,latin:'Vaccinium corymbosum',emoji:'🫐',type:'fruit',color:'#4f46e5',neon:'#818cf8',
    score:95,
    nutrition:{
      'Antioxidants':'#1 Highest of ALL fruits 🏆',
@@ -1075,7 +1078,7 @@ const DATA = [
    benefits:['Highest antioxidant content of ALL fruits','Improves memory and brain function','Reduces DNA damage','Lowers blood pressure','Fights ageing'],
    fact:'Blueberries score highest of any fruit on ORAC antioxidant tests. Eating them regularly improves memory by up to 30% in older adults!'},
 
-  {name:'Orange',emoji:'🍊',type:'fruit',color:'#ea580c',neon:'#fb923c',
+  {name:'Orange',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="52" r="28" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M40 24 C28 26 18 38 16 52" stroke-width="0.3" opacity="0.5"/><path d="M40 24 C52 26 62 38 64 52" stroke-width="0.3" opacity="0.5"/><path d="M16 52 C18 66 28 78 40 80" stroke-width="0.3" opacity="0.5"/><path d="M64 52 C62 66 52 78 40 80" stroke-width="0.3" opacity="0.5"/><line x1="12" y1="52" x2="68" y2="52" stroke-width="0.3" opacity="0.4"/><line x1="40" y1="24" x2="40" y2="80" stroke-width="0.3" opacity="0.4"/><path d="M40 24 C40 16 42 10 44 6" stroke-width="0.9"/><path d="M38 8 C34 6 30 8 28 12" stroke-width="0.7"/><path d="M40 24 C34 22 26 28 20 36" stroke-width="0.3" opacity="0.4"/></g></svg>`,latin:'Citrus sinensis',emoji:'🍊',type:'fruit',color:'#ea580c',neon:'#fb923c',
    score:87,
    nutrition:{
      'Vitamin C':'89% of your daily needs per 100g 🏆 Most famous source',
@@ -1089,7 +1092,7 @@ const DATA = [
    benefits:['One orange = nearly full daily Vitamin C','Strengthens immune system','Reduces kidney stone risk','Protects skin','Supports heart health'],
    fact:'One medium orange provides 89% of your daily Vitamin C. Before oranges arrived in Europe there was literally no word for the colour orange!'},
 
-  {name:'Banana',emoji:'🍌',type:'fruit',color:'#eab308',neon:'#fde047',
+  {name:'Banana',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M20 75 C22 60 28 40 38 24 C44 16 52 10 58 8 C62 8 64 12 62 18 C58 28 46 44 38 62 C34 72 32 80 30 86 C26 88 20 84 20 75Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M22 72 C24 58 30 40 40 26" stroke-width="0.4" opacity="0.5"/><path d="M26 78 C28 66 34 48 44 32" stroke-width="0.4" opacity="0.5"/><path d="M24 68 C26 56 30 44 38 30" stroke-width="0.3" opacity="0.4"/><path d="M60 8 C64 6 68 6 70 10" stroke-width="0.8"/><line x1="56" y1="10" x2="60" y2="6" stroke-width="0.5" opacity="0.6"/></g></svg>`,latin:'Musa acuminata',emoji:'🍌',type:'fruit',color:'#eab308',neon:'#fde047',
    score:82,
    nutrition:{
      'Vitamin B6':'25% of your daily needs per 100g 🏆 Top Fruit',
@@ -1103,7 +1106,7 @@ const DATA = [
    benefits:['Instant natural energy boost','Reduces muscle cramps','Supports brain function','Improves mood via serotonin','Aids digestion'],
    fact:'Bananas give you 25% of your daily Vitamin B6 — the highest of any fruit. They are naturally radioactive but completely safe to eat!'},
 
-  {name:'Mango',emoji:'🥭',type:'fruit',color:'#f59e0b',neon:'#fbbf24',
+  {name:'Mango',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 8 C48 10 58 22 60 38 C62 54 56 72 48 82 C44 88 36 90 32 86 C24 80 18 64 20 48 C22 32 30 12 40 8Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M34 18 C30 26 26 38 26 52 C26 64 30 76 34 84" stroke-width="0.3" opacity="0.5"/><path d="M46 14 C50 22 54 34 54 48 C54 60 52 72 48 80" stroke-width="0.3" opacity="0.5"/><line x1="22" y1="48" x2="60" y2="44" stroke-width="0.3" opacity="0.4"/><line x1="20" y1="58" x2="60" y2="56" stroke-width="0.3" opacity="0.4"/><path d="M40 8 C40 4 42 1 44 0" stroke-width="0.9"/><path d="M44 2 C48 0 52 2 54 6" stroke-width="0.7"/></g></svg>`,latin:'Mangifera indica',emoji:'🥭',type:'fruit',color:'#f59e0b',neon:'#fbbf24',
    score:89,
    nutrition:{
      'Vitamin C':'67% of your daily needs per 100g',
@@ -1117,7 +1120,7 @@ const DATA = [
    benefits:['67% daily Vitamin C in 100g','Improves digestion powerfully','Supports eye health via Vitamin A','Fights cancer cells','Promotes healthy skin'],
    fact:'Mango is the most consumed fruit in the world! One mango gives you 67% Vitamin C AND 54% Vitamin A — an extraordinary combination!'},
 
-  {name:'Apple',emoji:'🍎',type:'fruit',color:'#dc2626',neon:'#f87171',
+  {name:'Apple',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 20 C50 18 62 26 66 40 C70 54 66 70 58 80 C52 88 44 90 40 90 C36 90 28 88 22 80 C14 70 10 54 14 40 C18 26 30 18 40 20Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M24 30 C20 38 18 50 20 62" stroke-width="0.3" opacity="0.5"/><path d="M56 30 C60 38 62 50 60 62" stroke-width="0.3" opacity="0.5"/><line x1="14" y1="50" x2="66" y2="50" stroke-width="0.3" opacity="0.4"/><path d="M38 20 C37 12 36 6 38 2" stroke-width="1"/><path d="M38 4 C34 2 30 4 28 8" stroke-width="0.8"/><path d="M30 18 C26 14 22 14 20 18" stroke-width="0.7" opacity="0.7"/></g></svg>`,latin:'Malus domestica',emoji:'🍎',type:'fruit',color:'#dc2626',neon:'#f87171',
    score:78,
    nutrition:{
      'Quercetin':'Excellent source',
@@ -1131,7 +1134,7 @@ const DATA = [
    benefits:['Reduces risk of Type 2 diabetes','Promotes gut health','Lowers cholesterol','Protects heart','May prevent Alzheimers'],
    fact:'An apple a day really does work! The quercetin in apples is one of the most powerful antioxidants and has been linked to preventing Alzheimers!'},
 
-  {name:'Pineapple',emoji:'🍍',type:'fruit',color:'#eab308',neon:'#fde047',
+  {name:'Pineapple',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M26 38 C26 26 32 18 40 16 C48 18 54 26 54 38 C54 58 48 78 40 86 C32 78 26 58 26 38Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><line x1="30" y1="28" x2="50" y2="38" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="38" x2="52" y2="48" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="48" x2="52" y2="58" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="58" x2="52" y2="68" stroke-width="0.3" opacity="0.5"/><line x1="30" y1="28" x2="30" y2="70" stroke-width="0.3" opacity="0.4"/><line x1="36" y1="20" x2="36" y2="76" stroke-width="0.3" opacity="0.4"/><line x1="44" y1="20" x2="44" y2="76" stroke-width="0.3" opacity="0.4"/><line x1="50" y1="28" x2="50" y2="70" stroke-width="0.3" opacity="0.4"/><path d="M34 16 C32 10 28 4 26 0" stroke-width="0.8"/><path d="M37 15 C36 8 36 2 38 -2" stroke-width="0.8"/><path d="M40 15 C40 8 42 2 44 -2" stroke-width="0.7"/><path d="M44 16 C46 10 50 4 52 0" stroke-width="0.7"/><path d="M47 18 C52 14 56 8 56 3" stroke-width="0.6"/></g></svg>`,latin:'Ananas comosus',emoji:'🍍',type:'fruit',color:'#eab308',neon:'#fde047',
    score:86,
    nutrition:{
      'Vitamin C':'80% of your daily needs per 100g',
@@ -1145,7 +1148,7 @@ const DATA = [
    benefits:['44% daily Manganese — highest of any fruit','Bromelain reduces inflammation powerfully','Boosts immunity','Speeds wound healing','Aids protein digestion'],
    fact:'Pineapple has 44% of your daily Manganese — the highest of any fruit! Bromelain is so powerful it is used in medical treatments worldwide!'},
 
-  {name:'Watermelon',emoji:'🍉',type:'fruit',color:'#dc2626',neon:'#f87171',
+  {name:'Watermelon',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M12 52 L40 14 L68 52 Z" fill="rgba(201,169,110,0.06)" stroke-width="0.9"/><path d="M12 52 C14 60 24 72 40 76 C56 72 66 60 68 52" fill="rgba(201,169,110,0.04)" stroke-width="0.7"/><path d="M16 52 C18 60 26 70 40 74" stroke-width="0.3" opacity="0.5"/><path d="M64 52 C62 60 54 70 40 74" stroke-width="0.3" opacity="0.5"/><line x1="40" y1="14" x2="40" y2="76" stroke-width="0.3" opacity="0.4"/><path d="M20 52 C22 42 30 30 40 24" stroke-width="0.3" opacity="0.4"/><path d="M60 52 C58 42 50 30 40 24" stroke-width="0.3" opacity="0.4"/><circle cx="32" cy="44" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="42" cy="38" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="50" cy="46" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="36" cy="54" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/><circle cx="46" cy="56" r="2" fill="rgba(201,169,110,0.4)" stroke-width="0.5"/></g></svg>`,latin:'Citrullus lanatus',emoji:'🍉',type:'fruit',color:'#dc2626',neon:'#f87171',
    score:77,
    nutrition:{
      'Lycopene':'Most bioavailable source 🏆',
@@ -1159,7 +1162,7 @@ const DATA = [
    benefits:['92% water — ultimate hydration','Best lycopene source of any fruit','Reduces muscle soreness','Supports heart health','Only 30 calories per 100g'],
    fact:'Watermelon has more lycopene than tomatoes AND contains citrulline — a compound that improves blood flow and reduces muscle soreness by 40%!'},
 
-  {name:'Lemon',emoji:'🍋',type:'fruit',color:'#eab308',neon:'#fde047',
+  {name:'Lemon',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M14 52 C14 36 25 20 40 18 C55 20 66 36 66 52 C66 68 55 84 40 86 C25 84 14 68 14 52Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M40 18 C44 10 50 6 54 6" stroke-width="0.8"/><path d="M54 6 C58 4 62 6 62 10" stroke-width="0.7"/><path d="M40 86 C36 92 32 94 28 94" stroke-width="0.7"/><path d="M28 94 C24 94 22 90 24 86" stroke-width="0.6"/><path d="M18 40 C20 32 26 24 34 20" stroke-width="0.3" opacity="0.5"/><path d="M62 40 C60 32 54 24 46 20" stroke-width="0.3" opacity="0.5"/><line x1="14" y1="52" x2="66" y2="52" stroke-width="0.3" opacity="0.4"/></g></svg>`,latin:'Citrus limon',emoji:'🍋',type:'fruit',color:'#eab308',neon:'#fde047',
    score:81,
    nutrition:{
      'Vitamin C':'88% of your daily needs per 100g 🏆 Top 5',
@@ -1173,7 +1176,7 @@ const DATA = [
    benefits:['88% daily Vitamin C per 100g','Alkalises the body despite being acidic','Prevents kidney stones','Enhances iron absorption','Only 29 calories per 100g'],
    fact:'Lemons are the richest source of limonene — a compound that fights cancer cells, reduces anxiety, and gives lemons their distinctive scent!'},
 
-  {name:'Grapes',emoji:'🍇',type:'fruit',color:'#7c3aed',neon:'#a78bfa',
+  {name:'Grapes',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 8 C40 4 42 2 44 1" stroke-width="1"/><path d="M40 8 C36 12 30 18 28 26" stroke-width="0.8"/><path d="M40 8 C44 12 50 18 52 26" stroke-width="0.8"/><circle cx="28" cy="34" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="52" cy="34" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="40" cy="30" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="22" cy="50" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="40" cy="47" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="58" cy="50" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="30" cy="64" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="50" cy="64" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="40" cy="78" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="28" cy="32" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="52" cy="32" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="28" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="45" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="76" r="3" stroke-width="0.4" opacity="0.6"/></g></svg>`,latin:'Vitis vinifera',emoji:'🍇',type:'fruit',color:'#7c3aed',neon:'#a78bfa',
    score:84,
    nutrition:{
      'Resveratrol':'#1 Highest source 🏆',
@@ -1187,7 +1190,7 @@ const DATA = [
    benefits:['Resveratrol fights cancer and ageing','Reduces heart disease risk','Fights inflammation','Supports eye health','Improves sleep quality'],
    fact:'Red grapes are the #1 source of resveratrol — the compound linked to longevity in the Mediterranean. It literally slows the ageing process!'},
 
-  {name:'Cherry',emoji:'🍒',type:'fruit',color:'#be123c',neon:'#fb7185',
+  {name:'Cherry',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M28 20 C28 14 30 8 32 4" stroke-width="1"/><path d="M52 20 C52 14 50 8 48 4" stroke-width="1"/><path d="M28 20 C36 20 44 18 52 20" stroke-width="0.8"/><circle cx="24" cy="68" r="18" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><circle cx="56" cy="68" r="18" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M10 62 C12 54 18 48 24 46" stroke-width="0.3" opacity="0.5"/><path d="M42 62 C44 54 50 48 56 46" stroke-width="0.3" opacity="0.5"/><line x1="8" y1="68" x2="40" y2="68" stroke-width="0.3" opacity="0.4"/><line x1="40" y1="68" x2="72" y2="68" stroke-width="0.3" opacity="0.4"/><path d="M40 12 C38 8 38 4 40 2" stroke-width="0.7" opacity="0.7"/></g></svg>`,latin:'Prunus avium',emoji:'🍒',type:'fruit',color:'#be123c',neon:'#fb7185',
    score:85,
    nutrition:{
      'Melatonin':'#1 Natural food source 🏆',
@@ -1201,7 +1204,7 @@ const DATA = [
    benefits:['#1 natural melatonin source improves sleep','Reduces muscle pain by 22%','Fights gout effectively','Lowers inflammation','Supports heart health'],
    fact:'Tart cherries are the only food with significant natural melatonin. Athletes who drink cherry juice recover 22% faster from intense exercise!'},
 
-  {name:'Coconut',emoji:'🥥',type:'fruit',color:'#78350f',neon:'#d97706',
+  {name:'Coconut',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><ellipse cx="40" cy="55" rx="26" ry="28" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M20 40 C22 32 30 24 40 22 C50 24 58 32 60 40" stroke-width="0.5" opacity="0.5"/><path d="M16 55 C18 45 28 36 40 34" stroke-width="0.3" opacity="0.4"/><path d="M64 55 C62 45 52 36 40 34" stroke-width="0.3" opacity="0.4"/><line x1="16" y1="55" x2="64" y2="55" stroke-width="0.3" opacity="0.4"/><line x1="20" y1="68" x2="60" y2="68" stroke-width="0.3" opacity="0.3"/><path d="M40 27 C38 18 34 12 32 6" stroke-width="0.8"/><path d="M40 25 C42 16 48 10 52 4" stroke-width="0.8"/><path d="M40 26 C40 16 40 8 40 2" stroke-width="0.7"/><path d="M32 8 C28 4 22 2 18 4" stroke-width="0.6" opacity="0.7"/><path d="M50 6 C54 2 60 0 64 2" stroke-width="0.6" opacity="0.7"/></g></svg>`,latin:'Cocos nucifera',emoji:'🥥',type:'fruit',color:'#78350f',neon:'#d97706',
    score:80,
    nutrition:{
      'MCT Fats':'Most concentrated source 🏆',
@@ -1216,140 +1219,140 @@ const DATA = [
    fact:'100g of coconut gives you an extraordinary 75% of your daily Manganese! MCT fats go directly to the brain as instant fuel — unique among foods!'},
 
   // MORE VEGETABLES
-  {name:'Cabbage',emoji:'🥬',type:'vegetable',color:'#15803d',neon:'#4ade80',score:78,
+  {name:'Cabbage',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="52" r="28" fill="rgba(201,169,110,0.06)" stroke-width="0.9"/><ellipse cx="40" cy="52" rx="20" ry="22" stroke-width="0.5" opacity="0.5"/><ellipse cx="40" cy="52" rx="12" ry="14" stroke-width="0.5" opacity="0.4"/><path d="M20 38 C24 30 32 24 40 22 C48 24 56 30 60 38" stroke-width="0.3" opacity="0.5"/><path d="M14 52 C16 42 22 34 30 28" stroke-width="0.3" opacity="0.4"/><path d="M66 52 C64 42 58 34 50 28" stroke-width="0.3" opacity="0.4"/><path d="M26 66 C22 72 20 76 22 80" stroke-width="0.6"/><path d="M54 66 C58 72 60 76 58 80" stroke-width="0.6"/></g></svg>`,latin:'Brassica oleracea capitata',emoji:'🥬',type:'vegetable',color:'#15803d',neon:'#4ade80',score:78,
    nutrition:{'Vitamin K':'85% of your daily needs per 100g','Vitamin C':'61% of your daily needs','Vitamin B6':'15% of your daily needs','Fibre':'10% of your daily needs','Calories':'25 kcal per 100g'},
    vitamins:['Vitamin K 85%','Vitamin C 61%','Vitamin B6 15%','Fibre 10%'],
    benefits:['Powerful anti-cancer glucosinolates','Supports digestive health','Reduces inflammation','Strengthens immune system','Promotes healthy skin'],
    fact:'Fermented cabbage — sauerkraut — has 200 times more Vitamin C than fresh cabbage! Ancient Romans and Greeks used it as medicine.'},
 
-  {name:'Watercress',emoji:'🌿',type:'vegetable',color:'#166534',neon:'#4ade80',score:97,
+  {name:'Watercress',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 90 C40 78 40 66 40 55" stroke-width="1.2"/><path d="M40 55 C32 46 22 42 14 42 C18 36 28 38 40 48" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M40 44 C48 35 58 31 66 31 C62 25 52 27 40 37" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M40 67 C30 60 20 58 12 62 C16 56 26 56 38 63" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M40 76 C50 69 60 71 68 77 C64 71 52 69 42 73" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="18" cy="40" r="4" stroke-width="0.5" opacity="0.6"/><circle cx="64" cy="30" r="4" stroke-width="0.5" opacity="0.6"/><circle cx="16" cy="60" r="3.5" stroke-width="0.5" opacity="0.6"/><circle cx="66" cy="76" r="3.5" stroke-width="0.5" opacity="0.6"/></g></svg>`,latin:'Nasturtium officinale',emoji:'🌿',type:'vegetable',color:'#166534',neon:'#4ade80',score:97,
    nutrition:{'Vitamin K':'312% of your daily needs per 100g 🏆','Vitamin A':'106% of your daily needs','Vitamin C':'72% of your daily needs','Calcium':'12% of your daily needs','Calories':'11 kcal per 100g'},
    vitamins:['Vitamin K 312%','Vitamin A 106%','Vitamin C 72%','Calcium 12%'],
    benefits:['Highest nutrient density per calorie of any food','Fights cancer powerfully','Supports bone health','Protects eye health','Only 11 calories per 100g'],
    fact:'Watercress scores 100 out of 100 on the CDC nutrient density scale — the highest of any food! Hippocrates built his first hospital next to a stream to grow it.'},
 
-  {name:'Swiss Chard',emoji:'🌈',type:'vegetable',color:'#dc2626',neon:'#f87171',score:89,
+  {name:'Swiss Chard',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 90 C40 78 40 66 40 55" stroke-width="1.4"/><path d="M40 55 C26 44 14 40 6 42 C10 34 24 36 40 50" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><path d="M18 44 C22 40 28 44 34 50" stroke-width="0.3" opacity="0.5"/><path d="M12 40 C16 36 20 38 24 44" stroke-width="0.3" opacity="0.4"/><path d="M40 43 C54 32 66 28 74 30 C70 22 56 24 40 38" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><path d="M62 30 C58 26 52 28 46 34" stroke-width="0.3" opacity="0.5"/><path d="M40 68 C24 60 12 62 6 70 C10 62 24 60 40 66" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M40 78 C56 72 68 76 74 84 C70 76 56 72 42 76" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/></g></svg>`,latin:'Beta vulgaris cicla',emoji:'🌈',type:'vegetable',color:'#dc2626',neon:'#f87171',score:89,
    nutrition:{'Vitamin K':'830% of your daily needs per 100g 🏆','Vitamin A':'214% of your daily needs','Vitamin C':'50% of your daily needs','Magnesium':'20% of your daily needs','Calories':'19 kcal per 100g'},
    vitamins:['Vitamin K 830%','Vitamin A 214%','Vitamin C 50%','Magnesium 20%'],
    benefits:['830% daily Vitamin K — extraordinary','Regulates blood sugar powerfully','Supports bone strength','Fights cancer cells','Boosts brain health'],
    fact:'Swiss chard has 830% of your daily Vitamin K in 100g — even more than kale! It comes in stunning rainbow colours of red, yellow and white stems.'},
 
-  {name:'Bok Choy',emoji:'🥬',type:'vegetable',color:'#15803d',neon:'#22c55e',score:83,
+  {name:'Bok Choy',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 90 C40 80 40 70 40 60" stroke-width="1.4"/><path d="M34 62 C28 56 22 52 16 52 C18 46 26 48 34 58" fill="rgba(201,169,110,0.12)" stroke-width="0.9"/><path d="M46 62 C52 56 58 52 64 52 C62 46 54 48 46 58" fill="rgba(201,169,110,0.12)" stroke-width="0.9"/><path d="M32 55 C26 46 22 36 24 24 C28 30 30 44 34 54" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M48 55 C54 46 58 36 56 24 C52 30 50 44 46 54" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M36 52 C34 40 34 26 38 14 C40 22 40 40 42 52" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><ellipse cx="40" cy="76" rx="16" ry="10" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/></g></svg>`,latin:'Brassica rapa chinensis',emoji:'🥬',type:'vegetable',color:'#15803d',neon:'#22c55e',score:83,
    nutrition:{'Vitamin A':'89% of your daily needs per 100g','Vitamin C':'75% of your daily needs','Vitamin K':'57% of your daily needs','Calcium':'10% of your daily needs','Calories':'13 kcal per 100g'},
    vitamins:['Vitamin A 89%','Vitamin C 75%','Vitamin K 57%','Calcium 10%'],
    benefits:['Only 13 calories per 100g','Extraordinarily nutrient dense','Supports bone health','Boosts immune system','Fights cancer'],
    fact:'Bok choy has been cultivated in China for over 6000 years! At just 13 calories per 100g it is one of the most nutrient-dense foods per calorie on Earth.'},
 
-  {name:'Eggplant',emoji:'🍆',type:'vegetable',color:'#7c3aed',neon:'#a78bfa',score:72,
+  {name:'Eggplant',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M28 36 C28 24 32 16 40 14 C48 16 52 24 52 36 C56 44 58 58 56 70 C54 80 48 88 40 88 C32 88 26 80 24 70 C22 58 24 44 28 36Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M30 40 C28 50 26 62 28 72" stroke-width="0.3" opacity="0.5"/><path d="M50 40 C52 50 54 62 52 72" stroke-width="0.3" opacity="0.5"/><line x1="24" y1="58" x2="56" y2="58" stroke-width="0.3" opacity="0.4"/><path d="M36 14 C34 8 32 4 34 1" stroke-width="0.8"/><path d="M38 13 C37 6 38 2 40 0" stroke-width="0.8"/><path d="M42 14 C44 8 46 4 44 1" stroke-width="0.7"/><path d="M34 2 C30 0 26 2 24 6" stroke-width="0.6"/><path d="M46 2 C50 0 54 2 56 6" stroke-width="0.6"/></g></svg>`,latin:'Solanum melongena',emoji:'🍆',type:'vegetable',color:'#7c3aed',neon:'#a78bfa',score:72,
    nutrition:{'Nasunin':'Unique brain antioxidant 🏆','Fibre':'14% of your daily needs per 100g','Folate':'6% of your daily needs','Potassium':'5% of your daily needs','Calories':'25 kcal per 100g'},
    vitamins:['Nasunin Unique','Fibre 14%','Folate 6%','Potassium 5%'],
    benefits:['Nasunin protects brain cell membranes','Reduces cholesterol','Aids weight management','Supports heart health','Fights cancer'],
    fact:'The purple colour of eggplant comes from nasunin — a unique antioxidant that specifically protects the fats in brain cell membranes from damage!'},
 
-  {name:'Butternut Squash',emoji:'🎃',type:'vegetable',color:'#ea580c',neon:'#fb923c',score:82,
+  {name:'Butternut Squash',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M32 14 C32 8 36 4 40 4 C44 4 48 8 48 14 C50 18 52 26 50 34 C58 36 64 44 64 54 C64 68 54 80 40 80 C26 80 16 68 16 54 C16 44 22 36 30 34 C28 26 30 18 32 14Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><line x1="40" y1="34" x2="40" y2="80" stroke-width="0.4" opacity="0.5"/><line x1="16" y1="54" x2="64" y2="54" stroke-width="0.3" opacity="0.4"/><path d="M34 18 C32 26 30 32 30 36" stroke-width="0.3" opacity="0.5"/><path d="M46 18 C48 26 50 32 50 36" stroke-width="0.3" opacity="0.5"/><path d="M40 4 C40 0 42 -2 44 -3" stroke-width="0.8"/></g></svg>`,latin:'Cucurbita moschata',emoji:'🎃',type:'vegetable',color:'#ea580c',neon:'#fb923c',score:82,
    nutrition:{'Vitamin A':'457% of your daily needs per 100g 🏆','Vitamin C':'35% of your daily needs','Potassium':'10% of your daily needs','Fibre':'10% of your daily needs','Calories':'45 kcal per 100g'},
    vitamins:['Vitamin A 457%','Vitamin C 35%','Potassium 10%','Fibre 10%'],
    benefits:['457% daily Vitamin A — extraordinary','Supports eye health powerfully','Boosts immune system','Promotes healthy skin','Supports heart health'],
    fact:'One cup of butternut squash gives you 457% of your daily Vitamin A — nearly 5 times your daily needs in one serving!'},
 
-  {name:'Okra',emoji:'🌿',type:'vegetable',color:'#16a34a',neon:'#4ade80',score:76,
+  {name:'Okra',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M36 10 C38 6 40 4 42 4 C44 6 46 10 46 16 C50 20 52 34 52 50 C52 66 48 82 40 88 C32 82 28 66 28 50 C28 34 30 20 34 16 C34 12 36 10 36 10Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><line x1="30" y1="28" x2="50" y2="28" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="40" x2="52" y2="40" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="52" x2="52" y2="52" stroke-width="0.3" opacity="0.5"/><line x1="28" y1="64" x2="52" y2="64" stroke-width="0.3" opacity="0.5"/><line x1="30" y1="35" x2="30" y2="75" stroke-width="0.3" opacity="0.4"/><line x1="36" y1="22" x2="36" y2="82" stroke-width="0.3" opacity="0.4"/><line x1="44" y1="22" x2="44" y2="82" stroke-width="0.3" opacity="0.4"/><line x1="50" y1="35" x2="50" y2="75" stroke-width="0.3" opacity="0.4"/><path d="M40 4 C40 0 42 -2 44 -4" stroke-width="0.8"/><path d="M38 5 C36 1 34 -2 34 -5" stroke-width="0.7"/></g></svg>`,latin:'Abelmoschus esculentus',emoji:'🌿',type:'vegetable',color:'#16a34a',neon:'#4ade80',score:76,
    nutrition:{'Vitamin K':'40% of your daily needs per 100g','Vitamin C':'38% of your daily needs','Folate':'22% of your daily needs','Magnesium':'14% of your daily needs','Calories':'33 kcal per 100g'},
    vitamins:['Folate 22%','Vitamin K 40%','Vitamin C 38%','Magnesium 14%'],
    benefits:['Reduces blood sugar effectively','Supports heart health','Promotes gut health','Strengthens bones','Boosts brain function'],
    fact:'Okra seeds were roasted as a coffee substitute during the American Civil War! Its sticky mucilage is used to thicken soups across the world.'},
 
-  {name:'Fennel',emoji:'🌱',type:'vegetable',color:'#15803d',neon:'#86efac',score:75,
+  {name:'Fennel',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><ellipse cx="40" cy="68" rx="18" ry="12" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><path d="M36 56 C36 48 36 40 36 32" stroke-width="1.1"/><path d="M44 56 C44 48 44 40 44 32" stroke-width="1.1"/><path d="M36 42 C30 36 24 28 22 20" stroke-width="0.8"/><path d="M44 42 C50 36 56 28 58 20" stroke-width="0.8"/><path d="M36 34 C28 28 22 18 20 10" stroke-width="0.7"/><path d="M44 34 C52 28 58 18 60 10" stroke-width="0.7"/><path d="M40 32 C40 24 40 14 40 6" stroke-width="0.8"/><circle cx="22" cy="18" r="3" stroke-width="0.6" opacity="0.7"/><circle cx="58" cy="18" r="3" stroke-width="0.6" opacity="0.7"/><circle cx="20" cy="8" r="2.5" stroke-width="0.5" opacity="0.6"/><circle cx="60" cy="8" r="2.5" stroke-width="0.5" opacity="0.6"/><circle cx="40" cy="4" r="2.5" stroke-width="0.5" opacity="0.6"/><line x1="26" y1="68" x2="54" y2="68" stroke-width="0.3" opacity="0.5"/></g></svg>`,latin:'Foeniculum vulgare',emoji:'🌱',type:'vegetable',color:'#15803d',neon:'#86efac',score:75,
    nutrition:{'Manganese':'17% of your daily needs per 100g','Vitamin C':'21% of your daily needs','Potassium':'10% of your daily needs','Fibre':'12% of your daily needs','Calories':'31 kcal per 100g'},
    vitamins:['Manganese 17%','Fibre 12%','Vitamin C 21%','Potassium 10%'],
    benefits:['Powerful digestive aid','Reduces bloating instantly','Anti-inflammatory properties','Supports bone density','Natural breath freshener'],
    fact:'Fennel seeds were chewed after meals in ancient Rome to aid digestion and freshen breath — the original after-dinner mint!'},
 
-  {name:'Radish',emoji:'🌶️',type:'vegetable',color:'#dc2626',neon:'#f87171',score:68,
+  {name:'Radish',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="56" r="22" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M22 50 C24 42 30 36 40 34 C50 36 56 42 58 50" stroke-width="0.4" opacity="0.5"/><line x1="18" y1="56" x2="62" y2="56" stroke-width="0.3" opacity="0.4"/><path d="M40 78 C40 86 40 92 40 96" stroke-width="0.8"/><path d="M36 34 C34 24 32 14 34 6" stroke-width="0.8"/><path d="M38 33 C37 22 38 12 40 5" stroke-width="0.8"/><path d="M42 34 C44 24 46 14 44 6" stroke-width="0.7"/><path d="M34 8 C30 4 26 2 24 0" stroke-width="0.6"/><path d="M40 5 C40 1 40 -2 42 -4" stroke-width="0.6"/><path d="M44 8 C48 4 52 2 54 0" stroke-width="0.6"/></g></svg>`,latin:'Raphanus sativus',emoji:'🌶️',type:'vegetable',color:'#dc2626',neon:'#f87171',score:68,
    nutrition:{'Vitamin C':'29% of your daily needs per 100g','Folate':'7% of your daily needs','Potassium':'6% of your daily needs','Fibre':'7% of your daily needs','Calories':'16 kcal per 100g'},
    vitamins:['Vitamin C 29%','Folate 7%','Potassium 6%','Fibre 7%'],
    benefits:['Detoxifies the liver','Fights jaundice','Supports kidney health','Aids digestion','Very low calorie snack'],
    fact:'Radishes are one of the fastest growing vegetables — ready to harvest in just 3 weeks from seed! Ancient Egyptians valued them more than gold.'},
 
-  {name:'Parsnip',emoji:'🌿',type:'vegetable',color:'#d97706',neon:'#fbbf24',score:73,
+  {name:'Parsnip',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M36 16 C38 12 40 10 40 10 C42 12 44 16 45 22 C48 36 48 56 46 72 C44 82 42 90 40 92 C38 90 36 82 34 72 C32 56 32 36 35 22 C35 18 36 16 36 16Z" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/><line x1="37" y1="24" x2="37" y2="84" stroke-width="0.3" opacity="0.5"/><line x1="43" y1="24" x2="43" y2="84" stroke-width="0.3" opacity="0.5"/><line x1="34" y1="34" x2="46" y2="36" stroke-width="0.3" opacity="0.4"/><line x1="33" y1="48" x2="47" y2="50" stroke-width="0.3" opacity="0.4"/><line x1="33" y1="62" x2="47" y2="64" stroke-width="0.3" opacity="0.4"/><path d="M38 10 C36 4 34 0 34 -4" stroke-width="0.8"/><path d="M40 10 C40 4 40 0 40 -4" stroke-width="0.8"/><path d="M42 10 C44 4 46 0 46 -4" stroke-width="0.7"/></g></svg>`,latin:'Pastinaca sativa',emoji:'🌿',type:'vegetable',color:'#d97706',neon:'#fbbf24',score:73,
    nutrition:{'Folate':'22% of your daily needs per 100g','Vitamin C':'28% of your daily needs','Fibre':'18% of your daily needs','Potassium':'12% of your daily needs','Calories':'75 kcal per 100g'},
    vitamins:['Fibre 18%','Folate 22%','Vitamin C 28%','Potassium 12%'],
    benefits:['Excellent source of dietary fibre','Supports pregnancy health via folate','Promotes heart health','Boosts immune system','Regulates blood sugar'],
    fact:'Parsnips taste sweeter after a frost! Cold temperatures convert their starch to sugar — farmers leave them in the ground through winter on purpose.'},
 
   // MORE FRUITS
-  {name:'Acerola Cherry',emoji:'🍒',type:'fruit',color:'#dc2626',neon:'#f87171',score:100,
+  {name:'Acerola Cherry',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="30" cy="62" r="16" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><circle cx="50" cy="62" r="16" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><circle cx="30" cy="60" r="6" stroke-width="0.4" opacity="0.5"/><circle cx="50" cy="60" r="6" stroke-width="0.4" opacity="0.5"/><path d="M30 18 C30 12 32 8 34 5" stroke-width="1"/><path d="M50 18 C50 12 48 8 46 5" stroke-width="1"/><path d="M30 18 C38 18 44 16 50 18" stroke-width="0.8"/><path d="M20 56 C22 48 26 44 30 42" stroke-width="0.3" opacity="0.5"/><path d="M40 56 C42 48 46 44 50 42" stroke-width="0.3" opacity="0.5"/><path d="M40 10 C39 6 39 3 40 1" stroke-width="0.5" opacity="0.5"/></g></svg>`,latin:'Malpighia emarginata',emoji:'🍒',type:'fruit',color:'#dc2626',neon:'#f87171',score:100,
    nutrition:{'Vitamin C':'2740% of your daily needs per 100g 🏆 WORLD RECORD','Vitamin A':'75% of your daily needs','Iron':'3% of your daily needs','Calories':'32 kcal per 100g'},
    vitamins:['Vitamin C 2740%','Vitamin A 75%','Iron 3%'],
    benefits:['Highest Vitamin C of any food on Earth','Extraordinary immune booster','Fights free radicals powerfully','Promotes collagen production','Protects against scurvy'],
    fact:'Acerola cherry has 2740% of your daily Vitamin C per 100g — that is 65 times more than an orange! It holds the absolute world record for Vitamin C in any food.'},
 
-  {name:'Blackberry',emoji:'🫐',type:'fruit',color:'#4c1d95',neon:'#a78bfa',score:86,
+  {name:'Blackberry',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="32" cy="44" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="48" cy="44" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="40" cy="38" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="26" cy="56" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="40" cy="54" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="54" cy="56" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="32" cy="66" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="48" cy="66" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="40" cy="74" r="9" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><circle cx="32" cy="42" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="48" cy="42" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="36" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="52" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="72" r="3" stroke-width="0.4" opacity="0.6"/><path d="M38 30 C36 24 34 18 36 12" stroke-width="0.8"/><path d="M40 29 C40 22 40 16 42 10" stroke-width="0.7"/></g></svg>`,latin:'Rubus fruticosus',emoji:'🫐',type:'fruit',color:'#4c1d95',neon:'#a78bfa',score:86,
    nutrition:{'Manganese':'29% of your daily needs per 100g','Fibre':'21% of your daily needs','Vitamin C':'35% of your daily needs','Vitamin K':'25% of your daily needs','Calories':'43 kcal per 100g'},
    vitamins:['Manganese 29%','Fibre 21%','Vitamin C 35%','Vitamin K 25%'],
    benefits:['Exceptionally high in antioxidants','Supports brain health','Fights cancer cells','Promotes oral health','Strengthens bones'],
    fact:'Blackberries have been used as medicine since ancient Greece. Romans used the roots to treat gout and the leaves to heal wounds.'},
 
-  {name:'Elderberry',emoji:'🫐',type:'fruit',color:'#312e81',neon:'#818cf8',score:89,
+  {name:'Elderberry',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 16 C40 10 40 4 40 0" stroke-width="1.2"/><path d="M40 16 C30 18 22 24 18 30" stroke-width="0.9"/><path d="M40 16 C50 18 58 24 62 30" stroke-width="0.9"/><path d="M40 16 C38 22 34 28 28 34" stroke-width="0.8"/><path d="M40 16 C42 22 46 28 52 34" stroke-width="0.8"/><circle cx="18" cy="34" r="6" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="28" cy="40" r="5" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="40" cy="38" r="6" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="52" cy="40" r="5" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="62" cy="34" r="6" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="22" cy="52" r="5" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="34" cy="58" r="6" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="46" cy="58" r="6" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="58" cy="52" r="5" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="30" cy="68" r="5" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="40" cy="72" r="6" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="50" cy="68" r="5" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/></g></svg>`,latin:'Sambucus nigra',emoji:'🫐',type:'fruit',color:'#312e81',neon:'#818cf8',score:89,
    nutrition:{'Vitamin C':'87% of your daily needs per 100g','Anthocyanins':'Extraordinary 🏆','Iron':'13% of your daily needs','Potassium':'8% of your daily needs','Calories':'73 kcal per 100g'},
    vitamins:['Vitamin C 87%','Anthocyanins Extraordinary','Iron 13%','Potassium 8%'],
    benefits:['Reduces cold duration by 50% clinically proven','Powerful immune booster','Fights inflammation','Supports heart health','Anti-ageing properties'],
    fact:'Clinical studies show elderberry syrup reduces cold duration by 50% and flu by 4 days! It has been used as medicine for thousands of years.'},
 
-  {name:'Cranberry',emoji:'🍒',type:'fruit',color:'#be123c',neon:'#fb7185',score:82,
+  {name:'Cranberry',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="52" r="22" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M22 44 C24 36 30 30 40 28 C50 30 56 36 58 44" stroke-width="0.4" opacity="0.5"/><line x1="18" y1="52" x2="62" y2="52" stroke-width="0.3" opacity="0.4"/><path d="M36 30 C35 22 34 16 36 10" stroke-width="0.8"/><path d="M40 29 C40 20 40 14 40 8" stroke-width="0.7"/><path d="M44 30 C45 22 46 16 44 10" stroke-width="0.7"/><path d="M20 52 C20 42 24 34 30 28" stroke-width="0.3" opacity="0.4"/><circle cx="40" cy="52" r="10" stroke-width="0.4" opacity="0.4"/></g></svg>`,latin:'Vaccinium macrocarpon',emoji:'🍒',type:'fruit',color:'#be123c',neon:'#fb7185',score:82,
    nutrition:{'Vitamin C':'22% of your daily needs per 100g','Proanthocyanidins':'UTI fighter 🏆','Vitamin E':'8% of your daily needs','Vitamin K':'5% of your daily needs','Calories':'46 kcal per 100g'},
    vitamins:['Proanthocyanidins Unique','Vitamin C 22%','Vitamin E 8%','Vitamin K 5%'],
    benefits:['Prevents urinary tract infections uniquely','Fights cancer cells','Supports heart health','Promotes oral health','Boosts immune system'],
    fact:'Cranberries contain unique proanthocyanidins that prevent bacteria sticking to the bladder wall — natures own anti-UTI medicine!'},
 
-  {name:'Apricot',emoji:'🍑',type:'fruit',color:'#f97316',neon:'#fb923c',score:78,
+  {name:'Apricot',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M18 52 C18 34 28 16 40 14 C52 16 62 34 62 52 C62 70 52 88 40 90 C28 88 18 70 18 52Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M40 14 C40 10 38 6 36 2" stroke-width="1"/><path d="M40 14 C42 10 44 6 46 2" stroke-width="0.8"/><line x1="40" y1="14" x2="40" y2="90" stroke-width="0.4" opacity="0.5"/><path d="M20 48 C22 38 28 28 36 20" stroke-width="0.3" opacity="0.5"/><path d="M60 48 C58 38 52 28 44 20" stroke-width="0.3" opacity="0.5"/><ellipse cx="40" cy="52" rx="16" ry="20" stroke-width="0.3" opacity="0.3"/></g></svg>`,latin:'Prunus armeniaca',emoji:'🍑',type:'fruit',color:'#f97316',neon:'#fb923c',score:78,
    nutrition:{'Vitamin A':'26% of your daily needs per 100g','Vitamin C':'16% of your daily needs','Potassium':'6% of your daily needs','Fibre':'8% of your daily needs','Calories':'48 kcal per 100g'},
    vitamins:['Vitamin A 26%','Vitamin C 16%','Potassium 6%','Fibre 8%'],
    benefits:['Protects eye health','Promotes healthy skin','Supports heart health','Aids digestive health','Provides sustained energy'],
    fact:'Dried apricots have 12 times more nutrients than fresh ones by weight! The Hunza people of Pakistan eat them daily and are famous for exceptional longevity.'},
 
-  {name:'Mulberry',emoji:'🫐',type:'fruit',color:'#6d28d9',neon:'#c084fc',score:85,
+  {name:'Mulberry',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><ellipse cx="40" cy="52" rx="20" ry="28" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><circle cx="34" cy="38" r="5" fill="rgba(201,169,110,0.15)" stroke-width="0.6"/><circle cx="46" cy="38" r="5" fill="rgba(201,169,110,0.15)" stroke-width="0.6"/><circle cx="30" cy="50" r="5" fill="rgba(201,169,110,0.15)" stroke-width="0.6"/><circle cx="40" cy="46" r="5" fill="rgba(201,169,110,0.15)" stroke-width="0.6"/><circle cx="50" cy="50" r="5" fill="rgba(201,169,110,0.15)" stroke-width="0.6"/><circle cx="34" cy="62" r="5" fill="rgba(201,169,110,0.15)" stroke-width="0.6"/><circle cx="46" cy="62" r="5" fill="rgba(201,169,110,0.15)" stroke-width="0.6"/><circle cx="40" cy="70" r="5" fill="rgba(201,169,110,0.15)" stroke-width="0.6"/><path d="M38 24 C36 16 34 10 34 5" stroke-width="0.8"/><path d="M40 23 C40 14 40 8 40 3" stroke-width="0.8"/><path d="M42 24 C44 16 46 10 46 5" stroke-width="0.7"/><path d="M34 6 C30 4 26 6 24 10" stroke-width="0.6"/></g></svg>`,latin:'Morus nigra',emoji:'🫐',type:'fruit',color:'#6d28d9',neon:'#c084fc',score:85,
    nutrition:{'Vitamin C':'61% of your daily needs per 100g','Iron':'14% of your daily needs','Vitamin K':'11% of your daily needs','Resveratrol':'High content','Calories':'43 kcal per 100g'},
    vitamins:['Vitamin C 61%','Iron 14%','Vitamin K 11%','Resveratrol High'],
    benefits:['Fights anaemia with high iron','Lowers blood sugar','Reduces cholesterol','Fights cancer cells','Supports liver health'],
    fact:'Mulberry leaves are the only food silkworms eat! China cultivated mulberries for 5000 years primarily for silk — the fruit was a delicious bonus.'},
 
-  {name:'Persimmon',emoji:'🍊',type:'fruit',color:'#ea580c',neon:'#fb923c',score:81,
+  {name:'Persimmon',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="56" r="26" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M24 44 C26 36 32 30 40 28 C48 30 54 36 56 44" stroke-width="0.4" opacity="0.5"/><line x1="14" y1="56" x2="66" y2="56" stroke-width="0.3" opacity="0.4"/><path d="M32 30 C32 22 34 16 36 12" stroke-width="0.8"/><path d="M36 28 C35 20 36 12 38 8" stroke-width="0.8"/><path d="M40 28 C40 20 42 12 44 8" stroke-width="0.7"/><path d="M44 30 C46 22 48 16 48 12" stroke-width="0.7"/><path d="M36 30 C32 28 28 30 26 34" stroke-width="0.6"/><path d="M44 30 C48 28 52 30 54 34" stroke-width="0.6"/></g></svg>`,latin:'Diospyros kaki',emoji:'🍊',type:'fruit',color:'#ea580c',neon:'#fb923c',score:81,
    nutrition:{'Vitamin A':'55% of your daily needs per 100g','Manganese':'30% of your daily needs','Fibre':'24% of your daily needs','Vitamin C':'22% of your daily needs','Calories':'70 kcal per 100g'},
    vitamins:['Vitamin A 55%','Manganese 30%','Fibre 24%','Vitamin C 22%'],
    benefits:['Powerful antioxidant','Supports heart health','Promotes eye health','Aids digestive health','Fights inflammation'],
    fact:'Persimmons were called "the fruit of the gods" by the ancient Greeks. The name Diospyros literally means divine food in Greek!'},
 
-  {name:'Starfruit',emoji:'⭐',type:'fruit',color:'#eab308',neon:'#fde047',score:74,
+  {name:'Starfruit',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M40 10 L44 32 L66 32 L50 46 L56 68 L40 55 L24 68 L30 46 L14 32 L36 32 Z" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><line x1="40" y1="10" x2="40" y2="68" stroke-width="0.3" opacity="0.4"/><line x1="14" y1="32" x2="66" y2="32" stroke-width="0.3" opacity="0.4"/><line x1="24" y1="68" x2="56" y2="10" stroke-width="0.3" opacity="0.3"/><line x1="56" y1="68" x2="24" y2="10" stroke-width="0.3" opacity="0.3"/><circle cx="40" cy="38" r="8" stroke-width="0.4" opacity="0.5"/><path d="M40 68 C40 76 40 82 40 88" stroke-width="0.9"/></g></svg>`,latin:'Averrhoa carambola',emoji:'⭐',type:'fruit',color:'#eab308',neon:'#fde047',score:74,
    nutrition:{'Vitamin C':'76% of your daily needs per 100g','Fibre':'12% of your daily needs','Vitamin B5':'9% of your daily needs','Potassium':'4% of your daily needs','Calories':'31 kcal per 100g'},
    vitamins:['Vitamin C 76%','Fibre 12%','Vitamin B5 9%','Potassium 4%'],
    benefits:['76% daily Vitamin C per 100g','Promotes digestive health','Supports heart health','Anti-inflammatory','Very low calorie'],
    fact:'Starfruit is star-shaped when sliced! At just 31 calories per 100g with 76% daily Vitamin C it is one of the most nutritious low-calorie fruits.'},
 
-  {name:'Tamarind',emoji:'🌰',type:'fruit',color:'#92400e',neon:'#d97706',score:79,
+  {name:'Tamarind',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><path d="M16 46 C16 34 22 22 30 18 C30 22 28 30 28 40 C28 52 30 64 34 72" fill="rgba(201,169,110,0.06)" stroke-width="0.8"/><path d="M64 46 C64 34 58 22 50 18 C50 22 52 30 52 40 C52 52 50 64 46 72" fill="rgba(201,169,110,0.06)" stroke-width="0.8"/><path d="M28 40 C28 28 32 16 40 12 C48 16 52 28 52 40 C52 56 48 72 40 80 C32 72 28 56 28 40Z" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><line x1="32" y1="24" x2="48" y2="28" stroke-width="0.3" opacity="0.5"/><line x1="30" y1="36" x2="50" y2="36" stroke-width="0.3" opacity="0.5"/><line x1="30" y1="48" x2="50" y2="48" stroke-width="0.3" opacity="0.5"/><line x1="30" y1="60" x2="50" y2="60" stroke-width="0.3" opacity="0.5"/><path d="M40 12 C40 6 42 2 44 0" stroke-width="0.8"/></g></svg>`,latin:'Tamarindus indica',emoji:'🌰',type:'fruit',color:'#92400e',neon:'#d97706',score:79,
    nutrition:{'Iron':'35% of your daily needs per 100g 🏆','Thiamine':'34% of your daily needs','Magnesium':'23% of your daily needs','Potassium':'16% of your daily needs','Calories':'239 kcal per 100g'},
    vitamins:['Iron 35%','Thiamine 34%','Magnesium 23%','Potassium 16%'],
    benefits:['Extraordinary iron content fights anaemia','Promotes digestive health','Reduces fever naturally','Supports liver function','Anti-inflammatory'],
    fact:'Tamarind has the highest iron content of any fruit! It is a secret ingredient in Worcestershire sauce, Pad Thai, and hundreds of Asian dishes.'},
 
-  {name:'Gooseberry',emoji:'🍈',type:'fruit',color:'#84cc16',neon:'#bef264',score:77,
+  {name:'Gooseberry',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="52" r="22" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><line x1="18" y1="52" x2="62" y2="52" stroke-width="0.4" opacity="0.6"/><line x1="22" y1="40" x2="58" y2="40" stroke-width="0.3" opacity="0.4"/><line x1="22" y1="64" x2="58" y2="64" stroke-width="0.3" opacity="0.4"/><line x1="40" y1="30" x2="40" y2="74" stroke-width="0.4" opacity="0.6"/><line x1="26" y1="36" x2="54" y2="68" stroke-width="0.3" opacity="0.4"/><line x1="26" y1="68" x2="54" y2="36" stroke-width="0.3" opacity="0.4"/><path d="M36 30 C34 24 34 18 36 12" stroke-width="0.8"/><path d="M40 29 C40 22 40 16 40 10" stroke-width="0.7"/><path d="M44 30 C46 24 46 18 44 12" stroke-width="0.7"/></g></svg>`,latin:'Ribes uva-crispa',emoji:'🍈',type:'fruit',color:'#84cc16',neon:'#bef264',score:77,
    nutrition:{'Vitamin C':'46% of your daily needs per 100g','Fibre':'17% of your daily needs','Copper':'12% of your daily needs','Manganese':'10% of your daily needs','Calories':'44 kcal per 100g'},
    vitamins:['Vitamin C 46%','Fibre 17%','Copper 12%','Manganese 10%'],
    benefits:['Supports digestive health','Boosts immune system','Promotes healthy skin','Supports liver function','Fights inflammation'],
    fact:'Gooseberries were banned in the USA for nearly 100 years because they spread a disease harmful to pine trees! The ban was finally lifted in 1966.'},
 
-  {name:'Longan',emoji:'🍒',type:'fruit',color:'#d97706',neon:'#fbbf24',score:76,
+  {name:'Longan',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><circle cx="40" cy="52" r="24" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><circle cx="40" cy="52" r="14" stroke-width="0.4" opacity="0.5"/><circle cx="40" cy="50" r="6" fill="rgba(201,169,110,0.2)" stroke-width="0.6"/><path d="M30 34 C28 26 28 18 30 12" stroke-width="0.4" opacity="0.5"/><path d="M50 34 C52 26 52 18 50 12" stroke-width="0.4" opacity="0.5"/><path d="M40 28 C40 20 40 14 40 8" stroke-width="0.8"/><path d="M38 10 C34 8 30 10 28 14" stroke-width="0.7"/></g></svg>`,latin:'Dimocarpus longan',emoji:'🍒',type:'fruit',color:'#d97706',neon:'#fbbf24',score:76,
    nutrition:{'Vitamin C':'140% of your daily needs per 100g 🏆 Top 5','Riboflavin':'8% of your daily needs','Iron':'3% of your daily needs','Potassium':'5% of your daily needs','Calories':'60 kcal per 100g'},
    vitamins:['Vitamin C 140%','Riboflavin 8%','Iron 3%','Potassium 5%'],
    benefits:['140% daily Vitamin C per 100g','Calms the nervous system','Improves sleep quality','Supports heart health','Fights stress and anxiety'],
    fact:'Longan means dragon eye in Chinese! It has been used in traditional Chinese medicine for over 2000 years as a calming tonic for the heart and mind.'},
 
-  {name:'Jabuticaba',emoji:'🍇',type:'fruit',color:'#1e1b4b',neon:'#818cf8',score:84,
+  {name:'Jabuticaba',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><rect x="36" y="8" width="8" height="80" rx="2" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><line x1="38" y1="12" x2="38" y2="84" stroke-width="0.3" opacity="0.5"/><line x1="42" y1="12" x2="42" y2="84" stroke-width="0.3" opacity="0.5"/><circle cx="40" cy="26" r="8" fill="rgba(201,169,110,0.15)" stroke-width="0.8"/><circle cx="40" cy="42" r="8" fill="rgba(201,169,110,0.15)" stroke-width="0.8"/><circle cx="40" cy="58" r="8" fill="rgba(201,169,110,0.15)" stroke-width="0.8"/><circle cx="40" cy="74" r="8" fill="rgba(201,169,110,0.15)" stroke-width="0.8"/><circle cx="40" cy="24" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="40" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="56" r="3" stroke-width="0.4" opacity="0.6"/><circle cx="40" cy="72" r="3" stroke-width="0.4" opacity="0.6"/></g></svg>`,latin:'Plinia cauliflora',emoji:'🍇',type:'fruit',color:'#1e1b4b',neon:'#818cf8',score:84,
    nutrition:{'Anthocyanins':'Extraordinarily high 🏆','Vitamin C':'23% of your daily needs per 100g','Calcium':'8% of your daily needs','Iron':'2% of your daily needs','Calories':'58 kcal per 100g'},
    vitamins:['Anthocyanins Extraordinary','Vitamin C 23%','Calcium 8%','Iron 2%'],
    benefits:['Fights cancer powerfully','Reduces inflammation','Supports respiratory health','Promotes gut health','Anti-ageing antioxidants'],
    fact:'Jabuticaba grows directly on the tree trunk — not on branches! When in season the entire trunk turns purple. It is found only in Brazil and ripens within a day.'},
 
-  {name:'Feijoa',emoji:'🍈',type:'fruit',color:'#166534',neon:'#4ade80',score:77,
+  {name:'Feijoa',svg:`<svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round"><ellipse cx="40" cy="52" rx="22" ry="28" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/><path d="M22 44 C24 36 30 30 40 28 C50 30 56 36 58 44" stroke-width="0.3" opacity="0.5"/><line x1="18" y1="52" x2="62" y2="52" stroke-width="0.3" opacity="0.4"/><ellipse cx="40" cy="52" rx="12" ry="16" stroke-width="0.4" opacity="0.4"/><path d="M36 28 C36 22 36 16 38 10" stroke-width="0.8"/><path d="M40 26 C40 20 40 14 40 8" stroke-width="0.7"/><path d="M44 28 C44 22 44 16 42 10" stroke-width="0.7"/><path d="M38 12 C34 10 30 12 28 16" stroke-width="0.6"/></g></svg>`,latin:'Acca sellowiana',emoji:'🍈',type:'fruit',color:'#166534',neon:'#4ade80',score:77,
    nutrition:{'Vitamin C':'61% of your daily needs per 100g','Fibre':'24% of your daily needs','Folate':'9% of your daily needs','Iodine':'Natural source 🏆','Calories':'55 kcal per 100g'},
    vitamins:['Vitamin C 61%','Fibre 24%','Folate 9%','Iodine Natural'],
    benefits:['Supports digestive health','Boosts immune system strongly','One of few fruits with natural iodine','Fights inflammation','Supports heart health'],
@@ -1414,19 +1417,10 @@ function renderCards(){
 
     const emoji = document.createElement('div');
     emoji.className = 'vcard-emoji';
-    if(d.img){
-      const img = document.createElement('img');
-      img.src = d.img;
-      img.alt = d.name;
-      img.style.cssText='width:56px;height:56px;object-fit:contain;display:block;filter:saturate(0) brightness(1.8) contrast(0.7);opacity:0.8;';
-      img.onerror = function(){
-        const span = document.createElement('span');
-        span.className='vcard-engraved';
-        span.textContent=d.emoji;
-        emoji.innerHTML='';
-        emoji.appendChild(span);
-      };
-      emoji.appendChild(img);
+    if(d.svg){
+      emoji.innerHTML = d.svg;
+      const svgEl = emoji.querySelector('svg');
+      if(svgEl) svgEl.style.cssText='width:56px;height:56px;';
     } else {
       const span = document.createElement('span');
       span.className = 'vcard-engraved';
@@ -1457,11 +1451,10 @@ function renderCards(){
       vitamins.appendChild(scoreBadge);
     }
 
+    // Scientific name instead of veg/fruit tag
     const tag = document.createElement('div');
     tag.className = 'vcard-tag';
-    tag.textContent = d.type === 'vegetable' ? '🥦 Vegetable' : '🍎 Fruit';
-    tag.style.color = d.type==='vegetable'?'#22c55e':'#f87171';
-    tag.style.borderColor = d.type==='vegetable'?'rgba(34,197,94,0.3)':'rgba(248,113,113,0.3)';
+    tag.textContent = d.latin || '';
 
     card.appendChild(emoji);
     card.appendChild(name);
