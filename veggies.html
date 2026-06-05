@@ -90,7 +90,7 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 .vcard::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.3s;}
 .vcard:hover{transform:translateY(-6px) scale(1.02);z-index:5;}
 .vcard:hover::before{opacity:1;}
-.vcard-emoji{font-size:48px;margin-bottom:10px;transition:transform 0.3s;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5));}
+.vcard-emoji{font-size:48px;margin-bottom:10px;transition:transform 0.3s;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5));height:56px;display:flex;align-items:center;justify-content:center;}
 .vcard:hover .vcard-emoji{transform:scale(1.2) rotate(5deg);}
 .vcard-name{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;padding:4px 10px;border-radius:3px;border:1px solid currentColor;animation:neonFlicker 3s ease-in-out infinite;}
 @keyframes neonFlicker{0%,18%,20%,52%,54%,100%{opacity:1;}19%,53%{opacity:0.6;}}
@@ -979,7 +979,7 @@ function renderCards(){
       const img = document.createElement('img');
       img.src = d.img;
       img.alt = d.name;
-      img.style.cssText='width:72px;height:72px;object-fit:contain;border-radius:8px;';
+      img.style.cssText='width:56px;height:56px;object-fit:contain;border-radius:6px;display:block;';
       img.onerror = function(){ 
         emoji.textContent = d.emoji; 
       };
