@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — fab.games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{--black:#070708;--dark:#0d0d0f;--gold:#c9a84c;--gold2:#e8c96a;--white:#f0efe8;--muted:rgba(240,239,232,0.5);--border:rgba(255,255,255,0.07);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+
+/* grain */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.4;}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.nav-back{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.nav-back:hover{color:var(--gold);}
+
+.wrap{
+  max-width:900px;margin:0 auto;
+  padding:100px 48px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  align-items:start;
+}
+
+/* LEFT — info */
+.contact-badge{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(40px,7vw,72px);
+  font-weight:300;line-height:1.05;
+  margin-bottom:24px;
+}
+h1 em{font-style:italic;color:var(--gold);}
+.contact-intro{font-size:16px;color:var(--muted);line-height:1.9;margin-bottom:48px;}
+
+.contact-methods{display:flex;flex-direction:column;gap:2px;}
+.contact-method{
+  display:flex;align-items:center;gap:16px;
+  padding:20px 24px;
+  background:#0d0d0f;
+  border:1px solid transparent;
+  text-decoration:none;
+  transition:all 0.3s;
+}
+.contact-method:hover{
+  border-color:rgba(201,168,76,0.3);
+  background:#151510;
+  transform:translateX(6px);
+}
+.contact-method-icon{font-size:24px;flex-shrink:0;}
+.contact-method-info{}
+.contact-method-label{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:4px;
+}
+.contact-method-value{
+  font-size:15px;color:var(--white);
+  font-weight:400;
+}
+
+/* RIGHT — form */
+.contact-form{display:flex;flex-direction:column;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);
+}
+.form-input,.form-textarea{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:2px;
+  padding:14px 16px;
+  color:var(--white);
+  font-size:14px;
+  font-family:'Inter',sans-serif;
+  font-weight:300;
+  outline:none;
+  transition:border-color 0.2s;
+  width:100%;
+}
+.form-input:focus,.form-textarea:focus{
+  border-color:rgba(201,168,76,0.5);
+}
+.form-input::placeholder,.form-textarea::placeholder{color:rgba(240,239,232,0.2);}
+.form-textarea{resize:vertical;min-height:140px;line-height:1.7;}
+
+.form-btn{
+  padding:16px 40px;
+  background:linear-gradient(135deg,var(--gold),#a87d2a);
+  color:#000;
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  font-weight:600;border:none;border-radius:2px;
+  cursor:pointer;
+  box-shadow:0 0 30px rgba(201,168,76,0.2);
+  transition:all 0.2s;
+  align-self:flex-start;
+  font-family:'Inter',sans-serif;
+}
+.form-btn:hover{
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  box-shadow:0 0 50px rgba(201,168,76,0.4);
+  transform:translateY(-2px);
+}
+
+.form-success{
+  display:none;
+  text-align:center;
+  padding:40px 20px;
+}
+.form-success-emoji{font-size:48px;margin-bottom:16px;}
+.form-success-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:300;
+  color:var(--gold);margin-bottom:8px;
+}
+.form-success-sub{font-size:14px;color:var(--muted);line-height:1.8;}
+
+.divider{width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:48px 0;}
+
+footer{text-align:center;padding:40px;border-top:1px solid var(--border);font-size:11px;color:rgba(240,239,232,0.2);letter-spacing:1px;}
+
+@media(max-width:768px){
+  nav{padding:16px 20px;}
+  .wrap{grid-template-columns:1fr;padding:60px 20px;gap:48px;}
+  .form-btn{width:100%;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">fab.games</a>
+  <a href="/" class="nav-back">← Back to Home</a>
+</nav>
+
+<div class="wrap">
+  <!-- LEFT -->
+  <div>
+    <div class="contact-badge">— Get in Touch</div>
+    <h1>We'd Love<br>to <em>Hear</em><br>from You</h1>
+    <p class="contact-intro">Game suggestions, feedback, ideas, partnership enquiries — we read every single message and we always write back. Don't be shy!</p>
+
+    <div class="contact-methods">
+      <a href="mailto:fun@fab.games" class="contact-method">
+        <div class="contact-method-icon">✉️</div>
+        <div class="contact-method-info">
+          <div class="contact-method-label">Email Us</div>
+          <div class="contact-method-value">fun@fab.games</div>
+        </div>
+      </a>
+      <a href="https://todayinhawaii.com" target="_blank" class="contact-method">
+        <div class="contact-method-icon">🌺</div>
+        <div class="contact-method-info">
+          <div class="contact-method-label">Also Visit</div>
+          <div class="contact-method-value">todayinhawaii.com</div>
+        </div>
+      </a>
+      <div class="contact-method" style="cursor:default;">
+        <div class="contact-method-icon">📍</div>
+        <div class="contact-method-info">
+          <div class="contact-method-label">Based In</div>
+          <div class="contact-method-value">Hawaii, USA 🌺</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.8;">We typically reply within 24 hours.<br>Life's too short for slow emails! 😊</p>
+  </div>
+
+  <!-- RIGHT — form -->
+  <div>
+    <div class="contact-form" id="contactForm">
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input class="form-input" id="cName" type="text" placeholder="What do we call you?">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Email</label>
+        <input class="form-input" id="cEmail" type="email" placeholder="So we can write back!">
+      </div>
+      <div class="form-group">
+        <label class="form-label">What's on your mind?</label>
+        <select class="form-input" id="cSubject" style="cursor:pointer;">
+          <option value="" disabled selected>Choose a topic...</option>
+          <option>💡 Game idea or suggestion</option>
+          <option>🐛 Something's not working</option>
+          <option>💰 Partnership or business enquiry</option>
+          <option>🎮 I just want to say hi!</option>
+          <option>❓ Question about my subscription</option>
+          <option>✨ Something else</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Message</label>
+        <textarea class="form-textarea" id="cMessage" placeholder="Tell us everything — the more detail the better!"></textarea>
+      </div>
+      <button class="form-btn" onclick="sendMessage()">Send Message →</button>
+    </div>
+
+    <div class="form-success" id="formSuccess">
+      <div class="form-success-emoji">🌺</div>
+      <div class="form-success-title">Message Sent!</div>
+      <p class="form-success-sub">Mahalo for reaching out!<br>We'll write back within 24 hours.<br><br>In the meantime — go play some games! 🎮</p>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 fab.games — Made with 🌺 in Hawaii</footer>
+
+<script>
+function sendMessage(){
+  const name    = document.getElementById('cName').value.trim();
+  const email   = document.getElementById('cEmail').value.trim();
+  const subject = document.getElementById('cSubject').value;
+  const message = document.getElementById('cMessage').value.trim();
+
+  if(!name||!email||!message){
+    alert('Please fill in your name, email and message! 🌺');
+    return;
+  }
+
+  // Open default email client with pre-filled message
+  const body = `Hi fab.games team!%0A%0AMy name is ${encodeURIComponent(name)}.%0A%0ATopic: ${encodeURIComponent(subject||'General enquiry')}%0A%0A${encodeURIComponent(message)}%0A%0ABest,%0A${encodeURIComponent(name)}`;
+  const mailto = `mailto:fun@fab.games?subject=${encodeURIComponent('fab.games — '+subject)}&body=${body}`;
+  window.location.href = mailto;
+
+  // Show success
+  document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+}
+
+// Enter key submits
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.ctrlKey) sendMessage();
+});
+</script>
+</body>
+</html>
