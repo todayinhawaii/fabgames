@@ -98,10 +98,11 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 .vcard-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid;margin-top:auto;}
 
 /* EXPANDED CARD MODAL */
-.modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;padding:20px;}
+.modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
 .modal.show{display:flex;}
-.modal-card{background:rgba(15,15,25,0.97);border-radius:16px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;padding:32px 28px;position:relative;border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(20px);box-shadow:0 25px 80px rgba(0,0,0,0.6);}
-.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;}
+.modal-card{background:rgba(10,15,20,0.75);border-radius:20px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;padding:32px 28px;position:relative;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(30px);box-shadow:0 25px 80px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1);}
+.modal-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:50%;color:var(--white);font-size:16px;cursor:pointer;padding:6px 10px;transition:all 0.2s;backdrop-filter:blur(10px);}
+.modal-close:hover{background:rgba(255,255,255,0.2);}
 .modal-emoji{font-size:64px;text-align:center;margin-bottom:16px;display:block;}
 .modal-name{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;text-align:center;margin-bottom:4px;}
 .modal-type{font-size:10px;letter-spacing:3px;text-transform:uppercase;text-align:center;margin-bottom:24px;}
@@ -773,6 +774,146 @@ const DATA = [
    vitamins:['Manganese 75%','MCT Fats #1','Copper 22%','Iron 13%','Selenium 14%'],
    benefits:['75% daily Manganese in 100g','MCTs boost brain function instantly','Kills harmful microorganisms','Reduces hunger powerfully','Supports thyroid function'],
    fact:'100g of coconut gives you an extraordinary 75% of your daily Manganese! MCT fats go directly to the brain as instant fuel — unique among foods!'},
+
+  // MORE VEGETABLES
+  {name:'Cabbage',emoji:'🥬',type:'vegetable',color:'#15803d',neon:'#4ade80',score:78,
+   nutrition:{'Vitamin K':'85% of your daily needs per 100g','Vitamin C':'61% of your daily needs','Vitamin B6':'15% of your daily needs','Fibre':'10% of your daily needs','Calories':'25 kcal per 100g'},
+   vitamins:['Vitamin K 85%','Vitamin C 61%','Vitamin B6 15%','Fibre 10%'],
+   benefits:['Powerful anti-cancer glucosinolates','Supports digestive health','Reduces inflammation','Strengthens immune system','Promotes healthy skin'],
+   fact:'Fermented cabbage — sauerkraut — has 200 times more Vitamin C than fresh cabbage! Ancient Romans and Greeks used it as medicine.'},
+
+  {name:'Watercress',emoji:'🌿',type:'vegetable',color:'#166534',neon:'#4ade80',score:97,
+   nutrition:{'Vitamin K':'312% of your daily needs per 100g 🏆','Vitamin A':'106% of your daily needs','Vitamin C':'72% of your daily needs','Calcium':'12% of your daily needs','Calories':'11 kcal per 100g'},
+   vitamins:['Vitamin K 312%','Vitamin A 106%','Vitamin C 72%','Calcium 12%'],
+   benefits:['Highest nutrient density per calorie of any food','Fights cancer powerfully','Supports bone health','Protects eye health','Only 11 calories per 100g'],
+   fact:'Watercress scores 100 out of 100 on the CDC nutrient density scale — the highest of any food! Hippocrates built his first hospital next to a stream to grow it.'},
+
+  {name:'Swiss Chard',emoji:'🌈',type:'vegetable',color:'#dc2626',neon:'#f87171',score:89,
+   nutrition:{'Vitamin K':'830% of your daily needs per 100g 🏆','Vitamin A':'214% of your daily needs','Vitamin C':'50% of your daily needs','Magnesium':'20% of your daily needs','Calories':'19 kcal per 100g'},
+   vitamins:['Vitamin K 830%','Vitamin A 214%','Vitamin C 50%','Magnesium 20%'],
+   benefits:['830% daily Vitamin K — extraordinary','Regulates blood sugar powerfully','Supports bone strength','Fights cancer cells','Boosts brain health'],
+   fact:'Swiss chard has 830% of your daily Vitamin K in 100g — even more than kale! It comes in stunning rainbow colours of red, yellow and white stems.'},
+
+  {name:'Bok Choy',emoji:'🥬',type:'vegetable',color:'#15803d',neon:'#22c55e',score:83,
+   nutrition:{'Vitamin A':'89% of your daily needs per 100g','Vitamin C':'75% of your daily needs','Vitamin K':'57% of your daily needs','Calcium':'10% of your daily needs','Calories':'13 kcal per 100g'},
+   vitamins:['Vitamin A 89%','Vitamin C 75%','Vitamin K 57%','Calcium 10%'],
+   benefits:['Only 13 calories per 100g','Extraordinarily nutrient dense','Supports bone health','Boosts immune system','Fights cancer'],
+   fact:'Bok choy has been cultivated in China for over 6000 years! At just 13 calories per 100g it is one of the most nutrient-dense foods per calorie on Earth.'},
+
+  {name:'Eggplant',emoji:'🍆',type:'vegetable',color:'#7c3aed',neon:'#a78bfa',score:72,
+   nutrition:{'Nasunin':'Unique brain antioxidant 🏆','Fibre':'14% of your daily needs per 100g','Folate':'6% of your daily needs','Potassium':'5% of your daily needs','Calories':'25 kcal per 100g'},
+   vitamins:['Nasunin Unique','Fibre 14%','Folate 6%','Potassium 5%'],
+   benefits:['Nasunin protects brain cell membranes','Reduces cholesterol','Aids weight management','Supports heart health','Fights cancer'],
+   fact:'The purple colour of eggplant comes from nasunin — a unique antioxidant that specifically protects the fats in brain cell membranes from damage!'},
+
+  {name:'Butternut Squash',emoji:'🎃',type:'vegetable',color:'#ea580c',neon:'#fb923c',score:82,
+   nutrition:{'Vitamin A':'457% of your daily needs per 100g 🏆','Vitamin C':'35% of your daily needs','Potassium':'10% of your daily needs','Fibre':'10% of your daily needs','Calories':'45 kcal per 100g'},
+   vitamins:['Vitamin A 457%','Vitamin C 35%','Potassium 10%','Fibre 10%'],
+   benefits:['457% daily Vitamin A — extraordinary','Supports eye health powerfully','Boosts immune system','Promotes healthy skin','Supports heart health'],
+   fact:'One cup of butternut squash gives you 457% of your daily Vitamin A — nearly 5 times your daily needs in one serving!'},
+
+  {name:'Okra',emoji:'🌿',type:'vegetable',color:'#16a34a',neon:'#4ade80',score:76,
+   nutrition:{'Vitamin K':'40% of your daily needs per 100g','Vitamin C':'38% of your daily needs','Folate':'22% of your daily needs','Magnesium':'14% of your daily needs','Calories':'33 kcal per 100g'},
+   vitamins:['Folate 22%','Vitamin K 40%','Vitamin C 38%','Magnesium 14%'],
+   benefits:['Reduces blood sugar effectively','Supports heart health','Promotes gut health','Strengthens bones','Boosts brain function'],
+   fact:'Okra seeds were roasted as a coffee substitute during the American Civil War! Its sticky mucilage is used to thicken soups across the world.'},
+
+  {name:'Fennel',emoji:'🌱',type:'vegetable',color:'#15803d',neon:'#86efac',score:75,
+   nutrition:{'Manganese':'17% of your daily needs per 100g','Vitamin C':'21% of your daily needs','Potassium':'10% of your daily needs','Fibre':'12% of your daily needs','Calories':'31 kcal per 100g'},
+   vitamins:['Manganese 17%','Fibre 12%','Vitamin C 21%','Potassium 10%'],
+   benefits:['Powerful digestive aid','Reduces bloating instantly','Anti-inflammatory properties','Supports bone density','Natural breath freshener'],
+   fact:'Fennel seeds were chewed after meals in ancient Rome to aid digestion and freshen breath — the original after-dinner mint!'},
+
+  {name:'Radish',emoji:'🌶️',type:'vegetable',color:'#dc2626',neon:'#f87171',score:68,
+   nutrition:{'Vitamin C':'29% of your daily needs per 100g','Folate':'7% of your daily needs','Potassium':'6% of your daily needs','Fibre':'7% of your daily needs','Calories':'16 kcal per 100g'},
+   vitamins:['Vitamin C 29%','Folate 7%','Potassium 6%','Fibre 7%'],
+   benefits:['Detoxifies the liver','Fights jaundice','Supports kidney health','Aids digestion','Very low calorie snack'],
+   fact:'Radishes are one of the fastest growing vegetables — ready to harvest in just 3 weeks from seed! Ancient Egyptians valued them more than gold.'},
+
+  {name:'Parsnip',emoji:'🌿',type:'vegetable',color:'#d97706',neon:'#fbbf24',score:73,
+   nutrition:{'Folate':'22% of your daily needs per 100g','Vitamin C':'28% of your daily needs','Fibre':'18% of your daily needs','Potassium':'12% of your daily needs','Calories':'75 kcal per 100g'},
+   vitamins:['Fibre 18%','Folate 22%','Vitamin C 28%','Potassium 12%'],
+   benefits:['Excellent source of dietary fibre','Supports pregnancy health via folate','Promotes heart health','Boosts immune system','Regulates blood sugar'],
+   fact:'Parsnips taste sweeter after a frost! Cold temperatures convert their starch to sugar — farmers leave them in the ground through winter on purpose.'},
+
+  // MORE FRUITS
+  {name:'Acerola Cherry',emoji:'🍒',type:'fruit',color:'#dc2626',neon:'#f87171',score:100,
+   nutrition:{'Vitamin C':'2740% of your daily needs per 100g 🏆 WORLD RECORD','Vitamin A':'75% of your daily needs','Iron':'3% of your daily needs','Calories':'32 kcal per 100g'},
+   vitamins:['Vitamin C 2740%','Vitamin A 75%','Iron 3%'],
+   benefits:['Highest Vitamin C of any food on Earth','Extraordinary immune booster','Fights free radicals powerfully','Promotes collagen production','Protects against scurvy'],
+   fact:'Acerola cherry has 2740% of your daily Vitamin C per 100g — that is 65 times more than an orange! It holds the absolute world record for Vitamin C in any food.'},
+
+  {name:'Blackberry',emoji:'🫐',type:'fruit',color:'#4c1d95',neon:'#a78bfa',score:86,
+   nutrition:{'Manganese':'29% of your daily needs per 100g','Fibre':'21% of your daily needs','Vitamin C':'35% of your daily needs','Vitamin K':'25% of your daily needs','Calories':'43 kcal per 100g'},
+   vitamins:['Manganese 29%','Fibre 21%','Vitamin C 35%','Vitamin K 25%'],
+   benefits:['Exceptionally high in antioxidants','Supports brain health','Fights cancer cells','Promotes oral health','Strengthens bones'],
+   fact:'Blackberries have been used as medicine since ancient Greece. Romans used the roots to treat gout and the leaves to heal wounds.'},
+
+  {name:'Elderberry',emoji:'🫐',type:'fruit',color:'#312e81',neon:'#818cf8',score:89,
+   nutrition:{'Vitamin C':'87% of your daily needs per 100g','Anthocyanins':'Extraordinary 🏆','Iron':'13% of your daily needs','Potassium':'8% of your daily needs','Calories':'73 kcal per 100g'},
+   vitamins:['Vitamin C 87%','Anthocyanins Extraordinary','Iron 13%','Potassium 8%'],
+   benefits:['Reduces cold duration by 50% clinically proven','Powerful immune booster','Fights inflammation','Supports heart health','Anti-ageing properties'],
+   fact:'Clinical studies show elderberry syrup reduces cold duration by 50% and flu by 4 days! It has been used as medicine for thousands of years.'},
+
+  {name:'Cranberry',emoji:'🍒',type:'fruit',color:'#be123c',neon:'#fb7185',score:82,
+   nutrition:{'Vitamin C':'22% of your daily needs per 100g','Proanthocyanidins':'UTI fighter 🏆','Vitamin E':'8% of your daily needs','Vitamin K':'5% of your daily needs','Calories':'46 kcal per 100g'},
+   vitamins:['Proanthocyanidins Unique','Vitamin C 22%','Vitamin E 8%','Vitamin K 5%'],
+   benefits:['Prevents urinary tract infections uniquely','Fights cancer cells','Supports heart health','Promotes oral health','Boosts immune system'],
+   fact:'Cranberries contain unique proanthocyanidins that prevent bacteria sticking to the bladder wall — natures own anti-UTI medicine!'},
+
+  {name:'Apricot',emoji:'🍑',type:'fruit',color:'#f97316',neon:'#fb923c',score:78,
+   nutrition:{'Vitamin A':'26% of your daily needs per 100g','Vitamin C':'16% of your daily needs','Potassium':'6% of your daily needs','Fibre':'8% of your daily needs','Calories':'48 kcal per 100g'},
+   vitamins:['Vitamin A 26%','Vitamin C 16%','Potassium 6%','Fibre 8%'],
+   benefits:['Protects eye health','Promotes healthy skin','Supports heart health','Aids digestive health','Provides sustained energy'],
+   fact:'Dried apricots have 12 times more nutrients than fresh ones by weight! The Hunza people of Pakistan eat them daily and are famous for exceptional longevity.'},
+
+  {name:'Mulberry',emoji:'🫐',type:'fruit',color:'#6d28d9',neon:'#c084fc',score:85,
+   nutrition:{'Vitamin C':'61% of your daily needs per 100g','Iron':'14% of your daily needs','Vitamin K':'11% of your daily needs','Resveratrol':'High content','Calories':'43 kcal per 100g'},
+   vitamins:['Vitamin C 61%','Iron 14%','Vitamin K 11%','Resveratrol High'],
+   benefits:['Fights anaemia with high iron','Lowers blood sugar','Reduces cholesterol','Fights cancer cells','Supports liver health'],
+   fact:'Mulberry leaves are the only food silkworms eat! China cultivated mulberries for 5000 years primarily for silk — the fruit was a delicious bonus.'},
+
+  {name:'Persimmon',emoji:'🍊',type:'fruit',color:'#ea580c',neon:'#fb923c',score:81,
+   nutrition:{'Vitamin A':'55% of your daily needs per 100g','Manganese':'30% of your daily needs','Fibre':'24% of your daily needs','Vitamin C':'22% of your daily needs','Calories':'70 kcal per 100g'},
+   vitamins:['Vitamin A 55%','Manganese 30%','Fibre 24%','Vitamin C 22%'],
+   benefits:['Powerful antioxidant','Supports heart health','Promotes eye health','Aids digestive health','Fights inflammation'],
+   fact:'Persimmons were called "the fruit of the gods" by the ancient Greeks. The name Diospyros literally means divine food in Greek!'},
+
+  {name:'Starfruit',emoji:'⭐',type:'fruit',color:'#eab308',neon:'#fde047',score:74,
+   nutrition:{'Vitamin C':'76% of your daily needs per 100g','Fibre':'12% of your daily needs','Vitamin B5':'9% of your daily needs','Potassium':'4% of your daily needs','Calories':'31 kcal per 100g'},
+   vitamins:['Vitamin C 76%','Fibre 12%','Vitamin B5 9%','Potassium 4%'],
+   benefits:['76% daily Vitamin C per 100g','Promotes digestive health','Supports heart health','Anti-inflammatory','Very low calorie'],
+   fact:'Starfruit is star-shaped when sliced! At just 31 calories per 100g with 76% daily Vitamin C it is one of the most nutritious low-calorie fruits.'},
+
+  {name:'Tamarind',emoji:'🌰',type:'fruit',color:'#92400e',neon:'#d97706',score:79,
+   nutrition:{'Iron':'35% of your daily needs per 100g 🏆','Thiamine':'34% of your daily needs','Magnesium':'23% of your daily needs','Potassium':'16% of your daily needs','Calories':'239 kcal per 100g'},
+   vitamins:['Iron 35%','Thiamine 34%','Magnesium 23%','Potassium 16%'],
+   benefits:['Extraordinary iron content fights anaemia','Promotes digestive health','Reduces fever naturally','Supports liver function','Anti-inflammatory'],
+   fact:'Tamarind has the highest iron content of any fruit! It is a secret ingredient in Worcestershire sauce, Pad Thai, and hundreds of Asian dishes.'},
+
+  {name:'Gooseberry',emoji:'🍈',type:'fruit',color:'#84cc16',neon:'#bef264',score:77,
+   nutrition:{'Vitamin C':'46% of your daily needs per 100g','Fibre':'17% of your daily needs','Copper':'12% of your daily needs','Manganese':'10% of your daily needs','Calories':'44 kcal per 100g'},
+   vitamins:['Vitamin C 46%','Fibre 17%','Copper 12%','Manganese 10%'],
+   benefits:['Supports digestive health','Boosts immune system','Promotes healthy skin','Supports liver function','Fights inflammation'],
+   fact:'Gooseberries were banned in the USA for nearly 100 years because they spread a disease harmful to pine trees! The ban was finally lifted in 1966.'},
+
+  {name:'Longan',emoji:'🍒',type:'fruit',color:'#d97706',neon:'#fbbf24',score:76,
+   nutrition:{'Vitamin C':'140% of your daily needs per 100g 🏆 Top 5','Riboflavin':'8% of your daily needs','Iron':'3% of your daily needs','Potassium':'5% of your daily needs','Calories':'60 kcal per 100g'},
+   vitamins:['Vitamin C 140%','Riboflavin 8%','Iron 3%','Potassium 5%'],
+   benefits:['140% daily Vitamin C per 100g','Calms the nervous system','Improves sleep quality','Supports heart health','Fights stress and anxiety'],
+   fact:'Longan means dragon eye in Chinese! It has been used in traditional Chinese medicine for over 2000 years as a calming tonic for the heart and mind.'},
+
+  {name:'Jabuticaba',emoji:'🍇',type:'fruit',color:'#1e1b4b',neon:'#818cf8',score:84,
+   nutrition:{'Anthocyanins':'Extraordinarily high 🏆','Vitamin C':'23% of your daily needs per 100g','Calcium':'8% of your daily needs','Iron':'2% of your daily needs','Calories':'58 kcal per 100g'},
+   vitamins:['Anthocyanins Extraordinary','Vitamin C 23%','Calcium 8%','Iron 2%'],
+   benefits:['Fights cancer powerfully','Reduces inflammation','Supports respiratory health','Promotes gut health','Anti-ageing antioxidants'],
+   fact:'Jabuticaba grows directly on the tree trunk — not on branches! When in season the entire trunk turns purple. It is found only in Brazil and ripens within a day.'},
+
+  {name:'Feijoa',emoji:'🍈',type:'fruit',color:'#166534',neon:'#4ade80',score:77,
+   nutrition:{'Vitamin C':'61% of your daily needs per 100g','Fibre':'24% of your daily needs','Folate':'9% of your daily needs','Iodine':'Natural source 🏆','Calories':'55 kcal per 100g'},
+   vitamins:['Vitamin C 61%','Fibre 24%','Folate 9%','Iodine Natural'],
+   benefits:['Supports digestive health','Boosts immune system strongly','One of few fruits with natural iodine','Fights inflammation','Supports heart health'],
+   fact:'Feijoa is one of the very few fruits with natural iodine! New Zealand grows more feijoas than any other country and exports almost none — they eat them all!'},
 ];
 
 // ── CATEGORIES ──────────────────────────────────
