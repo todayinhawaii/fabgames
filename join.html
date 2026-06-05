@@ -143,6 +143,12 @@ footer{text-align:center;padding:24px;font-size:11px;color:rgba(240,239,232,0.2)
 <footer>© 2026 fab.games — Made with 🌺 in Hawaii</footer>
 
 <script>
+// Auto-select tab from URL param
+window.addEventListener('DOMContentLoaded',()=>{
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('tab')==='paid') showTab('paid');
+});
+
 function showTab(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>{
     t.classList.toggle('active', (i===0&&tab==='free')||(i===1&&tab==='paid'));
