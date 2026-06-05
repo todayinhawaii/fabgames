@@ -6,98 +6,64 @@
 <title>Join fab.games — Free for 30 Days</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--black:#070708;--gold:#c9a84c;--gold2:#e8c96a;--white:#f0efe8;--muted:rgba(240,239,232,0.5);--border:rgba(255,255,255,0.07);}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(201,168,76,0.06),transparent);pointer-events:none;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(201,168,76,0.05),transparent);pointer-events:none;}
 nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);}
 .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
 .nav-back{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
 .nav-back:hover{color:var(--gold);}
-
-.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;}
-.card{
-  width:100%;max-width:440px;
-  background:#0d0d0f;
-  border:1px solid rgba(201,168,76,0.15);
-  border-radius:4px;
-  padding:48px 40px;
-  box-shadow:0 0 60px rgba(201,168,76,0.06);
-}
-.card-badge{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;text-align:center;}
-h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;text-align:center;margin-bottom:8px;line-height:1.2;}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.card{width:100%;max-width:440px;background:#0d0d0f;border:1px solid rgba(201,168,76,0.15);border-radius:4px;padding:40px 36px;box-shadow:0 0 60px rgba(201,168,76,0.06);}
+.card-badge{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;text-align:center;}
+h1{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;text-align:center;margin-bottom:6px;}
 h1 em{font-style:italic;color:var(--gold);}
-.card-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:36px;line-height:1.8;}
-
-.tabs{display:flex;gap:2px;margin-bottom:28px;background:rgba(255,255,255,0.04);padding:4px;border-radius:3px;}
+.card-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:28px;line-height:1.7;}
+.tabs{display:flex;gap:2px;margin-bottom:24px;background:rgba(255,255,255,0.04);padding:4px;border-radius:3px;}
 .tab{flex:1;padding:10px;text-align:center;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-radius:2px;transition:all 0.2s;}
 .tab.active{background:rgba(201,168,76,0.15);color:var(--gold);}
-
-.form-group{margin-bottom:16px;}
-.form-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;display:block;}
-.form-input{
-  width:100%;padding:14px 16px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:2px;color:var(--white);
-  font-size:14px;font-family:'Inter',sans-serif;
-  outline:none;transition:border-color 0.2s;
-}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;display:block;}
+.form-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:2px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;}
 .form-input:focus{border-color:rgba(201,168,76,0.5);}
 .form-input::placeholder{color:rgba(240,239,232,0.2);}
-
-.main-btn{
-  width:100%;padding:16px;border:none;border-radius:2px;
-  background:linear-gradient(135deg,var(--gold),#a87d2a);
-  color:#000;font-size:13px;font-weight:600;
-  letter-spacing:2px;text-transform:uppercase;
-  cursor:pointer;font-family:'Inter',sans-serif;
-  box-shadow:0 0 30px rgba(201,168,76,0.2);
-  transition:all 0.2s;margin-top:8px;
-}
+.main-btn{width:100%;padding:15px;border:none;border-radius:2px;background:linear-gradient(135deg,var(--gold),#a87d2a);color:#000;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 0 30px rgba(201,168,76,0.2);transition:all 0.2s;margin-top:6px;}
 .main-btn:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 0 50px rgba(201,168,76,0.4);transform:translateY(-1px);}
-.main-btn:active{transform:translateY(1px);}
-
-.divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.divider span{font-size:11px;color:var(--muted);letter-spacing:1px;}
-
-.stripe-btn{
-  width:100%;padding:14px;border:1px solid rgba(255,255,255,0.1);border-radius:2px;
-  background:transparent;color:var(--muted);font-size:12px;
-  letter-spacing:2px;text-transform:uppercase;
-  cursor:pointer;font-family:'Inter',sans-serif;
-  transition:all 0.2s;
-}
-.stripe-btn:hover{border-color:rgba(201,168,76,0.3);color:var(--white);}
-
-.perks{margin:28px 0 0;padding-top:24px;border-top:1px solid var(--border);}
-.perk{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);margin-bottom:10px;}
-.perk::before{content:'—';color:var(--gold);font-size:10px;}
-
-.msg{padding:12px 16px;border-radius:2px;font-size:13px;margin-bottom:16px;display:none;text-align:center;}
+.main-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+.msg{padding:12px 16px;border-radius:2px;font-size:13px;margin-bottom:14px;display:none;text-align:center;line-height:1.6;}
 .msg.success{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#86efac;}
 .msg.error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;}
-
-footer{text-align:center;padding:24px;font-size:11px;color:rgba(240,239,232,0.2);}
+.msg.info{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);color:var(--gold);}
+.perks{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.perk{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:8px;}
+.perk::before{content:'—';color:var(--gold);font-size:10px;}
+.already-member{text-align:center;margin-top:16px;font-size:12px;color:var(--muted);}
+.already-member a{color:var(--gold);text-decoration:none;}
+.already-member a:hover{text-decoration:underline;}
+.password-strength{height:3px;border-radius:99px;margin-top:6px;background:rgba(255,255,255,0.08);overflow:hidden;}
+.strength-bar{height:100%;width:0%;border-radius:99px;transition:all 0.3s;}
+footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2);}
+@media(max-width:480px){.card{padding:28px 20px;}nav{padding:16px 20px;}}
 </style>
 </head>
 <body>
 <nav>
   <a href="/" class="nav-logo">fab.games</a>
-  <a href="/" class="nav-back">← Back</a>
+  <a href="/login" class="nav-back">Sign In →</a>
 </nav>
 
 <div class="wrap">
   <div class="card">
     <div class="card-badge">— Join Today</div>
     <h1>One Month <em>Free</em></h1>
-    <p class="card-sub">No credit card needed. Every game, every tool, 30 days on us. Then just $4.99/month.</p>
+    <p class="card-sub">No credit card. Full access. 30 days on us.<br>Then just $4.99/month — cancel anytime.</p>
 
     <div class="tabs">
-      <div class="tab active" onclick="showTab('free')">Free Month</div>
-      <div class="tab" onclick="showTab('paid')">Subscribe Now</div>
+      <div class="tab active" onclick="showTab('free')">🎁 Free Month</div>
+      <div class="tab" onclick="showTab('paid')">💳 Subscribe $4.99</div>
     </div>
 
     <div id="msgBox" class="msg"></div>
@@ -110,14 +76,23 @@ footer{text-align:center;padding:24px;font-size:11px;color:rgba(240,239,232,0.2)
       </div>
       <div class="form-group">
         <label class="form-label">Email Address</label>
-        <input class="form-input" id="freeEmail" type="email" placeholder="Your email address">
+        <input class="form-input" id="freeEmail" type="email" placeholder="your@email.com">
       </div>
-      <button class="main-btn" onclick="startFreeTrial()">Start Free Month →</button>
+      <div class="form-group">
+        <label class="form-label">Choose a Password</label>
+        <input class="form-input" id="freePassword" type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)">
+        <div class="password-strength"><div class="strength-bar" id="strengthBar"></div></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input class="form-input" id="freePassword2" type="password" placeholder="Repeat your password">
+      </div>
+      <button class="main-btn" id="freeBtn" onclick="startFreeTrial()">Start Free Month →</button>
       <div class="perks">
         <div class="perk">Every game — all of them</div>
-        <div class="perk">Film Lab — all 34 filters</div>
         <div class="perk">No credit card needed</div>
-        <div class="perk">Email reminder when month ends</div>
+        <div class="perk">Confirmation email sent instantly</div>
+        <div class="perk">30 days full access</div>
         <div class="perk">Cancel anytime — no fuss</div>
       </div>
     </div>
@@ -126,89 +101,163 @@ footer{text-align:center;padding:24px;font-size:11px;color:rgba(240,239,232,0.2)
     <div id="paidTab" style="display:none;">
       <div class="form-group">
         <label class="form-label">Email Address</label>
-        <input class="form-input" id="paidEmail" type="email" placeholder="Your email address">
+        <input class="form-input" id="paidEmail" type="email" placeholder="your@email.com">
       </div>
-      <button class="main-btn" onclick="startSubscription()">Subscribe for $4.99/month →</button>
-      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;">Secure payment via Stripe · Cancel anytime</p>
-      <div class="perks">
-        <div class="perk">Everything in free trial</div>
-        <div class="perk">New games every month</div>
-        <div class="perk">Global leaderboards</div>
-        <div class="perk">Less than a coffee a month</div>
-      </div>
+      <button class="main-btn" onclick="startSubscription()">Subscribe $4.99/month →</button>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.7;">Secure payment via Stripe · Cancel anytime<br>Less than a coffee a month ☕</p>
     </div>
+
+    <div class="already-member">Already have an account? <a href="/login">Sign in →</a></div>
   </div>
 </div>
 
 <footer>© 2026 fab.games — Made with 🌺 in Hawaii</footer>
 
 <script>
-// Auto-select tab from URL param
-window.addEventListener('DOMContentLoaded',()=>{
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('tab')==='paid') showTab('paid');
-});
+let supabase;
+
+async function init(){
+  try{
+    const res = await fetch('/api/config');
+    const config = await res.json();
+    supabase = window.supabase.createClient(config.supabase_url, config.supabase_anon_key);
+
+    // Check tab from URL
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('tab')==='paid') showTab('paid');
+
+    // Check if already logged in
+    const { data:{ session } } = await supabase.auth.getSession();
+    if(session) window.location.href='/play';
+  }catch(e){ console.log('Init error:', e); }
+}
+init();
 
 function showTab(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active', (i===0&&tab==='free')||(i===1&&tab==='paid'));
+    t.classList.toggle('active',(i===0&&tab==='free')||(i===1&&tab==='paid'));
   });
   document.getElementById('freeTab').style.display = tab==='free'?'block':'none';
   document.getElementById('paidTab').style.display = tab==='paid'?'block':'none';
   hideMsg();
 }
 
-function showMsg(msg, type){
-  const el = document.getElementById('msgBox');
-  el.textContent = msg;
-  el.className = 'msg ' + type;
-  el.style.display = 'block';
+function showMsg(msg,type='error'){
+  const el=document.getElementById('msgBox');
+  el.innerHTML=msg;
+  el.className='msg '+type;
+  el.style.display='block';
 }
 function hideMsg(){ document.getElementById('msgBox').style.display='none'; }
 
+function checkStrength(pw){
+  const bar=document.getElementById('strengthBar');
+  let strength=0;
+  if(pw.length>=8) strength++;
+  if(/[A-Z]/.test(pw)) strength++;
+  if(/[0-9]/.test(pw)) strength++;
+  if(/[^A-Za-z0-9]/.test(pw)) strength++;
+  const colors=['#ef4444','#f97316','#eab308','#22c55e'];
+  const widths=['25%','50%','75%','100%'];
+  bar.style.width = pw.length>0 ? widths[strength-1]||'10%' : '0%';
+  bar.style.background = pw.length>0 ? colors[strength-1]||'#ef4444' : '';
+}
+
 async function startFreeTrial(){
-  const name  = document.getElementById('freeName').value.trim();
-  const email = document.getElementById('freeEmail').value.trim();
-  if(!name||!email){ showMsg('Please enter your name and email! 🌺','error'); return; }
-  if(!email.includes('@')){ showMsg('Please enter a valid email address!','error'); return; }
+  const name     = document.getElementById('freeName').value.trim();
+  const email    = document.getElementById('freeEmail').value.trim().toLowerCase();
+  const password = document.getElementById('freePassword').value;
+  const password2= document.getElementById('freePassword2').value;
+
+  // Validation
+  if(!name){ showMsg('Please enter your name!'); return; }
+  if(!email||!email.includes('@')){ showMsg('Please enter a valid email address!'); return; }
+  if(password.length<8){ showMsg('Password must be at least 8 characters!'); return; }
+  if(password!==password2){ showMsg('Passwords don\'t match — please try again!'); return; }
+
+  const btn=document.getElementById('freeBtn');
+  btn.disabled=true;
+  btn.textContent='Creating your account...';
+  showMsg('Setting up your free month...','info');
 
   try{
-    const res = await fetch('/api/free-trial',{
+    // Try to sign up with Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options:{
+        data:{ name, status:'trial' },
+        emailRedirectTo:'https://www.fab.games/play'
+      }
+    });
+
+    if(error){
+      // Already registered
+      if(error.message.includes('already registered') || error.message.includes('already been registered')){
+        // Check if they already used free trial
+        const checkRes = await fetch('/api/check-member', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({email})
+        });
+        const checkData = await checkRes.json();
+
+        if(checkData.status==='active'){
+          showMsg('🌟 You\'re already a Premium member! <a href="/login" style="color:var(--gold2);font-weight:700;">Sign in here →</a>','info');
+        } else if(checkData.status==='trial'){
+          showMsg('🎮 You already have a free trial account! <a href="/login" style="color:var(--gold2);font-weight:700;">Sign in here →</a>','info');
+        } else {
+          showMsg('📧 This email already has an account. <a href="/login" style="color:var(--gold2);font-weight:700;">Sign in here →</a> or <a href="/login" style="color:var(--gold2);">reset your password</a>','info');
+        }
+      } else {
+        showMsg(error.message);
+      }
+      btn.disabled=false;
+      btn.textContent='Start Free Month →';
+      return;
+    }
+
+    // Save to members table via API
+    await fetch('/api/free-trial',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({name, email})
+      body:JSON.stringify({name, email})
     });
-    const data = await res.json();
-    if(data.ok){
-      showMsg('🎉 Welcome to fab.games! Redirecting to your games...','success');
-      localStorage.setItem('fabEmail', email);
-      localStorage.setItem('fabName', name);
-      setTimeout(()=>{ window.location.href='/play'; }, 1500);
-    } else {
-      showMsg(data.msg || 'Something went wrong — try again!','error');
-    }
+
+    // Save locally
+    localStorage.setItem('fabEmail', email);
+    localStorage.setItem('fabName', name);
+
+    // Show success — tell them to check email
+    hideMsg();
+    document.getElementById('freeTab').innerHTML=`
+      <div style="text-align:center;padding:20px 0;">
+        <div style="font-size:56px;margin-bottom:16px;">📧</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold);margin-bottom:12px;">Check Your Email!!</div>
+        <p style="font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:20px;">We sent a confirmation link to <strong style="color:var(--white);">${email}</strong><br>Click it to confirm your account and start playing!!</p>
+        <p style="font-size:12px;color:var(--muted);line-height:1.7;">Didn't get it? Check your spam folder.<br>The email comes from <strong>fab.games</strong></p>
+      </div>`;
+
   }catch(e){
-    showMsg('Connection error — please try again!','error');
+    showMsg('Connection error — please try again!');
+    btn.disabled=false;
+    btn.textContent='Start Free Month →';
   }
 }
 
 async function startSubscription(){
-  const email = document.getElementById('paidEmail').value.trim();
-  if(!email||!email.includes('@')){ showMsg('Please enter a valid email address!','error'); return; }
-
-  showMsg('Redirecting to secure checkout...','success');
+  const email=document.getElementById('paidEmail').value.trim();
+  if(!email||!email.includes('@')){ showMsg('Please enter a valid email address!'); return; }
+  showMsg('Redirecting to secure checkout...','info');
   try{
-    const res = await fetch('/api/create-checkout',{
+    const res=await fetch('/api/create-checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email})
+      body:JSON.stringify({email})
     });
-    const data = await res.json();
-    if(data.ok){ window.location.href = data.url; }
-    else { showMsg(data.msg || 'Something went wrong!','error'); }
-  }catch(e){
-    showMsg('Connection error — please try again!','error');
-  }
+    const data=await res.json();
+    if(data.ok){ window.location.href=data.url; }
+    else{ showMsg(data.msg||'Something went wrong!'); }
+  }catch(e){ showMsg('Connection error — please try again!'); }
 }
 </script>
 </body>
