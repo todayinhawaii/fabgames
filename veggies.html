@@ -812,12 +812,15 @@ function renderCards(){
     vitamins.className = 'vcard-vitamins';
     // Show top nutrition stat
     const topStat = d.nutrition ? Object.values(d.nutrition)[0] : d.vitamins[0];
-    vitamins.textContent = topStat.length > 30 ? topStat.substring(0,30)+'...' : topStat;
+    const statText = topStat.length > 30 ? topStat.substring(0,30)+'...' : topStat;
+    const statSpan = document.createElement('span');
+    statSpan.textContent = statText;
+    vitamins.appendChild(statSpan);
 
     // Score badge
     if(d.score){
       const scoreBadge = document.createElement('div');
-      scoreBadge.style.cssText=`font-size:10px;font-weight:800;margin-top:6px;padding:2px 8px;border-radius:99px;background:rgba(${hexToRgb(d.color)},0.15);color:${d.neon};border:1px solid rgba(${hexToRgb(d.color)},0.3);`;
+      scoreBadge.style.cssText='font-size:10px;font-weight:800;margin-top:6px;padding:2px 8px;border-radius:99px;background:rgba(0,0,0,0.3);color:'+d.neon+';border:1px solid '+d.neon+';display:inline-block;';
       scoreBadge.textContent='Score: '+d.score+'/100';
       vitamins.appendChild(scoreBadge);
     }
