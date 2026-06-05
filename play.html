@@ -308,15 +308,20 @@ async function checkAccess(){
     supabase = window.supabase.createClient(config.supabase_url, config.supabase_anon_key);
     const { data:{ session } } = await supabase.auth.getSession();
     if(!session){
-      window.location.href='/login';
-      return;
+      // Check localStorage fallback for free trial users
+      const email = localStorage.getItem('fabEmail');
+      if(!email){
+        window.location.href='/login';
+        return;
+      }
+    } else {
+      // Save name for welcome message
+      const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
+      localStorage.setItem('fabName', name);
+      localStorage.setItem('fabEmail', session.user.email);
+      document.getElementById('welcomeName').textContent = name.split(' ')[0];
     }
-    // Save name for welcome message
-    const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
-    localStorage.setItem('fabName', name);
-    localStorage.setItem('fabEmail', session.user.email);
   }catch(e){
-    // Server error — let them in
     console.log('Auth check error:', e);
   }
 }
@@ -338,8 +343,8 @@ for(let i=0;i<80;i++){
 }
 
 // ── WELCOME ───────────────────────────────────────
-const name=localStorage.getItem('fabName')||'Player';
-document.getElementById('welcomeName').textContent=name.split(' ')[0];
+const savedName=localStorage.getItem('fabName')||'Player';
+document.getElementById('welcomeName').textContent=savedName.split(' ')[0];
 
 // ── GAMES ─────────────────────────────────────────
 const GAMES=[
