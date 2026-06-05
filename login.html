@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login — fab.games</title>
+<title>Sign In — fab.games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,44 +17,33 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:20px 4
 .nav-back{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
 .nav-back:hover{color:var(--gold);}
 .wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;}
-.card{width:100%;max-width:420px;background:#0d0d0f;border:1px solid rgba(201,168,76,0.15);border-radius:4px;padding:48px 40px;box-shadow:0 0 60px rgba(201,168,76,0.06);}
-.card-badge{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;text-align:center;}
-h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;text-align:center;margin-bottom:8px;}
+.card{width:100%;max-width:420px;background:#0d0d0f;border:1px solid rgba(201,168,76,0.15);border-radius:4px;padding:40px 36px;box-shadow:0 0 60px rgba(201,168,76,0.06);}
+.card-badge{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;text-align:center;}
+h1{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;text-align:center;margin-bottom:6px;}
 h1 em{font-style:italic;color:var(--gold);}
-.card-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:32px;line-height:1.8;}
-
-/* Tabs */
-.tabs{display:flex;gap:2px;margin-bottom:28px;background:rgba(255,255,255,0.04);padding:4px;border-radius:3px;}
+.card-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:28px;line-height:1.7;}
+.tabs{display:flex;gap:2px;margin-bottom:24px;background:rgba(255,255,255,0.04);padding:4px;border-radius:3px;}
 .tab{flex:1;padding:10px;text-align:center;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-radius:2px;transition:all 0.2s;}
 .tab.active{background:rgba(201,168,76,0.15);color:var(--gold);}
-
-.form-group{margin-bottom:16px;}
-.form-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;display:block;}
-.form-input{width:100%;padding:14px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:2px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;display:block;}
+.form-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:2px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;}
 .form-input:focus{border-color:rgba(201,168,76,0.5);}
 .form-input::placeholder{color:rgba(240,239,232,0.2);}
-
-.main-btn{width:100%;padding:16px;border:none;border-radius:2px;background:linear-gradient(135deg,var(--gold),#a87d2a);color:#000;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 0 30px rgba(201,168,76,0.2);transition:all 0.2s;margin-top:8px;}
-.main-btn:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 0 50px rgba(201,168,76,0.4);transform:translateY(-1px);}
-
-.forgot-link{display:block;text-align:center;margin-top:16px;font-size:12px;color:var(--muted);text-decoration:none;transition:color 0.2s;cursor:pointer;}
+.main-btn{width:100%;padding:15px;border:none;border-radius:2px;background:linear-gradient(135deg,var(--gold),#a87d2a);color:#000;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 0 30px rgba(201,168,76,0.2);transition:all 0.2s;margin-top:6px;}
+.main-btn:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));transform:translateY(-1px);}
+.main-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+.forgot-link{display:block;text-align:right;margin-top:8px;font-size:12px;color:var(--muted);cursor:pointer;transition:color 0.2s;}
 .forgot-link:hover{color:var(--gold);}
-
-.msg{padding:12px 16px;border-radius:2px;font-size:13px;margin-bottom:16px;display:none;text-align:center;}
+.msg{padding:12px 16px;border-radius:2px;font-size:13px;margin-bottom:14px;display:none;text-align:center;line-height:1.6;}
 .msg.success{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#86efac;}
 .msg.error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;}
 .msg.info{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);color:var(--gold);}
-
-.divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.divider span{font-size:11px;color:var(--muted);}
-
-.no-account{text-align:center;margin-top:20px;font-size:13px;color:var(--muted);}
+.no-account{text-align:center;margin-top:16px;font-size:12px;color:var(--muted);}
 .no-account a{color:var(--gold);text-decoration:none;}
 .no-account a:hover{text-decoration:underline;}
-
-footer{text-align:center;padding:24px;font-size:11px;color:rgba(240,239,232,0.2);}
-@media(max-width:480px){.card{padding:32px 24px;}nav{padding:16px 20px;}}
+footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2);}
+@media(max-width:480px){.card{padding:28px 20px;}nav{padding:16px 20px;}}
 </style>
 </head>
 <body>
@@ -71,12 +60,12 @@ footer{text-align:center;padding:24px;font-size:11px;color:rgba(240,239,232,0.2)
 
     <div class="tabs">
       <div class="tab active" onclick="showTab('login')">Sign In</div>
-      <div class="tab" onclick="showTab('signup')">Create Account</div>
+      <div class="tab" onclick="showForgot()">Forgot Password</div>
     </div>
 
     <div id="msgBox" class="msg"></div>
 
-    <!-- LOGIN TAB -->
+    <!-- LOGIN -->
     <div id="loginTab">
       <div class="form-group">
         <label class="form-label">Email Address</label>
@@ -85,45 +74,21 @@ footer{text-align:center;padding:24px;font-size:11px;color:rgba(240,239,232,0.2)
       <div class="form-group">
         <label class="form-label">Password</label>
         <input class="form-input" id="loginPassword" type="password" placeholder="Your password">
+        <span class="forgot-link" onclick="showForgot()">Forgot password?</span>
       </div>
-      <button class="main-btn" onclick="signIn()">Sign In →</button>
-      <a class="forgot-link" onclick="showForgot()">Forgot your password?</a>
-    </div>
-
-    <!-- SIGNUP TAB -->
-    <div id="signupTab" style="display:none;">
-      <div class="form-group">
-        <label class="form-label">Your Name</label>
-        <input class="form-input" id="signupName" type="text" placeholder="What do we call you?">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" id="signupEmail" type="email" placeholder="your@email.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Choose a Password</label>
-        <input class="form-input" id="signupPassword" type="password" placeholder="Min 8 characters">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Confirm Password</label>
-        <input class="form-input" id="signupPassword2" type="password" placeholder="Repeat your password">
-      </div>
-      <button class="main-btn" onclick="signUp()">Create Account →</button>
+      <button class="main-btn" id="loginBtn" onclick="signIn()">Sign In →</button>
+      <div class="no-account">Don't have an account? <a href="/join">Start free month →</a></div>
     </div>
 
     <!-- FORGOT PASSWORD -->
     <div id="forgotTab" style="display:none;">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.8;">Enter your email and we'll send you a link to reset your password!!</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.8;">Enter your email and we'll send you a password reset link right away!!</p>
       <div class="form-group">
         <label class="form-label">Email Address</label>
         <input class="form-input" id="forgotEmail" type="email" placeholder="your@email.com">
       </div>
-      <button class="main-btn" onclick="resetPassword()">Send Reset Link →</button>
-      <a class="forgot-link" onclick="showTab('login')">← Back to Sign In</a>
-    </div>
-
-    <div class="no-account" id="noAccount">
-      Don't have an account? <a href="/join">Start free month →</a>
+      <button class="main-btn" id="forgotBtn" onclick="resetPassword()">Send Reset Link →</button>
+      <div class="no-account"><a href="/join">Don't have an account? Sign up free →</a></div>
     </div>
   </div>
 </div>
@@ -133,119 +98,123 @@ footer{text-align:center;padding:24px;font-size:11px;color:rgba(240,239,232,0.2)
 <script>
 let supabase;
 
-// Load config from server
 async function init(){
-  const res = await fetch('/api/config');
-  const config = await res.json();
-  supabase = window.supabase.createClient(config.supabase_url, config.supabase_anon_key);
+  try{
+    const res=await fetch('/api/config');
+    const config=await res.json();
+    supabase=window.supabase.createClient(config.supabase_url,config.supabase_anon_key);
 
-  // Check if already logged in
-  const { data: { session } } = await supabase.auth.getSession();
-  if(session) window.location.href = '/play';
-
-  // Handle password reset redirect
-  const hash = window.location.hash;
-  if(hash.includes('type=recovery')){
-    showTab('reset');
-  }
+    // Already logged in? Go to play
+    const { data:{ session } }=await supabase.auth.getSession();
+    if(session){
+      localStorage.setItem('fabEmail',session.user.email);
+      localStorage.setItem('fabName',session.user.user_metadata?.name||session.user.email.split('@')[0]);
+      window.location.href='/play';
+    }
+  }catch(e){ console.log('Init error:',e); }
 }
 init();
 
-function showMsg(msg, type='error'){
-  const el = document.getElementById('msgBox');
-  el.textContent = msg;
-  el.className = 'msg ' + type;
-  el.style.display = 'block';
+function showMsg(msg,type='error'){
+  const el=document.getElementById('msgBox');
+  el.innerHTML=msg;
+  el.className='msg '+type;
+  el.style.display='block';
 }
 function hideMsg(){ document.getElementById('msgBox').style.display='none'; }
 
 function showTab(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='signup'));
+    t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='forgot'));
   });
-  document.getElementById('loginTab').style.display = tab==='login'?'block':'none';
-  document.getElementById('signupTab').style.display = tab==='signup'?'block':'none';
-  document.getElementById('forgotTab').style.display = tab==='forgot'?'block':'none';
-  document.getElementById('noAccount').style.display = tab==='forgot'?'none':'block';
+  document.getElementById('loginTab').style.display=tab==='login'?'block':'none';
+  document.getElementById('forgotTab').style.display=tab==='forgot'?'block':'none';
   hideMsg();
 }
 
 function showForgot(){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active',i===1);
+  });
   document.getElementById('loginTab').style.display='none';
-  document.getElementById('signupTab').style.display='none';
   document.getElementById('forgotTab').style.display='block';
-  document.getElementById('noAccount').style.display='none';
   hideMsg();
 }
 
 async function signIn(){
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  if(!email||!password){ showMsg('Please enter your email and password!'); return; }
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password=document.getElementById('loginPassword').value;
 
-  showMsg('Signing in...','info');
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if(!email){ showMsg('Please enter your email address!'); return; }
+  if(!password){ showMsg('Please enter your password!'); return; }
 
-  if(error){
-    showMsg(error.message==='Invalid login credentials'
-      ? 'Wrong email or password — try again!'
-      : error.message);
-    return;
+  const btn=document.getElementById('loginBtn');
+  btn.disabled=true;
+  btn.textContent='Signing in...';
+  showMsg('Checking your account...','info');
+
+  try{
+    const { data, error }=await supabase.auth.signInWithPassword({ email, password });
+
+    if(error){
+      if(error.message.includes('Invalid login credentials')){
+        // Check if they have an account at all
+        showMsg('Wrong email or password.<br><a href="/join" style="color:var(--gold2);">Don\'t have an account? Sign up free →</a>');
+      } else if(error.message.includes('Email not confirmed')){
+        showMsg('📧 Please confirm your email first! Check your inbox for the confirmation link from fab.games.<br><br><span style="font-size:11px;">Check spam if you can\'t find it!</span>','info');
+      } else {
+        showMsg(error.message);
+      }
+      btn.disabled=false;
+      btn.textContent='Sign In →';
+      return;
+    }
+
+    // Success!!
+    const name=data.user.user_metadata?.name||email.split('@')[0];
+    localStorage.setItem('fabEmail',email);
+    localStorage.setItem('fabName',name);
+    showMsg('🎉 Welcome back '+name.split(' ')[0]+'!! Taking you to your games...','success');
+    setTimeout(()=>{ window.location.href='/play'; },1200);
+
+  }catch(e){
+    showMsg('Connection error — please try again!');
+    btn.disabled=false;
+    btn.textContent='Sign In →';
   }
-
-  // Save to localStorage for welcome message
-  localStorage.setItem('fabEmail', email);
-  localStorage.setItem('fabName', data.user.user_metadata?.name || email.split('@')[0]);
-  showMsg('Welcome back!! Taking you to your games...','success');
-  setTimeout(()=>{ window.location.href='/play'; }, 1200);
-}
-
-async function signUp(){
-  const name     = document.getElementById('signupName').value.trim();
-  const email    = document.getElementById('signupEmail').value.trim();
-  const password = document.getElementById('signupPassword').value;
-  const password2= document.getElementById('signupPassword2').value;
-
-  if(!name||!email||!password){ showMsg('Please fill in all fields!'); return; }
-  if(password.length < 8){ showMsg('Password must be at least 8 characters!'); return; }
-  if(password !== password2){ showMsg('Passwords don\'t match — try again!'); return; }
-
-  showMsg('Creating your account...','info');
-  const { data, error } = await supabase.auth.signUp({
-    email, password,
-    options:{ data:{ name } }
-  });
-
-  if(error){ showMsg(error.message); return; }
-
-  localStorage.setItem('fabEmail', email);
-  localStorage.setItem('fabName', name);
-  showMsg('🎉 Account created!! Check your email to confirm — then come back and sign in!!','success');
 }
 
 async function resetPassword(){
-  const email = document.getElementById('forgotEmail').value.trim();
+  const email=document.getElementById('forgotEmail').value.trim().toLowerCase();
   if(!email||!email.includes('@')){ showMsg('Please enter your email address!'); return; }
 
+  const btn=document.getElementById('forgotBtn');
+  btn.disabled=true;
+  btn.textContent='Sending...';
   showMsg('Sending reset link...','info');
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://www.fab.games/reset-password'
-  });
 
-  if(error){ showMsg(error.message); return; }
-  showMsg('✅ Reset link sent!! Check your email — it should arrive in a minute!!','success');
+  try{
+    const { error }=await supabase.auth.resetPasswordForEmail(email,{
+      redirectTo:'https://www.fab.games/reset-password'
+    });
+
+    if(error){ showMsg(error.message); btn.disabled=false; btn.textContent='Send Reset Link →'; return; }
+
+    showMsg('✅ Reset link sent to <strong>'+email+'</strong>!<br>Check your inbox — it should arrive within a minute!!<br><span style="font-size:11px;">Check spam if you can\'t find it!</span>','success');
+    btn.textContent='Link Sent!!';
+
+  }catch(e){
+    showMsg('Connection error — please try again!');
+    btn.disabled=false;
+    btn.textContent='Send Reset Link →';
+  }
 }
 
 // Enter key support
-document.addEventListener('keydown', e=>{
+document.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
-    const loginVisible = document.getElementById('loginTab').style.display!=='none';
-    const signupVisible = document.getElementById('signupTab').style.display!=='none';
-    const forgotVisible = document.getElementById('forgotTab').style.display!=='none';
-    if(loginVisible) signIn();
-    else if(signupVisible) signUp();
-    else if(forgotVisible) resetPassword();
+    if(document.getElementById('loginTab').style.display!=='none') signIn();
+    else resetPassword();
   }
 });
 </script>
