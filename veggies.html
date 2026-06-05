@@ -368,15 +368,19 @@ nav{
 }
 .modal-name{
   font-family:'Cormorant Garamond',serif;
-  font-size:32px;font-weight:400;
-  letter-spacing:6px;text-transform:uppercase;
+  font-size:28px;font-weight:400;
+  letter-spacing:5px;text-transform:uppercase;
   text-align:center;margin-bottom:4px;
   color:var(--white);
 }
 .modal-type{
-  font-size:9px;letter-spacing:4px;text-transform:uppercase;
-  text-align:center;margin-bottom:20px;
-  color:var(--gold);
+  font-size:13px;
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  text-align:center;
+  margin-bottom:8px;
+  color:var(--muted);
+  letter-spacing:0.5px;
 }
 
 /* Score */
@@ -399,13 +403,14 @@ nav{
 .modal-section{margin-bottom:20px;}
 .modal-section-title{
   font-size:8px;letter-spacing:4px;text-transform:uppercase;
-  color:var(--gold);margin-bottom:12px;
+  color:rgba(184,147,63,0.6);margin-bottom:12px;
   display:flex;align-items:center;gap:12px;
   font-family:'Inter',sans-serif;
 }
+.modal-section-title::before{content:'◆';font-size:6px;}
 .modal-section-title::after{
   content:'';flex:1;height:1px;
-  background:var(--border);
+  background:rgba(184,147,63,0.15);
 }
 
 .vitamin-badge{
@@ -441,19 +446,21 @@ nav{
 }
 
 .quiz-this-btn{
-  width:100%;padding:15px;
+  width:100%;padding:14px;
   background:transparent;
-  border:1px solid var(--border2);
-  color:var(--gold);
-  font-size:9px;font-weight:500;
+  border:1px solid rgba(184,147,63,0.3);
+  color:var(--muted);
+  font-size:8px;font-weight:400;
   letter-spacing:4px;text-transform:uppercase;
-  cursor:pointer;margin-top:20px;
+  cursor:pointer;margin-top:24px;
   font-family:'Inter',sans-serif;
   transition:all 0.3s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
 }
 .quiz-this-btn:hover{
-  background:rgba(184,147,63,0.1);
-  border-color:var(--gold);
+  border-color:rgba(184,147,63,0.6);
+  color:var(--gold);
+  background:rgba(184,147,63,0.05);
 }
 
 /* ── QUIZ ── */
@@ -649,9 +656,89 @@ footer{
 </nav>
 
 <div class="hero">
-  
-  <div class="hero-title">Veggie & Fruit Bible</div>
-  <p class="hero-sub">Your complete guide to natures greatest superfoods — learn, explore and get quizzed!!</p>
+
+  <!-- Botanical Bouquet -->
+  <div style="display:flex;justify-content:center;margin-bottom:20px;">
+<svg width="200" height="160" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#c9a96e" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M90 165 C100 158 110 155 110 155 C110 155 120 158 130 165" stroke-width="1" opacity="0.6"/>
+<path d="M96 163 C100 170 105 172 110 170 C115 172 120 170 124 163" stroke-width="0.8" opacity="0.5"/>
+<path d="M110 155 C108 140 104 120 100 100" stroke-width="1.2"/>
+<path d="M110 155 C112 138 116 118 122 98" stroke-width="1.2"/>
+<path d="M110 155 C110 138 110 118 110 96" stroke-width="1.1"/>
+<path d="M110 155 C106 142 98 125 88 108" stroke-width="1.0"/>
+<path d="M110 155 C114 142 124 126 134 110" stroke-width="1.0"/>
+<path d="M110 155 C104 145 92 132 78 122" stroke-width="0.9"/>
+<path d="M110 155 C116 145 130 133 144 124" stroke-width="0.9"/>
+<path d="M104 128 C96 124 88 126 84 132 C90 128 100 128 104 128Z" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/>
+<path d="M116 132 C124 128 132 130 136 136 C130 132 120 132 116 132Z" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/>
+<path d="M88 108 C90 100 93 90 92 80 C90 90 86 100 84 108Z" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/>
+<path d="M88 108 C89 118 88 124 87 128" stroke-width="0.7"/>
+<line x1="85" y1="90" x2="91" y2="93" stroke-width="0.3" opacity="0.5"/>
+<line x1="84" y1="100" x2="91" y2="102" stroke-width="0.3" opacity="0.5"/>
+<path d="M88 80 C84 72 80 65 78 58" stroke-width="0.8"/>
+<path d="M89 79 C88 70 88 63 90 56" stroke-width="0.7"/>
+<path d="M90 80 C94 72 98 65 100 58" stroke-width="0.7"/>
+<rect x="97" y="118" width="6" height="20" rx="1" fill="rgba(201,169,110,0.08)" stroke-width="0.7"/>
+<circle cx="96" cy="108" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<circle cx="102" cy="103" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<circle cx="108" cy="108" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<circle cx="99" cy="99" r="6" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<circle cx="105" cy="99" r="6" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<circle cx="96" cy="106" r="2.5" stroke-width="0.4" opacity="0.6"/>
+<circle cx="102" cy="101" r="2.5" stroke-width="0.4" opacity="0.6"/>
+<circle cx="108" cy="106" r="2.5" stroke-width="0.4" opacity="0.6"/>
+<circle cx="110" cy="78" r="18" fill="rgba(201,169,110,0.08)" stroke-width="0.9"/>
+<path d="M110 60 C108 54 108 49 110 46" stroke-width="0.9"/>
+<path d="M108 48 C104 46 100 48 99 52" stroke-width="0.7"/>
+<path d="M94 68 C92 60 96 52 102 50" stroke-width="0.3" opacity="0.4"/>
+<line x1="92" y1="78" x2="128" y2="78" stroke-width="0.3" opacity="0.3"/>
+<path d="M128 110 C128 98 130 85 132 76 C134 85 136 98 136 110Z" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/>
+<line x1="128" y1="86" x2="136" y2="90" stroke-width="0.3" opacity="0.5"/>
+<line x1="128" y1="94" x2="136" y2="96" stroke-width="0.3" opacity="0.5"/>
+<line x1="128" y1="102" x2="136" y2="102" stroke-width="0.3" opacity="0.5"/>
+<line x1="130" y1="82" x2="130" y2="110" stroke-width="0.3" opacity="0.4"/>
+<line x1="134" y1="80" x2="134" y2="110" stroke-width="0.3" opacity="0.4"/>
+<path d="M129 76 C127 68 124 62 122 55" stroke-width="0.8"/>
+<path d="M132 74 C132 66 132 58 134 52" stroke-width="0.7"/>
+<path d="M135 76 C137 68 140 62 142 55" stroke-width="0.7"/>
+<path d="M144 124 C148 118 154 112 158 106 C160 112 156 122 150 128Z" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/>
+<path d="M144 124 C140 130 138 136 140 140" stroke-width="0.7"/>
+<path d="M158 106 C162 102 165 100 167 100" stroke-width="0.7"/>
+<circle cx="70" cy="122" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<circle cx="78" cy="118" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<circle cx="64" cy="114" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<circle cx="72" cy="110" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<circle cx="66" cy="126" r="6" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/>
+<path d="M78 112 C78 106 80 100 82 94" stroke-width="0.8"/>
+<path d="M56 96 C60 90 68 86 72 88 C70 96 64 100 60 102Z" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/>
+<circle cx="60" cy="92" r="1.5" fill="rgba(201,169,110,0.4)" stroke-width="0.4"/>
+<circle cx="65" cy="89" r="1.5" fill="rgba(201,169,110,0.4)" stroke-width="0.4"/>
+<circle cx="63" cy="96" r="1.5" fill="rgba(201,169,110,0.4)" stroke-width="0.4"/>
+<ellipse cx="80" cy="64" rx="10" ry="8" fill="rgba(201,169,110,0.06)" stroke-width="0.7"/>
+<path d="M74 64 C74 57 77 50 80 46 C82 50 82 58 80 64Z" fill="rgba(201,169,110,0.08)" stroke-width="0.6"/>
+<path d="M80 64 C80 57 82 50 85 46 C87 50 86 58 84 64Z" fill="rgba(201,169,110,0.08)" stroke-width="0.6"/>
+<path d="M80 46 C80 40 80 35 80 30" stroke-width="0.8"/>
+<circle cx="148" cy="72" r="14" fill="rgba(201,169,110,0.08)" stroke-width="0.8"/>
+<path d="M144 58 C146 52 148 48 150 46" stroke-width="0.8"/>
+<path d="M148 57 C148 50 148 45 150 42" stroke-width="0.7"/>
+<path d="M152 58 C154 52 156 48 154 46" stroke-width="0.7"/>
+<path d="M144 60 C140 58 136 60 134 64" stroke-width="0.6" opacity="0.7"/>
+<path d="M152 60 C156 58 160 60 162 64" stroke-width="0.6" opacity="0.7"/>
+<line x1="134" y1="72" x2="162" y2="72" stroke-width="0.3" opacity="0.3"/>
+<path d="M94 64 C88 58 82 56 78 60" stroke-width="0.6" opacity="0.6"/>
+<path d="M126 66 C132 60 138 58 142 62" stroke-width="0.6" opacity="0.6"/>
+<path d="M108 52 C106 44 104 38 106 32" stroke-width="0.7" opacity="0.7"/>
+<path d="M112 52 C114 44 116 38 114 32" stroke-width="0.6" opacity="0.7"/>
+</g>
+</svg>
+  </div>
+
+  <div style="width:1px;height:48px;background:linear-gradient(180deg,transparent,rgba(184,147,63,0.5),transparent);margin:0 auto 24px;"></div>
+  <div class="hero-badge">— A Complete Collection</div>
+  <h1 class="hero-title">Veggie & <em>Fruit</em><br>Bible</h1>
+  <p class="hero-sub">Nature's finest — learn, explore and get quizzed</p>
+  <div style="display:flex;align-items:center;gap:16px;max-width:200px;margin:0 auto 32px;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(184,147,63,0.3));"></div><span style="font-size:10px;color:rgba(184,147,63,0.4);">◆</span><div style="flex:1;height:1px;background:linear-gradient(270deg,transparent,rgba(184,147,63,0.3));"></div></div>
   <div class="tab-switch" style="max-width:680px;">
     <button class="tab-btn active" onclick="switchTab('cards');setFilter('all')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> Browse All</button>
     <button class="tab-btn" onclick="switchTab('cards');setFilter('vegetable')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Vegetables</button>
@@ -708,7 +795,7 @@ footer{
       <div class="modal-section-title">Fun Fact</div>
       <div class="fun-fact" id="mFact"></div>
     </div>
-    <button class="quiz-this-btn" id="quizThisBtn" onclick="quizThisFood()">🧠 Quiz Me On This!!</button>
+    <button class="quiz-this-btn" id="quizThisBtn" onclick="quizThisFood()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg> Quiz Me On This</button>
   </div>
 </div>
 
@@ -1608,62 +1695,61 @@ function filterCards(){
 let currentModalFood = null;
 function openModal(d){
   currentModalFood = d;
+
+  // ── SVG ENGRAVING (same as card front) ──────
   const mEmojiEl = document.getElementById('mEmoji');
-  if(d.img){
-    mEmojiEl.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = d.img;
-    img.alt = d.name;
-    img.style.cssText='width:100px;height:100px;object-fit:contain;border-radius:12px;display:block;margin:0 auto;';
-    mEmojiEl.appendChild(img);
+  mEmojiEl.innerHTML = '';
+  if(d.svg){
+    mEmojiEl.innerHTML = d.svg;
+    const svgEl = mEmojiEl.querySelector('svg');
+    if(svgEl) svgEl.style.cssText='width:100px;height:100px;display:block;margin:0 auto;';
   } else {
-    mEmojiEl.innerHTML = '';
-    mEmojiEl.textContent = d.emoji;
+    const span = document.createElement('span');
+    span.style.cssText='font-size:64px;display:block;text-align:center;filter:saturate(0) brightness(1.8) contrast(0.7);';
+    span.textContent = d.emoji;
+    mEmojiEl.appendChild(span);
   }
-  document.getElementById('mName').textContent = d.name;
-  document.getElementById('mName').style.color = d.neon;
-  document.getElementById('mType').textContent = d.type==='vegetable'?'🥦 Vegetable':'🍎 Fruit';
-  document.getElementById('mType').style.color = d.neon;
-  // Score — elegant style
+
+  // ── NAME ────────────────────────────────────
+  const nameEl = document.getElementById('mName');
+  nameEl.textContent = d.name;
+  nameEl.style.cssText='';
+
+  // ── TYPE (latin name, no emoji, no neon) ────
+  const typeEl = document.getElementById('mType');
+  typeEl.textContent = d.latin || (d.type==='vegetable'?'Vegetable':'Fruit');
+
+  // ── SCORE ───────────────────────────────────
   const existingScore = document.getElementById('mScore');
   if(existingScore) existingScore.remove();
   if(d.score){
     const scoreEl = document.createElement('div');
-    scoreEl.id='mScore';
-    scoreEl.className='modal-score';
-    scoreEl.innerHTML='<div class="modal-score-num">'+d.score+'<span style="font-size:20px;opacity:0.5;">/100</span></div><div class="modal-score-lbl">Nutritional Score</div>';
-    document.getElementById('mType').after(scoreEl);
+    scoreEl.id = 'mScore';
+    scoreEl.className = 'modal-score';
+    scoreEl.innerHTML = '<div class="modal-score-num">'+d.score+'<span style="font-size:20px;opacity:0.4;">/100</span></div><div class="modal-score-lbl">Nutritional Score</div>';
+    typeEl.after(scoreEl);
   }
 
+  // ── NUTRITION TABLE ─────────────────────────
   const vDiv = document.getElementById('mVitamins');
   vDiv.innerHTML = '';
-
   if(d.nutrition){
-    const table = document.createElement('div');
-    table.style.cssText='width:100%;';
     Object.entries(d.nutrition).forEach(([key,val])=>{
       const row = document.createElement('div');
       row.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(184,147,63,0.08);gap:12px;';
       const k = document.createElement('span');
-      k.style.cssText='font-size:12px;color:var(--muted);letter-spacing:0.5px;flex-shrink:0;';
-      k.textContent=key;
+      k.style.cssText='font-size:12px;color:var(--muted);letter-spacing:0.5px;flex-shrink:0;font-family:Inter,sans-serif;';
+      k.textContent = key;
       const v = document.createElement('span');
-      v.style.cssText='font-size:12px;color:rgba(184,147,63,0.8);text-align:right;font-family:Cormorant Garamond,serif;font-style:italic;font-size:14px;';
-      v.textContent=val;
+      v.style.cssText='font-size:14px;color:rgba(184,147,63,0.85);text-align:right;font-family:Cormorant Garamond,serif;font-style:italic;';
+      v.textContent = val;
       row.appendChild(k);
       row.appendChild(v);
-      table.appendChild(row);
-    });
-    vDiv.appendChild(table);
-  } else {
-    d.vitamins.forEach(v=>{
-      const badge = document.createElement('span');
-      badge.className = 'vitamin-badge';
-      badge.textContent = v;
-      vDiv.appendChild(badge);
+      vDiv.appendChild(row);
     });
   }
 
+  // ── BENEFITS ────────────────────────────────
   const bDiv = document.getElementById('mBenefits');
   bDiv.innerHTML = '';
   d.benefits.forEach(b=>{
@@ -1673,7 +1759,9 @@ function openModal(d){
     bDiv.appendChild(item);
   });
 
+  // ── FUN FACT ────────────────────────────────
   document.getElementById('mFact').textContent = d.fact;
+
   document.getElementById('modal').classList.add('show');
   document.body.style.overflow='hidden';
 }
