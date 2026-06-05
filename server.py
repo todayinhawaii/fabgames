@@ -75,6 +75,10 @@ def success():
 def login():
     return send_from_directory('.', 'login.html')
 
+@app.route('/veggies')
+def veggies():
+    return send_from_directory('.', 'veggies.html')
+
 @app.route('/reset-password')
 def reset_password():
     return send_from_directory('.', 'reset_password.html')
