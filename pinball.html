@@ -271,17 +271,14 @@ const SFX={
     tone(f*1.5,'sine',0.08,0.18,0.04);
     tone(f*2,'sine',0.05,0.12,0.08);
   },
-  // Flipper — satisfying bright THWACK with sparkle
+  // Flipper — bright happy BING!!
   flipper:()=>{
-    tone(440,'sine',0.06,0.3);
-    tone(880,'sine',0.04,0.2,0.03);
-    tone(1320,'sine',0.02,0.1,0.06);
+    tone(1568,'sine',0.10,0.18);
+    tone(1976,'sine',0.07,0.14,0.04);
+    tone(2349,'sine',0.04,0.09,0.08);
   },
-  // Wall — ultra soft whisper shimmer, barely there
-  wall:()=>{
-    tone(2093,'sine',0.04,0.06,0);    // very short, very quiet, very high
-    tone(2637,'sine',0.02,0.04,0.02); // almost inaudible sparkle
-  },
+  // Wall — silent
+  wall:()=>{},
   // Hole capture — magical descending sparkle cascade
   hole:()=>{
     [1568,1320,1047,880,660].forEach((f,i)=>tone(f,'sine',0.12,0.22,i*0.06));
@@ -766,7 +763,6 @@ function wallHit(b,w){
     b.x+=nx*pen*Math.sign(dist);b.y+=ny*pen*Math.sign(dist);
     const dot=b.vx*nx+b.vy*ny;
     b.vx-=2*dot*nx*BNC;b.vy-=2*dot*ny*BNC;
-    SFX.wall();
   }
 }
 
