@@ -131,6 +131,28 @@ def free_trial():
 
     return jsonify({'ok': True, 'msg': 'Welcome to fab.games! Enjoy your free month!!'})
 
+# ── PWA FILES ────────────────────────────────────
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('.', 'manifest.json',
+        mimetype='application/manifest+json')
+
+@app.route('/service-worker.js')
+def service_worker():
+    response = send_from_directory('.', 'service-worker.js',
+        mimetype='application/javascript')
+    response.headers['Service-Worker-Allowed'] = '/'
+    response.headers['Cache-Control'] = 'no-cache'
+    return response
+
+@app.route('/icon-192.png')
+def icon192():
+    return send_from_directory('.', 'icon-192.png', mimetype='image/png')
+
+@app.route('/icon-512.png')
+def icon512():
+    return send_from_directory('.', 'icon-512.png', mimetype='image/png')
+
 # ── CHECK MEMBER ─────────────────────────────────
 @app.route('/api/check-member', methods=['POST'])
 def check_member():
