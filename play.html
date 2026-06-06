@@ -8,32 +8,231 @@
   <meta name="apple-mobile-web-app-title" content="fab.games">
   <link rel="apple-touch-icon" href="/icon-192.png">
   <meta name="theme-color" content="#070708">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Play — fab.games</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>fab.games — The World's Most Fabulous Games</title>
+<meta name="description" content="Fun, addictive games for the whole family — from anywhere in the world. New games every month. $4.99/month.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,600&family=Inter:wght@300;400;600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300;1,600&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-:root{--black:#050506;--card:#111114;--border:rgba(255,255,255,0.07);--gold:#c9a84c;--gold2:#e8c96a;--gold3:#fff3b0;--white:#f0efe8;--muted:rgba(240,239,232,0.45);}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(201,168,76,0.015) 2px,rgba(201,168,76,0.015) 4px);pointer-events:none;z-index:1;}
-.stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle ease-in-out infinite;}
-@keyframes twinkle{0%,100%{opacity:0.1;}50%{opacity:0.8;}}
-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(5,5,6,0.97);border-bottom:1px solid rgba(201,168,76,0.2);backdrop-filter:blur(20px);}
-.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
-.nav-welcome{font-size:13px;font-weight:600;color:var(--muted);}
-.nav-welcome span{color:var(--gold2);}
-.hero{text-align:center;padding:60px 20px 50px;position:relative;z-index:2;}
-.hero-badge{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,10vw,96px);font-weight:300;line-height:0.95;margin-bottom:16px;}
-.hero-title em{font-style:italic;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.hero-sub{font-size:15px;color:var(--muted);margin-bottom:32px;}
-.hero-line{width:120px;height:1px;margin:0 auto;background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),var(--gold),transparent);box-shadow:0 0 10px rgba(201,168,76,0.6);}
-.wrap{max-width:1400px;margin:0 auto;padding:40px 20px 100px;position:relative;z-index:2;}
-.section-label{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;display:flex;align-items:center;gap:16px;}
-.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent);}
-.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:3px;}
+:root{
+  --black:#070708;
+  --dark:#0d0d0f;
+  --card:#131316;
+  --border:rgba(255,255,255,0.07);
+  --gold:#c9a84c;
+  --gold2:#e8c96a;
+  --white:#f0efe8;
+  --muted:rgba(240,239,232,0.45);
+  --accent:#c9a84c;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:'Inter',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:default;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:1000;opacity:0.4;
+}
+
+/* ── CUSTOM CURSOR ── */
+*{cursor:none !important;}
+.cursor{
+  position:fixed;width:8px;height:8px;
+  background:var(--gold);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width 0.2s,height 0.2s,background 0.2s;
+  mix-blend-mode:difference;
+}
+.cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(201,168,76,0.5);
+  border-radius:50%;pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:all 0.15s ease;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 48px;
+  background:linear-gradient(180deg,rgba(7,7,8,0.95),transparent);
+  backdrop-filter:blur(0px);
+  transition:all 0.4s;
+}
+nav.scrolled{
+  background:rgba(7,7,8,0.97);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:14px 48px;
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-links{
+  display:flex;gap:36px;align-items:center;
+  list-style:none;
+}
+.nav-links a{
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--white);}
+.nav-cta{
+  padding:10px 24px;
+  border:1px solid rgba(201,168,76,0.4);
+  border-radius:2px;
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold) !important;
+  transition:all 0.2s !important;
+}
+.nav-cta:hover{
+  background:rgba(201,168,76,0.1) !important;
+  border-color:var(--gold) !important;
+  color:var(--gold2) !important;
+}
+.nav-mobile-btn{display:none;background:none;border:none;color:var(--white);font-size:22px;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:120px 24px 80px;
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%,rgba(201,168,76,0.06),transparent),
+    radial-gradient(ellipse 40% 40% at 20% 80%,rgba(201,168,76,0.04),transparent),
+    radial-gradient(ellipse 40% 40% at 80% 20%,rgba(201,168,76,0.03),transparent);
+}
+.hero-line{
+  width:1px;height:80px;
+  background:linear-gradient(180deg,transparent,var(--gold),transparent);
+  margin:0 auto 40px;
+  animation:lineGrow 1.5s ease forwards;
+}
+@keyframes lineGrow{0%{height:0;opacity:0;}100%{height:80px;opacity:1;}}
+
+.hero-badge{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:24px;
+  animation:fadeUp 0.8s 0.3s ease both;
+}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(52px,10vw,120px);
+  font-weight:300;line-height:0.95;
+  letter-spacing:-2px;
+  margin-bottom:8px;
+  animation:fadeUp 0.8s 0.5s ease both;
+}
+.hero-title span{
+  font-style:italic;
+  background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-title-games{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,10vw,120px);
+  letter-spacing:8px;
+  color:var(--white);
+  animation:fadeUp 0.8s 0.6s ease both;
+}
+.hero-sub{
+  font-size:clamp(13px,2vw,16px);
+  color:var(--muted);
+  max-width:500px;
+  line-height:1.8;
+  margin:24px auto 48px;
+  animation:fadeUp 0.8s 0.7s ease both;
+}
+.hero-btns{
+  display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp 0.8s 0.9s ease both;
+}
+.btn-primary{
+  padding:16px 40px;
+  background:linear-gradient(135deg,var(--gold),#a87d2a);
+  color:#000;
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  font-weight:600;border:none;border-radius:2px;
+  box-shadow:0 0 40px rgba(201,168,76,0.25);
+  transition:all 0.2s;text-decoration:none;
+  display:inline-block;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  box-shadow:0 0 60px rgba(201,168,76,0.4);
+  transform:translateY(-2px);
+}
+.btn-secondary{
+  padding:16px 40px;
+  background:transparent;
+  color:var(--white);
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,0.2);border-radius:2px;
+  transition:all 0.2s;text-decoration:none;
+  display:inline-block;
+}
+.btn-secondary:hover{
+  border-color:rgba(255,255,255,0.5);
+  background:rgba(255,255,255,0.04);
+}
+
+
+@keyframes fadeUp{
+  0%{opacity:0;transform:translateY(24px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+
+/* ── SECTION COMMON ── */
+section{padding:100px 48px;max-width:1400px;margin:0 auto;}
+.section-badge{
+  font-size:9px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,6vw,72px);
+  font-weight:300;line-height:1.05;
+  margin-bottom:16px;
+}
+.section-title em{font-style:italic;color:var(--gold);}
+.section-sub{
+  font-size:15px;color:var(--muted);
+  max-width:560px;line-height:1.8;
+  margin-bottom:60px;
+}
+
+/* ── GAMES GRID ── */
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:2px;
+}
 
 .game-card{position:relative;overflow:hidden;aspect-ratio:9/14;background:var(--card);text-decoration:none;display:block;transition:all 0.4s cubic-bezier(0.23,1,0.32,1);border:1px solid transparent;}
 .game-card:hover{transform:translateY(-8px) scale(1.02);z-index:10;border-color:rgba(255,215,0,0.4);box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 30px rgba(255,215,0,0.15);}
@@ -52,119 +251,232 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 .live-badge{position:absolute;top:12px;right:12px;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.35);border-radius:2px;color:#ffd700;animation:livePulse 2s ease-in-out infinite;}
 @keyframes livePulse{0%,100%{box-shadow:0 0 5px rgba(255,215,0,0.2);}50%{box-shadow:0 0 15px rgba(255,215,0,0.5);}}
 
-/* PWA INSTALL */
-.pwa-bar{
-  position:fixed;bottom:0;left:0;right:0;
-  z-index:500;
-  padding:14px 20px;
-  background:rgba(7,7,8,0.97);
-  border-top:1px solid rgba(201,168,76,0.2);
-  backdrop-filter:blur(20px);
-  display:none;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-.pwa-bar.show{display:flex;}
-.pwa-bar-text{
-  font-size:13px;color:rgba(240,239,232,0.7);
-  line-height:1.4;
-}
-.pwa-bar-text strong{color:#c9a84c;display:block;font-size:14px;margin-bottom:2px;}
-.pwa-install-btn{
-  flex-shrink:0;
-  padding:10px 20px;
-  background:linear-gradient(135deg,#c9a84c,#a87d2a);
-  color:#000;
-  border:none;
-  font-size:11px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;
-  cursor:pointer;
-  font-family:Inter,sans-serif;
-  border-radius:2px;
-  white-space:nowrap;
-  transition:all 0.2s;
-}
-.pwa-install-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,0.4);}
-.pwa-dismiss{
-  background:none;border:none;
-  color:rgba(240,239,232,0.3);
-  font-size:18px;cursor:pointer;
-  flex-shrink:0;padding:4px;
-}
-/* Per-card download button */
-.game-dl-btn{
-  display:flex;align-items:center;gap:5px;
-  margin-top:8px;
-  font-size:9px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(201,168,76,0.5);
-  background:none;border:none;cursor:pointer;
-  font-family:Inter,sans-serif;
-  transition:color 0.2s;
-  padding:0;
-}
-.game-dl-btn:hover{color:rgba(201,168,76,0.9);}
-.game-dl-btn svg{flex-shrink:0;}
-
-footer{text-align:center;padding:40px;border-top:1px solid rgba(201,168,76,0.1);font-size:11px;color:rgba(240,239,232,0.2);position:relative;z-index:2;}
-@media(max-width:768px){nav{padding:12px 16px;}.wrap{padding:20px 2px 80px;}.games-grid{grid-template-columns:repeat(2,1fr);gap:2px;}.hero{padding:40px 20px 30px;}}
 </style>
 </head>
 <body>
 
-<div class="stars" id="stars"></div>
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-<nav>
-  <a href="/" class="nav-logo">fab.games</a>
-  <div class="nav-welcome">Welcome <span id="welcomeName">Player</span>! 🌺</div>
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-logo">fab.games</div>
+  <ul class="nav-links">
+    <li><a href="#games">Games</a></li>
+    <li><a href="#world">World</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/login">Sign In</a></li>
+    <li><a href="/join?tab=paid" class="nav-cta">Join · $4.99</a></li>
+  </ul>
+  <button class="nav-mobile-btn">☰</button>
 </nav>
 
+<!-- HERO -->
 <div class="hero">
-  <div class="hero-badge">✦ Your Games Collection ✦</div>
-  <h1 class="hero-title">Let's<br><em>Play!</em></h1>
-  <p class="hero-sub">Every game is yours — pick one and have fun!!</p>
+  <div class="hero-bg"></div>
   <div class="hero-line"></div>
+  <div class="hero-badge">Games · Family · World · Fun</div>
+  <div class="hero-title">The World's Most <span>Fabulous</span></div>
+  <div class="hero-title-games">Games</div>
+  <p class="hero-sub">Fun, addictive games for the whole family — from anywhere in the world. Something new every single month.</p>
+  <div class="hero-btns">
+    <a href="/join" class="btn-secondary">🎁 Start Free Month</a>
+    <a href="/join?tab=paid" class="btn-primary">Subscribe $4.99 / month</a>
+  </div>
+  <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:28px;padding:20px 0;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
+      💚 No violence or dark content
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
+      👨‍👩‍👧‍👦 Safe for all ages
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
+      🌺 Good vibes only
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
+      🧠 Brain friendly games
+    </div>
+  </div>
 </div>
 
-<div class="wrap">
-  <div class="section-label">All Games</div>
+<!-- FAMILY SAFE SECTION -->
+<section style="text-align:center;padding:80px 48px;max-width:1000px;margin:0 auto;">
+  <div class="section-badge">— Safe for Everyone</div>
+  <h2 class="section-title">Games the <em>Whole Family</em><br>Can Love</h2>
+  <p class="section-sub" style="margin:0 auto 48px;">Every single game on fab.games is built around fun, creativity and kindness. No violence. No killing. No dark messages. Just pure, joyful play — the way games were meant to be.</p>
+  <div class="divider"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px;">
+    <div style="padding:36px 24px;background:#0d0d0f;">
+      <div style="font-size:36px;margin-bottom:12px;">💚</div>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">No Violence</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;">Zero killing, zero weapons, zero dark content. Every game is gentle and positive.</div>
+    </div>
+    <div style="padding:36px 24px;background:#0d0d0f;">
+      <div style="font-size:36px;margin-bottom:12px;">👨‍👩‍👧‍👦</div>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Family First</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;">Parents can hand their phone to any child and feel completely at ease. Always.</div>
+    </div>
+    <div style="padding:36px 24px;background:#0d0d0f;">
+      <div style="font-size:36px;margin-bottom:12px;">🧠</div>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Brain Friendly</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;">Strategy, memory, creativity and trivia — games that actually make you smarter.</div>
+    </div>
+    <div style="padding:36px 24px;background:#0d0d0f;">
+      <div style="font-size:36px;margin-bottom:12px;">🌺</div>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Good Vibes Only</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7;">Inspired by the spirit of Aloha — kindness, joy and fun for everyone.</div>
+    </div>
+  </div>
+</section>
+
+<div style="display:none;">
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+<!-- GAMES SECTION -->
+<section id="games">
+  <div class="section-badge">— Games Collection</div>
+  <h2 class="section-title">Play the <em>World</em></h2>
+  <p class="section-sub">From addictive card games to volcanic arcade action, Hawaiian trivia to vintage film photography — something fabulous for everyone.</p>
+  <div class="divider"></div>
   <div class="games-grid" id="gamesGrid"></div>
-</div>
+</section>
 
-<footer>© 2026 fab.games — Made with 🌺 in Hawaii · <a href="/" style="color:var(--gold);text-decoration:none;">Home</a></footer>
+
+
+<!-- WORLD SECTION -->
+<section id="world">
+  <div class="section-badge">— Coming to the World</div>
+  <h2 class="section-title">Every <em>Country</em><br>Every <em>Culture</em></h2>
+  <p class="section-sub">We're just getting started. Games inspired by extraordinary places worldwide — coming soon.</p>
+  <div class="divider"></div>
+  <div class="world-grid">
+    <div class="world-item"><div class="world-item-flag">🌺</div><div class="world-item-name">Hawaii</div></div>
+    <div class="world-item"><div class="world-item-flag">🗼</div><div class="world-item-name">Paris</div></div>
+    <div class="world-item"><div class="world-item-flag">🗽</div><div class="world-item-name">New York</div></div>
+    <div class="world-item"><div class="world-item-flag">⛩️</div><div class="world-item-name">Tokyo</div></div>
+    <div class="world-item"><div class="world-item-flag">🎭</div><div class="world-item-name">Venice</div></div>
+    <div class="world-item"><div class="world-item-flag">🏔️</div><div class="world-item-name">Alps</div></div>
+    <div class="world-item"><div class="world-item-flag">🦁</div><div class="world-item-name">Safari</div></div>
+    <div class="world-item"><div class="world-item-flag">🎪</div><div class="world-item-name">Barcelona</div></div>
+    <div class="world-item"><div class="world-item-flag">🏛️</div><div class="world-item-name">Rome</div></div>
+    <div class="world-item"><div class="world-item-flag">🌅</div><div class="world-item-name">Bali</div></div>
+    <div class="world-item"><div class="world-item-flag">🎸</div><div class="world-item-name">Nashville</div></div>
+    <div class="world-item"><div class="world-item-flag">✨</div><div class="world-item-name">More...</div></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" style="text-align:center;">
+  <div class="section-badge">— Simple Pricing</div>
+  <h2 class="section-title">One Price.<br><em>Everything</em> Included.</h2>
+  <p class="section-sub" style="margin:0 auto 60px;">One full month free — no credit card, just your email. Then $4.99/month for everything, forever. Less than a coffee.</p>
+  <div class="divider"></div>
+  <div class="pricing-wrap">
+    <div class="price-card">
+      <div class="price-tier">Free — One Full Month</div>
+      <div class="price-amount"><span></span>Free<small style="font-size:14px;"> for 30 days</small></div>
+      <p class="price-desc">Every game. No credit card. No catch. Just your email so we can remind you when your month is up!</p>
+      <ul class="price-features">
+        <li class="active">Every game — all of them</li>
+        
+        <li class="active">Global leaderboards</li>
+        <li class="active">No credit card needed</li>
+        <li class="active">Just your email</li>
+        <li class="active">Reminder when month ends</li>
+      </ul>
+      <a href="/join" class="btn-secondary" style="width:100%;text-align:center;display:block;">🎁 Start Free Month →</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-featured-badge">After Your Free Month</div>
+      <div class="price-tier">Premium — Keep Everything</div>
+      <div class="price-amount" style="background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+        <span>$</span>4.99<small>/mo</small>
+      </div>
+      <p class="price-desc">Love it? Keep everything for less than a coffee a month. New games added every month.</p>
+      <ul class="price-features">
+        <li class="active">Every game — always</li>
+        
+        <li class="active">New games every month</li>
+        
+        <li class="active">Global leaderboards</li>
+        <li class="active">Cancel anytime — no fuss</li>
+      </ul>
+      <a href="/join?tab=paid" class="btn-primary" style="width:100%;text-align:center;display:block;">Subscribe $4.99 / month →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">fab.games</div>
+  <div class="footer-tagline">"The world's most fabulous games"</div>
+  <div class="footer-links">
+    <a href="#games">Games</a>
+    <a href="#world">Coming Soon</a>
+    <a href="/join">Pricing</a>
+    <a href="/about">About</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 fab.games — All rights reserved</div>
+</footer>
 
 <script>
-// Stars
-const sw=document.getElementById('stars');
-for(let i=0;i<80;i++){
-  const s=document.createElement('div');s.className='star';
-  const sz=0.5+Math.random()*2;
-  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;`;
-  sw.appendChild(s);
+// ── CURSOR ────────────────────────────────────────
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
 }
+animRing();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.width='16px';cursor.style.height='16px';
+    ring.style.width='60px';ring.style.height='60px';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.width='8px';cursor.style.height='8px';
+    ring.style.width='36px';ring.style.height='36px';
+  });
+});
 
-// Welcome name
-const n=localStorage.getItem('fabName')||'Player';
-document.getElementById('welcomeName').textContent=n.split(' ')[0];
+// ── NAV SCROLL ────────────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>60);
+});
 
-// Games
+// ── GAMES DATA ────────────────────────────────────
+let deferredPrompt=null;
 const GAMES=[
-  {emoji:'🎰',cat:'Arcade · Classic',title:'Pinball Paradise',desc:'Full Vegas pinball! Slingshot launch, spinning bumpers, 4 flippers. Pure arcade magic.',href:'/pinball',color:'rgba(20,80,40,0.15)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
-  {emoji:'🥕',cat:'Encyclopedia · Quiz',title:'Veggie & Fruit Bible',desc:'77 vegetables and fruits. Real nutrition, botanical art, quizzes and rankings.',href:'/veggies',color:'rgba(184,147,63,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)',featured:true},
-  
-  {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',href:'https://todayinhawaii.com/dolphins',color:'rgba(34,211,238,0.1)',neon:'#22d3ee',neonbg:'rgba(34,211,238,0.08)'},
-  {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",href:'https://todayinhawaii.com/lava',color:'rgba(255,60,0,0.1)',neon:'#ff5500',neonbg:'rgba(255,60,0,0.1)'},
-  {emoji:'🐢',cat:'Strategy · AI',title:'Turtle Checkers',href:'https://todayinhawaii.com/turtles',color:'rgba(34,197,94,0.1)',neon:'#22c55e',neonbg:'rgba(34,197,94,0.08)'},
-  {emoji:'♛',cat:'Strategy · AI',title:'Mermaid Chess',href:'https://todayinhawaii.com/chess',color:'rgba(148,163,184,0.1)',neon:'#a78bfa',neonbg:'rgba(148,100,255,0.08)'},
-  {emoji:'🌺',cat:'Trivia · Knowledge',title:'Hawaii Trivia',href:'https://todayinhawaii.com/trivia',color:'rgba(251,191,36,0.1)',neon:'#fbbf24',neonbg:'rgba(251,191,36,0.08)'},
-  {emoji:'🧠',cat:'Memory · Speed',title:'Aloha Memory',href:'https://todayinhawaii.com/memorygame',color:'rgba(255,100,200,0.1)',neon:'#f472b6',neonbg:'rgba(255,100,200,0.08)'},
-  {emoji:'🔤',cat:'Word · Puzzle',title:'Hawaii Word Search',href:'https://todayinhawaii.com/wordsearch',color:'rgba(167,139,250,0.1)',neon:'#c084fc',neonbg:'rgba(192,132,252,0.08)'},
-  {emoji:'🎰',cat:'Word · Strategy',title:'Aloha Letters',href:'https://todayinhawaii.com/scrabble',color:'rgba(255,200,0,0.1)',neon:'#ffd700',neonbg:'rgba(255,200,0,0.08)'},
-  {emoji:'🎈',cat:'Action · Fun',title:'Pop That Balloon!',href:'https://todayinhawaii.com/balloons',color:'rgba(255,105,180,0.1)',neon:'#ff69b4',neonbg:'rgba(255,105,180,0.08)'},
-  {emoji:'🔮',cat:'Fortune · Fun',title:'Fortune Roulette',href:'https://todayinhawaii.com/fortune',color:'rgba(155,89,182,0.1)',neon:'#d946ef',neonbg:'rgba(217,70,239,0.08)'},
-  {emoji:'🎭',cat:'Personality · Fun',title:'Who Are You?',href:'https://todayinhawaii.com/humor',color:'rgba(255,80,80,0.1)',neon:'#ff4444',neonbg:'rgba(255,80,80,0.08)'},
-  {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists Factory',href:'https://todayinhawaii.com/slime',color:'rgba(0,220,80,0.1)',neon:'#00dc50',neonbg:'rgba(0,220,80,0.08)'},
-  {emoji:'🎞️',cat:'Photography · Creative',title:'Film Lab',href:'https://todayinhawaii.com/camera',color:'rgba(212,168,67,0.1)',neon:'#ffd700',neonbg:'rgba(212,168,67,0.08)'},
+  {emoji:'🎰',cat:'Arcade · Classic',title:'Pinball Paradise',desc:'Full Vegas-style pinball!! Slingshot launch, spinning bumpers, 4 flippers. A true arcade classic.',href:'/pinball',color:'rgba(20,80,40,0.15)',neon:'#ffd700',neonbg:'rgba(201,168,76,0.08)'},
+  {emoji:'🥕',cat:'Encyclopedia · Quiz',title:'Veggie & Fruit Bible',desc:'77 vegetables and fruits. Real nutrition data, botanical engravings, quizzes and rankings. A chefs bible.',href:'/veggies',color:'rgba(184,147,63,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)',featured:true},
+  {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',desc:'Flip the full 52-card deck across 2 rounds. Find every pair to win.',href:'/dolphins',color:'rgba(34,211,238,0.12)'},
+  {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",desc:'Stack the lava rocks, trigger eruptions. Hawaii\'s own Tetris.',href:'/lava',color:'rgba(255,60,0,0.12)'},
+  {emoji:'🐢',cat:'Strategy · AI',title:'Turtle Checkers',desc:'Classic checkers with Hawaiian sea turtles. Beat the AI.',href:'/turtles',color:'rgba(34,197,94,0.12)'},
+  {emoji:'♛',cat:'Strategy · AI',title:'Mermaid Chess',desc:'Full chess vs AI. 4 difficulty levels. Stunning ocean backdrop.',href:'/chess',color:'rgba(148,163,184,0.12)'},
+  {emoji:'🌺',cat:'Trivia · Knowledge',title:'Hawaii Trivia',desc:'222 questions about the islands. How well do you know Hawaii?',href:'/trivia',color:'rgba(251,191,36,0.12)'},
+  {emoji:'🧠',cat:'Memory · Speed',title:'Aloha Memory',desc:'222 Hawaiian memory challenges. Train your brain.',href:'/memorygame',color:'rgba(255,100,200,0.12)'},
+  {emoji:'🔤',cat:'Word · Puzzle',title:'Hawaii Word Search',desc:'222 Hawaiian word puzzles. Find them all.',href:'/wordsearch',color:'rgba(167,139,250,0.12)'},
+  {emoji:'🎰',cat:'Word · Strategy',title:'Aloha Letters',desc:'148,000+ word dictionary. Build the highest score.',href:'/scrabble',color:'rgba(255,200,0,0.12)'},
+  {emoji:'🎈',cat:'Action · Fun',title:'Pop That Balloon!',desc:'Pop every balloon before time runs out!',href:'/balloons',color:'rgba(255,105,180,0.12)'},
+  {emoji:'🔮',cat:'Fortune · Fun',title:'Fortune Roulette',desc:'222 unique fortunes. Spin the wheel of destiny.',href:'/fortune',color:'rgba(155,89,182,0.12)'},
+  {emoji:'🎭',cat:'Personality · Fun',title:'Who Are You?',desc:'222 wild personalities. Which one are you today?',href:'/humor',color:'rgba(255,80,80,0.12)'},
+  {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists Factory',desc:'Mix infinite colour combinations. Create your masterpiece.',href:'/slime',color:'rgba(0,220,80,0.12)'},
+  {emoji:'🎞️',cat:'Photography · Creative',title:'Film Lab',desc:'Step into the darkroom. 34 authentic film looks from Hawaii\'s golden eras. Transform your camera into a time machine.',href:'/camera',color:'rgba(212,168,67,0.12)'},
 ];
 
 function buildCard(g, href, grid, idx){
@@ -248,77 +560,31 @@ function buildCard(g, href, grid, idx){
   grid.appendChild(card);
 }
 
-// Render play page — cards go directly to the game
+// Render home page — cards go to /join (signup)
 const grid=document.getElementById('gamesGrid');
 if(grid){
   GAMES.forEach(function(g,i){
-    buildCard(g, g.href, grid, i);
+    buildCard(g, '/join', grid, i);
   });
 }
 
-// Auth check AFTER games are rendered
-// Instant auth check
-const email=localStorage.getItem('fabEmail');
-if(!email) window.location.href='/login';
+// ── SMOOTH SCROLL ─────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
 </script>
-
-<!-- PWA Install Bar -->
-<div class="pwa-bar" id="pwaBar">
-  <div class="pwa-bar-text">
-    <strong>📲 Add fab.games to your home screen</strong>
-    All 13 games — one tap away, anytime!!
-  </div>
-  <button class="pwa-install-btn" id="pwaInstallBtn">Install Free</button>
-  <button class="pwa-dismiss" id="pwaDismiss" aria-label="Dismiss">✕</button>
-</div>
-
 <script>
-// ── SERVICE WORKER ─────────────────────────────
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
+  window.addEventListener('load',()=>{
     navigator.serviceWorker.register('/service-worker.js')
-      .then(reg=>console.log('[fab.games] SW registered:', reg.scope))
-      .catch(err=>console.log('[fab.games] SW failed:', err));
+      .then(r=>console.log('[fab.games] SW ready'))
+      .catch(e=>console.log('[fab.games] SW error',e));
   });
 }
-
-// ── PWA INSTALL PROMPT ─────────────────────────
-let deferredPrompt = null;
-const pwaBar = document.getElementById('pwaBar');
-const pwaBtn = document.getElementById('pwaInstallBtn');
-const pwaDismiss = document.getElementById('pwaDismiss');
-
-window.addEventListener('beforeinstallprompt', e=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  // Show bar after 3 seconds
-  setTimeout(()=>{ pwaBar.classList.add('show'); }, 3000);
-});
-
-pwaBtn.addEventListener('click', async ()=>{
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if(outcome === 'accepted'){
-    pwaBar.classList.remove('show');
-    pwaBtn.textContent = '✓ Added!!';
-  }
-  deferredPrompt = null;
-});
-
-pwaDismiss.addEventListener('click', ()=>{
-  pwaBar.classList.remove('show');
-  sessionStorage.setItem('pwaDismissed','1');
-});
-
-// Hide if already dismissed this session
-if(sessionStorage.getItem('pwaDismissed')) pwaBar.style.display='none';
-
-// Already installed check
-window.addEventListener('appinstalled', ()=>{
-  pwaBar.classList.remove('show');
-  console.log('[fab.games] PWA installed!!');
-});
 </script>
 </body>
 </html>
