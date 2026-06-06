@@ -32,7 +32,7 @@ body{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:8px 16px;
+  padding:6px 16px;
   background:linear-gradient(180deg,#1a0014,#0a0008);
   border-bottom:2px solid #ff2d78;
   box-shadow:0 2px 20px rgba(255,45,120,0.4);
@@ -41,7 +41,7 @@ body{
 }
 .score-block{text-align:center;}
 .score-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
-.score-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#ffd700;text-shadow:0 0 10px #ffd700;line-height:1;}
+.score-val{font-family:'Bebas Neue',sans-serif;font-size:24px;color:#ffd700;text-shadow:0 0 10px #ffd700;line-height:1;}
 .game-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;}
 .balls-row{display:flex;gap:4px;justify-content:center;margin-top:2px;}
 .ball-dot{width:8px;height:8px;border-radius:50%;background:#c0c0c0;box-shadow:0 0 6px #fff;}
@@ -66,17 +66,20 @@ canvas{
   width:100%;
   max-width:420px;
   display:flex;
-  gap:0;
+  gap:4px;
   flex-shrink:0;
-  height:64px;
+  height:88px;
+  padding:8px;
+  background:#0a0008;
+  border-top:2px solid rgba(255,45,120,0.3);
 }
 .flip-btn{
   flex:1;
-  background:linear-gradient(180deg,#1a0014,#0d000a);
-  border:none;
-  border-top:2px solid rgba(255,45,120,0.4);
+  background:linear-gradient(180deg,#2a0020,#1a0014);
+  border:2px solid rgba(255,45,120,0.6);
+  border-radius:8px;
   color:#ff2d78;
-  font-size:11px;
+  font-size:14px;
   font-weight:900;
   letter-spacing:3px;
   text-transform:uppercase;
@@ -84,13 +87,16 @@ canvas{
   transition:all 0.05s;
   font-family:'Inter',sans-serif;
   display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 0 15px rgba(255,45,120,0.2),inset 0 1px 0 rgba(255,255,255,0.1);
+  -webkit-tap-highlight-color:transparent;
 }
 .flip-btn:active,.flip-btn.active{
-  background:linear-gradient(180deg,#3d0028,#1a0014);
-  box-shadow:inset 0 0 20px rgba(255,45,120,0.3);
-  color:#ff69b4;
+  background:linear-gradient(180deg,#5a0040,#3a0028);
+  border-color:#ff2d78;
+  box-shadow:0 0 30px rgba(255,45,120,0.6),inset 0 0 20px rgba(255,45,120,0.3);
+  color:#fff;
+  transform:scale(0.97);
 }
-.flip-btn-left{border-right:1px solid rgba(255,45,120,0.2);}
 
 /* OVERLAY SCREENS */
 .overlay{
@@ -240,14 +246,14 @@ function buildLayout(){
 
   // BUMPERS (circular — bounce ball away)
   bumpers = [
-    {x:W*0.25, y:H*0.22, r:18, pts:100, lit:0, color:'#ff2d78'},
-    {x:W*0.75, y:H*0.22, r:18, pts:100, lit:0, color:'#ff2d78'},
-    {x:W*0.50, y:H*0.18, r:18, pts:100, lit:0, color:'#ff2d78'},
-    {x:W*0.30, y:H*0.36, r:14, pts:50,  lit:0, color:'#ff9500'},
-    {x:W*0.70, y:H*0.36, r:14, pts:50,  lit:0, color:'#ff9500'},
-    {x:W*0.50, y:H*0.32, r:14, pts:50,  lit:0, color:'#ff9500'},
-    {x:W*0.20, y:H*0.50, r:12, pts:30,  lit:0, color:'#00ffff'},
-    {x:W*0.80, y:H*0.50, r:12, pts:30,  lit:0, color:'#00ffff'},
+    {x:W*0.25, y:H*0.22, r:28, pts:100, lit:0, color:'#ff2d78'},
+    {x:W*0.75, y:H*0.22, r:28, pts:100, lit:0, color:'#ff2d78'},
+    {x:W*0.50, y:H*0.18, r:28, pts:100, lit:0, color:'#ff2d78'},
+    {x:W*0.30, y:H*0.36, r:22, pts:50,  lit:0, color:'#ff9500'},
+    {x:W*0.70, y:H*0.36, r:22, pts:50,  lit:0, color:'#ff9500'},
+    {x:W*0.50, y:H*0.32, r:22, pts:50,  lit:0, color:'#ff9500'},
+    {x:W*0.20, y:H*0.50, r:18, pts:30,  lit:0, color:'#00ffff'},
+    {x:W*0.80, y:H*0.50, r:18, pts:30,  lit:0, color:'#00ffff'},
   ];
 
   // SCORE TARGETS (rectangular gates)
@@ -259,9 +265,9 @@ function buildLayout(){
 
   // HOLES (sink ball briefly, eject with bonus)
   holes = [
-    {x:W*0.50, y:H*0.55, r:16, pts:1000, lit:0, active:false, timer:0, color:'#9b59b6', label:'1000'},
-    {x:W*0.20, y:H*0.65, r:12, pts:300,  lit:0, active:false, timer:0, color:'#3498db', label:'300'},
-    {x:W*0.80, y:H*0.65, r:12, pts:300,  lit:0, active:false, timer:0, color:'#3498db', label:'300'},
+    {x:W*0.50, y:H*0.55, r:22, pts:1000, lit:0, active:false, timer:0, color:'#9b59b6', label:'1000'},
+    {x:W*0.20, y:H*0.65, r:18, pts:300,  lit:0, active:false, timer:0, color:'#3498db', label:'300'},
+    {x:W*0.80, y:H*0.65, r:18, pts:300,  lit:0, active:false, timer:0, color:'#3498db', label:'300'},
   ];
 
   // LANES (vertical score channels at top)
@@ -777,7 +783,7 @@ function draw(){
     // Points label
     ctx.globalAlpha = 1;
     ctx.fillStyle = lit ? '#000' : 'rgba(255,255,255,0.6)';
-    ctx.font = `700 ${bmp.r*0.7}px Inter`;
+    ctx.font = `900 ${bmp.r*0.75}px Inter`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(bmp.pts, bmp.x, bmp.y);
