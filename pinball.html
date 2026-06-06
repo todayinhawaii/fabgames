@@ -89,8 +89,7 @@ body{
   0%,100%{box-shadow:0 0 24px rgba(74,222,128,0.6),inset 0 2px 0 rgba(255,255,255,0.2);}
   50%{box-shadow:0 0 40px rgba(74,222,128,1),0 0 60px rgba(74,222,128,0.4),inset 0 2px 0 rgba(255,255,255,0.2);}
 }
-#goStopBtn .btn-icon{font-size:22px;line-height:1;}
-#goStopBtn .btn-lbl{font-size:13px;letter-spacing:3px;}
+#goStopBtn .btn-lbl{font-size:22px;letter-spacing:4px;font-weight:900;}
 
 /* START OVERLAY */
 #startScreen{
@@ -146,8 +145,31 @@ body{
 <div id="gameWrap">
   <canvas id="C"></canvas>
 
+  <!-- SIGNUP SCREEN -->
+  <div id="signupScreen" style="position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.95);text-align:center;padding:24px;">
+    <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#ff2d78;margin-bottom:10px;">— Enter Your Details</div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;color:#fff;margin-bottom:4px;">Pinball Paradise</h2>
+    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:22px;">Your score will be saved to the leaderboard!!</p>
+    <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+      <div style="text-align:left;">
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#ff2d78;margin-bottom:4px;">Your Name</div>
+        <input id="pbName" type="text" placeholder="What do we call you?" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,45,120,0.3);border-radius:2px;color:#fff;font-size:14px;font-family:Inter,sans-serif;outline:none;">
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#ff2d78;margin-bottom:4px;">Username</div>
+        <input id="pbUsername" type="text" placeholder="Your game name" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,45,120,0.3);border-radius:2px;color:#fff;font-size:14px;font-family:Inter,sans-serif;outline:none;">
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#ff2d78;margin-bottom:4px;">Where Are You From?</div>
+        <input id="pbLocation" type="text" placeholder="City, Country" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,45,120,0.3);border-radius:2px;color:#fff;font-size:14px;font-family:Inter,sans-serif;outline:none;">
+      </div>
+    </div>
+    <button class="startPlayBtn" onclick="submitSignup()">START GAME →</button>
+    <a href="/play" style="display:block;margin-top:14px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.2);text-decoration:none;text-transform:uppercase;">← All Games</a>
+  </div>
+
   <!-- START SCREEN -->
-  <div id="startScreen">
+  <div id="startScreen" style="display:none;">
     <h1>Pinball<br>Paradise</h1>
     <h2>🎰 Vegas Style</h2>
     <p>Press GO then PULL the ball back<br>and release to launch!<br>Use ◀ ▶ to flip · Tilt to guide!!</p>
@@ -159,10 +181,11 @@ body{
   <div id="gameOverScreen">
     <h1>Game<br>Stopped!</h1>
     <div id="finalScore" style="font-family:'Bebas Neue',sans-serif;font-size:58px;color:#ffd700;text-shadow:0 0 20px #ffd700;margin-bottom:4px;"></div>
-    <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);margin-bottom:18px;text-transform:uppercase;">Final Score</div>
-    <div id="newBestMsg" style="display:none;font-family:'Bebas Neue',sans-serif;font-size:26px;color:#4ade80;text-shadow:0 0 15px #4ade80;margin-bottom:16px;letter-spacing:3px;">🏆 New Best!!</div>
-    <button class="startPlayBtn" onclick="startGame()" style="background:linear-gradient(135deg,#16a34a,#052e16);box-shadow:0 0 30px rgba(74,222,128,0.5);">PLAY AGAIN</button>
-    <a href="/play" style="display:block;margin-top:14px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.2);text-decoration:none;text-transform:uppercase;">← All Games</a>
+    <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);margin-bottom:12px;text-transform:uppercase;">Final Score</div>
+    <div id="newBestMsg" style="display:none;font-family:'Bebas Neue',sans-serif;font-size:24px;color:#4ade80;text-shadow:0 0 15px #4ade80;margin-bottom:10px;letter-spacing:3px;">🏆 New Best!!</div>
+    <div id="lbDisplay"></div>
+    <button class="startPlayBtn" onclick="startGame()" style="margin-top:16px;background:linear-gradient(135deg,#16a34a,#052e16);box-shadow:0 0 30px rgba(74,222,128,0.5);">PLAY AGAIN</button>
+    <a href="/play" style="display:block;margin-top:12px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.2);text-decoration:none;text-transform:uppercase;">← All Games</a>
   </div>
 </div>
 
@@ -176,7 +199,6 @@ body{
 
   <!-- BIG GO/STOP BUTTON -->
   <button id="goStopBtn" class="go" onclick="toggleGoStop()">
-    <span class="btn-icon">▶</span>
     <span class="btn-lbl" id="goStopLbl">GO</span>
   </button>
 
@@ -290,7 +312,6 @@ function toggleGoStop(){
     gameRunning = true;
     const btn = document.getElementById('goStopBtn');
     btn.className = 'stop';
-    btn.querySelector('.btn-icon').textContent = '⏹';
     document.getElementById('goStopLbl').textContent = 'STOP';
     // Start demo if ball still in launcher
     if(G.ball.inLauncher) startSlingshotDemo();
@@ -315,6 +336,17 @@ function stopGame(){
     document.getElementById('newBestMsg').style.display='none';
   }
   document.getElementById('finalScore').textContent = G.score.toLocaleString();
+  if(playerUsername) saveToLeaderboard(G.score);
+  // Build leaderboard display
+  const board=getLeaderboard();
+  let lbHtml='<div style="margin-top:12px;width:100%;max-width:300px;">';
+  lbHtml+='<div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,45,120,0.6);margin-bottom:8px;text-align:center;">🏆 Top Scores</div>';
+  board.slice(0,5).forEach((e,i)=>{
+    const medals=['🥇','🥈','🥉','4','5'];
+    lbHtml+=`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:12px;"><span style="color:rgba(255,255,255,0.5);">${medals[i]} ${e.username}</span><span style="color:#ffd700;font-family:Bebas Neue,sans-serif;font-size:16px;">${e.score.toLocaleString()}</span></div>`;
+  });
+  lbHtml+='</div>';
+  document.getElementById('lbDisplay').innerHTML=lbHtml;
   const go = document.getElementById('gameOverScreen');
   go.style.display='flex';
   G.over = true;
@@ -335,30 +367,27 @@ function updateDemo(){
   demoT++;
   const b = G.ball;
   const MAX = 110;
+  const CYCLE = 90; // total frames per cycle
 
-  if(demoPhase===0){
-    // Pull back slowly downward
-    const progress = Math.min(demoT/50, 1);
-    demoPullX = b.startX + Math.sin(progress*1.2)*18;
-    demoPullY = b.startY + progress*MAX;
-    b.x = demoPullX; b.y = demoPullY;
-    if(demoT>=52) demoPhase=1;
-  } else if(demoPhase===1){
-    // Hold for a beat
-    if(demoT>=62) demoPhase=2;
-  } else if(demoPhase===2){
-    // Release — launch ball
-    demoActive = false;
-    b.isDragging = false;
-    const dx=b.startX-b.x, dy=b.startY-b.y;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    const power=dist/140;
-    const spd=8+power*16;
-    b.vx=(dx/dist)*spd; b.vy=(dy/dist)*spd;
-    b.inLauncher=false;
-    b.x=b.startX; b.y=b.startY;
-    SFX.launch(power);
-    burst(b.x,b.y,'#ffd700',14);
+  // Animate pull back and forth — NEVER release
+  // 0→45: pull back, 45→80: hold, 80→90: return to start, repeat
+  const phase = demoT % CYCLE;
+  if(phase < 45){
+    // Pull back
+    const p = phase/45;
+    const ease = p<0.5?2*p*p:(1-(2-2*p)*(2-2*p)/2);
+    b.x = b.startX + Math.sin(ease*0.8)*14;
+    b.y = b.startY + ease*MAX;
+  } else if(phase < 78){
+    // Hold at full pull — show PULL label pulsing
+    b.x = b.startX + Math.sin(0.8)*14;
+    b.y = b.startY + MAX;
+  } else {
+    // Snap back to start
+    const p = (phase-78)/12;
+    const ease = 1-(1-p)*(1-p);
+    b.x = b.startX + (1-ease)*Math.sin(0.8)*14;
+    b.y = b.startY + (1-ease)*MAX;
   }
 }
 
@@ -401,7 +430,7 @@ let G=null, raf=null;
 function makeBall(){
   const cx=MR+LANE/2+3;
   const sy=H*0.60;
-  return{x:cx,y:sy,vx:0,vy:0,r:10,startX:cx,startY:sy,
+  return{x:cx,y:sy,vx:0,vy:0,r:12,startX:cx,startY:sy,
     inLauncher:true,isDragging:false,
     inHole:false,holeTimer:0,holeTgt:null,
     stuckT:0,lastX:cx,lastY:sy};
@@ -412,11 +441,51 @@ function makeFlips(){
   const l1=MR*0.26, l2=MR*0.17;
   const g1=MR*0.055, g2=MR*0.040;
   return[
-    {cx:cx-g1,cy:y1,len:l1,a:0.40, tgt:0.40, up:-0.40, side:-1,act:false,_was:false},
-    {cx:cx+g1,cy:y1,len:l1,a:Math.PI-0.40,tgt:Math.PI-0.40,up:Math.PI+0.40,side:1,act:false,_was:false},
-    {cx:cx-g2,cy:y2,len:l2,a:0.38, tgt:0.38, up:-0.38, side:-1,act:false,_was:false},
-    {cx:cx+g2,cy:y2,len:l2,a:Math.PI-0.38,tgt:Math.PI-0.38,up:Math.PI+0.38,side:1,act:false,_was:false},
+    // 0: LEFT main flipper — pivot at LEFT, swings UP-LEFT
+    {cx:cx-g1,cy:y1,len:l1,a:0.42,tgt:0.42,up:-0.42,side:-1,act:false,_was:false},
+    // 1: RIGHT main flipper — pivot at RIGHT, swings UP-RIGHT
+    {cx:cx+g1,cy:y1,len:l1,a:Math.PI-0.42,tgt:Math.PI-0.42,up:Math.PI+0.42,side:1,act:false,_was:false},
+    // 2: LEFT mini flipper
+    {cx:cx-g2,cy:y2,len:l2,a:0.40,tgt:0.40,up:-0.40,side:-1,act:false,_was:false},
+    // 3: RIGHT mini flipper
+    {cx:cx+g2,cy:y2,len:l2,a:Math.PI-0.40,tgt:Math.PI-0.40,up:Math.PI+0.40,side:1,act:false,_was:false},
   ];
+}
+
+// Player info
+let playerName='', playerUsername='', playerLocation='';
+
+function submitSignup(){
+  const n = document.getElementById('pbName').value.trim();
+  const u = document.getElementById('pbUsername').value.trim();
+  const l = document.getElementById('pbLocation').value.trim();
+  if(!n||!u||!l){
+    alert('Please fill in all fields!!');return;
+  }
+  playerName=n; playerUsername=u; playerLocation=l;
+  // Save to leaderboard
+  saveToLeaderboard(0);
+  document.getElementById('signupScreen').style.display='none';
+  document.getElementById('startScreen').style.display='flex';
+}
+
+function saveToLeaderboard(score){
+  try{
+    const key='pbLeaderboard';
+    const board=JSON.parse(localStorage.getItem(key)||'[]');
+    const existing=board.findIndex(e=>e.username===playerUsername);
+    if(existing>=0){
+      if(score>board[existing].score) board[existing].score=score;
+    } else {
+      board.push({name:playerName,username:playerUsername,location:playerLocation,score});
+    }
+    board.sort((a,b)=>b.score-a.score);
+    localStorage.setItem(key,JSON.stringify(board.slice(0,10)));
+  }catch(e){}
+}
+
+function getLeaderboard(){
+  try{return JSON.parse(localStorage.getItem('pbLeaderboard')||'[]');}catch(e){return [];}
 }
 
 function startGame(){
@@ -437,7 +506,6 @@ function startGame(){
   // Reset GO button
   const btn=document.getElementById('goStopBtn');
   btn.className='go';
-  btn.querySelector('.btn-icon').textContent='▶';
   document.getElementById('goStopLbl').textContent='GO';
   document.getElementById('bestEl').textContent = G.best.toLocaleString();
   document.getElementById('scoreEl').textContent='0';
@@ -448,6 +516,8 @@ function startGame(){
 // ── FLIPPER CONTROL ────────────────────────────
 function fl(side,down){
   if(!G||G.over||!gameRunning) return;
+  // side 0=LEFT button → activates LEFT flippers (index 0,2)
+  // side 1=RIGHT button → activates RIGHT flippers (index 1,3)
   G.flips[side===0?0:1].act=down;
   G.flips[side===0?2:3].act=down;
 }
@@ -745,7 +815,25 @@ function draw(){
   ctx.save();
   ctx.strokeStyle='rgba(255,180,0,0.8)';ctx.lineWidth=3;
   ctx.shadowColor='rgba(255,180,0,0.4)';ctx.shadowBlur=10;
-  ctx.beginPath();ctx.moveTo(MR,0);ctx.lineTo(MR,H);ctx.stroke();
+  // Main channel wall from H*0.14 down to bottom
+  ctx.beginPath();ctx.moveTo(MR,H*0.14);ctx.lineTo(MR,H);ctx.stroke();
+  // Curved entrance at top — sweeps left into main field
+  ctx.beginPath();
+  ctx.moveTo(MR,H*0.14);
+  ctx.bezierCurveTo(
+    MR, H*0.06,        // control 1 — up
+    MR*0.72, H*0.02,   // control 2 — curves left
+    MR*0.58, H*0.01    // end — enters main field at top
+  );
+  ctx.strokeStyle='rgba(255,215,0,0.9)';
+  ctx.lineWidth=3;
+  ctx.shadowColor='rgba(255,215,0,0.6)';
+  ctx.shadowBlur=14;
+  ctx.stroke();
+  // Arrow showing entrance direction
+  ctx.fillStyle='rgba(255,215,0,0.7)';
+  ctx.font='700 11px Inter';ctx.textAlign='center';
+  ctx.fillText('←',MR*0.52,H*0.025);
   ctx.restore();
   ctx.save();
   ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=2;
