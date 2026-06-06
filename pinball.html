@@ -206,13 +206,33 @@ window.addEventListener('load',()=>{resize();setTimeout(resize,100);});
 const GRAV=0.044, FRIC=0.996, BNC=0.38;
 
 // ── TILT ───────────────────────────────────────
-let tiltX=0, tiltY=0;
-window.addEventListener('deviceorientation',e=>{
-  if(e.gamma!=null){
-    tiltX=Math.max(-15,Math.min(15,e.gamma*0.35));
-    tiltY=Math.max(-5, Math.min(5, (e.beta-45)*0.1));
+let tiltX=0, tiltY=0, tiltEnabled=false;
+
+function requestTilt(){
+  if(typeof DeviceOrientationEvent !== 'undefined' &&
+     typeof DeviceOrientationEvent.requestPermission === 'function'){
+    // iOS 13+ needs explicit permission
+    DeviceOrientationEvent.requestPermission()
+      .then(r=>{ if(r==='granted') enableTilt(); })
+      .catch(e=>console.log('Tilt permission denied'));
+  } else {
+    enableTilt(); // Android / older iOS — no permission needed
   }
-},{passive:true});
+}
+function enableTilt(){
+  tiltEnabled=true;
+  window.addEventListener('deviceorientation',e=>{
+    if(e.gamma!=null){
+      tiltX=Math.max(-20,Math.min(20,e.gamma*0.5));  // stronger response
+      tiltY=Math.max(-6, Math.min(6, (e.beta-45)*0.12));
+    }
+  },{passive:true});
+}
+// Auto-enable on non-iOS
+if(typeof DeviceOrientationEvent === 'undefined' ||
+   typeof DeviceOrientationEvent.requestPermission !== 'function'){
+  enableTilt();
+}
 
 // ── AUDIO ──────────────────────────────────────
 let AC=null,MG=null,SE=true;
@@ -284,8 +304,8 @@ function buildLayout(){
     {x:cx+W*0.20,y:H*0.36,r:22,pts:75, lit:0,col:'#c0c0c0',col2:'#808080'},
     // Lower row — 3 smaller silver
     {x:cx,     y:H*0.47,r:18,pts:50, lit:0,col:'#a0a0a0',col2:'#606060'},
-    {x:cx-W*0.28,y:H*0.54,r:16,pts:30, lit:0,col:'#a0a0a0',col2:'#606060'},
-    {x:cx+W*0.28,y:H*0.54,r:16,pts:30, lit:0,col:'#a0a0a0',col2:'#606060'},
+    {x:cx-W*0.22,y:H*0.54,r:16,pts:30, lit:0,col:'#a0a0a0',col2:'#606060'},
+    {x:cx+W*0.22,y:H*0.54,r:16,pts:30, lit:0,col:'#a0a0a0',col2:'#606060'},
   ];
 
   // Score targets — gold gates at top
@@ -414,6 +434,7 @@ function startGame(){
 function toggleGoStop(){
   if(!G)return;
   initAudio();rAC();
+  requestTilt(); // request tilt permission when GO is pressed
   if(!gameRunning){
     gameRunning=true;
     const btn=document.getElementById('goStopBtn');
@@ -438,7 +459,7 @@ function stopGame(){
   html+='<div style="font-size:8px;letter-spacing:3px;color:rgba(201,168,76,0.5);margin-bottom:8px;text-align:center;text-transform:uppercase;">🏆 Top Scores</div>';
   board.slice(0,5).forEach((e,i)=>{
     const m=['🥇','🥈','🥉','4','5'];
-    html+=`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(201,168,76,0.1);font-size:12px;"><span style="color:rgba(255,255,255,0.5);">${m[i]} ${e.username}</span><span style="color:#c9a84c;font-family:Bebas Neue,sans-serif;font-size:16px;">${e.score.toLocaleString()}</span></div>`;
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(201,168,76,0.1);"><div><div style="font-size:12px;color:rgba(255,255,255,0.6);">${m[i]} ${e.username}</div><div style="font-size:9px;color:rgba(201,168,76,0.45);letter-spacing:1px;">${e.location||''}</div></div><span style="color:#c9a84c;font-family:Bebas Neue,sans-serif;font-size:16px;">${e.score.toLocaleString()}</span></div>`;
   });
   html+='</div>';
   document.getElementById('lbDisplay').innerHTML=html;
@@ -541,7 +562,7 @@ function physics(){
 
   // Gravity + TILT (tilt is the main guidance mechanic)
   b.vy+=GRAV+tiltY*0.04;
-  b.vx+=tiltX*0.13; // stronger tilt response
+  if(tiltEnabled) b.vx+=tiltX*0.18; // strong tilt guidance
   b.vx*=FRIC; b.vy*=FRIC;
 
   // Speed clamp
@@ -564,9 +585,22 @@ function physics(){
   }
 
   // Walls — full width now!
-  if(b.x-b.r<3){b.x=3+b.r;b.vx=Math.abs(b.vx)*BNC+0.3;SFX.wall();}
-  if(b.x+b.r>W-3){b.x=W-3-b.r;b.vx=-Math.abs(b.vx)*BNC-0.3;SFX.wall();}
-  if(b.y-b.r<2){b.y=2+b.r;b.vy=Math.abs(b.vy)*BNC;SFX.wall();}
+  // Variable bounce strength - breaks repetitive patterns
+  if(b.x-b.r<3){
+    const rb=0.28+Math.random()*0.35;  // 0.28-0.63 random bounce
+    b.x=3+b.r;
+    b.vx=Math.abs(b.vx)*rb+0.4+Math.random()*0.6;
+    b.vy+=(Math.random()-0.5)*1.5; // random vertical kick
+    SFX.wall();
+  }
+  if(b.x+b.r>W-3){
+    const rb=0.28+Math.random()*0.35;
+    b.x=W-3-b.r;
+    b.vx=-(Math.abs(b.vx)*rb+0.4+Math.random()*0.6);
+    b.vy+=(Math.random()-0.5)*1.5;
+    SFX.wall();
+  }
+  if(b.y-b.r<2){b.y=2+b.r;b.vy=Math.abs(b.vy)*BNC;b.vx+=(Math.random()-0.5)*1.0;SFX.wall();}
 
   // Angled walls
   for(const w of walls)wallHit(b,w);
@@ -578,8 +612,13 @@ function physics(){
     if(dist<b.r+bmp.r+2){
       const nx=dx/dist,ny=dy/dist;
       const os=Math.max(Math.sqrt(b.vx*b.vx+b.vy*b.vy),4);
-      b.vx=nx*os*0.9; b.vy=ny*os*0.9;
-      b.x=bmp.x+nx*(b.r+bmp.r+3); b.y=bmp.y+ny*(b.r+bmp.r+3);
+      const rb=0.75+Math.random()*0.45; // 0.75-1.2 random
+      const kick=0.3+Math.random()*0.4;
+      b.vx=nx*os*rb+nx*kick; b.vy=ny*os*rb+ny*kick;
+      // Add slight random deflection so never same path
+      const deflect=(Math.random()-0.5)*1.2;
+      b.vx+=deflect; b.vy-=Math.abs(deflect)*0.3;
+      b.x=bmp.x+nx*(b.r+bmp.r+4); b.y=bmp.y+ny*(b.r+bmp.r+4);
       if(bmp.lit<=0){bmp.lit=24;SFX.bumper(bmp.pts);addScore(bmp.pts,bmp.x,bmp.y,bmp.col);}
     }
     // Spinning spoke collision for 200 bumper
@@ -894,10 +933,14 @@ function draw(){
   }
 
   // Tilt indicator when tilting
-  if(Math.abs(tiltX)>3){
+  if(!tiltEnabled&&G&&gameRunning){
+    ctx.save();ctx.globalAlpha=0.4+0.2*Math.sin(Date.now()*0.003);
+    ctx.fillStyle='#c9a84c';ctx.font='700 10px Inter';ctx.textAlign='center';
+    ctx.fillText('📱 Tap GO to enable tilt',W/2,H*0.96);ctx.restore();
+  } else if(tiltEnabled&&Math.abs(tiltX)>3){
     ctx.save();ctx.globalAlpha=0.35;
     ctx.fillStyle='#c9a84c';ctx.font='700 11px Inter';ctx.textAlign='center';
-    ctx.fillText(tiltX>0?'↗ TILT RIGHT':'↖ TILT LEFT',W/2,H*0.95);ctx.restore();
+    ctx.fillText(tiltX>0?'↗ TILT':'↖ TILT',W/2,H*0.96);ctx.restore();
   }
 }
 
