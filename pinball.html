@@ -264,17 +264,82 @@ function noise(d,g,ff,del){
   s.buffer=buf;s.connect(fl);fl.connect(gn);gn.connect(MG);s.start(st);s.stop(st+d+0.01);}catch(e){}
 }
 const SFX={
-  bumper:(p)=>{const f=p>=100?860:p>=50?640:480;tone(f*2,'square',0.06,0.2);tone(f,'sine',0.16,0.25);noise(0.06,0.14,f*1.5);},
-  flipper:()=>{tone(160,'square',0.08,0.28);noise(0.05,0.16,260);},
-  wall:()=>{tone(240,'square',0.04,0.1);noise(0.03,0.07,420);},
-  hole:()=>{try{const o=AC.createOscillator(),gn=AC.createGain(),t=AC.currentTime;o.type='sine';o.frequency.setValueAtTime(560,t);o.frequency.exponentialRampToValueAtTime(80,t+0.28);gn.gain.setValueAtTime(0.35,t);gn.gain.exponentialRampToValueAtTime(0.001,t+0.32);o.connect(gn);gn.connect(MG);o.start(t);o.stop(t+0.33);}catch(e){}},
-  eject:()=>{[160,280,420,580,760].forEach((f,i)=>tone(f,'square',0.08,0.16,i*0.05));},
-  lost:()=>{try{const o=AC.createOscillator(),gn=AC.createGain(),t=AC.currentTime;o.type='sawtooth';o.frequency.setValueAtTime(400,t);o.frequency.exponentialRampToValueAtTime(80,t+0.6);gn.gain.setValueAtTime(0.35,t);gn.gain.exponentialRampToValueAtTime(0.001,t+0.65);o.connect(gn);gn.connect(MG);o.start(t);o.stop(t+0.66);}catch(e){}},
-  over:()=>{[500,420,340,260,190].forEach((f,i)=>{tone(f,'sawtooth',0.25,0.25,i*0.11);});},
-  best:()=>{[520,520,520,390,520,660,780].forEach((f,i)=>{tone(f,'square',0.12,0.25,i*0.1);});},
-  launch:(p)=>{try{const o=AC.createOscillator(),gn=AC.createGain(),t=AC.currentTime;o.type='sawtooth';o.frequency.setValueAtTime(70+p*160,t);o.frequency.exponentialRampToValueAtTime(360+p*480,t+0.16);gn.gain.setValueAtTime(0.34,t);gn.gain.exponentialRampToValueAtTime(0.001,t+0.24);o.connect(gn);gn.connect(MG);o.start(t);o.stop(t+0.25);}catch(e){} noise(0.1,0.1,680);},
-  target:()=>{tone(1000,'sine',0.25,0.25);tone(1260,'sine',0.18,0.18,0.06);},
-  merry:()=>{tone(1000,'sine',0.09,0.26);tone(1260,'sine',0.08,0.2,0.06);noise(0.08,0.12,1100,0.04);},
+  // Bumper hit — bright cheerful BLING! Higher pts = higher pitch sparkle
+  bumper:(p)=>{
+    const f=p>=200?1320:p>=100?1047:p>=50?880:660;
+    tone(f,'sine',0.12,0.28);
+    tone(f*1.5,'sine',0.08,0.18,0.04);
+    tone(f*2,'sine',0.05,0.12,0.08);
+  },
+  // Flipper — satisfying bright THWACK with sparkle
+  flipper:()=>{
+    tone(440,'sine',0.06,0.3);
+    tone(880,'sine',0.04,0.2,0.03);
+    tone(1320,'sine',0.02,0.1,0.06);
+  },
+  // Wall — soft bright tick, like a coin tap
+  wall:()=>{
+    tone(1047,'sine',0.05,0.15);
+    tone(1568,'sine',0.03,0.08,0.02);
+  },
+  // Hole capture — magical descending sparkle cascade
+  hole:()=>{
+    [1568,1320,1047,880,660].forEach((f,i)=>tone(f,'sine',0.12,0.22,i*0.06));
+  },
+  // Hole eject — triumphant ascending fanfare!!
+  eject:()=>{
+    [523,659,784,1047,1319,1568].forEach((f,i)=>{
+      tone(f,'sine',0.14,0.28,i*0.055);
+      tone(f*2,'sine',0.04,0.1,i*0.055);
+    });
+  },
+  // Ball lost — gentle wistful chime, NOT negative
+  lost:()=>{
+    [784,659,523,440].forEach((f,i)=>tone(f,'sine',0.18,0.22,i*0.09));
+  },
+  // Game stopped — warm resolved chord
+  over:()=>{
+    [523,659,784,1047].forEach((f,i)=>tone(f,'sine',0.22,0.3,i*0.07));
+    tone(1568,'sine',0.15,0.4,0.3);
+  },
+  // New best — FULL celebration jingle!!
+  best:()=>{
+    const melody=[523,523,523,392,523,659,784,1047];
+    melody.forEach((f,i)=>{
+      tone(f,'sine',0.16,0.32,i*0.1);
+      tone(f*2,'sine',0.06,0.14,i*0.1);
+    });
+    // Final shimmer cascade
+    [1047,1175,1319,1480,1568,1760].forEach((f,i)=>tone(f,'sine',0.08,0.18,0.85+i*0.04));
+  },
+  // Launch — bright whoosh rising sparkle
+  launch:(p)=>{
+    try{
+      const o=AC.createOscillator(),gn=AC.createGain(),t=AC.currentTime;
+      o.type='sine';
+      o.frequency.setValueAtTime(440+p*400,t);
+      o.frequency.exponentialRampToValueAtTime(1320+p*800,t+0.2);
+      gn.gain.setValueAtTime(0.28,t);gn.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+      o.connect(gn);gn.connect(MG);o.start(t);o.stop(t+0.26);
+    }catch(e){}
+    // Sparkle trail
+    [880,1047,1320].forEach((f,i)=>tone(f,'sine',0.08,0.15,0.1+i*0.04));
+  },
+  // Target gate — bright double ding
+  target:()=>{
+    tone(1568,'sine',0.14,0.3);
+    tone(1976,'sine',0.1,0.22,0.07);
+    tone(2093,'sine',0.07,0.15,0.14);
+  },
+  // Spinning bumper hit — casino slot sparkle
+  merry:()=>{
+    [1047,1319,1568,1760].forEach((f,i)=>tone(f,'sine',0.1,0.24,i*0.04));
+  },
+  // Combo multiplier — ascending happy arpeggio
+  combo:(n)=>{
+    const notes=n>=3?[523,659,784,1047,1319]:[523,659,784];
+    notes.forEach((f,i)=>tone(f,'sine',0.12,0.26,i*0.07));
+  },
 };
 
 // ── MUTE ───────────────────────────────────────
@@ -375,6 +440,7 @@ function addScore(pts,x,y,col){
   G.score+=pts*mul;
   G.flash=(mul>1?`${pts*mul} x${mul}!!`:`+${pts}`);
   G.flashT=55;
+  if(mul>1 && SFX.combo) SFX.combo(G.combo);
   burst(x,y,col||'#c9a84c',10);
   document.getElementById('scoreEl').textContent=G.score.toLocaleString();
 }
