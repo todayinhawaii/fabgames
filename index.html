@@ -233,24 +233,205 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
   gap:2px;
 }
+.game-card{
+  position:relative;overflow:hidden;
+  aspect-ratio:9/14;
+  background:var(--card);
+  transition:all 0.4s cubic-bezier(0.23,1,0.32,1);
+}
+.game-card:hover{transform:scale(1.02);z-index:2;}
+.game-card-bg{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:80px;
+  transition:transform 0.6s ease;
+}
+.game-card:hover .game-card-bg{transform:scale(1.1);}
+.game-card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(7,7,8,0) 0%,
+    rgba(7,7,8,0.3) 40%,
+    rgba(7,7,8,0.85) 70%,
+    rgba(7,7,8,0.97) 100%
+  );
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+  padding:24px 20px 20px;
+}
+.game-card-cat{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:6px;
+}
+.game-card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;line-height:1.2;margin-bottom:8px;padding:5px 10px;border-radius:3px;display:inline-block;border:1px solid #ffd700;animation:neonFlicker 3s ease-in-out infinite;color:#ffd700!important;text-shadow:0 0 10px #ffd700,0 0 20px rgba(255,215,0,0.4)!important;background:rgba(255,215,0,0.06)!important;}
+.game-card-desc{
+  font-size:11px;color:var(--muted);
+  line-height:1.6;margin-bottom:14px;
+  display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+.game-card-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);
+  transition:gap 0.2s;
+}
+.game-card:hover .game-card-btn{gap:14px;}
+.game-live-badge{
+  position:absolute;top:16px;right:16px;
+  font-size:8px;letter-spacing:2px;text-transform:uppercase;
+  padding:4px 10px;
+  background:rgba(201,168,76,0.15);
+  border:1px solid rgba(201,168,76,0.3);
+  border-radius:2px;color:var(--gold);
+}
 
-.game-card{position:relative;overflow:hidden;aspect-ratio:9/14;background:var(--card);text-decoration:none;display:block;transition:all 0.4s cubic-bezier(0.23,1,0.32,1);border:1px solid transparent;}
-.game-card:hover{transform:translateY(-8px) scale(1.02);z-index:10;border-color:rgba(255,215,0,0.4);box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 30px rgba(255,215,0,0.15);}
-.game-card-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px;transition:transform 0.5s ease;}
-.game-card:hover .game-card-bg{transform:scale(1.15) rotate(3deg);}
-.game-card-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,0) 20%,rgba(5,5,6,0.98) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px 14px 14px;}
-.game-card-cat{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;opacity:0.7;}
-.game-card-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;line-height:1.2;margin-bottom:8px;padding:5px 10px;border-radius:3px;display:inline-block;border:1px solid #ffd700;animation:neonFlicker 3s ease-in-out infinite;color:#ffd700!important;text-shadow:0 0 10px #ffd700,0 0 20px rgba(255,215,0,0.5)!important;background:rgba(255,215,0,0.06)!important;box-shadow:inset 0 0 8px rgba(255,215,0,0.08);}
-@keyframes neonFlicker{0%,18%,20%,52%,54%,100%{opacity:1;}19%,53%{opacity:0.85;}}
-.game-card-desc{font-size:11px;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.play-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 0;background:linear-gradient(135deg,#ffd700,#c9a84c,#ffd700,#c9a84c);background-size:200% 200%;border:none;border-radius:3px;color:#000;font-size:12px;font-weight:900;letter-spacing:3px;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;box-shadow:0 5px 0 #5a3d08,0 0 20px rgba(255,215,0,0.4),inset 0 1px 0 rgba(255,255,255,0.3);transition:all 0.15s;animation:btnShimmer 3s ease infinite;width:100%;margin-bottom:8px;}
-@keyframes btnShimmer{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
-.play-btn:hover{box-shadow:0 7px 0 #5a3d08,0 0 40px rgba(255,215,0,0.7);transform:translateY(-2px);}
-.game-dl-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 0;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.25);border-radius:3px;color:rgba(255,215,0,0.6);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;width:100%;transition:all 0.2s;}
-.game-dl-btn:hover{background:rgba(255,215,0,0.12);border-color:rgba(255,215,0,0.5);color:rgba(255,215,0,0.9);}
-.live-badge{position:absolute;top:12px;right:12px;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.35);border-radius:2px;color:#ffd700;animation:livePulse 2s ease-in-out infinite;}
-@keyframes livePulse{0%,100%{box-shadow:0 0 5px rgba(255,215,0,0.2);}50%{box-shadow:0 0 15px rgba(255,215,0,0.5);}}
 
+
+/* ── PRICING ── */
+.pricing-wrap{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:2px;max-width:800px;margin:0 auto;
+}
+.price-card{
+  padding:48px 40px;
+  background:var(--card);
+  border:1px solid var(--border);
+  position:relative;
+}
+.price-card.featured{
+  background:linear-gradient(160deg,#1a1810,#13130e);
+  border-color:rgba(201,168,76,0.3);
+  box-shadow:0 0 60px rgba(201,168,76,0.08);
+}
+.price-featured-badge{
+  position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  font-size:8px;letter-spacing:3px;text-transform:uppercase;
+  padding:6px 20px;
+  background:var(--gold);color:#000;font-weight:600;
+}
+.price-tier{
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:20px;
+}
+.price-amount{
+  font-family:'Cormorant Garamond',serif;
+  font-size:64px;font-weight:300;line-height:1;
+  margin-bottom:4px;
+}
+.price-amount span{font-size:20px;vertical-align:super;}
+.price-amount small{font-size:18px;color:var(--muted);}
+.price-desc{
+  font-size:13px;color:var(--muted);
+  margin-bottom:32px;line-height:1.6;
+}
+.price-features{list-style:none;margin-bottom:40px;}
+.price-features li{
+  font-size:13px;padding:10px 0;
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
+  display:flex;align-items:center;gap:10px;
+}
+.price-features li::before{
+  content:'—';color:var(--gold);font-size:12px;
+}
+.price-features li.active{color:var(--white);}
+
+/* ── WORLD SECTION ── */
+.world-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:1px;margin-top:60px;
+}
+.world-item{
+  padding:28px 20px;
+  background:var(--card);
+  text-align:center;
+  border:1px solid transparent;
+  transition:all 0.3s;
+}
+.world-item:hover{border-color:rgba(201,168,76,0.2);background:#1a1a1d;}
+.world-item-flag{font-size:32px;margin-bottom:8px;}
+.world-item-name{
+  font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:60px 48px 40px;
+  text-align:center;
+}
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:36px;letter-spacing:4px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:16px;
+}
+.footer-tagline{
+  font-size:13px;color:var(--muted);
+  font-style:italic;font-family:'Cormorant Garamond',serif;
+  margin-bottom:40px;
+}
+.footer-links{
+  display:flex;gap:32px;justify-content:center;
+  flex-wrap:wrap;margin-bottom:40px;
+}
+.footer-links a{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;transition:color 0.2s;
+}
+.footer-links a:hover{color:var(--gold);}
+.footer-copy{
+  font-size:11px;color:rgba(240,239,232,0.2);
+  letter-spacing:1px;
+}
+
+/* ── SCROLL INDICATOR ── */
+.scroll-indicator{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  animation:fadeUp 1s 1.5s ease both;
+}
+.scroll-indicator span{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--muted);
+}
+.scroll-line{
+  width:1px;height:40px;
+  background:linear-gradient(180deg,var(--gold),transparent);
+  animation:scrollPulse 2s ease infinite;
+}
+@keyframes scrollPulse{
+  0%{transform:scaleY(0);transform-origin:top;}
+  50%{transform:scaleY(1);transform-origin:top;}
+  51%{transform:scaleY(1);transform-origin:bottom;}
+  100%{transform:scaleY(0);transform-origin:bottom;}
+}
+
+/* ── DIVIDER ── */
+.divider{
+  width:60px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:0 auto 40px;
+}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  nav{padding:16px 20px;}
+  nav.scrolled{padding:12px 20px;}
+  .nav-links{display:none;}
+  .nav-mobile-btn{display:block;}
+  section{padding:70px 20px;}
+  .hero{padding:100px 20px 60px;}
+  .hero-stats{gap:30px;}
+  .pricing-wrap{grid-template-columns:1fr;max-width:400px;}
+  .games-grid{grid-template-columns:repeat(2,1fr);}
+  .filters-showcase{grid-template-columns:repeat(2,1fr);}
+}
 </style>
 </head>
 <body>
@@ -460,10 +641,9 @@ window.addEventListener('scroll',()=>{
 });
 
 // ── GAMES DATA ────────────────────────────────────
-let deferredPrompt=null;
 const GAMES=[
-  {emoji:'🎰',cat:'Arcade · Classic',title:'Pinball Paradise',desc:'Full Vegas-style pinball!! Slingshot launch, spinning bumpers, 4 flippers. A true arcade classic.',href:'/pinball',color:'rgba(20,80,40,0.15)',neon:'#ffd700',neonbg:'rgba(201,168,76,0.08)'},
-  {emoji:'🥕',cat:'Encyclopedia · Quiz',title:'Veggie & Fruit Bible',desc:'77 vegetables and fruits. Real nutrition data, botanical engravings, quizzes and rankings. A chefs bible.',href:'/veggies',color:'rgba(184,147,63,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)',featured:true},
+  {emoji:'🎰',cat:'Arcade · Classic',title:'Pinball Paradise',desc:'Full Vegas pinball! Slingshot launch, spinning bumpers, 4 flippers. Pure arcade magic.',href:'/join',color:'rgba(20,80,40,0.18)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+  {emoji:'🥕',cat:'Encyclopedia · Quiz',title:'Veggie & Fruit Bible',desc:'77 vegetables and fruits. Real nutrition, botanical art, quizzes and rankings.',href:'/join',color:'rgba(184,147,63,0.14)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)',featured:true},
   {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',desc:'Flip the full 52-card deck across 2 rounds. Find every pair to win.',href:'/dolphins',color:'rgba(34,211,238,0.12)'},
   {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",desc:'Stack the lava rocks, trigger eruptions. Hawaii\'s own Tetris.',href:'/lava',color:'rgba(255,60,0,0.12)'},
   {emoji:'🐢',cat:'Strategy · AI',title:'Turtle Checkers',desc:'Classic checkers with Hawaiian sea turtles. Beat the AI.',href:'/turtles',color:'rgba(34,197,94,0.12)'},
@@ -480,95 +660,66 @@ const GAMES=[
 ];
 
 const grid=document.getElementById('gamesGrid');
-
-function buildCard(g, href, grid, idx){
+GAMES.forEach(function(g,i){
   const card=document.createElement('a');
-  card.href=href;
+  card.href='/join';
   card.className='game-card';
   card.style.textDecoration='none';
-
-  // Background
   const bg=document.createElement('div');
   bg.className='game-card-bg';
-  bg.style.background=g.color;
+  bg.style.background=g.color||'rgba(201,168,76,0.1)';
   if(g.featured){
-    bg.style.cssText='display:flex;align-items:center;justify-content:center;background:'+g.color+';width:100%;height:100%;position:absolute;inset:0;font-size:0;';
-    bg.innerHTML='<svg width="80" height="80" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"><path d="M90 165 C100 158 110 155 110 155 C110 155 120 158 130 165" stroke-width="1"/><path d="M110 155 C108 140 104 120 100 100" stroke-width="1.2"/><path d="M110 155 C112 138 116 118 122 98" stroke-width="1.2"/><path d="M110 155 C110 138 110 118 110 96" stroke-width="1.1"/><path d="M88 108 C90 100 93 90 92 80 C90 90 86 100 84 108Z" fill="rgba(201,169,110,0.15)" stroke-width="0.8"/><circle cx="110" cy="78" r="18" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><circle cx="96" cy="108" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="108" cy="108" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/></g></svg>';
+    bg.style.cssText='display:flex;align-items:center;justify-content:center;background:'+(g.color||'')+';width:100%;height:100%;position:absolute;inset:0;font-size:0;';
+    bg.innerHTML='<svg width="60" height="60" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"><path d="M110 155 C108 140 104 120 100 100" stroke-width="1.2"/><path d="M110 155 C112 138 116 118 122 98" stroke-width="1.2"/><path d="M110 155 C110 138 110 118 110 96" stroke-width="1.1"/><circle cx="110" cy="78" r="18" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><circle cx="96" cy="108" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/><circle cx="108" cy="108" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/></g></svg>';
   } else {
-    bg.textContent=g.emoji;
+    bg.textContent=g.emoji||'🎮';
   }
-
-  // Live badge
   const badge=document.createElement('div');
   badge.className='live-badge';
   badge.textContent='✦ Live';
-
-  // Overlay
   const overlay=document.createElement('div');
   overlay.className='game-card-overlay';
-
-  // Category
   const cat=document.createElement('div');
   cat.className='game-card-cat';
-  cat.textContent=g.cat;
-
-  // Title — always YELLOW
-  const title=document.createElement('div');
-  title.className='game-card-title';
-  title.textContent=g.title;
-  title.style.animationDelay=(Math.random()*3)+'s';
-
-  // Description — bigger font, prominent
-  const desc=document.createElement('div');
-  desc.className='game-card-desc';
-  desc.textContent=g.desc||'';
-
-  // PLAY button — big and bold
+  cat.textContent=g.cat||'';
+  const ttl=document.createElement('div');
+  ttl.className='game-card-title';
+  ttl.textContent=g.title;
+  ttl.style.animationDelay=(Math.random()*3)+'s';
+  const dsc=document.createElement('div');
+  dsc.className='game-card-desc';
+  dsc.textContent=g.desc||'';
   const btn=document.createElement('div');
   btn.className='play-btn';
   btn.innerHTML='<span>▶ Play Now</span>';
-
-  // ADD TO HOME SCREEN — own separate button
-  const dlBtn=document.createElement('button');
-  dlBtn.className='game-dl-btn';
-  dlBtn.id='dlBtn_'+idx;
-  dlBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Add to Home Screen';
-  dlBtn.onclick=function(e){
-    e.preventDefault(); e.stopPropagation();
-    if(typeof deferredPrompt!=='undefined' && deferredPrompt){
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function(r){
-        if(r.outcome==='accepted'){
-          dlBtn.innerHTML='✓ Added!!';
-          dlBtn.style.color='rgba(74,222,128,0.8)';
-          dlBtn.style.borderColor='rgba(74,222,128,0.4)';
-        }
-        deferredPrompt=null;
+  const dl=document.createElement('button');
+  dl.className='game-dl-btn';
+  dl.innerHTML='⊕ Add to Home Screen';
+  dl.onclick=function(e){
+    e.preventDefault();e.stopPropagation();
+    if(window.deferredPrompt){
+      window.deferredPrompt.prompt();
+      window.deferredPrompt.userChoice.then(function(r){
+        if(r.outcome==='accepted'){dl.innerHTML='✓ Added!!';dl.style.color='rgba(74,222,128,0.8)';}
+        window.deferredPrompt=null;
       });
     } else {
-      dlBtn.innerHTML='✓ Use browser menu to install';
-      setTimeout(()=>{ dlBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Add to Home Screen'; },2500);
+      dl.innerHTML='✓ Use browser + menu';
+      setTimeout(()=>{dl.innerHTML='⊕ Add to Home Screen';},2500);
     }
   };
-
   overlay.appendChild(cat);
-  overlay.appendChild(title);
-  overlay.appendChild(desc);
+  overlay.appendChild(ttl);
+  overlay.appendChild(dsc);
   overlay.appendChild(btn);
-  overlay.appendChild(dlBtn);
+  overlay.appendChild(dl);
   card.appendChild(bg);
   card.appendChild(badge);
   card.appendChild(overlay);
   grid.appendChild(card);
-}
+});
 
-// Render home page — cards go to /join (signup)
-const grid=document.getElementById('gamesGrid');
-if(grid){
-  GAMES.forEach(function(g,i){
-    buildCard(g, '/join', grid, i);
-  });
-}
+
 
 // ── SMOOTH SCROLL ─────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
