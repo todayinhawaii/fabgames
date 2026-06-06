@@ -251,7 +251,7 @@ let lanes = [];
 let walls = [];
 
 // Launcher channel width
-const LANE_W = 28;
+const LANE_W = 52;
 
 function buildLayout(){
   W = canvas.width;
@@ -311,7 +311,7 @@ function buildLayout(){
 function makeBall(){
   const MR = W - LANE_W - 6;
   const cx = MR + LANE_W/2;
-  const startY = H * 0.80;
+  const startY = H * 0.60;
   return {
     x: cx, y: startY,
     startX: cx, startY: startY,
@@ -434,7 +434,7 @@ function distTo(ax,ay,bx,by){ return Math.sqrt((ax-bx)**2+(ay-by)**2); }
 canvas.addEventListener('touchstart', e=>{
   if(!state||state.gameOver) return;
   const pos = getTouchPos(e);
-  if(state.ball.inLauncher && distTo(pos.x,pos.y,state.ball.x,state.ball.y)<40){
+  if(state.ball.inLauncher && distTo(pos.x,pos.y,state.ball.x,state.ball.y)<60){
     state.ball.isDragging = true;
     e.preventDefault();
   }
@@ -456,7 +456,7 @@ canvas.addEventListener('touchend', e=>{
 canvas.addEventListener('mousedown', e=>{
   if(!state||state.gameOver) return;
   const pos = getTouchPos(e);
-  if(state.ball.inLauncher && distTo(pos.x,pos.y,state.ball.x,state.ball.y)<40){
+  if(state.ball.inLauncher && distTo(pos.x,pos.y,state.ball.x,state.ball.y)<60){
     state.ball.isDragging = true;
   }
 });
@@ -474,7 +474,7 @@ canvas.addEventListener('mouseup', e=>{
 function dragBall(px, py){
   const b = state.ball;
   // Constrain drag — only downward and within limits
-  const maxPull = 80;
+  const maxPull = 130;
   const dx = px - b.startX;
   const dy = py - b.startY;
   const dist = Math.min(Math.sqrt(dx*dx+dy*dy), maxPull);
@@ -483,7 +483,7 @@ function dragBall(px, py){
   b.dragY = b.startY + Math.sin(angle)*dist;
   b.x = b.dragX;
   b.y = b.dragY;
-  sndCharge(dist/80);
+  sndCharge(dist/130);
 }
 
 function releaseSling(){
@@ -495,8 +495,8 @@ function releaseSling(){
   const dist = Math.sqrt(dx*dx+dy*dy);
   if(dist < 8){ return; } // didn't pull far enough
   // Launch with slingshot power
-  const power = dist / 80;
-  const speed = 8 + power * 16;
+  const power = dist / 130;
+  const speed = 14 + power * 22;
   b.vx = (dx/dist) * speed;
   b.vy = (dy/dist) * speed;
   b.inLauncher = false;
@@ -939,29 +939,34 @@ function draw(){
     const MR2 = W - LANE_W - 6;
     ctx.save();
     // Channel background
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(MR2, H*0.05, LANE_W+6, H*0.95);
-    // Channel walls
-    ctx.strokeStyle = 'rgba(255,180,0,0.6)';
+    // Dark channel background
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(MR2, 0, W - MR2, H);
+    // Left wall of channel (gold glow)
+    ctx.strokeStyle = 'rgba(255,180,0,0.8)';
     ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(MR2, H*0.05); ctx.lineTo(MR2, H*0.82); ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(W-4, H*0.05); ctx.lineTo(W-4, H*0.95); ctx.stroke();
-    // Opening at top (where ball enters main field)
-    ctx.strokeStyle = 'rgba(255,215,0,0.8)';
+    ctx.shadowColor = 'rgba(255,180,0,0.5)';
+    ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.moveTo(MR2, H*0.08); ctx.lineTo(MR2, H); ctx.stroke();
+    ctx.shadowBlur = 0;
+    // Right wall (subtle)
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
     ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(MR2, H*0.05);
-    ctx.lineTo(MR2-12, H*0.02);
-    ctx.stroke();
-    // Arrow hint
-    ctx.fillStyle = 'rgba(255,215,0,0.3)';
-    ctx.font = '700 10px Inter';
+    ctx.beginPath(); ctx.moveTo(W-4, 0); ctx.lineTo(W-4, H); ctx.stroke();
+    // TOP OPENING label
+    ctx.fillStyle = 'rgba(255,215,0,0.5)';
+    ctx.font = '700 9px Inter';
     ctx.textAlign = 'center';
-    ctx.fillText('▲', MR2 + LANE_W/2 + 3, H*0.5);
-    ctx.fillText('▲', MR2 + LANE_W/2 + 3, H*0.58);
-    ctx.fillText('▲', MR2 + LANE_W/2 + 3, H*0.66);
+    const chCx = MR2 + (W-MR2)/2;
+    ctx.fillText('LAUNCH', chCx, H*0.12);
+    ctx.fillText('ZONE', chCx, H*0.15);
+    // Up arrows guiding the eye
+    ctx.fillStyle = 'rgba(255,215,0,0.25)';
+    ctx.font = '700 14px Inter';
+    ctx.fillText('▲', chCx, H*0.22);
+    ctx.fillText('▲', chCx, H*0.30);
+    ctx.fillText('▲', chCx, H*0.38);
+    ctx.fillText('▲', chCx, H*0.46);
     ctx.restore();
   }
 
@@ -972,12 +977,12 @@ function draw(){
     const dx = b.startX - b.x;
     const dy = b.startY - b.y;
     const dist = Math.sqrt(dx*dx+dy*dy);
-    const tension = dist/80;
+    const tension = dist/130;
     const bandColor = tension>0.7?'#ff2d78':tension>0.4?'#ff9500':'#ffd700';
 
     // Anchor points (fork of slingshot)
-    const forkL = {x: b.startX - 12, y: b.startY - 16};
-    const forkR = {x: b.startX + 12, y: b.startY - 16};
+    const forkL = {x: b.startX - 18, y: b.startY - 22};
+    const forkR = {x: b.startX + 18, y: b.startY - 22};
 
     ctx.save();
 
@@ -1018,8 +1023,8 @@ function draw(){
       ctx.lineWidth=1.5;
       ctx.shadowBlur=0;
       ctx.moveTo(px2,py2);
-      for(let i=0;i<22;i++){
-        pvx*=0.98; pvy+=0.25;
+      for(let i=0;i<40;i++){
+        pvx*=0.985; pvy+=0.22;
         px2+=pvx; py2+=pvy;
         if(px2<6||px2>W-4||py2<0) break;
         ctx.lineTo(px2,py2);
