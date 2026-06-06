@@ -584,16 +584,17 @@ function doDrag(p){
 function doRelease(){
   const b=G.ball;
   b.isDragging=false;
-  const dx=b.startX-b.x,dy=b.startY-b.y;
+  const dx=b.startX-b.x, dy=b.startY-b.y;
   const dist=Math.sqrt(dx*dx+dy*dy);
   if(dist<10){b.x=b.startX;b.y=b.startY;return;}
   const power=dist/140;
-  const spd=2.5+power*5;
-  b.vx=(dx/dist)*spd;b.vy=(dy/dist)*spd;
+  // Launch STRAIGHT UP only — no horizontal in channel
+  b.vx = 0;
+  b.vy = -(2.5+power*5);
   b.inLauncher=false;
-  b.inChannel=true;  // still in tube after launch
-  b.x=b.startX;b.y=b.startY;
-  SFX.launch(power);burst(b.x,b.y,'#ffd700',14);
+  b.inChannel=true;
+  b.x=b.startX; b.y=b.startY;
+  SFX.launch(power); burst(b.x,b.y,'#ffd700',14);
 }
 
 // ── PARTICLES ──────────────────────────────────
@@ -626,21 +627,19 @@ function physics(){
   if(b.inHole){b.holeTimer--;if(b.holeTimer<=0)ejectHole();return;}
   if(!isFinite(b.x)||!isFinite(b.y)){b.x=MR/2;b.y=H/2;b.vx=0;b.vy=-5;}
 
-  // ── ENFORCE CHANNEL CONTAINMENT ─────────────────
-  // If ball is in channel, HARD clamp x every single frame
+  // ── CHANNEL: ball goes straight up, no side movement ──
   if(b.inChannel){
-    const channelLeft  = MR + 4;
-    const channelRight = W  - 6;
-    if(b.x < channelLeft  + b.r){ b.x = channelLeft  + b.r; b.vx = Math.abs(b.vx)*BNC+0.3; }
-    if(b.x > channelRight - b.r){ b.x = channelRight - b.r; b.vx = -Math.abs(b.vx)*BNC; }
-    // ── EXIT at very top only ──────────────────────
-    if(b.y - b.r < H*0.04){
+    b.vx = 0; // ZERO horizontal — straight up only
+    b.x  = b.startX; // locked to channel centre
+    // When ball reaches very top of screen → enter main field
+    if(b.y + b.r < 0){
       b.inChannel = false;
-      b.x  = MR - b.r - 4;
-      b.vx = -(1.2 + Math.random()*2.5);
-      b.vy = Math.min(b.vy, -0.5);
+      // Place ball at top of main field, coming in from right side
+      b.x  = MR - b.r - 6;
+      b.y  = b.r + 4;
+      b.vx = -(1.0 + Math.random()*2.0);
+      b.vy = Math.abs(b.vy)*0.4; // slight downward
     }
-    // Still apply gravity etc. while in channel
   }
 
   b.vy+=GRAV;b.vx+=tiltX*0.06;b.vx*=FRIC;b.vy*=FRIC;
@@ -870,7 +869,20 @@ function draw(){
   // Bright inner left wall
   ctx.strokeStyle='rgba(255,200,80,0.9)';ctx.lineWidth=2;
   ctx.shadowColor='rgba(255,180,0,0.8)';ctx.shadowBlur=12;
-  ctx.beginPath();ctx.moveTo(MR,H*0.06);ctx.lineTo(MR,H);ctx.stroke();
+  // Wall with GAP at top where curve begins
+  ctx.beginPath();ctx.moveTo(MR,H*0.10);ctx.lineTo(MR,H);ctx.stroke();
+  // Top section of wall - short piece showing connection
+  ctx.beginPath();ctx.moveTo(MR,0);ctx.lineTo(MR,H*0.02);ctx.stroke();
+  ctx.restore();
+  // Draw OPEN GAP marker between H*0.02 and H*0.10
+  ctx.save();
+  ctx.strokeStyle='rgba(0,255,200,0.5)';ctx.lineWidth=1.5;
+  ctx.setLineDash([3,4]);
+  ctx.beginPath();ctx.moveTo(MR,H*0.02);ctx.lineTo(MR,H*0.10);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(0,255,200,0.6)';
+  ctx.font='700 9px Inter';ctx.textAlign='right';
+  ctx.fillText('EXIT →',MR-3,H*0.06);
   ctx.restore();
 
   // Right wall of tube
@@ -902,11 +914,11 @@ function draw(){
   // ── CURVED TOP ENTRANCE ────────────────────────
   // This is the hero piece - a glowing tube that bends left
   const curveStartX=MR;
-  const curveStartY=H*0.06;
-  const curveEndX=MR*0.48;
-  const curveEndY=H*0.018;
+  const curveStartY=H*0.10;
+  const curveEndX=MR*0.44;
+  const curveEndY=-8; // exits ABOVE the screen
   const cp1x=MR;       const cp1y=H*0.02;
-  const cp2x=MR*0.62;  const cp2y=H*0.005;
+  const cp2x=MR*0.60;  const cp2y=-H*0.02;
 
   // Draw thick outer glow layers of the curve
   ctx.save();
