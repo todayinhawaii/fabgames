@@ -593,7 +593,9 @@ function doRelease(){
   b.vy = -(2.5+power*5);
   b.inLauncher=false;
   b.inChannel=true;
-  b.x=b.startX; b.y=b.startY;
+  // Set position to current channel centre (not stored startX)
+  b.x = W - LANE/2 - 5;
+  b.y = H * 0.60;
   SFX.launch(power); burst(b.x,b.y,'#ffd700',14);
 }
 
@@ -627,28 +629,32 @@ function physics(){
   if(b.inHole){b.holeTimer--;if(b.holeTimer<=0)ejectHole();return;}
   if(!isFinite(b.x)||!isFinite(b.y)){b.x=MR/2;b.y=H/2;b.vx=0;b.vy=-5;}
 
-  // ── CHANNEL: ball goes straight up, no side movement ──
+  // ── CHANNEL MODE: straight up only, locked to tube ──────
   if(b.inChannel){
-    b.vx = 0; // ZERO horizontal — straight up only
-    b.x  = b.startX; // locked to channel centre
-    // When ball reaches very top of screen → enter main field
+    const chCX = W - LANE/2 - 5; // dynamic centre of channel
+    b.x  = chCX;   // hard-lock x to channel centre every frame
+    b.vx = 0;      // zero horizontal always
+    b.vy += GRAV;  // only gravity affects movement
+    b.y  += b.vy;  // only y moves
+    // Entered main field when ball clears TOP of screen
     if(b.y + b.r < 0){
       b.inChannel = false;
-      // Place ball at top of main field, coming in from right side
-      b.x  = MR - b.r - 6;
-      b.y  = b.r + 4;
-      b.vx = -(1.0 + Math.random()*2.0);
-      b.vy = Math.abs(b.vy)*0.4; // slight downward
+      b.x  = MR - b.r - 8;
+      b.y  = b.r + 2;
+      b.vx = -(0.8 + Math.random()*1.8);
+      b.vy = 1.0;
     }
+    return; // SKIP all other physics while in channel
   }
 
-  b.vy+=GRAV;b.vx+=tiltX*0.06;b.vx*=FRIC;b.vy*=FRIC;
+  // ── MAIN FIELD PHYSICS ────────────────────────────────
+  b.vy+=GRAV; b.vx+=tiltX*0.06; b.vx*=FRIC; b.vy*=FRIC;
 
   // Speed clamp
   const spd=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
   if(spd>7){b.vx*=7/spd;b.vy*=7/spd;}
   if(spd>0.05&&spd<0.6){b.vx=(b.vx/spd)*0.6;b.vy=(b.vy/spd)*0.6;}
-  b.x+=b.vx;b.y+=b.vy;
+  b.x+=b.vx; b.y+=b.vy;
 
   // Stuck rescue
   const mv=Math.abs(b.x-b.lastX)+Math.abs(b.y-b.lastY);
@@ -819,7 +825,9 @@ function lostBall(){
   setTimeout(()=>{
     G.ball=makeBall();
     G.flips=makeFlips();
-    // Show demo again after reset
+    // Reset ball to live channel position
+    G.ball.x = W - LANE/2 - 5;
+    G.ball.y = H * 0.60;
     if(gameRunning) startSlingshotDemo();
   },700);
 }
