@@ -12,7 +12,10 @@ body{
   color:#fff;
   font-family:'Inter',sans-serif;
   overflow:hidden;
-  height:100vh;
+  height:100%;
+  width:100%;
+  position:fixed;
+  top:0;left:0;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -54,6 +57,7 @@ body{
   width:100%;
   max-width:420px;
   overflow:hidden;
+  min-height:0;
 }
 canvas{
   display:block;
@@ -68,11 +72,14 @@ canvas{
   display:flex;
   gap:6px;
   flex-shrink:0;
-  height:100px;
-  padding:8px 10px 12px;
-  background:#0a0008;
-  border-top:3px solid rgba(255,45,120,0.5);
-  box-shadow:0 -4px 30px rgba(255,45,120,0.2);
+  min-height:90px;
+  height:90px;
+  padding:8px 10px 10px;
+  background:#150010;
+  border-top:3px solid #ff2d78;
+  box-shadow:0 -4px 30px rgba(255,45,120,0.4);
+  position:relative;
+  z-index:20;
 }
 .flip-btn{
   flex:1;
@@ -148,6 +155,7 @@ canvas{
   color:rgba(255,255,255,0.3);text-decoration:none;
 }
 </style>
+<style>html{height:100%;overflow:hidden;}</style>
 </head>
 <body>
 
@@ -487,6 +495,12 @@ function updateBall(){
     return;
   }
 
+  // Guard against NaN
+  if(!isFinite(b.x)) b.x = W/2;
+  if(!isFinite(b.y)) b.y = H*0.5;
+  if(!isFinite(b.vx)) b.vx = 0;
+  if(!isFinite(b.vy)) b.vy = 0;
+
   // Gravity + tilt
   b.vy += GRAVITY;
   b.vx += tiltX * 0.08;
@@ -776,10 +790,14 @@ function draw(){
     // Fill
     ctx.beginPath();
     ctx.arc(bmp.x, bmp.y, bmp.r, 0, Math.PI*2);
-    const grad = ctx.createRadialGradient(bmp.x-bmp.r*0.3, bmp.y-bmp.r*0.3, 0, bmp.x, bmp.y, bmp.r);
-    grad.addColorStop(0, lit ? '#fff' : 'rgba(255,255,255,0.3)');
-    grad.addColorStop(1, lit ? bmp.color : 'rgba(0,0,0,0.5)');
-    ctx.fillStyle = grad;
+    try{
+      const grad = ctx.createRadialGradient(bmp.x-bmp.r*0.3, bmp.y-bmp.r*0.3, 0, bmp.x, bmp.y, bmp.r);
+      grad.addColorStop(0, lit ? '#fff' : 'rgba(255,255,255,0.3)');
+      grad.addColorStop(1, lit ? bmp.color : 'rgba(0,0,0,0.5)');
+      ctx.fillStyle = grad;
+    } catch(e){
+      ctx.fillStyle = lit ? bmp.color : 'rgba(255,255,255,0.2)';
+    }
     ctx.fill();
 
     // Points label
@@ -826,22 +844,32 @@ function draw(){
     ctx.save();
     ctx.shadowColor = '#c0c0c0';
     ctx.shadowBlur = b.inLauncher ? 8 : 15;
-    const ballGrad = ctx.createRadialGradient(
-      b.x - b.r*0.3, b.y - b.r*0.4, 0,
-      b.x, b.y, b.r
-    );
-    ballGrad.addColorStop(0, '#ffffff');
-    ballGrad.addColorStop(0.4, '#d0d0d0');
-    ballGrad.addColorStop(1, '#606060');
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
-    ctx.fillStyle = ballGrad;
-    ctx.fill();
-    // Shine
-    ctx.beginPath();
-    ctx.arc(b.x - b.r*0.3, b.y - b.r*0.35, b.r*0.25, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fill();
+    if(isFinite(b.x) && isFinite(b.y) && isFinite(b.r) && b.r > 0){
+      try{
+        const ballGrad = ctx.createRadialGradient(
+          b.x - b.r*0.3, b.y - b.r*0.4, 0,
+          b.x, b.y, b.r
+        );
+        ballGrad.addColorStop(0, '#ffffff');
+        ballGrad.addColorStop(0.4, '#d0d0d0');
+        ballGrad.addColorStop(1, '#606060');
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+        ctx.fillStyle = ballGrad;
+        ctx.fill();
+        // Shine
+        ctx.beginPath();
+        ctx.arc(b.x - b.r*0.3, b.y - b.r*0.35, b.r*0.25, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.fill();
+      } catch(e){
+        // Fallback solid circle
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+        ctx.fillStyle = '#d0d0d0';
+        ctx.fill();
+      }
+    }
     ctx.restore();
   }
 
@@ -892,6 +920,7 @@ function draw(){
 }
 
 function drawFlipper(fl, isRight){
+  if(!isFinite(fl.cx)||!isFinite(fl.cy)||!isFinite(fl.angle)) return;
   ctx.save();
   const active = fl.active;
   ctx.shadowColor = active ? '#ff2d78' : '#ff69b480';
