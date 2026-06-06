@@ -196,7 +196,7 @@ function resize(){
   canvas.width=wrap.clientWidth;
   canvas.height=wrap.clientHeight;
   W=canvas.width; H=canvas.height;
-  if(G) buildLayout();
+  if(W>50&&H>50) buildLayout();
 }
 window.addEventListener('resize',resize);
 window.addEventListener('load',()=>{resize();setTimeout(resize,100);});
@@ -270,9 +270,7 @@ let bumpers=[],targets=[],holes=[],walls=[];
 let merry={angle:0,speed:0.018,pts:200,lit:0};
 
 function buildLayout(){
-  // FULL WIDTH gameplay — no tube!
-  // Bumpers in diamond/triangle layout for good ball flow
-  // Gold and silver colors — Vegas retro
+  if(!W||!H||W<50||H<50) return; // wait for valid dimensions
   const cx=W/2;
   bumpers=[
     // Top row — 3 large gold bumpers spread wide
@@ -392,9 +390,12 @@ function startGame(){
   document.getElementById('gameOverScreen').classList.add('hidden');
   setTimeout(resize,10);
   setTimeout(()=>{
+    resize(); // ensure W/H are correct BEFORE building layout
+    buildLayout(); // explicitly rebuild with correct dimensions
     G={score:0,best:parseInt(localStorage.getItem('pbBest3')||'0'),
        ball:null,flips:null,pts:[],flash:'',flashT:0,combo:0,comboTmr:null,over:false};
     G.ball=makeBall(); G.flips=makeFlips();
+    buildLayout(); // build again now G exists
     gameRunning=false; demoActive=false;
     const btn=document.getElementById('goStopBtn');
     btn.style.display='flex'; btn.className='go';
