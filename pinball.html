@@ -320,8 +320,8 @@ function makeBall(){
     dragX: cx, dragY: startY,
     isDragging: false,
     inHole: false, holeTimer: 0, holeTarget: null,
-    // legacy - not used
     launchPower: 0, launching: false,
+    stuckTimer: 0, lastX: cx, lastY: startY,
   };
 }
 
@@ -616,26 +616,52 @@ function updateBall(){
   const speed = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
   if(speed > 20){ b.vx *= 20/speed; b.vy *= 20/speed; }
 
+  // Minimum speed — never let ball crawl to a stop
+  if(speed > 0.1 && speed < 1.8){
+    b.vx = (b.vx/speed) * 1.8;
+    b.vy = (b.vy/speed) * 1.8;
+  }
+
   b.x += b.vx;
   b.y += b.vy;
+
+  // ── STUCK DETECTION ──────────────────────────
+  const moved = Math.abs(b.x - b.lastX) + Math.abs(b.y - b.lastY);
+  if(moved < 1.5){
+    b.stuckTimer++;
+  } else {
+    b.stuckTimer = 0;
+    b.lastX = b.x;
+    b.lastY = b.y;
+  }
+  // If stuck for 60 frames (1 second) — RESCUE the ball!!
+  if(b.stuckTimer > 60){
+    b.stuckTimer = 0;
+    b.vx = (Math.random() - 0.5) * 8;
+    b.vy = -10 - Math.random() * 6;
+    // Move ball to centre of field to unstick
+    const MResc = W - LANE_W - 6;
+    if(b.x > MResc - b.r * 2) b.x = MResc * 0.5;
+    addParticles(b.x, b.y, '#ff2d78', 10);
+  }
 
   // Wall bounce
   const MR = W - LANE_W - 6;
   // Left wall
   if(b.x - b.r < 6){ b.x = 6+b.r; b.vx = Math.abs(b.vx)*BOUNCE; sndWallBounce(); }
-  // Right wall of MAIN FIELD (not the outer wall)
-  if(b.x + b.r > MR && b.y > H*0.05){
-    b.x = MR - b.r;
-    b.vx = -Math.abs(b.vx)*BOUNCE;
+  const MR_wall = W - LANE_W - 6;
+  // Right wall of MAIN FIELD — strong push back
+  if(b.x + b.r > MR_wall){
+    b.x = MR_wall - b.r - 1;
+    b.vx = -Math.abs(b.vx) * BOUNCE - 1; // always bounces left
+    if(Math.abs(b.vx) < 2) b.vx = -3; // min bounce speed
     sndWallBounce();
   }
-  // When ball exits top of launcher channel into main field
-  if(b.x > MR && b.y < H*0.06){
-    b.x = MR - b.r;
-    b.vx = -(2 + Math.random()*3); // deflect LEFT into main field
+  // When ball exits top of channel into main field
+  if(b.x > MR_wall - b.r && b.y < H*0.08){
+    b.x = MR_wall - b.r - 2;
+    b.vx = -(3 + Math.random()*4);
   }
-  // Outer right wall (launcher channel outer edge)
-  if(b.x + b.r > W-4){ b.x = W-4-b.r; b.vx = -Math.abs(b.vx)*BOUNCE; }
   // Top wall
   if(b.y - b.r < 0){ b.y = b.r; b.vy = Math.abs(b.vy)*BOUNCE; sndWallBounce(); }
 
@@ -650,16 +676,26 @@ function updateBall(){
     const dy = b.y - bmp.y;
     const dist = Math.sqrt(dx*dx+dy*dy);
     if(dist < b.r + bmp.r + 2){
-      const nx = dx/dist;
-      const ny = dy/dist;
+      // Push ball OUT strongly — never let it stay inside
+      const nx = dx/(dist||1);
+      const ny = dy/(dist||1);
+      // Ensure ball moves AWAY from bumper
       const dot = b.vx*nx + b.vy*ny;
-      b.vx = (b.vx - 2*dot*nx) * 1.1;
-      b.vy = (b.vy - 2*dot*ny) * 1.1;
-      b.x = bmp.x + nx*(b.r+bmp.r+2);
-      b.y = bmp.y + ny*(b.r+bmp.r+2);
-      bmp.lit = 12;
-      sndBumper(bmp.pts);
-      addScore(bmp.pts, bmp.x, bmp.y, bmp.color);
+      b.vx = (b.vx - 2*dot*nx);
+      b.vy = (b.vy - 2*dot*ny);
+      // Boost away
+      const outSpeed = Math.max(Math.sqrt(b.vx*b.vx+b.vy*b.vy), 5);
+      b.vx = nx * outSpeed * 1.15;
+      b.vy = ny * outSpeed * 1.15;
+      // Push clear of bumper completely
+      b.x = bmp.x + nx * (b.r + bmp.r + 4);
+      b.y = bmp.y + ny * (b.r + bmp.r + 4);
+      // Only score if bumper cooldown is clear (prevents infinite scoring)
+      if(bmp.lit <= 0){
+        bmp.lit = 20;
+        sndBumper(bmp.pts);
+        addScore(bmp.pts, bmp.x, bmp.y, bmp.color);
+      }
     }
     if(bmp.lit > 0) bmp.lit--;
   }
