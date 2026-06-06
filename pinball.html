@@ -196,9 +196,10 @@ function resize(){
   canvas.width=wrap.clientWidth;
   canvas.height=wrap.clientHeight;
   W=canvas.width; H=canvas.height;
-  if(W>50&&H>50) buildLayout();
+  // Only rebuild layout during gameplay, not on every resize
+  if(G && W>50 && H>50) buildLayout();
 }
-window.addEventListener('resize',resize);
+window.addEventListener('resize',()=>{resize();});
 window.addEventListener('load',()=>{resize();setTimeout(resize,100);});
 
 // ── PHYSICS ────────────────────────────────────
@@ -388,14 +389,16 @@ function startGame(){
   initAudio();rAC();
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('gameOverScreen').classList.add('hidden');
-  setTimeout(resize,10);
+  // Use longer delay so flex layout settles before reading dimensions
   setTimeout(()=>{
-    resize(); // ensure W/H are correct BEFORE building layout
-    buildLayout(); // explicitly rebuild with correct dimensions
+    resize();
+    if(!W||W<50){W=canvas.parentElement.clientWidth||300;}
+    if(!H||H<50){H=canvas.parentElement.clientHeight||500;}
+    canvas.width=W; canvas.height=H;
     G={score:0,best:parseInt(localStorage.getItem('pbBest3')||'0'),
        ball:null,flips:null,pts:[],flash:'',flashT:0,combo:0,comboTmr:null,over:false};
+    buildLayout(); // build with settled dimensions
     G.ball=makeBall(); G.flips=makeFlips();
-    buildLayout(); // build again now G exists
     gameRunning=false; demoActive=false;
     const btn=document.getElementById('goStopBtn');
     btn.style.display='flex'; btn.className='go';
@@ -713,6 +716,8 @@ function animFlips(){
 // ── DRAW ───────────────────────────────────────
 function draw(){
   if(!W||!H||W<10||H<10)return;
+  // Safety: rebuild bumpers if they got lost
+  if(G && bumpers.length===0 && W>50) buildLayout();
   ctx.clearRect(0,0,W,H);
 
   // Vegas green felt background
