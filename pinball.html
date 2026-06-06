@@ -654,16 +654,16 @@ function physics(){
     b.x=3+b.r;
     b.vx=Math.abs(b.vx)*rb+0.4+Math.random()*0.6;
     b.vy+=(Math.random()-0.5)*1.5; // random vertical kick
-    SFX.wall();
+    
   }
   if(b.x+b.r>W-3){
     const rb=0.28+Math.random()*0.35;
     b.x=W-3-b.r;
     b.vx=-(Math.abs(b.vx)*rb+0.4+Math.random()*0.6);
     b.vy+=(Math.random()-0.5)*1.5;
-    SFX.wall();
+    
   }
-  if(b.y-b.r<2){b.y=2+b.r;b.vy=Math.abs(b.vy)*BNC;b.vx+=(Math.random()-0.5)*1.0;SFX.wall();}
+  if(b.y-b.r<2){b.y=2+b.r;b.vy=Math.abs(b.vy)*BNC;b.vx+=(Math.random()-0.5)*1.0;}
 
   // Angled walls
   for(const w of walls)wallHit(b,w);
