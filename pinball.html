@@ -250,60 +250,71 @@ let holes = [];
 let lanes = [];
 let walls = [];
 
+// Launcher channel width
+const LANE_W = 28;
+
 function buildLayout(){
   W = canvas.width;
   H = canvas.height;
 
-  // BUMPERS (circular — bounce ball away)
+  // Main field right boundary — leaves room for launcher channel
+  const MR = W - LANE_W - 6; // main field right edge
+
+  // BUMPERS — all inside main field (left of MR)
   bumpers = [
-    {x:W*0.25, y:H*0.22, r:28, pts:100, lit:0, color:'#ff2d78'},
-    {x:W*0.75, y:H*0.22, r:28, pts:100, lit:0, color:'#ff2d78'},
-    {x:W*0.50, y:H*0.18, r:28, pts:100, lit:0, color:'#ff2d78'},
-    {x:W*0.30, y:H*0.36, r:22, pts:50,  lit:0, color:'#ff9500'},
-    {x:W*0.70, y:H*0.36, r:22, pts:50,  lit:0, color:'#ff9500'},
-    {x:W*0.50, y:H*0.32, r:22, pts:50,  lit:0, color:'#ff9500'},
-    {x:W*0.20, y:H*0.50, r:18, pts:30,  lit:0, color:'#00ffff'},
-    {x:W*0.80, y:H*0.50, r:18, pts:30,  lit:0, color:'#00ffff'},
+    {x:MR*0.28, y:H*0.18, r:26, pts:100, lit:0, color:'#ff2d78'},
+    {x:MR*0.72, y:H*0.18, r:26, pts:100, lit:0, color:'#ff2d78'},
+    {x:MR*0.50, y:H*0.13, r:26, pts:100, lit:0, color:'#ff2d78'},
+    {x:MR*0.20, y:H*0.32, r:20, pts:50,  lit:0, color:'#ff9500'},
+    {x:MR*0.80, y:H*0.32, r:20, pts:50,  lit:0, color:'#ff9500'},
+    {x:MR*0.50, y:H*0.28, r:20, pts:50,  lit:0, color:'#ff9500'},
+    {x:MR*0.18, y:H*0.46, r:16, pts:30,  lit:0, color:'#00ffff'},
+    {x:MR*0.82, y:H*0.46, r:16, pts:30,  lit:0, color:'#00ffff'},
   ];
 
-  // SCORE TARGETS (rectangular gates)
+  // SCORE TARGETS
   targets = [
-    {x:W*0.15, y:H*0.12, w:28, h:10, pts:200, lit:0, color:'#ffd700', label:'200'},
-    {x:W*0.50, y:H*0.08, w:28, h:10, pts:500, lit:0, color:'#ff2d78', label:'500'},
-    {x:W*0.85, y:H*0.12, w:28, h:10, pts:200, lit:0, color:'#ffd700', label:'200'},
+    {x:MR*0.18, y:H*0.08, w:26, h:10, pts:200, lit:0, color:'#ffd700', label:'200'},
+    {x:MR*0.50, y:H*0.05, w:26, h:10, pts:500, lit:0, color:'#ff2d78', label:'500'},
+    {x:MR*0.82, y:H*0.08, w:26, h:10, pts:200, lit:0, color:'#ffd700', label:'200'},
   ];
 
-  // HOLES (sink ball briefly, eject with bonus)
+  // HOLES
   holes = [
-    {x:W*0.50, y:H*0.55, r:22, pts:1000, lit:0, active:false, timer:0, color:'#9b59b6', label:'1000'},
-    {x:W*0.20, y:H*0.65, r:18, pts:300,  lit:0, active:false, timer:0, color:'#3498db', label:'300'},
-    {x:W*0.80, y:H*0.65, r:18, pts:300,  lit:0, active:false, timer:0, color:'#3498db', label:'300'},
+    {x:MR*0.50, y:H*0.52, r:20, pts:1000, lit:0, active:false, timer:0, color:'#9b59b6', label:'1000'},
+    {x:MR*0.22, y:H*0.62, r:16, pts:300,  lit:0, active:false, timer:0, color:'#3498db', label:'300'},
+    {x:MR*0.78, y:H*0.62, r:16, pts:300,  lit:0, active:false, timer:0, color:'#3498db', label:'300'},
   ];
 
-  // LANES (vertical score channels at top)
   lanes = [
-    {x:W*0.08, pts:150, lit:0},
-    {x:W*0.92, pts:150, lit:0},
+    {x:MR*0.10, pts:150, lit:0},
+    {x:MR*0.90, pts:150, lit:0},
   ];
 
-  // WALLS (angled guides)
+  // WALLS — infield guides + launcher separator
   walls = [
-    // Left angled wall
-    {x1:0,       y1:H*0.75, x2:W*0.18, y2:H*0.90},
-    // Right angled wall
-    {x1:W,       y1:H*0.75, x2:W*0.82, y2:H*0.90},
-    // Left upper guide
-    {x1:0,       y1:H*0.40, x2:W*0.12, y2:H*0.52},
-    // Right upper guide
-    {x1:W,       y1:H*0.40, x2:W*0.88, y2:H*0.52},
+    // Left angled drain guide
+    {x1:6,      y1:H*0.76, x2:MR*0.22, y2:H*0.88},
+    // Right angled drain guide (inside main field)
+    {x1:MR,     y1:H*0.76, x2:MR*0.78, y2:H*0.88},
+    // Left upper bumper guide
+    {x1:6,      y1:H*0.38, x2:MR*0.14, y2:H*0.50},
+    // Right upper bumper guide
+    {x1:MR,     y1:H*0.38, x2:MR*0.86, y2:H*0.50},
+    // LAUNCHER WALL — separates channel from main field
+    // Goes from top down to just above the flippers, then opens
+    {x1:MR, y1:0, x2:MR, y2:H*0.82},
   ];
 }
 
 // ── BALL ────────────────────────────────────────
 function makeBall(){
+  // Ball sits in the launcher channel (right side)
+  const MR = W - LANE_W - 6;
+  const cx = MR + LANE_W/2; // centre of channel
   return {
-    x: W * 0.92,
-    y: H * 0.85,
+    x: cx,
+    y: H * 0.82,
     vx: 0,
     vy: 0,
     r: 10,
@@ -318,28 +329,32 @@ function makeBall(){
 
 // ── FLIPPERS ─────────────────────────────────────
 function makeFlippers(){
-  const cx = W * 0.5;
-  const y  = H * 0.875;
-  const len = W * 0.22;
-  const gap = W * 0.08;
+  const MR = W - LANE_W - 6;
+  const fieldW = MR - 6; // usable field width
+  const cx = fieldW / 2 + 6; // centre of main field
+  const y  = H * 0.88;
+  const len = fieldW * 0.28;
+  const gap = fieldW * 0.06;
   return {
     left:{
-      cx: cx - gap - len*0.1,
+      cx: cx - gap,
       cy: y,
       len: len,
-      angle: 0.45,   // resting angle (radians up from horizontal)
-      targetAngle: 0.45,
+      angle: 0.42,
+      targetAngle: 0.42,
       active: false,
-      activeAngle: -0.45,
+      activeAngle: -0.42,
+      _wasActive: false,
     },
     right:{
-      cx: cx + gap + len*0.1,
+      cx: cx + gap,
       cy: y,
       len: len,
-      angle: Math.PI - 0.45,
-      targetAngle: Math.PI - 0.45,
+      angle: Math.PI - 0.42,
+      targetAngle: Math.PI - 0.42,
       active: false,
-      activeAngle: Math.PI + 0.45,
+      activeAngle: Math.PI + 0.42,
+      _wasActive: false,
     },
   };
 }
@@ -383,8 +398,8 @@ function flipLeft(down){
   if(!down && state.ball.inLauncher && state.ball.launching){
     // LAUNCH!!
     const power = Math.min(state.ball.launchPower, 1);
-    state.ball.vy = -(14 + power * 10);
-    state.ball.vx = -1 + Math.random()*0.5;
+    state.ball.vy = -(16 + power * 12);
+    state.ball.vx = 0; // shoots straight up channel
     state.ball.inLauncher = false;
     state.ball.launching = false;
     sndLaunch(state.ball.launchPower);
@@ -515,8 +530,23 @@ function updateBall(){
   b.y += b.vy;
 
   // Wall bounce
-  if(b.x - b.r < 0){ b.x = b.r; b.vx = Math.abs(b.vx)*BOUNCE; sndWallBounce(); }
-  if(b.x + b.r > W){ b.x = W-b.r; b.vx = -Math.abs(b.vx)*BOUNCE; sndWallBounce(); }
+  const MR = W - LANE_W - 6;
+  // Left wall
+  if(b.x - b.r < 6){ b.x = 6+b.r; b.vx = Math.abs(b.vx)*BOUNCE; sndWallBounce(); }
+  // Right wall of MAIN FIELD (not the outer wall)
+  if(b.x + b.r > MR && b.y > H*0.05){
+    b.x = MR - b.r;
+    b.vx = -Math.abs(b.vx)*BOUNCE;
+    sndWallBounce();
+  }
+  // When ball exits top of launcher channel into main field
+  if(b.x > MR && b.y < H*0.06){
+    b.x = MR - b.r;
+    b.vx = -(2 + Math.random()*3); // deflect LEFT into main field
+  }
+  // Outer right wall (launcher channel outer edge)
+  if(b.x + b.r > W-4){ b.x = W-4-b.r; b.vx = -Math.abs(b.vx)*BOUNCE; }
+  // Top wall
   if(b.y - b.r < 0){ b.y = b.r; b.vy = Math.abs(b.vy)*BOUNCE; sndWallBounce(); }
 
   // Angled walls
@@ -814,29 +844,59 @@ function draw(){
   drawFlipper(state.flippers.left, false);
   drawFlipper(state.flippers.right, true);
 
-  // Launcher channel
-  ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(W-22, H*0.7);
-  ctx.lineTo(W-22, H*0.92);
-  ctx.stroke();
-  ctx.restore();
+  // Draw launcher channel (right side)
+  if(W && H){
+    const MR2 = W - LANE_W - 6;
+    ctx.save();
+    // Channel background
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(MR2, H*0.05, LANE_W+6, H*0.95);
+    // Channel walls
+    ctx.strokeStyle = 'rgba(255,180,0,0.6)';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(MR2, H*0.05); ctx.lineTo(MR2, H*0.82); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(W-4, H*0.05); ctx.lineTo(W-4, H*0.95); ctx.stroke();
+    // Opening at top (where ball enters main field)
+    ctx.strokeStyle = 'rgba(255,215,0,0.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(MR2, H*0.05);
+    ctx.lineTo(MR2-12, H*0.02);
+    ctx.stroke();
+    // Arrow hint
+    ctx.fillStyle = 'rgba(255,215,0,0.3)';
+    ctx.font = '700 10px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('▲', MR2 + LANE_W/2 + 3, H*0.5);
+    ctx.fillText('▲', MR2 + LANE_W/2 + 3, H*0.58);
+    ctx.fillText('▲', MR2 + LANE_W/2 + 3, H*0.66);
+    ctx.restore();
+  }
 
   // Ball (or launcher power indicator)
   const b = state.ball;
-  if(b.inLauncher){
-    // Draw launcher power bar
+  if(b.inLauncher && W && H){
+    const MR3 = W - LANE_W - 6;
+    const cx3 = MR3 + LANE_W/2 + 3;
     ctx.save();
-    ctx.fillStyle='rgba(255,255,255,0.1)';
-    ctx.fillRect(W-20, H*0.7, 14, H*0.22);
-    const barH = b.launchPower * H*0.22;
+    // Power bar background
+    ctx.fillStyle='rgba(255,255,255,0.08)';
+    ctx.fillRect(MR3+4, H*0.65, LANE_W-2, H*0.18);
+    // Power bar fill
+    const barH = b.launchPower * H*0.18;
     const powerColor = b.launchPower > 0.7 ? '#ff2d78' : b.launchPower > 0.4 ? '#ff9500' : '#ffd700';
     ctx.fillStyle = powerColor;
     ctx.shadowColor = powerColor;
-    ctx.shadowBlur = 10;
-    ctx.fillRect(W-20, H*0.92-barH, 14, barH);
+    ctx.shadowBlur = 12;
+    ctx.fillRect(MR3+4, H*0.83-barH, LANE_W-2, barH);
+    // Label
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '600 9px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('PWR', cx3, H*0.87);
     ctx.restore();
   }
 
@@ -907,14 +967,16 @@ function draw(){
   }
 
   // Launcher instruction
-  if(state.ball.inLauncher && !state.ball.launching){
+  if(state.ball.inLauncher && !state.ball.launching && W && H){
+    const MR4 = W - LANE_W - 6;
     ctx.save();
     ctx.globalAlpha = 0.5 + 0.3*Math.sin(Date.now()*0.004);
     ctx.fillStyle = '#ffd700';
-    ctx.font = '700 10px Inter';
+    ctx.font = '700 11px Inter';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('HOLD LEFT TO LAUNCH', W/2, H*0.92);
+    ctx.fillText('HOLD ◀ TO', W/2, H*0.915);
+    ctx.fillText('LAUNCH!', W/2, H*0.935);
     ctx.restore();
   }
 }
