@@ -137,21 +137,28 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
   font-weight:400;
 }
 
-/* PLAY button — soft sage green */
+/* PLAY button — gold chocolate box */
 .play-btn{
   display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:10px 0;
-  background:linear-gradient(135deg,rgba(74,160,100,0.7),rgba(45,120,70,0.8));
-  border:1px solid rgba(100,200,130,0.25);
+  padding:11px 0;
+  background:transparent;
+  border:1px solid rgba(201,168,76,0.55);
   border-radius:8px;
-  color:rgba(220,255,230,0.95);font-size:11px;font-weight:700;letter-spacing:2px;
+  color:#c9a84c;
+  font-size:11px;font-weight:700;letter-spacing:2.5px;
   text-transform:uppercase;
   font-family:'Inter',sans-serif;cursor:pointer;
-  box-shadow:0 2px 10px rgba(60,140,80,0.2);
-  transition:all 0.2s;width:100%;margin-bottom:7px;
-  backdrop-filter:blur(4px);
+  box-shadow:0 1px 8px rgba(201,168,76,0.12),inset 0 1px 0 rgba(255,215,0,0.08);
+  transition:all 0.22s;width:100%;margin-bottom:7px;
+  backdrop-filter:blur(6px);
 }
-.play-btn:hover{background:linear-gradient(135deg,rgba(90,180,115,0.8),rgba(55,140,80,0.9));box-shadow:0 4px 16px rgba(60,140,80,0.35);transform:translateY(-1px);}
+.play-btn:hover{
+  background:rgba(201,168,76,0.1);
+  border-color:rgba(255,215,0,0.75);
+  color:#ffd700;
+  box-shadow:0 3px 16px rgba(201,168,76,0.25),inset 0 1px 0 rgba(255,215,0,0.15);
+  transform:translateY(-1px);
+}
 
 /* Add to Home Screen */
 .game-dl-btn{
