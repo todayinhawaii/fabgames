@@ -248,17 +248,35 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   aspect-ratio:3/4;
   text-decoration:none;display:block;
   border-radius:16px;
-  background:linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03));
-  border:1px solid rgba(255,255,255,0.12);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1);
+  background:linear-gradient(
+    145deg,
+    rgba(255,255,255,0.11) 0%,
+    rgba(180,160,255,0.05) 40%,
+    rgba(100,180,255,0.04) 70%,
+    rgba(255,255,255,0.06) 100%
+  );
+  border:1px solid rgba(255,255,255,0.14);
+  border-top:1px solid rgba(255,255,255,0.22);
+  border-left:1px solid rgba(255,255,255,0.18);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.1);
   transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
 }
 .game-card:hover{
   transform:translateY(-6px) scale(1.02);
-  border-color:rgba(255,215,0,0.35);
-  box-shadow:0 20px 50px rgba(0,0,0,0.5),0 0 25px rgba(255,215,0,0.12),inset 0 1px 0 rgba(255,255,255,0.15);
+  border-color:rgba(255,255,255,0.28);
+  background:linear-gradient(
+    145deg,
+    rgba(255,255,255,0.15) 0%,
+    rgba(180,160,255,0.07) 40%,
+    rgba(100,180,255,0.06) 70%,
+    rgba(255,255,255,0.09) 100%
+  );
+  box-shadow:0 20px 50px rgba(0,0,0,0.5),0 0 30px rgba(255,255,255,0.06),inset 0 1px 0 rgba(255,255,255,0.22);
 }
 
 /* Background emoji / image */
@@ -315,22 +333,21 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   font-weight:400;
 }
 
-/* PLAY button — green shimmer */
+/* PLAY button — soft sage green */
 .play-btn{
   display:flex;align-items:center;justify-content:center;gap:6px;
   padding:10px 0;
-  background:linear-gradient(135deg,#22c55e 0%,#16a34a 50%,#22c55e 100%);
-  background-size:200% 100%;
-  animation:playShimmer 2.5s ease infinite;
-  border:none;border-radius:8px;
-  color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;
+  background:linear-gradient(135deg,rgba(74,160,100,0.7),rgba(45,120,70,0.8));
+  border:1px solid rgba(100,200,130,0.25);
+  border-radius:8px;
+  color:rgba(220,255,230,0.95);font-size:11px;font-weight:700;letter-spacing:2px;
   text-transform:uppercase;
   font-family:'Inter',sans-serif;cursor:pointer;
-  box-shadow:0 3px 12px rgba(34,197,94,0.3);
+  box-shadow:0 2px 10px rgba(60,140,80,0.2);
   transition:all 0.2s;width:100%;margin-bottom:7px;
+  backdrop-filter:blur(4px);
 }
-@keyframes playShimmer{0%{background-position:100% 0;}100%{background-position:-100% 0;}}
-.play-btn:hover{box-shadow:0 5px 20px rgba(34,197,94,0.5);transform:translateY(-1px);}
+.play-btn:hover{background:linear-gradient(135deg,rgba(90,180,115,0.8),rgba(55,140,80,0.9));box-shadow:0 4px 16px rgba(60,140,80,0.35);transform:translateY(-1px);}
 
 /* Add to Home Screen */
 .game-dl-btn{
@@ -456,27 +473,7 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
 
 
 
-<!-- WORLD SECTION -->
-<section id="world">
-  <div class="section-badge">— Coming to the World</div>
-  <h2 class="section-title">Every <em>Country</em><br>Every <em>Culture</em></h2>
-  <p class="section-sub">We're just getting started. Games inspired by extraordinary places worldwide — coming soon.</p>
-  <div class="divider"></div>
-  <div class="world-grid">
-    <div class="world-item"><div class="world-item-flag">🌺</div><div class="world-item-name">Hawaii</div></div>
-    <div class="world-item"><div class="world-item-flag">🗼</div><div class="world-item-name">Paris</div></div>
-    <div class="world-item"><div class="world-item-flag">🗽</div><div class="world-item-name">New York</div></div>
-    <div class="world-item"><div class="world-item-flag">⛩️</div><div class="world-item-name">Tokyo</div></div>
-    <div class="world-item"><div class="world-item-flag">🎭</div><div class="world-item-name">Venice</div></div>
-    <div class="world-item"><div class="world-item-flag">🏔️</div><div class="world-item-name">Alps</div></div>
-    <div class="world-item"><div class="world-item-flag">🦁</div><div class="world-item-name">Safari</div></div>
-    <div class="world-item"><div class="world-item-flag">🎪</div><div class="world-item-name">Barcelona</div></div>
-    <div class="world-item"><div class="world-item-flag">🏛️</div><div class="world-item-name">Rome</div></div>
-    <div class="world-item"><div class="world-item-flag">🌅</div><div class="world-item-name">Bali</div></div>
-    <div class="world-item"><div class="world-item-flag">🎸</div><div class="world-item-name">Nashville</div></div>
-    <div class="world-item"><div class="world-item-flag">✨</div><div class="world-item-name">More...</div></div>
-  </div>
-</section>
+
 
 <!-- PRICING -->
 <section id="pricing" style="text-align:center;">
