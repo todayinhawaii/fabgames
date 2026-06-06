@@ -277,10 +277,10 @@ const SFX={
     tone(880,'sine',0.04,0.2,0.03);
     tone(1320,'sine',0.02,0.1,0.06);
   },
-  // Wall — soft bright tick, like a coin tap
+  // Wall — ultra soft whisper shimmer, barely there
   wall:()=>{
-    tone(1047,'sine',0.05,0.15);
-    tone(1568,'sine',0.03,0.08,0.02);
+    tone(2093,'sine',0.04,0.06,0);    // very short, very quiet, very high
+    tone(2637,'sine',0.02,0.04,0.02); // almost inaudible sparkle
   },
   // Hole capture — magical descending sparkle cascade
   hole:()=>{
