@@ -397,14 +397,17 @@ let merry={angle:0,speed:0.022,pts:150,lit:0};
 
 function buildLayout(){
   bumpers=[
-    {x:MR*0.27,y:H*0.21,r:23,pts:100,lit:0,col:'#ff2d78'},
-    {x:MR*0.73,y:H*0.21,r:23,pts:100,lit:0,col:'#ff2d78'},
-    {x:MR*0.50,y:H*0.16,r:23,pts:100,lit:0,col:'#ff2d78'},
-    {x:MR*0.22,y:H*0.35,r:18,pts:50, lit:0,col:'#ff9500'},
-    {x:MR*0.78,y:H*0.35,r:18,pts:50, lit:0,col:'#ff9500'},
-    {x:MR*0.50,y:H*0.31,r:18,pts:50, lit:0,col:'#ff9500'},
-    {x:MR*0.17,y:H*0.48,r:14,pts:30, lit:0,col:'#00ffff'},
-    {x:MR*0.83,y:H*0.48,r:14,pts:30, lit:0,col:'#00ffff'},
+    // 150 row — spread wide, pushed lower
+    {x:MR*0.22,y:H*0.28,r:23,pts:100,lit:0,col:'#ff2d78'},
+    {x:MR*0.78,y:H*0.28,r:23,pts:100,lit:0,col:'#ff2d78'},
+    {x:MR*0.50,y:H*0.24,r:23,pts:100,lit:0,col:'#ff2d78'},
+    // 50 row — pushed lower, wider apart
+    {x:MR*0.18,y:H*0.44,r:18,pts:50, lit:0,col:'#ff9500'},
+    {x:MR*0.82,y:H*0.44,r:18,pts:50, lit:0,col:'#ff9500'},
+    {x:MR*0.50,y:H*0.40,r:18,pts:50, lit:0,col:'#ff9500'},
+    // 30 row — pushed lower, wide
+    {x:MR*0.14,y:H*0.58,r:14,pts:30, lit:0,col:'#00ffff'},
+    {x:MR*0.86,y:H*0.58,r:14,pts:30, lit:0,col:'#00ffff'},
   ];
   targets=[
     {x:MR*0.18,y:H*0.075,w:24,h:9,pts:300,lit:0,col:'#ffd700'},
@@ -412,9 +415,9 @@ function buildLayout(){
     {x:MR*0.82,y:H*0.075,w:24,h:9,pts:300,lit:0,col:'#ffd700'},
   ];
   holes=[
-    {x:MR*0.50,y:H*0.54,r:19,pts:1000,lit:0,active:false,timer:0,col:'#9b59b6'},
-    {x:MR*0.20,y:H*0.64,r:14,pts:300, lit:0,active:false,timer:0,col:'#3498db'},
-    {x:MR*0.80,y:H*0.64,r:14,pts:300, lit:0,active:false,timer:0,col:'#3498db'},
+    {x:MR*0.50,y:H*0.54,r:19,pts:1000,lit:0,active:false,timer:0,col:'#9b59b6',cooldown:0},
+    {x:MR*0.20,y:H*0.64,r:14,pts:300, lit:0,active:false,timer:0,col:'#3498db',cooldown:0},
+    {x:MR*0.80,y:H*0.64,r:14,pts:300, lit:0,active:false,timer:0,col:'#3498db',cooldown:0},
   ];
   walls=[
     {x1:6,  y1:H*0.77,x2:MR*0.22,y2:H*0.89},
@@ -623,6 +626,23 @@ function physics(){
   if(b.inHole){b.holeTimer--;if(b.holeTimer<=0)ejectHole();return;}
   if(!isFinite(b.x)||!isFinite(b.y)){b.x=MR/2;b.y=H/2;b.vx=0;b.vy=-5;}
 
+  // ── ENFORCE CHANNEL CONTAINMENT ─────────────────
+  // If ball is in channel, HARD clamp x every single frame
+  if(b.inChannel){
+    const channelLeft  = MR + 4;
+    const channelRight = W  - 6;
+    if(b.x < channelLeft  + b.r){ b.x = channelLeft  + b.r; b.vx = Math.abs(b.vx)*BNC+0.3; }
+    if(b.x > channelRight - b.r){ b.x = channelRight - b.r; b.vx = -Math.abs(b.vx)*BNC; }
+    // ── EXIT at very top only ──────────────────────
+    if(b.y - b.r < H*0.04){
+      b.inChannel = false;
+      b.x  = MR - b.r - 4;
+      b.vx = -(1.2 + Math.random()*2.5);
+      b.vy = Math.min(b.vy, -0.5);
+    }
+    // Still apply gravity etc. while in channel
+  }
+
   b.vy+=GRAV;b.vx+=tiltX*0.06;b.vx*=FRIC;b.vy*=FRIC;
 
   // Speed clamp
@@ -689,7 +709,8 @@ function physics(){
 
   // Holes
   for(const h of holes){
-    if(!h.active&&d2(b.x,b.y,h.x,h.y)<h.r+b.r-5){
+    if(h.cooldown>0) h.cooldown--;
+    if(!h.active&&!h.cooldown&&d2(b.x,b.y,h.x,h.y)<h.r+b.r-5){
       b.inHole=true;b.holeTimer=62;b.holeTgt=h;
       b.vx=0;b.vy=0;b.x=h.x;b.y=h.y;
       h.active=true;h.lit=62;SFX.hole();
@@ -707,9 +728,22 @@ function physics(){
 function ejectHole(){
   const b=G.ball,h=b.holeTgt;
   b.inHole=false;b.holeTgt=null;
-  b.x=h.x;b.y=h.y-h.r-b.r-2;
-  b.vx=(Math.random()-0.5)*2;b.vy=-5;
-  h.active=false;SFX.eject();addScore(h.pts,h.x,h.y,h.col);
+  // Random angle between 200°-340° (upward hemisphere only)
+  // Never straight up — always angled to prevent looping
+  const minAngle = 200, maxAngle = 340;
+  const angleDeg = minAngle + Math.random()*(maxAngle-minAngle);
+  const angleRad = angleDeg * Math.PI/180;
+  const speed    = 3.5 + Math.random()*2.5;
+  b.vx = Math.cos(angleRad)*speed;
+  b.vy = Math.sin(angleRad)*speed;  // sin of 200-340 is mostly negative = upward
+  // Eject from SIDE of hole (offset position so ball never goes back in immediately)
+  b.x = h.x + Math.cos(angleRad)*(h.r+b.r+4);
+  b.y = h.y + Math.sin(angleRad)*(h.r+b.r+4);
+  // Add cooldown so hole cant capture ball again for 120 frames (2 sec)
+  h.active=true; h.lit=60;
+  h.cooldown = 120;
+  h.active=false;
+  SFX.eject();addScore(h.pts,h.x,h.y,h.col);
 }
 
 function wallHit(b,w){
@@ -910,12 +944,25 @@ function draw(){
   ctx.fillStyle='rgba(255,240,180,0.5)';ctx.fill();
   ctx.restore();
 
-  // Entry arrow
+  // Opening gap marker — shows where ball enters
   ctx.save();
-  ctx.fillStyle='rgba(255,215,0,0.6)';
-  ctx.shadowColor='rgba(255,215,0,0.8)';ctx.shadowBlur=8;
-  ctx.font='700 11px Inter';ctx.textAlign='center';
-  ctx.fillText('◀ ENTER',curveEndX-12,curveEndY-10);
+  // Draw a glowing gap/portal at the curve end
+  const gapR = 14;
+  ctx.beginPath();ctx.arc(curveEndX,curveEndY,gapR,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,215,0,0.12)';ctx.fill();
+  // Pulsing ring
+  const pulse = 0.5+0.5*Math.sin(Date.now()*0.006);
+  ctx.beginPath();ctx.arc(curveEndX,curveEndY,gapR+4+pulse*4,0,Math.PI*2);
+  ctx.strokeStyle=`rgba(255,215,0,${0.4+pulse*0.4})`;
+  ctx.lineWidth=2;ctx.stroke();
+  // Arrow into field
+  ctx.fillStyle='rgba(255,240,160,0.85)';
+  ctx.shadowColor='#ffd700';ctx.shadowBlur=10;
+  ctx.font='700 10px Inter';ctx.textAlign='center';
+  ctx.fillText('▶ ENTER',curveEndX+30,curveEndY+4);
+  // Open notch in the left wall at curve end — clear visual gap
+  ctx.fillStyle='rgba(0,0,0,0.9)';
+  ctx.fillRect(MR-3, curveEndY-gapR, 6, gapR*2);
   ctx.restore();
 
   // ── LEFT RAIL ────────────────────────────────
