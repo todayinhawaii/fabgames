@@ -233,79 +233,24 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
   gap:2px;
 }
+
 .game-card{position:relative;overflow:hidden;aspect-ratio:9/14;background:var(--card);text-decoration:none;display:block;transition:all 0.4s cubic-bezier(0.23,1,0.32,1);border:1px solid transparent;}
-.game-card:hover{transform:translateY(-8px) scale(1.02);z-index:10;border-color:rgba(201,168,76,0.4);box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 30px rgba(201,168,76,0.15);}
+.game-card:hover{transform:translateY(-8px) scale(1.02);z-index:10;border-color:rgba(255,215,0,0.4);box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 30px rgba(255,215,0,0.15);}
 .game-card-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px;transition:transform 0.5s ease;}
 .game-card:hover .game-card-bg{transform:scale(1.15) rotate(3deg);}
-.game-card-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,0) 25%,rgba(5,5,6,0.97) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:20px 18px 18px;}
-.game-card-cat{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
-.game-card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;line-height:1.2;margin-bottom:12px;padding:5px 10px;border-radius:3px;display:inline-block;border:1px solid currentColor;animation:neonFlicker 3s ease-in-out infinite;}
-@keyframes neonFlicker{0%,18%,20%,52%,54%,100%{opacity:1;}19%,53%{opacity:0.5;}}
-.play-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 0;background:linear-gradient(135deg,var(--gold),#a87d2a,var(--gold2),#a87d2a);background-size:200% 200%;border:none;border-radius:3px;color:#000;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;box-shadow:0 5px 0 #5a3d08,0 0 20px rgba(201,168,76,0.4),inset 0 1px 0 rgba(255,255,255,0.3);transition:all 0.15s;animation:btnShimmer 3s ease infinite;width:100%;}
+.game-card-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,0) 20%,rgba(5,5,6,0.98) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px 14px 14px;}
+.game-card-cat{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;opacity:0.7;}
+.game-card-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;line-height:1.2;margin-bottom:8px;padding:5px 10px;border-radius:3px;display:inline-block;border:1px solid #ffd700;animation:neonFlicker 3s ease-in-out infinite;color:#ffd700!important;text-shadow:0 0 10px #ffd700,0 0 20px rgba(255,215,0,0.5)!important;background:rgba(255,215,0,0.06)!important;box-shadow:inset 0 0 8px rgba(255,215,0,0.08);}
+@keyframes neonFlicker{0%,18%,20%,52%,54%,100%{opacity:1;}19%,53%{opacity:0.85;}}
+.game-card-desc{font-size:11px;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.play-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 0;background:linear-gradient(135deg,#ffd700,#c9a84c,#ffd700,#c9a84c);background-size:200% 200%;border:none;border-radius:3px;color:#000;font-size:12px;font-weight:900;letter-spacing:3px;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;box-shadow:0 5px 0 #5a3d08,0 0 20px rgba(255,215,0,0.4),inset 0 1px 0 rgba(255,255,255,0.3);transition:all 0.15s;animation:btnShimmer 3s ease infinite;width:100%;margin-bottom:8px;}
 @keyframes btnShimmer{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
-.play-btn:hover{box-shadow:0 7px 0 #5a3d08,0 0 40px rgba(201,168,76,0.7);transform:translateY(-2px);}
-.live-badge{position:absolute;top:12px;right:12px;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:2px;color:var(--gold);animation:livePulse 2s ease-in-out infinite;}
-@keyframes livePulse{0%,100%{box-shadow:0 0 5px rgba(201,168,76,0.2);}50%{box-shadow:0 0 15px rgba(201,168,76,0.6);}}
-/* PWA INSTALL */
-.pwa-bar{
-  position:fixed;bottom:0;left:0;right:0;
-  z-index:500;
-  padding:14px 20px;
-  background:rgba(7,7,8,0.97);
-  border-top:1px solid rgba(201,168,76,0.2);
-  backdrop-filter:blur(20px);
-  display:none;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-.pwa-bar.show{display:flex;}
-.pwa-bar-text{
-  font-size:13px;color:rgba(240,239,232,0.7);
-  line-height:1.4;
-}
-.pwa-bar-text strong{color:#c9a84c;display:block;font-size:14px;margin-bottom:2px;}
-.pwa-install-btn{
-  flex-shrink:0;
-  padding:10px 20px;
-  background:linear-gradient(135deg,#c9a84c,#a87d2a);
-  color:#000;
-  border:none;
-  font-size:11px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;
-  cursor:pointer;
-  font-family:Inter,sans-serif;
-  border-radius:2px;
-  white-space:nowrap;
-  transition:all 0.2s;
-}
-.pwa-install-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,0.4);}
-.pwa-dismiss{
-  background:none;border:none;
-  color:rgba(240,239,232,0.3);
-  font-size:18px;cursor:pointer;
-  flex-shrink:0;padding:4px;
-}
-/* Per-card download button */
-.game-dl-btn{
-  display:flex;align-items:center;gap:5px;
-  margin-top:8px;
-  font-size:9px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(201,168,76,0.5);
-  background:none;border:none;cursor:pointer;
-  font-family:Inter,sans-serif;
-  transition:color 0.2s;
-  padding:0;
-}
-.game-dl-btn:hover{color:rgba(201,168,76,0.9);}
-.game-dl-btn svg{flex-shrink:0;}
+.play-btn:hover{box-shadow:0 7px 0 #5a3d08,0 0 40px rgba(255,215,0,0.7);transform:translateY(-2px);}
+.game-dl-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 0;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.25);border-radius:3px;color:rgba(255,215,0,0.6);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;width:100%;transition:all 0.2s;}
+.game-dl-btn:hover{background:rgba(255,215,0,0.12);border-color:rgba(255,215,0,0.5);color:rgba(255,215,0,0.9);}
+.live-badge{position:absolute;top:12px;right:12px;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.35);border-radius:2px;color:#ffd700;animation:livePulse 2s ease-in-out infinite;}
+@keyframes livePulse{0%,100%{box-shadow:0 0 5px rgba(255,215,0,0.2);}50%{box-shadow:0 0 15px rgba(255,215,0,0.5);}}
 
-footer{text-align:center;padding:40px;border-top:1px solid rgba(201,168,76,0.1);font-size:11px;color:rgba(240,239,232,0.2);position:relative;z-index:2;}
-@media(max-width:768px){nav{padding:12px 16px;}.wrap{padding:20px 2px 80px;}.games-grid{grid-template-columns:repeat(2,1fr);gap:2px;}.hero{padding:40px 20px 30px;}}
-
-.games-grid{grid-template-columns:repeat(2,1fr);}
-  .filters-showcase{grid-template-columns:repeat(2,1fr);}
-}
 </style>
 </head>
 <body>
@@ -515,9 +460,10 @@ window.addEventListener('scroll',()=>{
 });
 
 // ── GAMES DATA ────────────────────────────────────
+let deferredPrompt=null;
 const GAMES=[
-  {emoji:'🎰',cat:'Arcade · Classic',title:'Pinball Paradise',desc:'Full Vegas-style pinball!! Slingshot launch, spinning bumpers, 4 flippers. A true arcade classic.',href:'/pinball',color:'rgba(20,80,40,0.15)',neon:'#c9a84c',neonbg:'rgba(201,168,76,0.08)'},
-  {emoji:'🥕',cat:'Encyclopedia · Quiz',title:'Veggie & Fruit Bible',desc:'77 vegetables and fruits. Real nutrition data, botanical engravings, quizzes and rankings. A chefs bible.',href:'/veggies',color:'rgba(184,147,63,0.12)',neon:'#c9a84c',neonbg:'rgba(184,147,63,0.08)',featured:true},
+  {emoji:'🎰',cat:'Arcade · Classic',title:'Pinball Paradise',desc:'Full Vegas-style pinball!! Slingshot launch, spinning bumpers, 4 flippers. A true arcade classic.',href:'/pinball',color:'rgba(20,80,40,0.15)',neon:'#ffd700',neonbg:'rgba(201,168,76,0.08)'},
+  {emoji:'🥕',cat:'Encyclopedia · Quiz',title:'Veggie & Fruit Bible',desc:'77 vegetables and fruits. Real nutrition data, botanical engravings, quizzes and rankings. A chefs bible.',href:'/veggies',color:'rgba(184,147,63,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)',featured:true},
   {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',desc:'Flip the full 52-card deck across 2 rounds. Find every pair to win.',href:'/dolphins',color:'rgba(34,211,238,0.12)'},
   {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",desc:'Stack the lava rocks, trigger eruptions. Hawaii\'s own Tetris.',href:'/lava',color:'rgba(255,60,0,0.12)'},
   {emoji:'🐢',cat:'Strategy · AI',title:'Turtle Checkers',desc:'Classic checkers with Hawaiian sea turtles. Beat the AI.',href:'/turtles',color:'rgba(34,197,94,0.12)'},
@@ -534,100 +480,95 @@ const GAMES=[
 ];
 
 const grid=document.getElementById('gamesGrid');
-GAMES.forEach(function(g,i){
+
+function buildCard(g, href, grid, idx){
   const card=document.createElement('a');
-  card.href='/join'; // home page → signup
+  card.href=href;
   card.className='game-card';
+  card.style.textDecoration='none';
+
+  // Background
   const bg=document.createElement('div');
   bg.className='game-card-bg';
   bg.style.background=g.color;
   if(g.featured){
-    // Elegant botanical SVG for veggie bible
     bg.style.cssText='display:flex;align-items:center;justify-content:center;background:'+g.color+';width:100%;height:100%;position:absolute;inset:0;font-size:0;';
-    bg.innerHTML='<svg width="80" height="80" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"><path d="M90 165 C100 158 110 155 110 155 C110 155 120 158 130 165" stroke-width="1"/><path d="M110 155 C108 140 104 120 100 100" stroke-width="1.2"/><path d="M110 155 C112 138 116 118 122 98" stroke-width="1.2"/><path d="M110 155 C110 138 110 118 110 96" stroke-width="1.1"/><path d="M110 155 C106 142 98 125 88 108" stroke-width="1.0"/><path d="M110 155 C114 142 124 126 134 110" stroke-width="1.0"/><path d="M88 108 C90 100 93 90 92 80 C90 90 86 100 84 108Z" fill="rgba(201,169,110,0.15)" stroke-width="0.8"/><path d="M88 80 C84 72 80 65 78 58" stroke-width="0.8"/><path d="M89 79 C88 70 88 63 90 56" stroke-width="0.7"/><path d="M90 80 C94 72 98 65 100 58" stroke-width="0.7"/><circle cx="96" cy="108" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="102" cy="103" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="108" cy="108" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="110" cy="78" r="18" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><path d="M110 60 C108 54 108 49 110 46" stroke-width="0.9"/><path d="M128 110 C128 98 130 85 132 76 C134 85 136 98 136 110Z" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M129 76 C127 68 124 62 122 55" stroke-width="0.8"/><path d="M132 74 C132 66 132 58 134 52" stroke-width="0.7"/><path d="M135 76 C137 68 140 62 142 55" stroke-width="0.7"/><circle cx="70" cy="122" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="78" cy="118" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="72" cy="110" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="148" cy="72" r="14" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M144 58 C146 52 148 48 150 46" stroke-width="0.8"/><path d="M152 58 C154 52 156 48 154 46" stroke-width="0.7"/></g></svg>';
+    bg.innerHTML='<svg width="80" height="80" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"><path d="M90 165 C100 158 110 155 110 155 C110 155 120 158 130 165" stroke-width="1"/><path d="M110 155 C108 140 104 120 100 100" stroke-width="1.2"/><path d="M110 155 C112 138 116 118 122 98" stroke-width="1.2"/><path d="M110 155 C110 138 110 118 110 96" stroke-width="1.1"/><path d="M88 108 C90 100 93 90 92 80 C90 90 86 100 84 108Z" fill="rgba(201,169,110,0.15)" stroke-width="0.8"/><circle cx="110" cy="78" r="18" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><circle cx="96" cy="108" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="108" cy="108" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/></g></svg>';
   } else {
     bg.textContent=g.emoji;
   }
+
+  // Live badge
   const badge=document.createElement('div');
   badge.className='live-badge';
   badge.textContent='✦ Live';
+
+  // Overlay
   const overlay=document.createElement('div');
   overlay.className='game-card-overlay';
+
+  // Category
   const cat=document.createElement('div');
   cat.className='game-card-cat';
   cat.textContent=g.cat;
+
+  // Title — always YELLOW
   const title=document.createElement('div');
   title.className='game-card-title';
   title.textContent=g.title;
+  title.style.animationDelay=(Math.random()*3)+'s';
 
-  // Download / install button on each card
-  const dlBtn = document.createElement('button');
+  // Description — bigger font, prominent
+  const desc=document.createElement('div');
+  desc.className='game-card-desc';
+  desc.textContent=g.desc||'';
+
+  // PLAY button — big and bold
+  const btn=document.createElement('div');
+  btn.className='play-btn';
+  btn.innerHTML='<span>▶ Play Now</span>';
+
+  // ADD TO HOME SCREEN — own separate button
+  const dlBtn=document.createElement('button');
   dlBtn.className='game-dl-btn';
-  dlBtn.id='dlBtn_'+i;
-  dlBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Add to Home Screen';
+  dlBtn.id='dlBtn_'+idx;
+  dlBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Add to Home Screen';
   dlBtn.onclick=function(e){
     e.preventDefault(); e.stopPropagation();
-    if(deferredPrompt){
+    if(typeof deferredPrompt!=='undefined' && deferredPrompt){
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(function(r){
         if(r.outcome==='accepted'){
-          dlBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Added!!';
-          dlBtn.style.color='rgba(34,197,94,0.7)';
+          dlBtn.innerHTML='✓ Added!!';
+          dlBtn.style.color='rgba(74,222,128,0.8)';
+          dlBtn.style.borderColor='rgba(74,222,128,0.4)';
         }
         deferredPrompt=null;
       });
     } else {
-      // Already installed or iOS
-      dlBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> On Home Screen';
-      dlBtn.style.color='rgba(34,197,94,0.7)';
-      setTimeout(()=>{ pwaBar.classList.add('show'); },200);
+      dlBtn.innerHTML='✓ Use browser menu to install';
+      setTimeout(()=>{ dlBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Add to Home Screen'; },2500);
     }
   };
-  title.style.color=g.neon;
-  title.style.borderColor=g.neon;
-  title.style.background=g.neonbg;
-  title.style.textShadow='0 0 8px '+g.neon+',0 0 16px '+g.neon;
-  title.style.boxShadow='inset 0 0 8px '+g.neonbg;
-  title.style.animationDelay=(Math.random()*3)+'s';
-  const btn=document.createElement('div');
-  btn.className='play-btn';
-  btn.innerHTML='<span>Play Now</span><span>→</span>';
+
   overlay.appendChild(cat);
   overlay.appendChild(title);
-  overlay.appendChild(dlBtn);
+  overlay.appendChild(desc);
   overlay.appendChild(btn);
+  overlay.appendChild(dlBtn);
   card.appendChild(bg);
   card.appendChild(badge);
   card.appendChild(overlay);
   grid.appendChild(card);
-});
-
-// Auth check AFTER games are rendered
-// Instant auth check
-const email=localStorage.getItem('fabEmail');
-if(!email) window.location.href='/login';
-</script>
-
-<!-- PWA Install Bar -->
-<div class="pwa-bar" id="pwaBar">
-  <div class="pwa-bar-text">
-    <strong>📲 Add fab.games to your home screen</strong>
-    All 13 games — one tap away, anytime!!
-  </div>
-  <button class="pwa-install-btn" id="pwaInstallBtn">Install Free</button>
-  <button class="pwa-dismiss" id="pwaDismiss" aria-label="Dismiss">✕</button>
-</div>
-
-<script>
-// ── SERVICE WORKER ─────────────────────────────
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(reg=>console.log('[fab.games] SW registered:', reg.scope))
-      .catch(err=>console.log('[fab.games] SW failed:', err));
-  });
 }
 
+// Render home page — cards go to /join (signup)
+const grid=document.getElementById('gamesGrid');
+if(grid){
+  GAMES.forEach(function(g,i){
+    buildCard(g, '/join', grid, i);
+  });
+}
 
 // ── SMOOTH SCROLL ─────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
