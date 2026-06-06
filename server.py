@@ -79,6 +79,10 @@ def login():
 def veggies():
     return send_from_directory('.', 'veggies.html')
 
+@app.route('/pinball')
+def pinball():
+    return send_from_directory('.', 'pinball.html')
+
 @app.route('/reset-password')
 def reset_password():
     return send_from_directory('.', 'reset_password.html')
