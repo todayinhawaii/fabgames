@@ -84,7 +84,7 @@ document.getElementById('welcomeName').textContent=n.split(' ')[0];
 
 // Games
 const GAMES=[
-  {emoji:'🥕',cat:'Education · Health',title:'Veggie & Fruit Bible',href:'/veggies',color:'rgba(34,197,94,0.1)',neon:'#22c55e',neonbg:'rgba(34,197,94,0.08)'},
+  {emoji:'🥕',cat:'Encyclopedia · Quiz',title:'Veggie & Fruit Bible',href:'/veggies',color:'rgba(184,147,63,0.12)',neon:'#c9a84c',neonbg:'rgba(184,147,63,0.08)',featured:true},
   
   {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',href:'https://todayinhawaii.com/dolphins',color:'rgba(34,211,238,0.1)',neon:'#22d3ee',neonbg:'rgba(34,211,238,0.08)'},
   {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",href:'https://todayinhawaii.com/lava',color:'rgba(255,60,0,0.1)',neon:'#ff5500',neonbg:'rgba(255,60,0,0.1)'},
@@ -109,7 +109,13 @@ GAMES.forEach(function(g,i){
   const bg=document.createElement('div');
   bg.className='game-card-bg';
   bg.style.background=g.color;
-  bg.textContent=g.emoji;
+  if(g.featured){
+    // Elegant botanical SVG for veggie bible
+    bg.style.cssText='display:flex;align-items:center;justify-content:center;background:'+g.color+';width:100%;height:100%;position:absolute;inset:0;font-size:0;';
+    bg.innerHTML='<svg width="80" height="80" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"><path d="M90 165 C100 158 110 155 110 155 C110 155 120 158 130 165" stroke-width="1"/><path d="M110 155 C108 140 104 120 100 100" stroke-width="1.2"/><path d="M110 155 C112 138 116 118 122 98" stroke-width="1.2"/><path d="M110 155 C110 138 110 118 110 96" stroke-width="1.1"/><path d="M110 155 C106 142 98 125 88 108" stroke-width="1.0"/><path d="M110 155 C114 142 124 126 134 110" stroke-width="1.0"/><path d="M88 108 C90 100 93 90 92 80 C90 90 86 100 84 108Z" fill="rgba(201,169,110,0.15)" stroke-width="0.8"/><path d="M88 80 C84 72 80 65 78 58" stroke-width="0.8"/><path d="M89 79 C88 70 88 63 90 56" stroke-width="0.7"/><path d="M90 80 C94 72 98 65 100 58" stroke-width="0.7"/><circle cx="96" cy="108" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="102" cy="103" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="108" cy="108" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="110" cy="78" r="18" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><path d="M110 60 C108 54 108 49 110 46" stroke-width="0.9"/><path d="M128 110 C128 98 130 85 132 76 C134 85 136 98 136 110Z" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M129 76 C127 68 124 62 122 55" stroke-width="0.8"/><path d="M132 74 C132 66 132 58 134 52" stroke-width="0.7"/><path d="M135 76 C137 68 140 62 142 55" stroke-width="0.7"/><circle cx="70" cy="122" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="78" cy="118" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="72" cy="110" r="7" fill="rgba(201,169,110,0.12)" stroke-width="0.7"/><circle cx="148" cy="72" r="14" fill="rgba(201,169,110,0.1)" stroke-width="0.8"/><path d="M144 58 C146 52 148 48 150 46" stroke-width="0.8"/><path d="M152 58 C154 52 156 48 154 46" stroke-width="0.7"/></g></svg>';
+  } else {
+    bg.textContent=g.emoji;
+  }
   const badge=document.createElement('div');
   badge.className='live-badge';
   badge.textContent='✦ Live';
