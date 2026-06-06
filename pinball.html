@@ -52,6 +52,22 @@ canvas{display:block;width:100%;height:100%;}
 }
 .flip-btn span.arrow{font-size:30px;line-height:1;}
 .flip-btn span.lbl{font-size:12px;letter-spacing:2px;}
+.stop-btn{
+  width:60px;flex-shrink:0;
+  background:rgba(20,0,15,0.9);
+  border:2px solid rgba(255,255,255,0.2);
+  border-radius:10px;color:rgba(255,255,255,0.5);
+  cursor:pointer;font-family:'Inter',sans-serif;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:2px;transition:all 0.15s;
+  touch-action:manipulation;
+}
+.stop-btn:active{
+  background:rgba(60,0,40,0.9);
+  border-color:rgba(255,255,255,0.5);
+  color:#fff;
+}
 .flip-btn:active{
   background:linear-gradient(160deg,#7a0050,#4a0030);
   border-color:#fff;color:#fff;
@@ -93,7 +109,6 @@ canvas{display:block;width:100%;height:100%;}
   <div class="score-block">
     <div class="score-label">Best</div>
     <div class="score-val" id="bestDisplay">0</div>
-    <div class="balls-row" id="ballsRow"></div>
   </div>
 </div>
 
@@ -123,6 +138,10 @@ canvas{display:block;width:100%;height:100%;}
     onmousedown="fl(0,true)" onmouseup="fl(0,false)">
     <span class="arrow">◀</span><span class="lbl">LEFT</span>
   </button>
+  <button class="stop-btn" onclick="stopGame()">
+    <span style="font-size:18px;">⏹</span><br>
+    <span style="font-size:9px;letter-spacing:2px;">STOP</span>
+  </button>
   <button class="flip-btn" id="rightBtn"
     ontouchstart="fl(1,true)" ontouchend="fl(1,false)"
     onmousedown="fl(1,true)" onmouseup="fl(1,false)">
@@ -134,9 +153,9 @@ canvas{display:block;width:100%;height:100%;}
 const canvas = document.getElementById('C');
 const ctx    = canvas.getContext('2d');
 const LANE   = 54; // launcher channel width
-const GRAV   = 0.26;
-const FRIC   = 0.991;
-const BNC    = 0.62;
+const GRAV   = 0.13;
+const FRIC   = 0.994;
+const BNC    = 0.55;
 let W, H, MR; // MR = main field right boundary
 let G = null; // game state
 let raf = null;
@@ -231,7 +250,7 @@ window.addEventListener('load', addMute);
 // ── LAYOUT BUILDER ─────────────────────────────
 let bumpers=[], targets=[], holes=[], walls=[];
 // Merry-go-round state
-let merry = { angle:0, speed:0.04, pts:150, lit:0 };
+let merry = { angle:0, speed:0.022, pts:150, lit:0 };
 
 function buildLayout(){
   // Bumpers — all safely inside main field
@@ -357,6 +376,22 @@ function updateUI(){
 }
 
 // ── FLIPPER CONTROL ────────────────────────────
+function stopGame(){
+  if(!G) return;
+  // Save best score
+  if(G.score > G.best){
+    G.best = G.score;
+    localStorage.setItem('pbBest', G.best);
+    document.getElementById('newBestMsg').style.display='block';
+  } else {
+    document.getElementById('newBestMsg').style.display='none';
+  }
+  document.getElementById('finalScore').textContent = G.score.toLocaleString();
+  document.getElementById('gameOverScreen').classList.remove('hidden');
+  G.over = true;
+  SFX.over();
+}
+
 function fl(side, down){
   if(!G||G.over) return;
   initAudio(); rAC();
@@ -414,7 +449,7 @@ function doRelease(){
   const dist=Math.sqrt(dx*dx+dy*dy);
   if(dist<10){b.x=b.startX;b.y=b.startY;return;}
   const power=dist/140;
-  const spd=10+power*22;
+  const spd=6+power*12;
   b.vx=(dx/dist)*spd;
   b.vy=(dy/dist)*spd;
   b.inLauncher=false;
@@ -488,7 +523,7 @@ function physics(){
     if(dist<b.r+bmp.r+2){
       const nx=dx/dist, ny=dy/dist;
       const outspd=Math.max(Math.sqrt(b.vx*b.vx+b.vy*b.vy),5);
-      b.vx=nx*outspd*1.2; b.vy=ny*outspd*1.2;
+      b.vx=nx*outspd*0.9; b.vy=ny*outspd*0.9;
       b.x=bmp.x+nx*(b.r+bmp.r+3); b.y=bmp.y+ny*(b.r+bmp.r+3);
       if(bmp.lit<=0){ bmp.lit=22; SFX.bumper(bmp.pts); score(bmp.pts,bmp.x,bmp.y,bmp.col); }
     }
@@ -611,23 +646,12 @@ function flipCollide(b,fp){
 }
 
 function lostBall(){
-  G.balls--; updateUI(); burst(G.ball.x,H*0.9,'#ff2d78',18); SFX.lost();
-  if(G.balls<=0){
-    setTimeout(()=>{
-      const best = G.score > G.best;
-      if(best){G.best=G.score;localStorage.setItem('pbBest',G.best);}
-      document.getElementById('finalScore').textContent = G.score.toLocaleString();
-      document.getElementById('newBestMsg').style.display = best?'block':'none';
-      document.getElementById('gameOverScreen').classList.remove('hidden');
-      G.over=true;
-      best?SFX.best():SFX.over();
-    },700);
-  } else {
-    setTimeout(()=>{
-      G.ball=makeBall();
-      G.flips=makeFlippers();
-    },600);
-  }
+  burst(G.ball.x,H*0.9,'#ff2d78',18); SFX.lost();
+  // Never game over — just reset ball and keep playing!!
+  setTimeout(()=>{
+    G.ball=makeBall();
+    G.flips=makeFlippers();
+  },600);
 }
 
 // ── FLIPPER ANIMATION ──────────────────────────
@@ -658,11 +682,11 @@ function draw(){
   ctx.strokeStyle='rgba(255,180,0,0.75)';
   ctx.lineWidth=3;
   ctx.shadowColor='rgba(255,180,0,0.4)'; ctx.shadowBlur=8;
-  ctx.beginPath(); ctx.moveTo(MR,H*0.08); ctx.lineTo(MR,H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(MR,0); ctx.lineTo(MR,H); ctx.stroke();
   ctx.restore();
   // Right edge
   ctx.save();
-  ctx.strokeStyle='rgba(255,255,255,0.12)';
+  ctx.strokeStyle='rgba(255,255,255,0.2)';
   ctx.lineWidth=2;
   ctx.beginPath(); ctx.moveTo(W-4,0); ctx.lineTo(W-4,H); ctx.stroke();
   ctx.restore();
@@ -815,15 +839,14 @@ function draw(){
       }
       ctx.restore();
       // Hint
-      if(!b.isDragging){
-        ctx.save();
-        ctx.globalAlpha=0.45+0.3*Math.sin(Date.now()*0.004);
-        ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=8;
-        ctx.font='700 11px Inter'; ctx.textAlign='center';
-        ctx.fillText('✦ DRAG BALL BACK',W/2-LANE/2,H*0.915);
-        ctx.fillText('& RELEASE ✦',W/2-LANE/2,H*0.934);
-        ctx.restore();
-      }
+      // PULL label ON the slingshot fork
+      ctx.save();
+      ctx.globalAlpha=0.6+0.3*Math.sin(Date.now()*0.004);
+      ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=10;
+      ctx.font='900 16px Bebas Neue'; ctx.textAlign='center';
+      ctx.letterSpacing='3px';
+      ctx.fillText('PULL',b.startX, b.startY+28);
+      ctx.restore();
     }
   }
 
@@ -832,21 +855,26 @@ function draw(){
     const b=G.ball;
     if(!b.inHole&&isFinite(b.x)&&isFinite(b.y)&&b.r>0){
       ctx.save();
-      ctx.shadowColor='#d0d0d0'; ctx.shadowBlur=b.inLauncher?8:18;
+      ctx.shadowColor='rgba(180,180,180,0.4)'; ctx.shadowBlur=b.inLauncher?4:8;
       try{
-        const bg2=ctx.createRadialGradient(b.x-b.r*0.32,b.y-b.r*0.38,0,b.x,b.y,b.r);
-        bg2.addColorStop(0,'#ffffff');
-        bg2.addColorStop(0.35,'#d8d8d8');
-        bg2.addColorStop(0.75,'#909090');
-        bg2.addColorStop(1,'#404040');
+        // Chrome silver ball — realistic metallic look
+        const bg2=ctx.createRadialGradient(b.x-b.r*0.35,b.y-b.r*0.4,b.r*0.05,b.x,b.y,b.r);
+        bg2.addColorStop(0,'#e8e8e8');   // bright chrome top
+        bg2.addColorStop(0.25,'#c0c0c0'); // mid silver
+        bg2.addColorStop(0.6,'#808080');  // shadow side
+        bg2.addColorStop(0.85,'#505050'); // dark edge
+        bg2.addColorStop(1,'#303030');    // deep shadow
         ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
         ctx.fillStyle=bg2; ctx.fill();
-        // Chrome ring
+        // Thin chrome ring
         ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
-        ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1; ctx.stroke();
-        // Highlight
-        ctx.beginPath(); ctx.arc(b.x-b.r*0.3,b.y-b.r*0.35,b.r*0.27,0,Math.PI*2);
-        ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.fill();
+        ctx.strokeStyle='rgba(200,200,200,0.4)'; ctx.lineWidth=0.8; ctx.stroke();
+        // Small sharp specular highlight
+        ctx.beginPath(); ctx.arc(b.x-b.r*0.32,b.y-b.r*0.36,b.r*0.18,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
+        // Secondary soft reflection at bottom
+        ctx.beginPath(); ctx.arc(b.x+b.r*0.2,b.y+b.r*0.3,b.r*0.1,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.fill();
       }catch(e){
         ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
         ctx.fillStyle='#c8c8c8'; ctx.fill();
