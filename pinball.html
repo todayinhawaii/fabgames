@@ -203,7 +203,7 @@ window.addEventListener('resize',()=>{resize();});
 window.addEventListener('load',()=>{resize();setTimeout(resize,100);});
 
 // ── PHYSICS ────────────────────────────────────
-const GRAV=0.04, FRIC=0.996, BNC=0.38;
+const GRAV=0.044, FRIC=0.996, BNC=0.38;
 
 // ── TILT ───────────────────────────────────────
 let tiltX=0, tiltY=0;
@@ -469,8 +469,10 @@ function fl(side,down){
   if(!G||G.over||!gameRunning)return;
   // LEFT btn (side=0) → left flippers (0,2)
   // RIGHT btn (side=1) → right flippers (1,3)
-  G.flips[side===0?0:1].act=down;
-  G.flips[side===0?2:3].act=down;
+  // side=0 LEFT button → flips[1,3] RIGHT arms (was wrong, now swapped)
+  // side=1 RIGHT button → flips[0,2] LEFT arms
+  G.flips[side===0?1:0].act=down;
+  G.flips[side===0?3:2].act=down;
 }
 document.addEventListener('keydown',e=>{
   if(!gameRunning)return;
@@ -522,7 +524,7 @@ function doRelease(){
   const dist=Math.sqrt(dx*dx+dy*dy);
   if(dist<12){b.x=b.startX;b.y=b.startY;return;}
   const power=Math.min(dist/130,1);
-  const spd=3+power*7;
+  const spd=3.3+power*7.7;
   b.vx=(dx/dist)*spd; b.vy=(dy/dist)*spd;
   b.inLauncher=false;
   b.x=b.startX; b.y=b.startY;
@@ -539,12 +541,12 @@ function physics(){
 
   // Gravity + TILT (tilt is the main guidance mechanic)
   b.vy+=GRAV+tiltY*0.04;
-  b.vx+=tiltX*0.12; // stronger tilt response
+  b.vx+=tiltX*0.13; // stronger tilt response
   b.vx*=FRIC; b.vy*=FRIC;
 
   // Speed clamp
   const spd=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
-  if(spd>8){b.vx*=8/spd;b.vy*=8/spd;}
+  if(spd>8.8){b.vx*=8.8/spd;b.vy*=8.8/spd;}
   if(spd>0.05&&spd<0.7){b.vx=(b.vx/spd)*0.7;b.vy=(b.vy/spd)*0.7;}
   b.x+=b.vx; b.y+=b.vy;
 
@@ -880,7 +882,7 @@ function draw(){
     ctx.font=`900 ${W*0.10}px Bebas Neue`;
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillStyle='#c9a84c';ctx.shadowColor='#c9a84c';ctx.shadowBlur=22;
-    ctx.fillText(G.flash,W/2,H*0.43);ctx.restore();
+    ctx.fillText(G.flash,W/2,H*0.32);ctx.restore();
   }
 
   // Press GO hint
