@@ -66,6 +66,7 @@ body{
 /* GO / STOP BUTTON */
 #goStopBtn{
   width:72px;height:72px;flex-shrink:0;
+  display:none;
   border-radius:50%;border:3px solid;
   cursor:pointer;font-family:'Bebas Neue',sans-serif;
   font-size:16px;letter-spacing:2px;
@@ -237,9 +238,9 @@ window.addEventListener('load',   initResize);
 document.addEventListener('DOMContentLoaded', initResize);
 
 // ── PHYSICS CONSTANTS ──────────────────────────
-const GRAV = 0.13;
-const FRIC = 0.994;
-const BNC  = 0.52;
+const GRAV = 0.065;
+const FRIC = 0.996;
+const BNC  = 0.42;
 
 // ── TILT ───────────────────────────────────────
 let tiltX = 0;
@@ -491,6 +492,7 @@ function getLeaderboard(){
 function startGame(){
   initAudio(); rAC();
   document.getElementById('startScreen').style.display='none';
+  document.getElementById('goStopBtn').style.display='flex';
   document.getElementById('gameOverScreen').style.display='none';
   initResize();
   G={
@@ -582,7 +584,7 @@ function doRelease(){
   const dist=Math.sqrt(dx*dx+dy*dy);
   if(dist<10){b.x=b.startX;b.y=b.startY;return;}
   const power=dist/140;
-  const spd=8+power*16;
+  const spd=4+power*8;
   b.vx=(dx/dist)*spd;b.vy=(dy/dist)*spd;
   b.inLauncher=false;
   b.x=b.startX;b.y=b.startY;
@@ -623,8 +625,8 @@ function physics(){
 
   // Speed clamp
   const spd=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
-  if(spd>18){b.vx*=18/spd;b.vy*=18/spd;}
-  if(spd>0.05&&spd<1.4){b.vx=(b.vx/spd)*1.4;b.vy=(b.vy/spd)*1.4;}
+  if(spd>10){b.vx*=10/spd;b.vy*=10/spd;}
+  if(spd>0.05&&spd<0.8){b.vx=(b.vx/spd)*0.8;b.vy=(b.vy/spd)*0.8;}
   b.x+=b.vx;b.y+=b.vy;
 
   // Stuck rescue
@@ -637,19 +639,20 @@ function physics(){
   }
 
   // Walls
-  if(b.x-b.r<6){b.x=6+b.r;b.vx=Math.abs(b.vx)*BNC+0.5;SFX.wall();}
+  if(b.x-b.r<6){b.x=6+b.r;b.vx=Math.abs(b.vx)*BNC+0.2;SFX.wall();}
   if(b.y-b.r<0){b.y=b.r;b.vy=Math.abs(b.vy)*BNC;SFX.wall();}
 
   // RIGHT WALL — launcher separator — HARD block
-  if(b.x+b.r>MR-1&&b.y>H*0.05){
+  if(b.x+b.r>MR-1&&b.y>H*0.13){
     b.x=MR-b.r-1;
-    b.vx=-Math.abs(b.vx)*BNC-2;
-    if(b.vx>-2.5)b.vx=-2.5;
+    b.vx=-Math.abs(b.vx)*BNC-0.8;
+    if(b.vx>-1.5)b.vx=-1.5;
     SFX.wall();
   }
-  // Ball can only enter field from very top of channel
-  if(b.x+b.r>MR&&b.y<=H*0.05){
-    b.vx=-(3+Math.random()*3);
+  // Ball enters main field ONLY through curved top entrance
+  if(b.x+b.r>MR&&b.y<=H*0.13){
+    b.vx=-(2+Math.random()*2);
+    b.vy*=0.8;
     b.x=MR-b.r-2;
   }
 
@@ -666,7 +669,7 @@ function physics(){
     if(dist<b.r+bmp.r+2){
       const nx=dx/dist,ny=dy/dist;
       const os=Math.max(Math.sqrt(b.vx*b.vx+b.vy*b.vy),5);
-      b.vx=nx*os*1.15;b.vy=ny*os*1.15;
+      b.vx=nx*os*0.75;b.vy=ny*os*0.75;
       b.x=bmp.x+nx*(b.r+bmp.r+3);b.y=bmp.y+ny*(b.r+bmp.r+3);
       if(bmp.lit<=0){bmp.lit=22;SFX.bumper(bmp.pts);addScore(bmp.pts,bmp.x,bmp.y,bmp.col);}
     }
@@ -703,7 +706,7 @@ function ejectHole(){
   const b=G.ball,h=b.holeTgt;
   b.inHole=false;b.holeTgt=null;
   b.x=h.x;b.y=h.y-h.r-b.r-2;
-  b.vx=(Math.random()-0.5)*6;b.vy=-12;
+  b.vx=(Math.random()-0.5)*3;b.vy=-7;
   h.active=false;SFX.eject();addScore(h.pts,h.x,h.y,h.col);
 }
 
@@ -766,10 +769,10 @@ function flipHit(b,fp){
     if(dist<b.r+6){
       const nx=dx/dist,ny=dy/dist;
       b.x=fx+nx*(b.r+6);b.y=fy+ny*(b.r+6);
-      const boost=fp.act?12:2;
+      const boost=fp.act?7:1.5;
       const dot=b.vx*nx+b.vy*ny;
       b.vx-=2*dot*nx;
-      b.vy=Math.min(b.vy-boost,-3);
+      b.vy=Math.min(b.vy-boost,-2);
       if(fp.act)b.vx+=fp.side*(boost*0.22);
       break;
     }
@@ -809,41 +812,108 @@ function draw(){
   bg.addColorStop(0,'#130019');bg.addColorStop(1,'#080010');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 
-  // ── LAUNCHER CHANNEL ─────────────────────────
-  ctx.fillStyle='rgba(0,0,0,0.6)';
-  ctx.fillRect(MR,0,W-MR,H);
-  ctx.save();
-  ctx.strokeStyle='rgba(255,180,0,0.8)';ctx.lineWidth=3;
-  ctx.shadowColor='rgba(255,180,0,0.4)';ctx.shadowBlur=10;
-  // Main channel wall from H*0.14 down to bottom
-  ctx.beginPath();ctx.moveTo(MR,H*0.14);ctx.lineTo(MR,H);ctx.stroke();
-  // Curved entrance at top — sweeps left into main field
-  ctx.beginPath();
-  ctx.moveTo(MR,H*0.14);
-  ctx.bezierCurveTo(
-    MR, H*0.06,        // control 1 — up
-    MR*0.72, H*0.02,   // control 2 — curves left
-    MR*0.58, H*0.01    // end — enters main field at top
-  );
-  ctx.strokeStyle='rgba(255,215,0,0.9)';
-  ctx.lineWidth=3;
-  ctx.shadowColor='rgba(255,215,0,0.6)';
-  ctx.shadowBlur=14;
-  ctx.stroke();
-  // Arrow showing entrance direction
-  ctx.fillStyle='rgba(255,215,0,0.7)';
-  ctx.font='700 11px Inter';ctx.textAlign='center';
-  ctx.fillText('←',MR*0.52,H*0.025);
-  ctx.restore();
-  ctx.save();
-  ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(W-4,0);ctx.lineTo(W-4,H);ctx.stroke();
-  ctx.restore();
-  // Up arrows
+  // ── GLOWING NEON LAUNCH TUBE ──────────────────
   const chX=MR+LANE/2+3;
+  const tubeColor='rgba(255,180,0,';
+  const innerW=LANE-8; // inner tube width
+
+  // Dark background fill for whole channel
+  ctx.fillStyle='rgba(0,0,0,0.7)';
+  ctx.fillRect(MR+2,H*0.13,W-MR-2,H);
+
+  // ── STRAIGHT TUBE SECTION (middle to bottom) ──
+  // Outer glow - left wall
   ctx.save();
-  ctx.fillStyle='rgba(255,215,0,0.2)';ctx.font='700 13px Inter';ctx.textAlign='center';
-  [0.18,0.26,0.34,0.42,0.50].forEach(f=>ctx.fillText('▲',chX,H*f));
+  for(let glow=0;glow<3;glow++){
+    const alpha=0.15-glow*0.04;
+    const width=8+glow*6;
+    ctx.strokeStyle=`rgba(255,180,0,${alpha})`;
+    ctx.lineWidth=width;
+    ctx.beginPath();ctx.moveTo(MR,H*0.13);ctx.lineTo(MR,H);ctx.stroke();
+  }
+  // Bright inner left wall
+  ctx.strokeStyle='rgba(255,200,80,0.9)';ctx.lineWidth=2;
+  ctx.shadowColor='rgba(255,180,0,0.8)';ctx.shadowBlur=12;
+  ctx.beginPath();ctx.moveTo(MR,H*0.13);ctx.lineTo(MR,H);ctx.stroke();
+  ctx.restore();
+
+  // Right wall of tube
+  ctx.save();
+  for(let glow=0;glow<3;glow++){
+    const alpha=0.1-glow*0.03;
+    ctx.strokeStyle=`rgba(255,180,0,${alpha})`;
+    ctx.lineWidth=6+glow*4;
+    ctx.beginPath();ctx.moveTo(W-4,H*0.13);ctx.lineTo(W-4,H);ctx.stroke();
+  }
+  ctx.strokeStyle='rgba(255,200,80,0.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(W-4,H*0.13);ctx.lineTo(W-4,H);ctx.stroke();
+  ctx.restore();
+
+  // Inner tube glow (atmospheric)
+  const tubeGrad=ctx.createLinearGradient(MR,0,W,0);
+  tubeGrad.addColorStop(0,'rgba(255,160,0,0.08)');
+  tubeGrad.addColorStop(0.5,'rgba(255,200,100,0.04)');
+  tubeGrad.addColorStop(1,'rgba(255,160,0,0.02)');
+  ctx.fillStyle=tubeGrad;
+  ctx.fillRect(MR+2,H*0.13,W-MR-6,H);
+
+  // Up arrow guides inside tube
+  ctx.save();
+  ctx.fillStyle='rgba(255,215,0,0.18)';ctx.font='700 12px Inter';ctx.textAlign='center';
+  [0.22,0.31,0.40,0.49,0.58].forEach(f=>ctx.fillText('▲',chX,H*f));
+  ctx.restore();
+
+  // ── CURVED TOP ENTRANCE ────────────────────────
+  // This is the hero piece - a glowing tube that bends left
+  const curveStartX=MR;
+  const curveStartY=H*0.13;
+  const curveEndX=MR*0.50;
+  const curveEndY=H*0.025;
+  const cp1x=MR; const cp1y=H*0.04;
+  const cp2x=MR*0.65; const cp2y=H*0.01;
+
+  // Draw thick outer glow layers of the curve
+  ctx.save();
+  const glowLayers=[
+    {w:22,alpha:0.06,col:'255,180,0'},
+    {w:14,alpha:0.12,col:'255,200,80'},
+    {w:8, alpha:0.25,col:'255,210,100'},
+    {w:4, alpha:0.6, col:'255,220,120'},
+    {w:2, alpha:0.95,col:'255,230,140'},
+  ];
+  glowLayers.forEach(layer=>{
+    ctx.beginPath();
+    ctx.moveTo(curveStartX,curveStartY);
+    ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,curveEndX,curveEndY);
+    ctx.strokeStyle=`rgba(${layer.col},${layer.alpha})`;
+    ctx.lineWidth=layer.w;ctx.lineCap='round';
+    ctx.shadowBlur=0;ctx.stroke();
+  });
+
+  // Bright core of curve
+  ctx.beginPath();
+  ctx.moveTo(curveStartX,curveStartY);
+  ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,curveEndX,curveEndY);
+  ctx.strokeStyle='rgba(255,240,180,1)';
+  ctx.lineWidth=1.5;ctx.lineCap='round';
+  ctx.shadowColor='rgba(255,215,0,1)';ctx.shadowBlur=20;
+  ctx.stroke();
+  ctx.restore();
+
+  // Entrance opening glow at top
+  ctx.save();
+  ctx.beginPath();ctx.arc(curveEndX,curveEndY,10,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,215,0,0.15)';ctx.fill();
+  ctx.beginPath();ctx.arc(curveEndX,curveEndY,5,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,240,180,0.5)';ctx.fill();
+  ctx.restore();
+
+  // Entry arrow
+  ctx.save();
+  ctx.fillStyle='rgba(255,215,0,0.6)';
+  ctx.shadowColor='rgba(255,215,0,0.8)';ctx.shadowBlur=8;
+  ctx.font='700 11px Inter';ctx.textAlign='center';
+  ctx.fillText('◀ ENTER',curveEndX-12,curveEndY-10);
   ctx.restore();
 
   // ── LEFT RAIL ────────────────────────────────
