@@ -66,36 +66,36 @@ canvas{
   width:100%;
   max-width:420px;
   display:flex;
-  gap:4px;
+  gap:6px;
   flex-shrink:0;
-  height:88px;
-  padding:8px;
+  height:100px;
+  padding:8px 10px 12px;
   background:#0a0008;
-  border-top:2px solid rgba(255,45,120,0.3);
+  border-top:3px solid rgba(255,45,120,0.5);
+  box-shadow:0 -4px 30px rgba(255,45,120,0.2);
 }
 .flip-btn{
   flex:1;
-  background:linear-gradient(180deg,#2a0020,#1a0014);
-  border:2px solid rgba(255,45,120,0.6);
-  border-radius:8px;
+  background:linear-gradient(160deg,#3a0028,#1a0014,#2a001e);
+  border:2px solid #ff2d78;
+  border-radius:10px;
   color:#ff2d78;
-  font-size:14px;
   font-weight:900;
-  letter-spacing:3px;
   text-transform:uppercase;
   cursor:pointer;
-  transition:all 0.05s;
+  transition:all 0.08s;
   font-family:'Inter',sans-serif;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  box-shadow:0 0 15px rgba(255,45,120,0.2),inset 0 1px 0 rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 0 20px rgba(255,45,120,0.35),inset 0 1px 0 rgba(255,150,150,0.15);
   -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
 .flip-btn:active,.flip-btn.active{
-  background:linear-gradient(180deg,#5a0040,#3a0028);
-  border-color:#ff2d78;
-  box-shadow:0 0 30px rgba(255,45,120,0.6),inset 0 0 20px rgba(255,45,120,0.3);
+  background:linear-gradient(160deg,#7a0050,#4a0030,#6a0045);
+  border-color:#fff;
+  box-shadow:0 0 40px rgba(255,45,120,0.8),inset 0 0 30px rgba(255,45,120,0.4);
   color:#fff;
-  transform:scale(0.97);
+  transform:scale(0.96);
 }
 
 /* OVERLAY SCREENS */
@@ -197,12 +197,14 @@ canvas{
   <button class="flip-btn flip-btn-left" id="leftBtn"
     ontouchstart="flipLeft(true)" ontouchend="flipLeft(false)"
     onmousedown="flipLeft(true)" onmouseup="flipLeft(false)">
-    ◄ LEFT
+    <span style="font-size:32px;line-height:1;">◀</span>
+    <span style="font-size:13px;letter-spacing:2px;">LEFT</span>
   </button>
   <button class="flip-btn" id="rightBtn"
     ontouchstart="flipRight(true)" ontouchend="flipRight(false)"
     onmousedown="flipRight(true)" onmouseup="flipRight(false)">
-    RIGHT ►
+    <span style="font-size:13px;letter-spacing:2px;">RIGHT</span>
+    <span style="font-size:32px;line-height:1;">▶</span>
   </button>
 </div>
 
