@@ -66,7 +66,6 @@ body{
 /* GO / STOP BUTTON */
 #goStopBtn{
   width:72px;height:72px;flex-shrink:0;
-  display:none;
   border-radius:50%;border:3px solid;
   cursor:pointer;font-family:'Bebas Neue',sans-serif;
   font-size:16px;letter-spacing:2px;
@@ -199,7 +198,7 @@ body{
   </button>
 
   <!-- BIG GO/STOP BUTTON -->
-  <button id="goStopBtn" class="go" onclick="toggleGoStop()">
+  <button id="goStopBtn" class="go" onclick="toggleGoStop()" style="display:none;">
     <span class="btn-lbl" id="goStopLbl">GO</span>
   </button>
 
@@ -238,9 +237,9 @@ window.addEventListener('load',   initResize);
 document.addEventListener('DOMContentLoaded', initResize);
 
 // ── PHYSICS CONSTANTS ──────────────────────────
-const GRAV = 0.065;
-const FRIC = 0.996;
-const BNC  = 0.42;
+const GRAV = 0.042;
+const FRIC = 0.997;
+const BNC  = 0.32;
 
 // ── TILT ───────────────────────────────────────
 let tiltX = 0;
@@ -433,6 +432,7 @@ function makeBall(){
   const sy=H*0.60;
   return{x:cx,y:sy,vx:0,vy:0,r:12,startX:cx,startY:sy,
     inLauncher:true,isDragging:false,
+    inChannel:true,  // ball is in launcher tube
     inHole:false,holeTimer:0,holeTgt:null,
     stuckT:0,lastX:cx,lastY:sy};
 }
@@ -520,8 +520,9 @@ function fl(side,down){
   if(!G||G.over||!gameRunning) return;
   // side 0=LEFT button → activates LEFT flippers (index 0,2)
   // side 1=RIGHT button → activates RIGHT flippers (index 1,3)
-  G.flips[side===0?0:1].act=down;
-  G.flips[side===0?2:3].act=down;
+  // Swapped: side=0(LEFT btn)→flip[1](RIGHT arm), side=1(RIGHT btn)→flip[0](LEFT arm)
+  G.flips[side===0?1:0].act=down;
+  G.flips[side===0?3:2].act=down;
 }
 document.addEventListener('keydown',e=>{
   if(!gameRunning) return;
@@ -584,9 +585,10 @@ function doRelease(){
   const dist=Math.sqrt(dx*dx+dy*dy);
   if(dist<10){b.x=b.startX;b.y=b.startY;return;}
   const power=dist/140;
-  const spd=4+power*8;
+  const spd=2.5+power*5;
   b.vx=(dx/dist)*spd;b.vy=(dy/dist)*spd;
   b.inLauncher=false;
+  b.inChannel=true;  // still in tube after launch
   b.x=b.startX;b.y=b.startY;
   SFX.launch(power);burst(b.x,b.y,'#ffd700',14);
 }
@@ -625,8 +627,8 @@ function physics(){
 
   // Speed clamp
   const spd=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
-  if(spd>10){b.vx*=10/spd;b.vy*=10/spd;}
-  if(spd>0.05&&spd<0.8){b.vx=(b.vx/spd)*0.8;b.vy=(b.vy/spd)*0.8;}
+  if(spd>7){b.vx*=7/spd;b.vy*=7/spd;}
+  if(spd>0.05&&spd<0.6){b.vx=(b.vx/spd)*0.6;b.vy=(b.vy/spd)*0.6;}
   b.x+=b.vx;b.y+=b.vy;
 
   // Stuck rescue
@@ -639,14 +641,14 @@ function physics(){
   }
 
   // Walls
-  if(b.x-b.r<6){b.x=6+b.r;b.vx=Math.abs(b.vx)*BNC+0.2;SFX.wall();}
+  if(b.x-b.r<6){b.x=6+b.r;b.vx=Math.abs(b.vx)*BNC;SFX.wall();}
   if(b.y-b.r<0){b.y=b.r;b.vy=Math.abs(b.vy)*BNC;SFX.wall();}
 
   // RIGHT WALL — launcher separator — HARD block
   if(b.x+b.r>MR-1&&b.y>H*0.13){
     b.x=MR-b.r-1;
-    b.vx=-Math.abs(b.vx)*BNC-0.8;
-    if(b.vx>-1.5)b.vx=-1.5;
+    b.vx=-Math.abs(b.vx)*BNC;
+    if(b.vx>-1.0)b.vx=-1.0;
     SFX.wall();
   }
   // Ball enters main field ONLY through curved top entrance
@@ -669,7 +671,7 @@ function physics(){
     if(dist<b.r+bmp.r+2){
       const nx=dx/dist,ny=dy/dist;
       const os=Math.max(Math.sqrt(b.vx*b.vx+b.vy*b.vy),5);
-      b.vx=nx*os*0.75;b.vy=ny*os*0.75;
+      b.vx=nx*os*0.55;b.vy=ny*os*0.55;
       b.x=bmp.x+nx*(b.r+bmp.r+3);b.y=bmp.y+ny*(b.r+bmp.r+3);
       if(bmp.lit<=0){bmp.lit=22;SFX.bumper(bmp.pts);addScore(bmp.pts,bmp.x,bmp.y,bmp.col);}
     }
@@ -706,7 +708,7 @@ function ejectHole(){
   const b=G.ball,h=b.holeTgt;
   b.inHole=false;b.holeTgt=null;
   b.x=h.x;b.y=h.y-h.r-b.r-2;
-  b.vx=(Math.random()-0.5)*3;b.vy=-7;
+  b.vx=(Math.random()-0.5)*2;b.vy=-5;
   h.active=false;SFX.eject();addScore(h.pts,h.x,h.y,h.col);
 }
 
@@ -769,10 +771,10 @@ function flipHit(b,fp){
     if(dist<b.r+6){
       const nx=dx/dist,ny=dy/dist;
       b.x=fx+nx*(b.r+6);b.y=fy+ny*(b.r+6);
-      const boost=fp.act?7:1.5;
+      const boost=fp.act?4.5:1;
       const dot=b.vx*nx+b.vy*ny;
       b.vx-=2*dot*nx;
-      b.vy=Math.min(b.vy-boost,-2);
+      b.vy=Math.min(b.vy-boost,-1.5);
       if(fp.act)b.vx+=fp.side*(boost*0.22);
       break;
     }
@@ -817,9 +819,9 @@ function draw(){
   const tubeColor='rgba(255,180,0,';
   const innerW=LANE-8; // inner tube width
 
-  // Dark background fill for whole channel
-  ctx.fillStyle='rgba(0,0,0,0.7)';
-  ctx.fillRect(MR+2,H*0.13,W-MR-2,H);
+  // Dark background fill for ENTIRE channel height
+  ctx.fillStyle='rgba(0,0,0,0.75)';
+  ctx.fillRect(MR+2,0,W-MR-2,H);
 
   // ── STRAIGHT TUBE SECTION (middle to bottom) ──
   // Outer glow - left wall
@@ -834,7 +836,7 @@ function draw(){
   // Bright inner left wall
   ctx.strokeStyle='rgba(255,200,80,0.9)';ctx.lineWidth=2;
   ctx.shadowColor='rgba(255,180,0,0.8)';ctx.shadowBlur=12;
-  ctx.beginPath();ctx.moveTo(MR,H*0.13);ctx.lineTo(MR,H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(MR,H*0.06);ctx.lineTo(MR,H);ctx.stroke();
   ctx.restore();
 
   // Right wall of tube
@@ -846,7 +848,7 @@ function draw(){
     ctx.beginPath();ctx.moveTo(W-4,H*0.13);ctx.lineTo(W-4,H);ctx.stroke();
   }
   ctx.strokeStyle='rgba(255,200,80,0.5)';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(W-4,H*0.13);ctx.lineTo(W-4,H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(W-4,0);ctx.lineTo(W-4,H);ctx.stroke();
   ctx.restore();
 
   // Inner tube glow (atmospheric)
@@ -860,17 +862,17 @@ function draw(){
   // Up arrow guides inside tube
   ctx.save();
   ctx.fillStyle='rgba(255,215,0,0.18)';ctx.font='700 12px Inter';ctx.textAlign='center';
-  [0.22,0.31,0.40,0.49,0.58].forEach(f=>ctx.fillText('▲',chX,H*f));
+  [0.12,0.22,0.32,0.42,0.52,0.62,0.72].forEach(f=>ctx.fillText('▲',chX,H*f));
   ctx.restore();
 
   // ── CURVED TOP ENTRANCE ────────────────────────
   // This is the hero piece - a glowing tube that bends left
   const curveStartX=MR;
-  const curveStartY=H*0.13;
-  const curveEndX=MR*0.50;
-  const curveEndY=H*0.025;
-  const cp1x=MR; const cp1y=H*0.04;
-  const cp2x=MR*0.65; const cp2y=H*0.01;
+  const curveStartY=H*0.06;
+  const curveEndX=MR*0.48;
+  const curveEndY=H*0.018;
+  const cp1x=MR;       const cp1y=H*0.02;
+  const cp2x=MR*0.62;  const cp2y=H*0.005;
 
   // Draw thick outer glow layers of the curve
   ctx.save();
