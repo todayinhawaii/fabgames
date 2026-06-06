@@ -293,9 +293,9 @@ nav{
 
 /* ── CARD VITAMINS ── */
 .vcard-vitamins{
-  font-size:13px;color:var(--muted);
+  font-size:15px;color:var(--muted);
   line-height:1.6;margin-bottom:8px;
-  letter-spacing:0.3px;
+  letter-spacing:0.2px;
 }
 
 /* ── CARD TAG ── */
@@ -1674,13 +1674,14 @@ function renderCards(){
     const topStat = d.nutrition ? Object.values(d.nutrition)[0] : d.vitamins[0];
     const statText = topStat.length > 30 ? topStat.substring(0,30)+'...' : topStat;
     const statSpan = document.createElement('span');
+    statSpan.style.fontSize = '15px';
     statSpan.textContent = statText;
     vitamins.appendChild(statSpan);
 
     // Score badge
     if(d.score){
       const scoreBadge = document.createElement('div');
-      scoreBadge.style.cssText='font-size:8px;font-weight:400;margin-top:8px;padding:3px 10px;background:transparent;color:rgba(184,147,63,0.7);border:1px solid rgba(184,147,63,0.25);display:inline-block;letter-spacing:2px;text-transform:uppercase;font-family:Inter,sans-serif;';
+      scoreBadge.style.cssText='font-size:11px;font-weight:400;margin-top:8px;padding:3px 10px;background:transparent;color:rgba(184,147,63,0.7);border:1px solid rgba(184,147,63,0.25);display:inline-block;letter-spacing:2px;text-transform:uppercase;font-family:Inter,sans-serif;';
       scoreBadge.textContent='Score '+d.score+'/100';
       vitamins.appendChild(scoreBadge);
     }
