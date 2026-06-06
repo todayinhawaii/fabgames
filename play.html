@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="fab.games">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <meta name="theme-color" content="#070708">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Play — fab.games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,6 +47,60 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 .play-btn:hover{box-shadow:0 7px 0 #5a3d08,0 0 40px rgba(201,168,76,0.7);transform:translateY(-2px);}
 .live-badge{position:absolute;top:12px;right:12px;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:2px;color:var(--gold);animation:livePulse 2s ease-in-out infinite;}
 @keyframes livePulse{0%,100%{box-shadow:0 0 5px rgba(201,168,76,0.2);}50%{box-shadow:0 0 15px rgba(201,168,76,0.6);}}
+/* PWA INSTALL */
+.pwa-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  z-index:500;
+  padding:14px 20px;
+  background:rgba(7,7,8,0.97);
+  border-top:1px solid rgba(201,168,76,0.2);
+  backdrop-filter:blur(20px);
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.pwa-bar.show{display:flex;}
+.pwa-bar-text{
+  font-size:13px;color:rgba(240,239,232,0.7);
+  line-height:1.4;
+}
+.pwa-bar-text strong{color:#c9a84c;display:block;font-size:14px;margin-bottom:2px;}
+.pwa-install-btn{
+  flex-shrink:0;
+  padding:10px 20px;
+  background:linear-gradient(135deg,#c9a84c,#a87d2a);
+  color:#000;
+  border:none;
+  font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;
+  font-family:Inter,sans-serif;
+  border-radius:2px;
+  white-space:nowrap;
+  transition:all 0.2s;
+}
+.pwa-install-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,0.4);}
+.pwa-dismiss{
+  background:none;border:none;
+  color:rgba(240,239,232,0.3);
+  font-size:18px;cursor:pointer;
+  flex-shrink:0;padding:4px;
+}
+/* Per-card download button */
+.game-dl-btn{
+  display:flex;align-items:center;gap:5px;
+  margin-top:8px;
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(201,168,76,0.5);
+  background:none;border:none;cursor:pointer;
+  font-family:Inter,sans-serif;
+  transition:color 0.2s;
+  padding:0;
+}
+.game-dl-btn:hover{color:rgba(201,168,76,0.9);}
+.game-dl-btn svg{flex-shrink:0;}
+
 footer{text-align:center;padding:40px;border-top:1px solid rgba(201,168,76,0.1);font-size:11px;color:rgba(240,239,232,0.2);position:relative;z-index:2;}
 @media(max-width:768px){nav{padding:12px 16px;}.wrap{padding:20px 2px 80px;}.games-grid{grid-template-columns:repeat(2,1fr);gap:2px;}.hero{padding:40px 20px 30px;}}
 </style>
@@ -127,6 +187,30 @@ GAMES.forEach(function(g,i){
   const title=document.createElement('div');
   title.className='game-card-title';
   title.textContent=g.title;
+
+  // Download / install button on each card
+  const dlBtn = document.createElement('button');
+  dlBtn.className='game-dl-btn';
+  dlBtn.id='dlBtn_'+i;
+  dlBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Add to Home Screen';
+  dlBtn.onclick=function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(r){
+        if(r.outcome==='accepted'){
+          dlBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Added!!';
+          dlBtn.style.color='rgba(34,197,94,0.7)';
+        }
+        deferredPrompt=null;
+      });
+    } else {
+      // Already installed or iOS
+      dlBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> On Home Screen';
+      dlBtn.style.color='rgba(34,197,94,0.7)';
+      setTimeout(()=>{ pwaBar.classList.add('show'); },200);
+    }
+  };
   title.style.color=g.neon;
   title.style.borderColor=g.neon;
   title.style.background=g.neonbg;
@@ -138,6 +222,7 @@ GAMES.forEach(function(g,i){
   btn.innerHTML='<span>Play Now</span><span>→</span>';
   overlay.appendChild(cat);
   overlay.appendChild(title);
+  overlay.appendChild(dlBtn);
   overlay.appendChild(btn);
   card.appendChild(bg);
   card.appendChild(badge);
@@ -149,6 +234,65 @@ GAMES.forEach(function(g,i){
 // Instant auth check
 const email=localStorage.getItem('fabEmail');
 if(!email) window.location.href='/login';
+</script>
+
+<!-- PWA Install Bar -->
+<div class="pwa-bar" id="pwaBar">
+  <div class="pwa-bar-text">
+    <strong>📲 Add fab.games to your home screen</strong>
+    All 13 games — one tap away, anytime!!
+  </div>
+  <button class="pwa-install-btn" id="pwaInstallBtn">Install Free</button>
+  <button class="pwa-dismiss" id="pwaDismiss" aria-label="Dismiss">✕</button>
+</div>
+
+<script>
+// ── SERVICE WORKER ─────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg=>console.log('[fab.games] SW registered:', reg.scope))
+      .catch(err=>console.log('[fab.games] SW failed:', err));
+  });
+}
+
+// ── PWA INSTALL PROMPT ─────────────────────────
+let deferredPrompt = null;
+const pwaBar = document.getElementById('pwaBar');
+const pwaBtn = document.getElementById('pwaInstallBtn');
+const pwaDismiss = document.getElementById('pwaDismiss');
+
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show bar after 3 seconds
+  setTimeout(()=>{ pwaBar.classList.add('show'); }, 3000);
+});
+
+pwaBtn.addEventListener('click', async ()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if(outcome === 'accepted'){
+    pwaBar.classList.remove('show');
+    pwaBtn.textContent = '✓ Added!!';
+  }
+  deferredPrompt = null;
+});
+
+pwaDismiss.addEventListener('click', ()=>{
+  pwaBar.classList.remove('show');
+  sessionStorage.setItem('pwaDismissed','1');
+});
+
+// Hide if already dismissed this session
+if(sessionStorage.getItem('pwaDismissed')) pwaBar.style.display='none';
+
+// Already installed check
+window.addEventListener('appinstalled', ()=>{
+  pwaBar.classList.remove('show');
+  console.log('[fab.games] PWA installed!!');
+});
 </script>
 </body>
 </html>
