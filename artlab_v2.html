@@ -823,7 +823,14 @@ function onDn(e){
     document.getElementById('cvWrap').appendChild(shapeOv);
     return;
   }
-  // Start wet layer stroke
+  // Eraser + smudge draw directly to layer (bypass wet canvas)
+  const m2=S.tool==='eraser'?'eraser':S.medium;
+  if(m2==='eraser'||m2==='smudge'){
+    saveUndo();
+    S.painting=true; S.lx=x; S.ly=y;
+    return;
+  }
+  // All other mediums use wet layer
   saveUndo();
   S.painting=true; S.lx=x; S.ly=y;
   pts=[{x,y}];
@@ -835,7 +842,15 @@ function onMv(e){
   if(!S.painting)return;
   const{x,y}=gpt(e);
   if(['line','rect','circle'].includes(S.tool)&&shapeOv){drawShPrev(x,y);S.lx=x;S.ly=y;return;}
-  // Accumulate point + redraw wet layer
+  const m3=S.tool==='eraser'?'eraser':S.medium;
+  if(m3==='eraser'){
+    drawDirect(S.lx,S.ly,x,y,'eraser');
+    S.lx=x;S.ly=y;return;
+  }
+  if(m3==='smudge'){
+    drawDirect(S.lx,S.ly,x,y,'smudge');
+    S.lx=x;S.ly=y;return;
+  }
   pts.push({x,y});
   drawWet();
   S.lx=x;S.ly=y;
@@ -848,10 +863,12 @@ function onUp(e){
     commitSh(p.x,p.y);shapeOv.remove();shapeOv=null;
     S.painting=false;renderLayers();return;
   }
-  // If only one point (click, no drag), draw a dot
+  const m4=S.tool==='eraser'?'eraser':S.medium;
+  if(m4==='eraser'||m4==='smudge'){
+    pts=[];S.painting=false;renderLayers();return;
+  }
   if(pts.length===1) pts.push({x:pts[0].x+0.1,y:pts[0].y+0.1});
   drawWet();
-  // Commit wet layer to active layer
   const ctx=getCtx();
   if(ctx&&wetCanvas){
     ctx.drawImage(wetCanvas,0,0);
@@ -866,6 +883,26 @@ function updCursor(e){
   const r=document.getElementById('cvWrap').getBoundingClientRect();
   const x=Math.floor((e.clientX-r.left)/S.zoom),y=Math.floor((e.clientY-r.top)/S.zoom);
   document.getElementById('cursorPt').textContent=`x:${x}  y:${y}`;
+}
+
+// ── DIRECT DRAW (eraser + smudge bypass wet canvas) ──
+function drawDirect(x0,y0,x1,y1,m){
+  const ctx=getCtx(); if(!ctx)return;
+  ctx.save();
+  if(m==='eraser'){
+    ctx.globalCompositeOperation='destination-out';
+    ctx.strokeStyle='rgba(0,0,0,1)';
+    ctx.lineWidth=Math.max(1,S.brushSize);
+    ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();
+  } else if(m==='smudge'){
+    const sz=Math.max(4,S.brushSize*0.5);
+    try{
+      const id=ctx.getImageData(Math.floor(x0-sz),Math.floor(y0-sz),sz*2,sz*2);
+      ctx.putImageData(id,Math.floor(x1-sz),Math.floor(y1-sz));
+    }catch(e){}
+  }
+  ctx.restore();
 }
 
 // ── WET LAYER DRAW ─────────────────────────────────
