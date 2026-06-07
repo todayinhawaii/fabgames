@@ -293,7 +293,37 @@
       font-size:12px;font-weight:700;z-index:300;animation:tpop 2.2s ease forwards;
       white-space:nowrap;pointer-events:none;}
     @keyframes tpop{0%{opacity:0;transform:translate(-50%,-8px);}12%{opacity:1;transform:translate(-50%,0);}78%{opacity:1;}100%{opacity:0;}}
-  </style>
+  
+/* ── MOBILE TOOLS ── */
+@media(max-width:768px){
+  /* Hide toolbar by default on mobile */
+  #toolWrap{
+    transform:translateX(-155px)!important;
+    transition:transform 0.28s ease;
+  }
+  #toolWrap.mob-open{
+    transform:translateX(0)!important;
+  }
+  /* Hide the original toggle arrow on mobile */
+  #tbToggle{ display:none!important; }
+  /* Floating tools button */
+  #mobToolBtn{
+    display:flex!important;
+  }
+  /* Gold pulsing close button inside toolbar */
+  #toolCloseBtn{
+    display:flex!important;
+  }
+}
+/* Hide mobile elements on desktop */
+#mobToolBtn{ display:none; }
+#toolCloseBtn{ display:none; }
+
+@keyframes slimePulse{
+  0%,100%{box-shadow:0 0 8px rgba(255,215,0,0.4);}
+  50%{box-shadow:0 0 18px rgba(255,215,0,0.9),0 0 28px rgba(255,215,0,0.3);}
+}
+</style>
 </head>
 <body>
 
@@ -1240,5 +1270,20 @@ loop();
 
 showToast('🧪 Draw inside the slime — it squishes and moves your art!');
 </script>
+
+<!-- Mobile floating tools toggle -->
+<div id="mobToolBtn"
+  onclick="document.getElementById('toolWrap').classList.toggle('mob-open')"
+  style="position:fixed;bottom:200px;left:10px;z-index:200;
+    width:46px;height:46px;border-radius:50%;
+    background:rgba(13,17,23,0.92);
+    border:1px solid rgba(255,215,0,0.45);
+    color:#c9a84c;font-size:18px;
+    align-items:center;justify-content:center;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,0.5);
+    backdrop-filter:blur(8px);">
+  🛠
+</div>
 </body>
 </html>
