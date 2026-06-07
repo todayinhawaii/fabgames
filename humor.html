@@ -283,7 +283,7 @@
     <div id="histList"></div>
   </div>
 
-  <div class="back"><a href="/games">← Back to Games Hub 🎮</a></div>
+  <div class="back"><a href="/play">← Back to Games Hub 🎮</a></div>
 </div>
 
 <script>
@@ -459,8 +459,8 @@ function updateHistory(){
 
 function shareResult(){
   if(!current)return;
-  const txt=`🎭 I just found out WHO I AM on the "Who Are You?" wheel: I AM ${current.word}!! ${current.emoji} "${current.desc}" 😂 What are YOU? todayinhawaii.com/humor`;
-  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://www.todayinhawaii.com/humor')+'&quote='+encodeURIComponent(txt),'_blank');
+  const txt=`🎭 I just found out WHO I AM on the "Who Are You?" wheel: I AM ${current.word}!! ${current.emoji} "${current.desc}" 😂 What are YOU? fab.games/who-are-you`;
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://www.fab.games/who-are-you')+'&quote='+encodeURIComponent(txt),'_blank');
 }
 
 function celebrate(color){
