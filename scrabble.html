@@ -640,8 +640,15 @@ function renderZone(zone){
       cleanIndicators();
     });
 
-    // Tap to move between zones (quick tap)
-    btn.addEventListener('click',()=>tapTile(t.id));
+    // Tap to move — only fires on mouse click, NOT after touch
+    // (touch is handled entirely by touchend → tapTile)
+    btn.addEventListener('click', e=>{
+      if(e.sourceCapabilities && !e.sourceCapabilities.firesTouchEvents){
+        tapTile(t.id); // real mouse click only
+      } else if(!('ontouchstart' in window)){
+        tapTile(t.id); // desktop fallback
+      }
+    });
 
     // Touch drag to reorder within zone or move between zones
     btn.addEventListener('touchstart', e=>touchDragStart(e, t.id), {passive:false});
@@ -653,7 +660,12 @@ function renderZone(zone){
 }
 
 // ── Tap to move (mobile fallback) ───────────
+let lastTapTime=0;
 function tapTile(id){
+  // Debounce - prevent double-fire within 300ms
+  const now=Date.now();
+  if(now-lastTapTime<300) return;
+  lastTapTime=now;
   const t=tiles.find(x=>x.id===id);
   if(!t) return;
 
@@ -730,6 +742,7 @@ function touchDragMove(e){
 }
 
 function touchDragEnd(e){
+  e.preventDefault(); // Stop browser firing synthetic click after touch
   if(!touchDragId){return;}
 
   // Remove ghost — bulletproof cleanup
@@ -746,8 +759,9 @@ function touchDragEnd(e){
 
   // If barely moved, treat as tap
   if(!touchMoved){
-    tapTile(touchDragId);
+    const id=touchDragId;
     touchDragId=null;touchMoved=false;
+    tapTile(id); // call AFTER clearing state
     return;
   }
 
