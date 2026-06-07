@@ -283,12 +283,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
     box-shadow:-4px 0 20px rgba(0,0,0,0.5); }
   #rightPanel.mob-open{ display:flex; }
   #rightPanel.mob-open #panelCloseBtn{ display:block!important; }
+  #leftPanel.mob-open #leftCloseBtn{ display:flex!important; }
 
   #leftPanel{ display:none; position:fixed; top:54px; left:0;
     z-index:500; height:auto; padding:8px 4px;
     box-shadow:4px 0 20px rgba(0,0,0,0.5); border-radius:0 10px 10px 0; }
   #leftPanel.mob-open{ display:flex; }
-  #leftPanel.mob-open #leftCloseBtn{ display:flex!important; }
 
   /* Medium bar scrolls horizontally — compact */
   #medBar{ height:58px; }
@@ -331,6 +331,28 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
   }
   .mob-fab:active{ background:rgba(201,168,76,0.2); }
 }
+
+/* ── MOBILE CLOSE BUTTON ── */
+@keyframes closePulse{
+  0%,100%{box-shadow:0 0 8px rgba(255,215,0,0.4),0 0 0 rgba(255,215,0,0);}
+  50%{box-shadow:0 0 16px rgba(255,215,0,0.8),0 0 20px rgba(255,215,0,0.2);}
+}
+.mob-close-btn{
+  display:none;
+  width:calc(100% - 24px);
+  margin:10px 12px 12px;
+  padding:11px 0;
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  border:none;border-radius:8px;
+  color:#1a1a1a;font-size:12px;font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;
+  font-family:'DM Sans',sans-serif;cursor:pointer;
+  text-align:center;
+  animation:closePulse 2s ease-in-out infinite;
+  box-shadow:0 0 12px rgba(255,215,0,0.35);
+  flex-shrink:0;
+}
+.mob-close-btn:active{transform:scale(0.97);}
 
 /* Hide floating buttons on desktop */
 #mobTools,#mobPanel{ display:none; }
@@ -471,13 +493,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
     <div class="tb" id="tb-line" onclick="setTool('line')" title="Line (L)" style="width:60px;height:60px;font-size:25px;">╱<div class="tb-lbl" style="font-size:10px;">Line</div></div>
     <div class="tb" id="tb-rect" onclick="setTool('rect')" title="Rectangle (R)" style="width:60px;height:60px;font-size:25px;">▭<div class="tb-lbl" style="font-size:10px;">Rect</div></div>
     <div class="tb" id="tb-circle" onclick="setTool('circle')" title="Ellipse (C)" style="width:60px;height:60px;font-size:25px;">◯<div class="tb-lbl" style="font-size:10px;">Ellipse</div></div>
-    <div onclick="document.getElementById('leftPanel').classList.remove('mob-open')"
-      id="leftCloseBtn"
-      style="display:none;width:38px;height:28px;border-radius:6px;
-             border:1px solid var(--border);background:transparent;
-             color:var(--muted);font-size:11px;cursor:pointer;
-             display:none;align-items:center;justify-content:center;
-             margin-top:4px;">✕</div>
+    <button class="mob-close-btn" id="leftCloseBtn"
+      style="width:50px;padding:8px 4px;font-size:9px;letter-spacing:1px;margin:8px 4px 4px;"
+      onclick="document.getElementById('leftPanel').classList.remove('mob-open')">
+      ✕
+    </button>
     <div id="swatchWrap">
       <div id="swWrap">
         <div class="sw" id="bgSw" onclick="pickSw('bg')" title="Background colour"></div>
@@ -522,15 +542,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
       <button class="la-btn" onclick="mergeDn()">Merge ↓</button>
     </div>
     <!-- Close button for mobile -->
-    <div onclick="document.getElementById('rightPanel').classList.remove('mob-open')"
-      style="display:none;padding:10px 12px;border-top:1px solid var(--border);cursor:pointer;
-             text-align:center;font-size:11px;color:var(--muted);letter-spacing:1px;
-             transition:all .18s;" 
-      id="panelCloseBtn"
-      onmouseover="this.style.color='var(--gold)'" 
-      onmouseout="this.style.color='var(--muted)'">
-      ✕ Close
-    </div>
+    <button class="mob-close-btn" id="panelCloseBtn"
+      onclick="document.getElementById('rightPanel').classList.remove('mob-open')">
+      ✕ Close Panel
+    </button>
   </div>
 </div>
 
