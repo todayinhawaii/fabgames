@@ -443,7 +443,7 @@
 
   </div>
 
-  <div class="back"><a href="/games">← Back to Hawaii Games Hub 🎮</a></div>
+  <div class="back"><a href="/play">← Back to Hawaii Games Hub 🎮</a></div>
 </div>
 
 <!-- Result Overlay -->
@@ -1109,8 +1109,8 @@ function playAgain(){closeOverlay();newGame();}
 function closeOverlay(){document.getElementById('overlay').classList.remove('show');}
 
 function shareScore(){
-  const txt='🎰 I scored '+score.toLocaleString()+' pts on Aloha Letters from '+playerLoc+'! Found '+wordsFound.length+' words! Beat me! 🌺 todayinhawaii.com/scrabble';
-  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://www.todayinhawaii.com/scrabble')+'&quote='+encodeURIComponent(txt),'_blank');
+  const txt='🎰 I scored '+score.toLocaleString()+' pts on Aloha Letters from '+playerLoc+'! Found '+wordsFound.length+' words! Beat me! 🌺 fab.games/aloha-letters';
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://www.fab.games/aloha-letters')+'&quote='+encodeURIComponent(txt),'_blank');
 }
 
 // ── Celebrations ─────────────────────────────
