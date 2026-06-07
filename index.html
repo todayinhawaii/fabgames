@@ -649,24 +649,8 @@ window.addEventListener('scroll',()=>{
 });
 
 // ── GAMES DATA ────────────────────────────────────
-const GAMES=[
-  {emoji:'🎨',cat:'Art & Creativity',title:'Art Lab',desc:'Professional drawing app. Pencils, watercolour, oil paint, layers and more. Create and share your art.',href:'/join',color:'rgba(155,89,182,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
-  {emoji:'🎰',cat:'Arcade · Classic',title:'Pinball Paradise',desc:'Full Vegas pinball! Slingshot launch, spinning bumpers, 4 flippers. Pure arcade magic.',href:'/join',color:'rgba(20,80,40,0.18)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
-  {emoji:'🥕',cat:'Encyclopedia · Quiz',title:'Veggie & Fruit Bible',desc:'77 vegetables and fruits. Real nutrition, botanical art, quizzes and rankings.',href:'/join',color:'rgba(184,147,63,0.14)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)',featured:true},
-  {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',desc:'Flip the full 52-card deck across 2 rounds. Find every pair to win.',href:'/dolphins',color:'rgba(34,211,238,0.12)'},
-  {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",desc:'Stack the lava rocks, trigger eruptions. Hawaii\'s own Tetris.',href:'/lava',color:'rgba(255,60,0,0.12)'},
-  {emoji:'🐢',cat:'Strategy · AI',title:'Turtle Checkers',desc:'Classic checkers with Hawaiian sea turtles. Beat the AI.',href:'/turtles',color:'rgba(34,197,94,0.12)'},
-  {emoji:'♛',cat:'Strategy · AI',title:'Mermaid Chess',desc:'Full chess vs AI. 4 difficulty levels. Stunning ocean backdrop.',href:'/chess',color:'rgba(148,163,184,0.12)'},
-  {emoji:'🌺',cat:'Trivia · Knowledge',title:'Hawaii Trivia',desc:'222 questions about the islands. How well do you know Hawaii?',href:'/trivia',color:'rgba(251,191,36,0.12)'},
-  {emoji:'🧠',cat:'Memory · Speed',title:'Aloha Memory',desc:'222 Hawaiian memory challenges. Train your brain.',href:'/memorygame',color:'rgba(255,100,200,0.12)'},
-  {emoji:'🔤',cat:'Word · Puzzle',title:'Hawaii Word Search',desc:'222 Hawaiian word puzzles. Find them all.',href:'/wordsearch',color:'rgba(167,139,250,0.12)'},
-  {emoji:'🎰',cat:'Word · Strategy',title:'Aloha Letters',desc:'148,000+ word dictionary. Build the highest score.',href:'/scrabble',color:'rgba(255,200,0,0.12)'},
-  {emoji:'🎈',cat:'Action · Fun',title:'Pop That Balloon!',desc:'Pop every balloon before time runs out!',href:'/balloons',color:'rgba(255,105,180,0.12)'},
-  {emoji:'🔮',cat:'Fortune · Fun',title:'Fortune Roulette',desc:'222 unique fortunes. Spin the wheel of destiny.',href:'/fortune',color:'rgba(155,89,182,0.12)'},
-  {emoji:'🎭',cat:'Personality · Fun',title:'Who Are You?',desc:'222 wild personalities. Which one are you today?',href:'/humor',color:'rgba(255,80,80,0.12)'},
-  {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists Factory',desc:'Mix infinite colour combinations. Create your masterpiece.',href:'/slime',color:'rgba(0,220,80,0.12)'},
-  {emoji:'🎞️',cat:'Photography · Creative',title:'Film Lab',desc:'Step into the darkroom. 34 authentic film looks from Hawaii\'s golden eras. Transform your camera into a time machine.',href:'/camera',color:'rgba(212,168,67,0.12)'},
-];
+// Games loaded from /games.js
+
 
 const grid=document.getElementById('gamesGrid');
 GAMES.forEach(function(g,i){
