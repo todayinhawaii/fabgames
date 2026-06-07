@@ -428,12 +428,12 @@
     <div id="lbList" style="margin-bottom:14px;"></div>
     <button class="res-btn res-btn-share" onclick="shareScore()">📘 Challenge Friends!</button>
     <button class="res-btn res-btn-play" onclick="playAgain()">🎈 Play Again!</button>
-    <button class="res-btn res-btn-home" onclick="window.location='/games'">← Games Hub</button>
+    <button class="res-btn res-btn-home" onclick="window.location='/play'">← Play Room</button>
   </div>
 </div>
 
 <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
-<a class="back-btn" href="/games">← Games</a>
+<a class="back-btn" href="/play">← Games</a>
 
 <script>
 // ══════════════════════════════════════════════════
@@ -838,8 +838,8 @@ function playAgain(){
 }
 
 function shareScore(){
-  const txt='🎈 I popped '+totalPopped+' balloons and scored '+score.toLocaleString()+' pts on Pop That Balloon! from '+playerLoc+'! Can you beat me? 🌺 todayinhawaii.com/balloons';
-  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://www.todayinhawaii.com/balloons')+'&quote='+encodeURIComponent(txt),'_blank');
+  const txt='🎈 I popped '+totalPopped+' balloons and scored '+score.toLocaleString()+' pts on Pop That Balloon! from '+playerLoc+'! Can you beat me? 🌺 fab.games/balloons';
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('/balloons')+'&quote='+encodeURIComponent(txt),'_blank');
 }
 
 // ── ASMR Pop Sound ────────────────────────────────
