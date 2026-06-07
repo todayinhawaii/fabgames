@@ -475,7 +475,8 @@
     .signup-label{font-size:9px;font-weight:900;text-transform:uppercase;
       letter-spacing:0.12em;color:rgba(255,255,255,0.5);
       margin-bottom:-6px;align-self:flex-start;padding-left:4px;}
-    </style>
+    @media(max-width:480px){.wheel-wrap{margin-bottom:8px!important;}.spin-btn{padding:12px!important;margin-bottom:8px!important;}}
+</style>
 </head>
 <body>
 
@@ -738,6 +739,9 @@ function adjustColor(hex, amount){
 
 // ── Spin Wheel ────────────────────────────────
 function beginGame(){
+  // Hide the name form after first spin
+  const nf=document.getElementById('nameForm');
+  if(nf) nf.style.display='none';
   playerName=document.getElementById('playerName')?.value.trim()||'Mystery Player';
   const _u=document.getElementById('playerUser')?.value.trim()||'';
   const _l=document.getElementById('playerLoc')?.value.trim()||'Hawaii';
