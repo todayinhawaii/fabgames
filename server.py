@@ -83,6 +83,10 @@ def veggies():
 def pinball():
     return send_from_directory('.', 'pinball.html')
 
+@app.route('/artlab')
+def artlab():
+    return send_from_directory('.', 'artlab_v2.html')
+
 @app.route('/reset-password')
 def reset_password():
     return send_from_directory('.', 'reset_password.html')
