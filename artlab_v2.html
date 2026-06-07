@@ -282,11 +282,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
     z-index:500; width:220px; overflow-y:auto;
     box-shadow:-4px 0 20px rgba(0,0,0,0.5); }
   #rightPanel.mob-open{ display:flex; }
+  #rightPanel.mob-open #panelCloseBtn{ display:block!important; }
 
   #leftPanel{ display:none; position:fixed; top:54px; left:0;
     z-index:500; height:auto; padding:8px 4px;
     box-shadow:4px 0 20px rgba(0,0,0,0.5); border-radius:0 10px 10px 0; }
   #leftPanel.mob-open{ display:flex; }
+  #leftPanel.mob-open #leftCloseBtn{ display:flex!important; }
 
   /* Medium bar scrolls horizontally — compact */
   #medBar{ height:58px; }
@@ -469,6 +471,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
     <div class="tb" id="tb-line" onclick="setTool('line')" title="Line (L)" style="width:60px;height:60px;font-size:25px;">╱<div class="tb-lbl" style="font-size:10px;">Line</div></div>
     <div class="tb" id="tb-rect" onclick="setTool('rect')" title="Rectangle (R)" style="width:60px;height:60px;font-size:25px;">▭<div class="tb-lbl" style="font-size:10px;">Rect</div></div>
     <div class="tb" id="tb-circle" onclick="setTool('circle')" title="Ellipse (C)" style="width:60px;height:60px;font-size:25px;">◯<div class="tb-lbl" style="font-size:10px;">Ellipse</div></div>
+    <div onclick="document.getElementById('leftPanel').classList.remove('mob-open')"
+      id="leftCloseBtn"
+      style="display:none;width:38px;height:28px;border-radius:6px;
+             border:1px solid var(--border);background:transparent;
+             color:var(--muted);font-size:11px;cursor:pointer;
+             display:none;align-items:center;justify-content:center;
+             margin-top:4px;">✕</div>
     <div id="swatchWrap">
       <div id="swWrap">
         <div class="sw" id="bgSw" onclick="pickSw('bg')" title="Background colour"></div>
@@ -511,6 +520,16 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
       <button class="la-btn" onclick="addLayer()">+ New</button>
       <button class="la-btn" onclick="dupeLayer()">Dupe</button>
       <button class="la-btn" onclick="mergeDn()">Merge ↓</button>
+    </div>
+    <!-- Close button for mobile -->
+    <div onclick="document.getElementById('rightPanel').classList.remove('mob-open')"
+      style="display:none;padding:10px 12px;border-top:1px solid var(--border);cursor:pointer;
+             text-align:center;font-size:11px;color:var(--muted);letter-spacing:1px;
+             transition:all .18s;" 
+      id="panelCloseBtn"
+      onmouseover="this.style.color='var(--gold)'" 
+      onmouseout="this.style.color='var(--muted)'">
+      ✕ Close
     </div>
   </div>
 </div>
