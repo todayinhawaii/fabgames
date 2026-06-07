@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐬 Dolphin Card Game — Today in Hawaii</title>
+  <meta name="description" content="Flip and match all 52 playing cards! Classic memory game with Vegas flair — fastest time wins!">
+  <link rel="icon" href="/icon-192.png">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{
+      background:linear-gradient(160deg,#061d2c 0%,#0a2e44 60%,#061d2c 100%);
+      min-height:100vh;font-family:system-ui,sans-serif;
+      color:#e8f4f8;overflow-x:hidden;
+    }
+
+    /* Stars */
+    .star{position:fixed;background:white;border-radius:50%;
+      animation:twinkle ease-in-out infinite;pointer-events:none;z-index:0;}
+    @keyframes twinkle{0%,100%{opacity:0.1;}50%{opacity:0.5;}}
+
+    /* HUD */
+    #hud{
+      position:sticky;top:0;
+      padding:10px 14px;z-index:50;
+      display:none;
+      background:rgba(6,29,44,0.95);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+    .hud-inner{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+
+    /* Slot machine timer */
+    .slot-box{
+      background:linear-gradient(180deg,#0a0020,#050010);
+      border:2px solid #22d3ee;border-radius:8px;
+      padding:4px 12px;
+      box-shadow:0 0 12px rgba(34,211,238,0.4),inset 0 2px 4px rgba(0,0,0,0.8);
+      position:relative;overflow:hidden;
+    }
+    .slot-box::before,.slot-box::after{
+      content:'●';position:absolute;font-size:6px;
+      color:#22d3ee;top:50%;transform:translateY(-50%);opacity:0.6;
+    }
+    .slot-box::before{left:3px;}
+    .slot-box::after{right:3px;}
+    .slot-label{font-size:8px;font-weight:900;letter-spacing:0.15em;
+      color:#22d3ee;text-transform:uppercase;text-align:center;
+      text-shadow:0 0 6px rgba(34,211,238,0.6);}
+    .slot-val{
+      font-size:22px;font-weight:900;font-family:'Courier New',monospace;
+      background:linear-gradient(180deg,#88ffee,#22d3ee,#0099bb);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      text-align:center;letter-spacing:2px;line-height:1.2;
+    }
+    .slot-val.flash{animation:slotFlash 0.12s ease-in-out;}
+    @keyframes slotFlash{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.1);opacity:0.3;}}
+
+    /* Score slot */
+    .slot-box.gold{border-color:#ffd700;box-shadow:0 0 12px rgba(255,215,0,0.4),inset 0 2px 4px rgba(0,0,0,0.8);}
+    .slot-box.gold .slot-label{color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,0.6);}
+    .slot-box.gold .slot-val{background:linear-gradient(180deg,#ffe566,#ffd700,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .slot-box.gold .slot-box::before,.slot-box.gold .slot-box::after{color:#ffd700;}
+
+    .hud-pairs{text-align:center;}
+    .hud-pairs-num{font-size:22px;font-weight:900;color:#a78bfa;}
+    .hud-pairs-lbl{font-size:9px;color:#7fb3c8;text-transform:uppercase;letter-spacing:0.1em;}
+
+    /* Game area */
+    #gameWrap{position:relative;z-index:1;padding:10px 8px 40px;}
+
+    @keyframes stagePulse{0%{opacity:0.7;}100%{opacity:1;}}
+    /* Card grid */
+    #cardGrid{
+      display:grid;
+      gap:6px;
+      max-width:600px;
+      margin:0 auto;
+      padding:8px;
+    }
+
+    /* Card */
+    .card{
+      aspect-ratio:5/7;
+      cursor:pointer;
+      perspective:800px;
+      position:relative;
+    }
+    .card-inner{
+      width:100%;height:100%;
+      position:relative;
+      transform-style:preserve-3d;
+      transition:transform 0.45s cubic-bezier(0.23,1,0.32,1);
+      transform:rotateY(0deg);
+    }
+    .card.flipped .card-inner{transform:rotateY(180deg);}
+    .card.matched .card-inner{transform:rotateY(180deg);}
+
+    /* Card faces */
+    .card-back,.card-front{
+      position:absolute;inset:0;
+      border-radius:8px;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 3px 10px rgba(0,0,0,0.4);
+    }
+    /* Card front face — white traditional card */
+    .card-front{
+      background:#fffef9;
+      transform:rotateY(180deg);
+      border:2px solid #e0e0e0;
+      flex-direction:column;
+      overflow:hidden;
+    }
+
+    /* Back — Dolphin */
+    .card-back{
+      background:linear-gradient(135deg,#051a30,#0d3b5e,#1a5276,#0d3b5e,#051a30);
+      border:2px solid rgba(34,211,238,0.4);
+      flex-direction:column;gap:3px;
+      overflow:hidden;box-shadow:inset 0 0 20px rgba(0,0,0,0.3);
+    }
+    .card-back::before{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(circle at 60% 40%,rgba(34,211,238,0.12),transparent 60%);
+    }
+    .dolphin-back{font-size:clamp(36px,10vw,56px);animation:dolphinBob 2s ease-in-out infinite alternate;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.5));}@keyframes dolphinBob{0%{transform:scale(1)rotate(-6deg);}100%{transform:scale(1.1)rotate(6deg);}}
+    @keyframes dolphinBob{0%{transform:scale(1)rotate(-5deg);}100%{transform:scale(1.1)rotate(5deg);}}
+    .dolphin-emoji{font-size:clamp(34px,9vw,54px);filter:drop-shadow(0 3px 10px rgba(0,0,0,0.5));}
+    .dolphin-sub{font-size:clamp(7px,1.8vw,11px);color:rgba(34,211,238,0.6);font-weight:700;letter-spacing:0.05em;}
+
+    /* Front — Playing card */
+    
+    .card-front.red{color:#cc0000;}
+    .card-front.black{color:#111;}
+
+    .card-corner{
+      display:flex;flex-direction:column;align-items:center;
+      line-height:1;
+    }
+    .card-corner.br{transform:rotate(180deg);}
+    .card-val{font-size:clamp(8px,2.2vw,14px);font-weight:900;line-height:1;}
+    .card-suit-sm{font-size:clamp(7px,1.8vw,12px);line-height:1;}
+    .card-suit-big{
+      font-size:clamp(16px,4.5vw,30px);
+      position:absolute;top:50%;left:50%;
+      transform:translate(-50%,-50%);
+    }
+
+    /* Matched — fade out */
+    .card.matched{pointer-events:none;}
+    .match-overlay{
+      position:absolute;inset:0;z-index:20;
+      background:rgba(0,200,80,0.55);
+      border-radius:8px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:2.2em;color:#fff;font-weight:900;
+      text-shadow:0 2px 8px rgba(0,0,0,0.5);
+      animation:matchOverlayIn 0.35s cubic-bezier(0.23,1,0.32,1) forwards;
+      pointer-events:none;
+    }
+    @keyframes matchOverlayIn{
+      0%{opacity:0;transform:scale(0.3);}
+      70%{transform:scale(1.15);}
+      100%{opacity:1;transform:scale(1);}
+    }
+    .card.matched .card-inner{
+      transform:rotateY(180deg);
+    }
+    .card.matched .card-front{
+      opacity:0.4;
+      filter:grayscale(60%) brightness(0.7);
+    }
+    /* Green success overlay on matched cards */
+    .card.matched::after{
+      content:'✓';
+      position:absolute;
+      inset:0;
+      background:rgba(0,200,80,0.45);
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:2em;
+      font-weight:900;
+      color:rgba(255,255,255,0.9);
+      text-shadow:0 2px 6px rgba(0,0,0,0.5);
+      z-index:5;
+      animation:matchFadeIn 0.4s ease forwards;
+    }
+    @keyframes matchFadeIn{
+      0%{opacity:0;transform:scale(0.5);}
+      100%{opacity:1;transform:scale(1);}
+    }
+
+    /* Wrong flash */
+    .card.wrong .card-back{
+      animation:wrongFlash 0.4s ease;
+    }
+    @keyframes wrongFlash{
+      0%,100%{border-color:rgba(34,211,238,0.3);}
+      50%{border-color:#ef4444;box-shadow:0 0 12px rgba(239,68,68,0.6);}
+    }
+
+    /* Match celebration */
+    .card.matched .card-front{
+      animation:matchGlow 0.5s ease;
+    }
+    @keyframes matchGlow{
+      0%{box-shadow:0 0 0 rgba(34,197,94,0);}
+      50%{box-shadow:0 0 20px rgba(34,197,94,0.8),0 0 40px rgba(34,197,94,0.4);}
+      100%{box-shadow:none;}
+    }
+
+    /* Score popup */
+    .score-pop{
+      position:fixed;font-size:20px;font-weight:900;
+      pointer-events:none;z-index:9999;
+      animation:scoreFly 1s ease forwards;
+      text-shadow:0 2px 8px rgba(0,0,0,0.5);
+      transform:translate(-50%,-50%);
+    }
+    @keyframes scoreFly{
+      0%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+      100%{opacity:0;transform:translate(-50%,-130%) scale(1.5);}
+    }
+
+    /* Confetti */
+    .confetti{position:fixed;pointer-events:none;z-index:9998;}
+
+    /* Name screen */
+    #nameScreen{
+      position:fixed;inset:0;z-index:200;
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(160deg,#061d2c,#0a2e44);
+    }
+    .ns-card{
+      background:rgba(10,46,68,0.95);
+      border:1.5px solid rgba(34,211,238,0.2);
+      border-radius:28px;padding:28px 22px;
+      max-width:360px;width:92%;
+      box-shadow:0 0 40px rgba(34,211,238,0.1),0 20px 60px rgba(0,0,0,0.5);
+      text-align:center;
+    }
+    .ns-logo{font-size:64px;margin-bottom:6px;animation:logoBob 2s ease-in-out infinite;}
+    @keyframes logoBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+    .ns-title{
+      font-size:26px;font-weight:900;
+      background:linear-gradient(135deg,#22d3ee,#a78bfa);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      margin-bottom:4px;
+    }
+    .ns-sub{font-size:13px;color:#7fb3c8;margin-bottom:20px;line-height:1.5;}
+    .ns-stats{
+      display:flex;gap:10px;justify-content:center;margin-bottom:18px;
+    }
+    .ns-stat{
+      background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+      border-radius:12px;padding:8px 14px;text-align:center;
+    }
+    .ns-stat-v{font-size:18px;font-weight:900;color:#22d3ee;}
+    .ns-stat-l{font-size:10px;color:#7fb3c8;}
+    .ns-input{
+      width:100%;padding:12px;background:rgba(255,255,255,0.07);
+      border:1.5px solid rgba(34,211,238,0.2);border-radius:12px;
+      color:#e8f4f8;font-size:15px;font-family:inherit;
+      outline:none;margin-bottom:10px;text-align:center;
+    }
+    .ns-input::placeholder{color:#7fb3c8;}
+    .ns-input:focus{border-color:rgba(34,211,238,0.5);}
+    .ns-select{
+      width:100%;padding:12px;background:rgba(6,29,44,0.8);
+      border:1.5px solid rgba(34,211,238,0.2);border-radius:12px;
+      color:#e8f4f8;font-size:14px;font-family:inherit;
+      outline:none;margin-bottom:14px;cursor:pointer;
+    }
+    .ns-btn{
+      width:100%;padding:16px;border:none;border-radius:14px;
+      font-size:16px;font-weight:900;cursor:pointer;
+      font-family:inherit;letter-spacing:1px;color:#003344;
+      background:linear-gradient(180deg,#88ffee,#22d3ee,#0099bb);
+      box-shadow:0 6px 0 #006688,0 8px 20px rgba(34,211,238,0.4);
+      transition:all 0.1s;
+    }
+    .ns-btn:disabled{opacity:0.35;cursor:not-allowed;}
+    .ns-btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #006688,0 3px 8px rgba(34,211,238,0.3);}
+
+    /* Leaderboard in name screen */
+    .ns-lb{margin-top:16px;text-align:left;}
+    .ns-lb-title{font-size:12px;font-weight:800;color:#fbbf24;text-transform:uppercase;
+      letter-spacing:0.1em;margin-bottom:8px;text-align:center;}
+    .lb-row{display:flex;align-items:center;gap:8px;padding:6px 8px;
+      border-radius:8px;font-size:12px;margin-bottom:3px;
+      background:rgba(255,255,255,0.04);}
+    .lb-row.r1{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);}
+    .lb-row.r2{background:rgba(192,192,192,0.07);}
+    .lb-row.r3{background:rgba(205,127,50,0.07);}
+    .lb-medal{font-size:14px;width:20px;}
+    .lb-name{flex:1;font-weight:700;}
+    .lb-time{color:#22d3ee;font-weight:700;font-size:11px;}
+    .lb-pts{color:#fbbf24;font-weight:900;}
+
+    /* Win overlay */
+    #winOverlay{
+      position:fixed;inset:0;display:none;
+      align-items:center;justify-content:center;
+      z-index:300;background:rgba(6,29,44,0.93);backdrop-filter:blur(12px);
+    }
+    #winOverlay.show{display:flex;}
+    .win-card{
+      background:linear-gradient(135deg,#0a2e44,#061d2c);
+      border:2px solid rgba(34,211,238,0.3);
+      border-radius:28px;padding:28px 22px;
+      max-width:360px;width:92%;
+      box-shadow:0 0 40px rgba(34,211,238,0.2),0 20px 60px rgba(0,0,0,0.7);
+      text-align:center;max-height:90vh;overflow-y:auto;
+    }
+    .win-emoji{font-size:70px;margin-bottom:10px;}
+    .win-title{font-size:26px;font-weight:900;color:#22d3ee;margin-bottom:8px;
+      text-shadow:0 0 20px rgba(34,211,238,0.5);}
+    .win-time{font-size:48px;font-weight:900;color:#ffd700;
+      font-family:'Courier New',monospace;letter-spacing:3px;
+      text-shadow:0 0 20px rgba(255,215,0,0.5);}
+    .win-score{font-size:22px;font-weight:900;color:#a78bfa;margin:4px 0;}
+    .win-stats{
+      display:flex;gap:10px;justify-content:center;
+      margin:14px 0;flex-wrap:wrap;
+    }
+    .win-stat{
+      background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+      border-radius:12px;padding:8px 14px;text-align:center;
+    }
+    .win-stat-v{font-size:18px;font-weight:900;color:#22d3ee;}
+    .win-stat-l{font-size:10px;color:#7fb3c8;}
+    .win-msg{font-size:13px;color:#7fb3c8;line-height:1.6;margin-bottom:16px;}
+    .win-btn{
+      width:100%;padding:13px;border:none;border-radius:13px;
+      font-size:14px;font-weight:800;cursor:pointer;
+      font-family:inherit;margin-bottom:8px;color:#fff;
+      transition:transform 0.1s;
+    }
+    .win-btn:active{transform:scale(0.97);}
+    .win-btn-play{
+      background:linear-gradient(180deg,#88ffee,#22d3ee,#0099bb);
+      color:#003344;
+    }
+    .win-btn-share{background:linear-gradient(135deg,#1877f2,#0d65d9);}
+    .win-btn-home{background:rgba(255,255,255,0.07);color:#e8f4f8;}
+
+    .mute-btn{
+      position:fixed;bottom:16px;right:16px;
+      width:42px;height:42px;border-radius:50%;
+      background:rgba(6,29,44,0.8);
+      border:1px solid rgba(255,255,255,0.12);
+      font-size:18px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      z-index:100;color:white;
+    }
+  
+    .signup-form{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;align-items:center;}
+    .signup-input{width:100%;padding:12px 16px;background:rgba(255,255,255,0.07);
+      border:2px solid rgba(255,255,255,0.2);border-radius:12px;color:#fff;
+      font-size:14px;font-family:system-ui,sans-serif;outline:none;text-align:center;
+      transition:border-color 0.2s;}
+    .signup-input:focus{border-color:rgba(255,255,255,0.6);}
+    .signup-input::placeholder{color:rgba(255,255,255,0.35);}
+    .signup-label{font-size:9px;font-weight:900;text-transform:uppercase;
+      letter-spacing:0.12em;color:rgba(255,255,255,0.5);
+      margin-bottom:-6px;align-self:flex-start;padding-left:4px;}
+    </style>
+</head>
+<body>
+
+<!-- Stars -->
+<script>
+for(let i=0;i<30;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  s.style.cssText=`width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*4}s;`;
+  document.body.appendChild(s);
+}
+</script>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-inner">
+    <div class="slot-box">
+      <div class="slot-label">⏱️ TIME</div>
+      <div class="slot-val" id="timerDisplay">0:00</div>
+    </div>
+    <div class="hud-pairs">
+      <div class="hud-pairs-num"><span id="pairsLeft">15</span></div>
+      <div class="hud-pairs-lbl">pairs left 🐬</div>
+    </div>
+    <div class="slot-box gold">
+      <div class="slot-label">🎰 SCORE</div>
+      <div class="slot-val" id="scoreDisplay">0</div>
+    </div>
+  </div>
+</div>
+
+<!-- Game area -->
+<div id="gameWrap" style="display:none;">
+  <div id="stageBadge" style="display:none;text-align:center;
+  font-size:13px;font-weight:900;color:#00e5ff;
+  text-shadow:0 0 10px rgba(0,200,255,0.6);
+  padding:4px 0 2px;letter-spacing:0.05em;
+  animation:stagePulse 1.5s ease-in-out infinite alternate;"></div>
+<div id="cardGrid"></div>
+</div>
+
+<!-- Name Screen -->
+<div id="nameScreen">
+  <div class="ns-card">
+    <div class="ns-logo">🐬</div>
+    <div class="ns-title">Dolphin Card Game</div>
+    <div class="ns-sub">Flip and match all 52 cards! Fastest time wins — the dolphin is watching! 🐬🌺</div>
+    <div class="ns-stats">
+      <div class="ns-stat"><div class="ns-stat-v">52</div><div class="ns-stat-l">Cards</div></div>
+      <div class="ns-stat"><div class="ns-stat-v">26</div><div class="ns-stat-l">Pairs</div></div>
+      <div class="ns-stat"><div class="ns-stat-v">⏱️</div><div class="ns-stat-l">Timed</div></div>
+    </div>
+    
+    
+    <div class="signup-form">
+            <span class="signup-label">Your Full Name</span>
+            <input class="signup-input" id="playerName"
+              placeholder="e.g. Sarah Johnson" maxlength="30"
+              onkeydown="if(event.key==='Enter')document.getElementById('playerUser').focus()">
+            <span class="signup-label">Choose a Username</span>
+            <input class="signup-input" id="playerUser"
+              placeholder="e.g. SurfQueen808" maxlength="20"
+              onkeydown="if(event.key==='Enter')document.getElementById('playerLoc').focus()">
+            <span class="signup-label">Country, City or Island 🌺</span>
+            <input class="signup-input" id="playerLoc"
+              placeholder="e.g. Maui, Hawaii" maxlength="30"
+              onkeydown="if(event.key==='Enter')beginGame()">
+          </div>
+          <button class="ns-btn" id="startBtn" onclick="startGame()" disabled>🐬 Deal the Cards!</button>
+    <div class="ns-lb">
+      <div class="ns-lb-title">🏆 Fastest Players</div>
+      <div id="lbList"><div style="text-align:center;color:#7fb3c8;font-size:12px;padding:8px;">Loading... 🐬</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Win Overlay -->
+<div id="winOverlay">
+  <div class="win-card">
+    <div class="win-emoji">🐬</div>
+    <div class="win-title">All Pairs Found!!</div>
+    <div class="win-time" id="winTime">0:00</div>
+    <div class="win-score" id="winScore">0 pts</div>
+    <div class="win-stats">
+      <div class="win-stat"><div class="win-stat-v" id="winFlips">0</div><div class="win-stat-l">Flips</div></div>
+      <div class="win-stat"><div class="win-stat-v" id="winMatches">26</div><div class="win-stat-l">Matches</div></div>
+      <div class="win-stat"><div class="win-stat-v" id="winBonus">0</div><div class="win-stat-l">Bonus pts</div></div>
+    </div>
+    <div class="win-msg" id="winMsg"></div>
+    <div id="winLbList" style="margin-bottom:14px;"></div>
+    <button class="win-btn win-btn-share" onclick="shareScore()">📘 Show off on Facebook!</button>
+    <button class="win-btn win-btn-play" onclick="playAgain()">🐬 Play Again!</button>
+    <button class="win-btn win-btn-home" onclick="window.location='/games'">← Games Hub</button>
+  </div>
+</div>
+
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+
+<script>
+// ══════════════════════════════════════════════════
+// DOLPHIN CARD GAME — Classic Memory Match
+// Today in Hawaii © 2026
+// 52 cards · 26 pairs · Fastest time wins!
+// ══════════════════════════════════════════════════
+
+const SUITS = [
+  {sym:'♠',name:'spades',  color:'black'},
+  {sym:'♥',name:'hearts',  color:'red'},
+  {sym:'♦',name:'diamonds',color:'red'},
+  {sym:'♣',name:'clubs',   color:'black'},
+];
+const VALUES = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+
+let playerName='',playerLoc='';
+let cards=[];          // [{id,val,suit,flipped,matched}]
+let flippedCards=[];   // max 2 at a time
+let canFlip=true;
+let matchesFound=0,totalFlips=0;
+let timerSecs=0,timerInterval=null;
+let gameStarted=false,gameOver=false;
+let muted=false,myRank=0;
+let displayScore=0;
+// Mobile 2-stage system
+let stage=1, allCards=[], stage1Count=30, stage2Start=30;
+const isMobile=()=>window.innerWidth<=640;
+
+// ── Name Entry ─────────────────────────────────
+document.getElementById('playerName').addEventListener('input',checkReady);
+document.getElementById('playerLoc').addEventListener('input',checkReady);
+function checkReady(){
+  const ok=document.getElementById('playerName')?.value.trim().length>=2 && document.getElementById('playerLoc')?.value.trim().length>=2;
+  document.getElementById('startBtn').disabled=!ok;
+}
+
+function startGame(){
+  // Content filter — block bad words and politics
+  const _fc = checkInputs('playerName', 'playerLoc');
+  if(!_fc.ok){
+    const _fi = document.getElementById('playerName');
+    if(_fi){ _fi.style.borderColor='#ff4444'; _fi.style.boxShadow='0 0 10px rgba(255,0,0,0.4)'; }
+    // Show error message
+    const _fe = document.getElementById('filterError') || (()=>{
+      const d=document.createElement('div');
+      d.id='filterError';
+      d.style.cssText='color:#ff6666;font-size:12px;font-weight:700;text-align:center;margin-top:-8px;';
+      const btn=document.querySelector('.ov-btn');
+      if(btn&&btn.parentNode)btn.parentNode.insertBefore(d,btn);
+      return d;
+    })();
+    _fe.textContent='⚠️ '+_fc.msg;
+    setTimeout(()=>{if(_fi){_fi.style.borderColor='';_fi.style.boxShadow='';}if(_fe)_fe.textContent='';},3000);
+    return;
+  }
+  playerName=document.getElementById('playerName')?.value.trim()||'Player';
+  const _u=document.getElementById('playerUser')?.value.trim()||'';
+  playerLoc=(_u?_u+' · ':'')+document.getElementById('playerLoc')?.value.trim()||'Hawaii';
+  document.getElementById('nameScreen').style.display='none';
+  document.getElementById('hud').style.display='block';
+  document.getElementById('gameWrap').style.display='block';
+  buildDeck();
+  renderGrid();
+}
+
+// ── Build & Shuffle Deck ──────────────────────
+function buildDeck(){
+  const SUITS_ALL=[
+    {sym:'♠',color:'black',code:'s'},
+    {sym:'♥',color:'red',  code:'h'},
+    {sym:'♦',color:'red',  code:'d'},
+    {sym:'♣',color:'black',code:'c'},
+  ];
+
+  // Step 1: create flat array of 52 cards
+  const pool=[];
+  SUITS_ALL.forEach(suit=>{
+    VALUES.forEach(val=>{
+      pool.push({val, suit, flipped:false, matched:false});
+    });
+  }); // should be 52
+
+  // Step 2: shuffle pool
+  for(let i=pool.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+
+  // Step 3: group into value buckets (4 cards each)
+  const buckets={};
+  VALUES.forEach(v=>{buckets[v]=[];});
+  pool.forEach(c=>buckets[c.val].push(c));
+
+  // Step 4: from each bucket of 4, make 2 pairs
+  const pairs=[];
+  VALUES.forEach(val=>{
+    const b=buckets[val];
+    pairs.push([b[0],b[1]]); // pair A
+    pairs.push([b[2],b[3]]); // pair B
+  }); // should be 26
+
+  // Step 5: shuffle the pairs
+  for(let i=pairs.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [pairs[i],pairs[j]]=[pairs[j],pairs[i]];
+  }
+
+  // Step 6: split — stage 1 gets 15 pairs, stage 2 gets 11
+  const s1pairs=pairs.slice(0,15);
+  const s2pairs=pairs.slice(15);
+
+  // Step 7: flatten and shuffle each stage
+  function flatShuffle(pList){
+    const flat=pList.flat();
+    for(let i=flat.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [flat[i],flat[j]]=[flat[j],flat[i]];
+    }
+    return flat;
+  }
+
+  const s1cards=flatShuffle(s1pairs);
+  const s2cards=flatShuffle(s2pairs);
+
+  allCards={s1:s1cards, s2:s2cards};
+  cards=allCards.s1;
+}
+
+// ── Render Grid ────────────────────────────────
+function renderGrid(){
+  const grid=document.getElementById('cardGrid');
+  grid.innerHTML='';
+  grid.style.gridTemplateColumns='repeat(5,1fr)';
+
+  // Show stage badge on mobile
+  const badge=document.getElementById('stageBadge');
+  if(badge){
+    badge.textContent=stage===1
+      ?'🐬 Stage 1 of 2 — 15 pairs':'🌊 Stage 2 of 2 — 11 pairs!';
+    badge.style.display='block';
+  }
+
+  cards.forEach((card,idx)=>{
+    const div=document.createElement('div');
+    div.className='card';
+    div.id='card-'+idx;
+    div.innerHTML=buildCardHTML(card);
+    div.addEventListener('click',()=>flipCard(idx));
+    grid.appendChild(div);
+  });
+}
+
+function getCardImageName(card){
+  // card_as.jpg, card_2h.jpg, card_kd.jpg etc
+  const valMap={'A':'a','J':'j','Q':'q','K':'k'};
+  const suitMap={'♠':'s','♥':'h','♦':'d','♣':'c'};
+  const v=valMap[card.val]||card.val;
+  const s=suitMap[card.suit.sym];
+  return 'card_'+v+s+'.jpg';
+}
+
+function buildCardHTML(card){
+  const s   = card.suit.sym;
+  const v   = card.val;
+  const red = card.suit.color==='red';
+  const col = red ? '#cc1111' : '#111111';
+  const isFace = ['J','Q','K'].includes(v);
+
+  /* ── Corner (top-left and bottom-right) ─────── */
+  function corner(flip){
+    const pos = flip
+      ? 'bottom:4%;right:5%;transform:rotate(180deg);'
+      : 'top:4%;left:5%;';
+    return `<div style="position:absolute;${pos}
+      display:flex;flex-direction:column;align-items:center;
+      color:${col};line-height:1.2;font-family:Georgia,serif;">
+      <div style="font-size:clamp(10px,3vw,16px);font-weight:900;">${v}</div>
+      <div style="font-size:clamp(9px,2.6vw,14px);">${s}</div>
+    </div>`;
+  }
+
+  /* ── Pip grid for 2–10 ───────────────────────── */
+  const PIPS = {
+    '2': [{r:0,c:1},{r:4,c:1,f:1}],
+    '3': [{r:0,c:1},{r:2,c:1},{r:4,c:1,f:1}],
+    '4': [{r:0,c:0},{r:0,c:2},{r:4,c:0,f:1},{r:4,c:2,f:1}],
+    '5': [{r:0,c:0},{r:0,c:2},{r:2,c:1},{r:4,c:0,f:1},{r:4,c:2,f:1}],
+    '6': [{r:0,c:0},{r:0,c:2},{r:2,c:0},{r:2,c:2},{r:4,c:0,f:1},{r:4,c:2,f:1}],
+    '7': [{r:0,c:0},{r:0,c:2},{r:1,c:1},{r:2,c:0},{r:2,c:2},{r:4,c:0,f:1},{r:4,c:2,f:1}],
+    '8': [{r:0,c:0},{r:0,c:2},{r:1,c:1},{r:2,c:0},{r:2,c:2},{r:3,c:1,f:1},{r:4,c:0,f:1},{r:4,c:2,f:1}],
+    '9': [{r:0,c:0},{r:0,c:2},{r:1,c:0},{r:1,c:2},{r:2,c:1},{r:3,c:0,f:1},{r:3,c:2,f:1},{r:4,c:0,f:1},{r:4,c:2,f:1}],
+    '10':[{r:0,c:0},{r:0,c:2},{r:1,c:0},{r:1,c:2},{r:2,c:1},{r:2,c:1,f:1},{r:3,c:0,f:1},{r:3,c:2,f:1},{r:4,c:0,f:1},{r:4,c:2,f:1}],
+  };
+  function pipGrid(){
+    const layout = PIPS[v] || [];
+    const g = Array.from({length:5},()=>['','','']);
+    layout.forEach(p=>{
+      g[p.r][p.c] = p.f
+        ? `<span style="display:inline-block;transform:rotate(180deg)">${s}</span>`
+        : s;
+    });
+    return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;
+      grid-template-rows:repeat(5,1fr);
+      width:68%;height:66%;color:${col};
+      font-size:clamp(8px,2.6vw,15px);
+      align-items:center;justify-items:center;">
+      ${g.flat().map(c=>`<div>${c}</div>`).join('')}
+    </div>`;
+  }
+
+  /* ── Face cards ──────────────────────────────── */
+  const FACE_DATA = {
+    J:{icon:'⚔️',name:'JACK',  accent:'#8B4513'},
+    Q:{icon:'♛', name:'QUEEN', accent:'#7B2D8B'},
+    K:{icon:'♚', name:'KING',  accent:'#B8860B'},
+  };
+  function faceCard(){
+    const f = FACE_DATA[v];
+    return `<div style="display:flex;flex-direction:column;align-items:center;
+      justify-content:center;height:56%;width:58%;
+      border:2px solid ${f.accent};border-radius:5px;
+      background:rgba(0,0,0,0.02);gap:2px;padding:4px 2px;">
+      <div style="font-size:clamp(14px,4vw,24px);line-height:1.1;">${f.icon}</div>
+      <div style="font-size:clamp(5px,1.4vw,8px);font-weight:900;color:${f.accent};
+        letter-spacing:0.1em;font-family:Georgia,serif;">${f.name}</div>
+      <div style="font-size:clamp(8px,2.2vw,12px);color:${col};">${s}</div>
+    </div>`;
+  }
+
+  /* ── Ace ─────────────────────────────────────── */
+  function ace(){
+    return `<div style="font-size:clamp(26px,8vw,48px);color:${col};
+      line-height:1;text-shadow:0 1px 3px rgba(0,0,0,0.15);">${s}</div>`;
+  }
+
+  const center = v==='A' ? ace() : isFace ? faceCard() : pipGrid();
+
+  // Image filename: card_As.png, card_Kh.png, card_10d.png, card_Jc.png etc
+  const suitCode = card.suit.code || (
+    card.suit.sym==='♠'?'s':card.suit.sym==='♥'?'h':
+    card.suit.sym==='♦'?'d':'c');
+  const valCode  = v; // A, 2-9, 10, J, Q, K
+  const imgFile  = `card_${valCode}${suitCode}.jpg`;
+
+  return `<div class="card-inner">
+    <div class="card-back" id="card-back-face">
+      <img src="/dolphin_back.jpg"
+        style="width:100%;height:100%;object-fit:cover;border-radius:6px;display:block;"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div style="display:none;flex-direction:column;align-items:center;
+        justify-content:center;width:100%;height:100%;">
+        <div class="dolphin-back">🐬</div>
+        <div class="dolphin-sub">DOLPHINS</div>
+      </div>
+    </div>
+    <div class="card-front">
+      <img src="/${imgFile}"
+        style="width:100%;height:100%;object-fit:cover;border-radius:6px;
+               display:block;position:absolute;inset:0;z-index:1;"
+        onerror="this.style.display='none';">
+      <!-- Drawn fallback (shows when no image uploaded) -->
+      <div class="card-drawn-fallback" style="
+        position:absolute;inset:0;z-index:0;
+        display:flex;flex-direction:column;
+        align-items:center;justify-content:center;">
+        ${corner(false)}
+        <div style="position:absolute;inset:8px;border:1px solid rgba(0,0,0,0.1);
+          border-radius:4px;pointer-events:none;"></div>
+        ${center}
+        ${corner(true)}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Flip Card ──────────────────────────────────
+function flipCard(idx){
+  if(!canFlip) return;
+  if(gameOver) return;
+  const card=cards[idx];
+  if(card.flipped||card.matched) return;
+  if(flippedCards.length>=2) return;
+
+  // Start timer on first flip
+  if(!gameStarted){
+    gameStarted=true;
+    timerInterval=setInterval(()=>{
+      timerSecs++;
+      updateTimer();
+    },1000);
+  }
+
+  // Flip!
+  card.flipped=true;
+  totalFlips++;
+  const el=document.getElementById('card-'+idx);
+  el.classList.add('flipped');
+  playFlipSound();
+  vibrate(8);
+
+  flippedCards.push(idx);
+
+  if(flippedCards.length===2){
+    canFlip=false;
+    checkMatch();
+  }
+}
+
+// ── Check Match ────────────────────────────────
+function checkMatch(){
+  const [i1,i2]=flippedCards;
+  const c1=cards[i1],c2=cards[i2];
+
+  // Match by VALUE only — any two 5s match, any two Jacks match!
+  const isMatch=(c1.val===c2.val);
+
+  if(isMatch){
+    // MATCH!
+    setTimeout(()=>{
+      const el1=document.getElementById('card-'+i1);
+      const el2=document.getElementById('card-'+i2);
+      el1.classList.add('matched');
+      el2.classList.add('matched');
+      // Inject overlay into .card-front (works with 3D flip)
+      [el1,el2].forEach(el=>{
+        if(!el) return;
+        const front=el.querySelector('.card-front');
+        if(front){
+          const ov=document.createElement('div');
+          ov.className='match-overlay';
+          ov.textContent='✓';
+          front.appendChild(ov);
+        }
+      });
+      c1.matched=true;c2.matched=true;
+      matchesFound++;
+
+      // Score — faster = more points per match
+      const pts=Math.max(50,500-Math.floor(timerSecs/2));
+      displayScore+=pts;
+      updateScoreSlot(displayScore);
+
+      // Effects
+      celebrateMatch(el1,el2,c1.suit.color==='red'?'#ff4444':'#444');
+      playMatchSound();
+      vibrate([30,20,60]);
+
+      // Score popup
+      showScorePop('+'+pts,el1);
+
+      // Update pairs left for current stage
+      const _pl=document.getElementById('pairsLeft');
+      if(_pl){
+        const _remaining=Math.floor(cards.length/2)-matchesFound;
+        _pl.textContent=_remaining;
+      }
+
+      flippedCards=[];
+      canFlip=true; // always reset before win check
+
+      // Check win — use allCards directly, not cards (avoids sync bug)
+      const need1 = Math.floor(allCards.s1.length/2); // always 15
+      const need2 = Math.floor(allCards.s2.length/2); // always 11
+      if(stage===1 && matchesFound===need1){
+        setTimeout(()=>advanceStage(),500);
+      } else if(stage===2 && matchesFound===need2){
+        setTimeout(()=>winGame(),600);
+      }
+    },400);
+  } else {
+    // No match — flip back
+    setTimeout(()=>{
+      try{
+        const el1=document.getElementById('card-'+i1);
+        const el2=document.getElementById('card-'+i2);
+        if(el1){ el1.classList.add('wrong'); }
+        if(el2){ el2.classList.add('wrong'); }
+        setTimeout(()=>{
+          if(el1){ el1.classList.remove('wrong'); el1.classList.remove('flipped'); }
+          if(el2){ el2.classList.remove('wrong'); el2.classList.remove('flipped'); }
+        },400);
+        c1.flipped=false; c2.flipped=false;
+        try{ playNoMatchSound(); }catch(e){}
+      }catch(e){
+        console.error('No-match handler error:',e);
+      }finally{
+        // ALWAYS reset — game must never freeze
+        flippedCards=[];
+        canFlip=true;
+      }
+    },900);
+  }
+}
+
+// ── Win! ────────────────────────────────────────
+// ── Stage Advance (mobile) ─────────────────────
+function advanceStage(){
+  // Set state immediately - no delays
+  stage = 2;
+  matchesFound = 0;
+  canFlip = false;
+  flippedCards = [];
+
+  // CRITICAL: update cards to stage 2 BEFORE rendering
+  cards = allCards.s2;
+
+  // Re-render the grid with new cards
+  var grid = document.getElementById('cardGrid');
+  if(!grid){
+    return;
+  }
+
+  // Clear and rebuild
+  grid.style.opacity = '1';
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = 'repeat(5,1fr)';
+
+  // Stage badge
+  var badge = document.getElementById('stageBadge');
+  if(badge){
+    badge.textContent = '🌊 Stage 2 of 2 — 11 pairs!';
+    badge.style.display = 'block';
+  }
+
+  // Render each card
+  cards.forEach(function(card, idx){
+    var div = document.createElement('div');
+    div.className = 'card';
+    div.id = 'card-' + idx;
+    div.innerHTML = buildCardHTML(card);
+    div.addEventListener('click', (function(i){ return function(){ flipCard(i); }; })(idx));
+    grid.appendChild(div);
+  });
+
+  // Update pairs counter
+  var pl = document.getElementById('pairsLeft');
+  if(pl) pl.textContent = Math.floor(cards.length/2);
+
+  // Re-enable play
+  canFlip = true;
+
+  // Big obvious STAGE 2 announcement!
+  var ann = document.createElement('div');
+  ann.style.cssText = 'position:fixed;inset:0;z-index:9999;'+
+    'display:flex;flex-direction:column;align-items:center;justify-content:center;'+
+    'background:rgba(0,0,0,0.85);pointer-events:none;'+
+    'animation:stageAnnounce 2s ease forwards;';
+  ann.innerHTML = '<div style="font-size:clamp(32px,10vw,56px);font-weight:900;'+
+    'color:#00e5ff;text-shadow:0 0 30px rgba(0,200,255,0.8);text-align:center;">'+
+    '🌊 STAGE 2! 🌊</div>'+
+    '<div style="font-size:clamp(16px,4vw,24px);color:#fff;margin-top:12px;">'+
+    '11 more pairs to find!</div>';
+
+  // Add keyframe if not already added
+  if(!document.getElementById('stageAnnCSS')){
+    var st=document.createElement('style');st.id='stageAnnCSS';
+    st.textContent='@keyframes stageAnnounce{0%{opacity:0;}15%{opacity:1;}75%{opacity:1;}100%{opacity:0;}}';
+    document.head.appendChild(st);
+  }
+  document.body.appendChild(ann);
+  setTimeout(function(){ann.remove();},2000);
+
+  try{ showToast('🌊 Stage 2!! 11 more pairs!!'); }catch(e){}
+  try{ playLevelUp(); }catch(e){}
+}
+
+async function winGame(){
+  gameOver=true;
+  clearInterval(timerInterval);
+
+  // Calculate final score — time bonus!
+  const timeBonus=Math.max(0,10000-timerSecs*20);
+  const flipBonus=Math.max(0,5000-totalFlips*50);
+  const finalScore=displayScore+timeBonus+flipBonus;
+  displayScore=finalScore;
+
+  // Mega celebration!
+  for(let i=0;i<5;i++){
+    setTimeout(()=>{
+      const x=Math.random()*window.innerWidth;
+      const y=Math.random()*window.innerHeight*0.5;
+      bigBurst(x,y);
+    },i*200);
+  }
+  playWinSound();
+  vibrate([100,50,100,50,200]);
+
+  await submitScore(finalScore);
+  await loadLeaderboard(true);
+
+  const timeStr=formatTime(timerSecs);
+  const msgs=[
+    'The dolphin is SO proud of you!! 🐬💙',
+    'Incredible memory!! Are you a card shark? 🦈',
+    'Mahalo for playing — the ocean cheers for you! 🌊',
+    'The cards have spoken — you\'re a legend!! 🃏🏆',
+  ];
+
+  document.getElementById('winTime').textContent=timeStr;
+  document.getElementById('winScore').textContent=finalScore.toLocaleString()+' pts';
+  document.getElementById('winFlips').textContent=totalFlips;
+  document.getElementById('winMatches').textContent=26;
+  document.getElementById('winBonus').textContent=(timeBonus+flipBonus).toLocaleString();
+  document.getElementById('winMsg').textContent=
+    'Time: '+timeStr+' · '+totalFlips+' flips · '+
+    msgs[Math.floor(Math.random()*msgs.length)];
+  document.getElementById('winOverlay').classList.add('show');
+}
+
+function playAgain(){
+  document.getElementById('winOverlay').classList.remove('show');
+  cards=[];flippedCards=[];canFlip=true;
+  matchesFound=0;totalFlips=0;timerSecs=0;
+  gameStarted=false;gameOver=false;displayScore=0;
+  stage=1;allCards=[];
+  clearInterval(timerInterval);
+  document.getElementById('timerDisplay').textContent='0:00';
+  document.getElementById('scoreDisplay').textContent='0';
+  document.getElementById('pairsLeft').textContent='15';
+  buildDeck();renderGrid();
+}
+
+function shareScore(){
+  const txt='🐬 I found all 26 pairs in '+formatTime(timerSecs)+' on the Dolphin Card Game from '+playerLoc+'! Can you beat me? 🌺 todayinhawaii.com/dolphins';
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://www.todayinhawaii.com/dolphins')+'&quote='+encodeURIComponent(txt),'_blank');
+}
+
+// ── Timer & Score ──────────────────────────────
+function formatTime(s){
+  const m=Math.floor(s/60);
+  const sec=s%60;
+  return m+':'+(sec<10?'0':'')+sec;
+}
+
+function updateTimer(){
+  const el=document.getElementById('timerDisplay');
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+  setTimeout(()=>el.classList.remove('flash'),120);
+  el.textContent=formatTime(timerSecs);
+}
+
+let scoreAnimating=false;
+function updateScoreSlot(newScore){
+  const el=document.getElementById('scoreDisplay');
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+  setTimeout(()=>{
+    el.textContent=newScore.toLocaleString();
+    el.classList.remove('flash');
+  },60);
+}
+
+// ── Effects ────────────────────────────────────
+function celebrateMatch(el1,el2,color){
+  [el1,el2].forEach(el=>{
+    const rect=el.getBoundingClientRect();
+    const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+    for(let i=0;i<8;i++){
+      const p=document.createElement('div');
+      p.className='confetti';
+      const sz=4+Math.random()*6;
+      p.style.cssText=`background:${['#22d3ee','#ffd700','#a78bfa','#22c55e',color][Math.floor(Math.random()*5)]};width:${sz}px;height:${sz}px;border-radius:50%;left:${cx}px;top:${cy}px;`;
+      document.body.appendChild(p);
+      const ang=Math.random()*Math.PI*2,dist=30+Math.random()*50;
+      const tx=Math.cos(ang)*dist,ty=Math.sin(ang)*dist;
+      const dur=400+Math.random()*300,start=Date.now();
+      function animC(){
+        const progress=Math.min(1,(Date.now()-start)/dur);
+        const e=1-Math.pow(1-progress,2);
+        p.style.transform=`translate(calc(-50% + ${tx*e}px),calc(-50% + ${ty*e+40*progress*progress}px)) rotate(${progress*360}deg)`;
+        p.style.opacity=1-progress;
+        if(progress<1) requestAnimationFrame(animC);
+        else p.remove();
+      }
+      requestAnimationFrame(animC);
+    }
+  });
+}
+
+function bigBurst(cx,cy){
+  const colors=['#22d3ee','#ffd700','#a78bfa','#ff4444','#22c55e','#ff8c00'];
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');
+    p.className='confetti';
+    const sz=6+Math.random()*10;
+    p.style.cssText=`background:${colors[Math.floor(Math.random()*colors.length)]};width:${sz}px;height:${sz}px;border-radius:${Math.random()>0.5?'50%':'3px'};left:${cx}px;top:${cy}px;`;
+    document.body.appendChild(p);
+    const ang=Math.random()*Math.PI*2,dist=60+Math.random()*120;
+    const tx=Math.cos(ang)*dist,ty=Math.sin(ang)*dist;
+    const dur=600+Math.random()*600,start=Date.now();
+    function animC(){
+      const progress=Math.min(1,(Date.now()-start)/dur);
+      const e=1-Math.pow(1-progress,2);
+      p.style.transform=`translate(calc(-50% + ${tx*e}px),calc(-50% + ${ty*e+80*progress*progress}px)) rotate(${progress*540}deg)`;
+      p.style.opacity=1-progress;
+      if(progress<1) requestAnimationFrame(animC);
+      else p.remove();
+    }
+    requestAnimationFrame(animC);
+  }
+}
+
+function showScorePop(txt,el){
+  const rect=el.getBoundingClientRect();
+  const pop=document.createElement('div');
+  pop.className='score-pop';
+  pop.style.cssText=`left:${rect.left+rect.width/2}px;top:${rect.top}px;color:#22d3ee;`;
+  pop.textContent=txt;
+  document.body.appendChild(pop);
+  setTimeout(()=>pop.remove(),1000);
+}
+
+// ── Sound ──────────────────────────────────────
+let audioCtx=null;
+function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playTone(f,t,v,d,delay){
+  if(muted)return;delay=delay||0;
+  try{
+    const c=getAudio(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type=t;o.frequency.value=f;
+    g.gain.setValueAtTime(0,c.currentTime+delay);
+    g.gain.linearRampToValueAtTime(v,c.currentTime+delay+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+delay+d);
+    o.start(c.currentTime+delay);o.stop(c.currentTime+delay+d+0.05);
+  }catch(e){}
+}
+function playFlipSound(){playTone(600,'sine',0.2,0.08);}
+function playMatchSound(){
+  [523,659,784,1047].forEach((f,i)=>playTone(f,'sine',0.4,0.18,i*0.06));
+}
+function playNoMatchSound(){playTone(220,'sawtooth',0.25,0.2);}
+function playWinSound(){
+  const notes=[523,659,784,1047,1319,1047,784,1047,1319,1568];
+  notes.forEach((f,i)=>playTone(f,'sine',0.5,0.2,i*0.08));
+}
+function toggleMute(){muted=!muted;document.getElementById('muteBtn').textContent=muted?'🔇':'🔊';}
+function playLevelUp(){
+  try{
+    const c=new(window.AudioContext||window.webkitAudioContext)();
+    [523,659,784,1047].forEach((f,i)=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,c.currentTime+i*0.1);
+      g.gain.linearRampToValueAtTime(0.3,c.currentTime+i*0.1+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+i*0.1+0.18);
+      o.start(c.currentTime+i*0.1);o.stop(c.currentTime+i*0.1+0.2);
+    });
+  }catch(e){}
+}
+function showToast(msg){
+  document.querySelectorAll('.toast-msg').forEach(t=>t.remove());
+  const t=document.createElement('div');t.className='toast-msg';
+  t.textContent=msg;
+  t.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);'+
+    'background:rgba(0,0,0,0.85);color:#00e5ff;padding:8px 18px;'+
+    'border-radius:99px;font-size:13px;font-weight:700;z-index:999;'+
+    'animation:tpop 2.5s ease forwards;white-space:nowrap;pointer-events:none;'+
+    'border:1px solid rgba(0,200,255,0.3);';
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2600);
+}
+function vibrate(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
+
+// ── Leaderboard ────────────────────────────────
+async function loadLeaderboard(forWin=false){
+  try{
+    const res=await fetch('/api/dolphin-scores');
+    const data=await res.json();
+    const medals=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣'];
+    if(!data.length){
+      const html='<div style="text-align:center;color:#7fb3c8;font-size:12px;padding:8px;">Be the first Dolphin Champion! 🐬</div>';
+      document.getElementById('lbList').innerHTML=html;
+      if(forWin) document.getElementById('winLbList').innerHTML=html;
+      return;
+    }
+    const html=data.slice(0,6).map((s,i)=>{
+      const isMe=playerName&&s.name.toLowerCase()===playerName.toLowerCase();
+      const cls=i===0?'r1':i===1?'r2':i===2?'r3':isMe?'me':'';
+      return `<div class="lb-row ${cls}">
+        <span class="lb-medal">${medals[i]||i+1}</span>
+        <div style="flex:1">
+          <div class="lb-name">${s.name}${isMe?' ← You!':''}</div>
+          <div style="font-size:10px;color:#7fb3c8;">📍 ${s.island}</div>
+        </div>
+        <span class="lb-time">${s.timeStr||'?'}</span>
+        <span class="lb-pts" style="margin-left:6px;">${Number(s.score).toLocaleString()}</span>
+      </div>`;
+    }).join('');
+    document.getElementById('lbList').innerHTML=html;
+    if(forWin) document.getElementById('winLbList').innerHTML=html;
+  }catch(e){
+    document.getElementById('lbList').innerHTML='<div style="text-align:center;color:#7fb3c8;font-size:12px;padding:8px;">Play to get on the board! 🐬</div>';
+  }
+}
+
+async function submitScore(finalScore){
+  if(!playerName||finalScore<=0) return;
+  try{
+    const res=await fetch('/api/dolphin-scores',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        name:playerName,score:finalScore,
+        island:playerLoc,level:totalFlips,
+        timeStr:formatTime(timerSecs),timeSecs:timerSecs
+      })
+    });
+    const data=await res.json();
+    if(data.ok) myRank=data.rank;
+  }catch(e){}
+}
+
+loadLeaderboard();
+
+// ── CONTENT FILTER ──────────────────────────────
+// Checks names/locations for inappropriate content
+// Returns {ok:true} or {ok:false, msg:"reason"}
+function filterInput(text){
+  if(!text||text.trim().length===0) return {ok:true};
+  const t = text.toLowerCase().replace(/[^a-z0-9\s]/g,'');
+  const words = t.split(/\s+/);
+
+  // Bad words list (partial — catches roots)
+  const BAD = [
+    'fuck','shit','ass','bitch','cunt','dick','cock','pussy','bastard',
+    'whore','slut','nigger','nigga','faggot','retard','rape','pedo',
+    'porn','sex','naked','nude','boob','tit','butt','anus','penis',
+    'vagina','dildo','boner','horny','cum','jizz','anal','xxx',
+    'drugs','meth','cocaine','heroin','weed','kike','spic','chink',
+    'cracker','tranny','crap','piss','damn','hell','idiot','moron',
+    'stupid','loser','hate','kill','murder','suicide','terrorist',
+    'jihad','nazi','racist','slavery'
+  ];
+
+  // Political / divisive names to block
+  const POLITICAL = [
+    'trump','biden','obama','clinton','hillary','harris','desantis',
+    'pelosi','maga','democrat','republican','liberal','conservative',
+    'socialist','communist','fascist','antifa','kkk','proud boys',
+    'blm','qanon','isis','taliban','putin','kim jong','xi jinping',
+    'zelensky','netanyahu','aoc','bernie','elon','musk','soros',
+    'rothschild','illuminati'
+  ];
+
+  // Check each word
+  for(const w of words){
+    for(const bad of BAD){
+      if(w.includes(bad)) return {ok:false, msg:'Please keep it family-friendly! 🌺'};
+    }
+    for(const pol of POLITICAL){
+      if(t.includes(pol)) return {ok:false, msg:'Please keep names neutral — no politics here! 🌺'};
+    }
+  }
+  // Max length check
+  if(text.trim().length > 25) return {ok:false, msg:'Please keep it under 25 characters! 🌺'};
+  return {ok:true};
+}
+
+function checkInputs(nameId, locId){
+  const name = document.getElementById(nameId)?.value.trim()||'';
+  const loc  = document.getElementById(locId)?.value.trim()||'';
+  const nCheck = filterInput(name);
+  const lCheck = filterInput(loc);
+  if(!nCheck.ok) return {ok:false, msg:'Name: '+nCheck.msg};
+  if(!lCheck.ok) return {ok:false, msg:'Location: '+lCheck.msg};
+  return {ok:true};
+}
+// ────────────────────────────────────────────────
+
+
+</script>
+</body>
+</html>

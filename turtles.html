@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐢 Turtle Checkers — Today in Hawaii</title>
+  <meta name="description" content="Play checkers with Hawaiian sea turtles! Black turtles vs White turtles — challenge the AI on 4 difficulty levels!">
+  <link rel="icon" href="/icon-192.png">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{
+      width:100%;height:100%;overflow:hidden;
+      background:radial-gradient(ellipse at 30% 20%,#0a2a0a,#041004 60%,#000800);
+      font-family:system-ui,sans-serif;
+      user-select:none;-webkit-user-select:none;
+    }
+
+    /* Ocean bg */
+    #bg{
+      position:fixed;inset:0;z-index:0;
+      background:
+        radial-gradient(ellipse at 20% 80%,rgba(0,80,60,0.4) 0%,transparent 50%),
+        radial-gradient(ellipse at 80% 20%,rgba(0,60,80,0.3) 0%,transparent 50%),
+        linear-gradient(160deg,#051a05 0%,#0a2010 40%,#051018 100%);
+    }
+    .bubble{
+      position:absolute;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,200,180,0.15),transparent);
+      animation:bubbleRise linear infinite;pointer-events:none;
+    }
+    @keyframes bubbleRise{
+      0%{transform:translateY(0) scale(1);opacity:0.4;}
+      100%{transform:translateY(-100vh) scale(0.3);opacity:0;}
+    }
+
+    /* Layout */
+    #wrap{
+      position:relative;z-index:1;
+      display:flex;flex-direction:column;align-items:center;
+      height:100vh;padding:6px 8px 6px;gap:6px;
+    }
+
+    /* Header */
+    #hdr{text-align:center;flex-shrink:0;}
+    #hdr h1{
+      font-size:clamp(16px,4.5vw,24px);font-weight:900;letter-spacing:1px;
+      background:linear-gradient(135deg,#00e676,#00bcd4,#69f0ae,#00e676);
+      background-size:200% auto;
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      animation:shimmer 3s linear infinite;
+    }
+    @keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
+    #hdr .sub{font-size:9px;color:#4caf50;letter-spacing:0.12em;margin-top:1px;}
+
+    /* Status bar */
+    #statusBar{
+      width:100%;max-width:440px;flex-shrink:0;
+      background:rgba(0,0,0,0.5);
+      border:1px solid rgba(0,200,100,0.2);
+      border-radius:12px;padding:7px 14px;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:8px;
+    }
+    .turn-ind{
+      display:flex;align-items:center;gap:6px;
+      font-size:12px;font-weight:800;color:#fff;
+    }
+    .turn-turtle{font-size:22px;
+      animation:turtleBob 0.8s ease-in-out infinite alternate;}
+    @keyframes turtleBob{0%{transform:scale(1);}100%{transform:scale(1.15) rotate(5deg);}}
+    #statusMsg{
+      font-size:11px;font-weight:700;
+      color:#69f0ae;text-align:center;flex:1;
+    }
+    .score-pair{display:flex;gap:10px;}
+    .sc{text-align:center;}
+    .sc-lbl{font-size:7px;color:#4caf50;font-weight:700;text-transform:uppercase;}
+    .sc-val{font-size:16px;font-weight:900;color:#fff;}
+
+    /* Board container — fills all available space */
+    #boardWrap{
+      position:relative;flex:1;min-height:0;
+      display:flex;align-items:center;justify-content:center;
+      width:100%;
+    }
+    #boardCanvas{
+      display:block;
+      border-radius:8px;
+      box-shadow:
+        0 0 0 3px rgba(0,200,100,0.3),
+        0 0 20px rgba(0,180,100,0.2),
+        0 8px 32px rgba(0,0,0,0.6);
+      cursor:pointer;touch-action:none;
+    }
+
+    /* Bottom controls */
+    #controls{
+      display:flex;gap:7px;flex-shrink:0;
+      width:100%;max-width:440px;
+    }
+    .ctrl{
+      flex:1;padding:16px 6px;border:none;border-radius:16px;
+      font-size:15px;font-weight:900;cursor:pointer;
+      font-family:inherit;transition:all 0.12s;
+      letter-spacing:0.05em;
+      box-shadow:0 5px 0 rgba(0,0,0,0.4);
+      -webkit-font-smoothing:antialiased;
+    }
+    .ctrl:hover{transform:translateY(-2px);}
+    .ctrl:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,0.4);}
+    .ctrl:active{transform:scale(0.93);}
+    .c-new{background:linear-gradient(135deg,#00c853,#00897b);color:#fff;
+      box-shadow:0 3px 0 #005740,0 0 12px rgba(0,200,100,0.3);}
+    .c-undo{background:rgba(255,255,255,0.08);color:#aaa;
+      box-shadow:0 3px 0 rgba(0,0,0,0.4);}
+    .c-diff{
+      background:linear-gradient(135deg,#ff9800,#f57c00);color:#fff;
+      box-shadow:0 3px 0 #7a3900,0 0 10px rgba(255,150,0,0.25);
+    }
+
+    /* Overlays */
+    .ov{
+      position:fixed;inset:0;z-index:100;
+      background:rgba(0,0,0,0.92);backdrop-filter:blur(10px);
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      gap:14px;padding:20px;overflow-y:auto;
+    }
+    .ov.hide{display:none;}
+    .ov-title{
+      font-size:clamp(28px,7vw,48px);font-weight:900;
+      background:linear-gradient(180deg,#ffffff,#69f0ae,#00c853);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      filter:drop-shadow(0 0 14px rgba(0,255,100,0.7));
+      letter-spacing:2px;text-transform:uppercase;
+      margin-bottom:8px;text-align:center;
+      -webkit-font-smoothing:antialiased;
+    }
+    .ov-turtles{font-size:clamp(36px,10vw,64px);letter-spacing:8px;}
+    .ov-sub{
+      font-size:16px;color:#b9f6ca;line-height:1.7;
+      text-align:center;max-width:320px;
+      -webkit-font-smoothing:antialiased;
+      text-shadow:0 0 10px rgba(0,200,80,0.3);
+    }
+    .ov-btn{
+      padding:18px 48px;border:none;border-radius:99px;
+      font-size:18px;font-weight:900;cursor:pointer;
+      font-family:inherit;letter-spacing:2px;text-transform:uppercase;
+      background:linear-gradient(160deg,#00e676,#00c853,#69f0ae,#00897b);
+      background-size:200% 200%;
+      color:#fff;
+      border:3px solid #00ff88;
+      box-shadow:0 8px 0 #004d40,
+                 0 0 25px #00e676,
+                 0 0 50px rgba(0,255,120,0.5),
+                 0 0 90px rgba(0,255,80,0.25),
+                 inset 0 1px 0 rgba(255,255,255,0.3);
+      text-shadow:0 0 12px #00ff88,0 2px 4px rgba(0,0,0,0.7);
+      animation:turtleGreenPulse 1.6s ease-in-out infinite alternate,
+                turtleShift 3s ease infinite;
+      transition:all 0.12s;
+      -webkit-font-smoothing:antialiased;
+    }
+    @keyframes turtleGreenPulse{
+      0%{box-shadow:0 8px 0 #004d40,0 0 20px #00e676,0 0 40px rgba(0,255,100,0.4),inset 0 1px 0 rgba(255,255,255,0.3);}
+      100%{box-shadow:0 8px 0 #004d40,0 0 40px #00ff88,0 0 80px rgba(0,255,120,0.8),0 0 120px rgba(0,255,80,0.4),inset 0 1px 0 rgba(255,255,255,0.4);}
+    }
+    @keyframes turtleShift{
+      0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}
+    }
+    .ov-btn:hover{
+      transform:translateY(-3px) scale(1.05);
+      box-shadow:0 12px 0 #004d40,0 0 50px #00ff88,0 0 100px rgba(0,255,120,0.9);
+    }
+    .ov-btn:active{
+      transform:translateY(6px);
+      box-shadow:0 2px 0 #004d40,0 0 30px #00e676;
+    }
+    .ov-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #004d40;}
+
+    /* Difficulty selector */
+    .diff-grid{
+      display:grid;grid-template-columns:1fr 1fr;gap:8px;
+      width:100%;max-width:300px;
+    }
+    .diff-btn{
+      padding:18px 10px;
+      border:2px solid rgba(0,255,100,0.4);
+      border-radius:18px;
+      background:linear-gradient(160deg,rgba(0,60,20,0.8),rgba(0,30,10,0.9));
+      cursor:pointer;transition:all 0.15s;text-align:center;
+      font-family:inherit;
+      box-shadow:0 4px 0 rgba(0,0,0,0.5),0 0 15px rgba(0,200,80,0.2);
+    }
+    .diff-btn:hover{
+      border-color:rgba(0,255,120,0.9);
+      background:linear-gradient(160deg,rgba(0,100,40,0.9),rgba(0,60,20,0.95));
+      box-shadow:0 4px 0 rgba(0,0,0,0.5),0 0 30px rgba(0,255,100,0.5);
+      transform:translateY(-2px) scale(1.03);
+    }
+    .diff-btn:active{transform:scale(0.94);}
+    .diff-btn.sel{
+      border-color:rgba(0,230,120,0.8);
+      background:rgba(0,180,100,0.2);
+      box-shadow:0 0 14px rgba(0,230,100,0.3);
+    }
+    .diff-icon{font-size:28px;display:block;margin-bottom:4px;}
+    .diff-name{font-size:13px;font-weight:900;color:#fff;}
+    .diff-desc{font-size:10px;color:#4caf50;margin-top:2px;}
+
+    /* Name entry */
+    .ov-input{
+      width:100%;max-width:260px;padding:11px 16px;
+      background:rgba(255,255,255,0.07);
+      border:2px solid rgba(0,200,100,0.4);border-radius:12px;
+      color:#fff;font-size:15px;font-family:inherit;outline:none;
+      text-align:center;
+    }
+    .ov-input:focus{border-color:rgba(0,230,120,0.8);
+      box-shadow:0 0 12px rgba(0,200,100,0.3);}
+    .ov-input::placeholder{color:rgba(100,200,150,0.4);}
+
+    /* Result overlay */
+    #resultTurtles{font-size:56px;
+      animation:winWiggle 0.5s ease-in-out infinite alternate;}
+    @keyframes winWiggle{
+      0%{transform:scale(1) rotate(-8deg);}
+      100%{transform:scale(1.15) rotate(8deg);}
+    }
+
+    /* Leaderboard */
+    .lb-wrap{
+      width:100%;max-width:320px;max-height:190px;overflow-y:auto;
+      background:rgba(0,0,0,0.5);border:1px solid rgba(0,180,100,0.25);
+      border-radius:12px;scrollbar-width:none;
+    }
+    .lb-wrap::-webkit-scrollbar{display:none;}
+    .lb-hdr{background:rgba(0,150,80,0.2);padding:7px 14px;
+      font-size:10px;font-weight:900;color:#69f0ae;
+      letter-spacing:0.12em;text-transform:uppercase;}
+    .lb-row{display:flex;align-items:center;gap:8px;
+      padding:6px 14px;border-top:1px solid rgba(0,180,80,0.1);
+      font-size:12px;}
+    .lb-rank{width:22px;font-weight:900;color:#4caf50;flex-shrink:0;}
+    .lb-name{flex:1;font-weight:700;color:#fff;overflow:hidden;
+      text-overflow:ellipsis;white-space:nowrap;}
+    .lb-loc{font-size:10px;color:#4caf50;flex-shrink:0;}
+    .lb-pts{font-weight:900;color:#69f0ae;flex-shrink:0;}
+    .lb-row.me{background:rgba(0,200,100,0.08);}
+
+    .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);
+      background:rgba(0,0,0,0.9);color:#69f0ae;padding:7px 18px;
+      border-radius:99px;font-size:12px;font-weight:700;z-index:300;
+      animation:tpop 2s ease forwards;white-space:nowrap;pointer-events:none;
+      border:1px solid rgba(0,200,100,0.3);}
+    @keyframes tpop{0%{opacity:0;transform:translate(-50%,-8px);}
+      12%{opacity:1;transform:translate(-50%,0);}78%{opacity:1;}100%{opacity:0;}}
+  
+    /* ── Standard Signup Form ─────────────────── */
+    .signup-form{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;align-items:center;}
+    .signup-input{
+      width:100%;padding:12px 16px;
+      background:rgba(255,255,255,0.1);
+      border:2px solid rgba(255,255,255,0.25);
+      border-radius:12px;color:#fff;
+      font-size:15px;font-family:system-ui,sans-serif;
+      outline:none;text-align:center;
+      transition:border-color 0.2s;
+    }
+    .signup-input:focus{border-color:rgba(255,255,255,0.7);}
+    .signup-input::placeholder{color:rgba(255,255,255,0.4);}
+    .signup-label{
+      font-size:9px;font-weight:900;text-transform:uppercase;
+      letter-spacing:0.12em;color:rgba(255,255,255,0.55);
+      margin-bottom:-6px;align-self:flex-start;padding-left:4px;
+    }
+    
+    /* ── FLYING TURTLES BACKGROUND ─────────────────── */
+    .fly-turtle{
+      position:fixed;
+      font-size:clamp(24px,4vw,42px);
+      pointer-events:none;
+      z-index:0;
+      animation:flyAcross linear infinite;
+      filter:drop-shadow(0 0 8px rgba(0,255,100,0.6));
+      opacity:0;
+    }
+    @keyframes flyAcross{
+      0%  { transform:translateX(-120px) translateY(0px) rotate(-10deg); opacity:0; }
+      5%  { opacity:0.7; }
+      45% { transform:translateX(50vw) translateY(-30px) rotate(5deg); }
+      55% { transform:translateX(55vw) translateY(10px) rotate(-5deg); }
+      95% { opacity:0.7; }
+      100%{ transform:translateX(calc(100vw + 120px)) translateY(-20px) rotate(10deg); opacity:0; }
+    }
+
+    /* Extra overlay bling */
+    .ov{
+      background:radial-gradient(ellipse at 50% 0%,rgba(0,100,40,0.3),rgba(0,0,0,0.95)) !important;
+    }
+    .ov-turtles{
+      font-size:clamp(50px,12vw,80px);
+      filter:drop-shadow(0 0 20px rgba(0,255,100,0.7));
+      animation:turtleBob 2s ease-in-out infinite;
+    }
+    @keyframes turtleBob{
+      0%,100%{transform:translateY(0) rotate(-5deg) scale(1);}
+      50%{transform:translateY(-12px) rotate(5deg) scale(1.08);}
+    }
+    /* Score glow */
+    .sbox-val{
+      color:#69f0ae !important;
+      text-shadow:0 0 14px rgba(0,255,100,0.7) !important;
+    }
+
+    </style>
+</head>
+<body>
+<div id="bg"></div>
+<script>
+for(let i=0;i<12;i++){
+  const b=document.createElement('div');b.className='bubble';
+  const sz=8+Math.random()*20;
+  b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${Math.random()*30}%;
+    animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*8}s;`;
+  document.getElementById('bg').appendChild(b);
+}
+</script>
+
+<div id="wrap">
+  <div id="hdr">
+    <h1>🐢 Turtle Checkers 🐢</h1>
+    <div class="sub">🌊 Hawaiian Sea Turtle Battle! 🌊</div>
+  </div>
+
+  <div id="statusBar">
+    <div class="turn-ind">
+      <span class="turn-turtle" id="turnTurtle">🐢</span>
+      <span id="turnLabel">Your turn</span>
+    </div>
+    <div id="statusMsg">Select a turtle to move!</div>
+    <div class="score-pair">
+      <div class="sc"><div class="sc-lbl">🟤 You</div><div class="sc-val" id="scYou">12</div></div>
+      <div class="sc"><div class="sc-lbl">⬜ AI</div><div class="sc-val" id="scAI">12</div></div>
+    </div>
+  </div>
+
+  <div id="boardWrap">
+    <canvas id="boardCanvas"></canvas>
+  </div>
+
+  <div id="controls">
+    <button class="ctrl c-new"  onclick="newGame()">🐢 New Game</button>
+    <button class="ctrl c-undo" onclick="undoMove()">↩️ Undo</button>
+    <button class="ctrl c-diff" onclick="showDifficulty()">⚡ <span id="diffLabel">Easy</span></button>
+  </div>
+</div>
+
+<!-- Welcome overlay -->
+<div class="ov" id="welcomeOv">
+  <div class="ov-turtles">🐢🐢</div>
+  <div class="ov-title">Turtle Checkers</div>
+  <div class="ov-sub">
+    Black turtles vs White turtles!<br>
+    <strong style="color:#fff;">YOU vs the AI 🤖</strong><br><br>
+    Jump over your opponent's turtles<br>
+    to capture them — last turtle wins! 🏆
+  </div>
+  <button class="ov-btn" onclick="showDifficultyFirst()">🐢 Choose Difficulty!</button>
+  <a href="/games" style="
+    display:inline-block;
+    margin-top:8px;
+    padding:10px 28px;
+    background:linear-gradient(135deg,rgba(0,200,80,0.15),rgba(0,100,40,0.2));
+    border:2px solid rgba(0,255,100,0.5);
+    border-radius:99px;
+    color:#69f0ae;
+    font-size:14px;
+    font-weight:800;
+    text-decoration:none;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    box-shadow:0 0 16px rgba(0,200,80,0.3);
+    transition:all 0.2s;
+    -webkit-font-smoothing:antialiased;
+    animation:hubPulse 2s ease-in-out infinite alternate;
+    ">🎮 ← Games Hub</a>
+  <style>@keyframes hubPulse{
+    0%{box-shadow:0 0 10px rgba(0,200,80,0.2);border-color:rgba(0,255,100,0.4);}
+    100%{box-shadow:0 0 25px rgba(0,255,100,0.6);border-color:rgba(0,255,100,0.9);}
+  }</style>
+</div>
+
+<!-- Difficulty overlay -->
+<div class="ov hide" id="diffOv">
+  <div class="ov-title" style="font-size:clamp(20px,5vw,30px);">⚡ Choose Level</div>
+  <div class="diff-grid">
+    <button class="diff-btn" onclick="setDiff(1)" id="d1">
+      <span class="diff-icon">🐣</span>
+      <div class="diff-name">Baby Turtle</div>
+      <div class="diff-desc">Random — but always captures!</div>
+    </button>
+    <button class="diff-btn" onclick="setDiff(2)" id="d2">
+      <span class="diff-icon">🐢</span>
+      <div class="diff-name">Sea Turtle</div>
+      <div class="diff-desc">Thinks 1 move ahead — fair!</div>
+    </button>
+    <button class="diff-btn" onclick="setDiff(3)" id="d3">
+      <span class="diff-icon">🦾</span>
+      <div class="diff-name">Old Turtle</div>
+      <div class="diff-desc">Thinks 4 moves deep — tough!</div>
+    </button>
+    <button class="diff-btn" onclick="setDiff(4)" id="d4">
+      <span class="diff-icon">👹</span>
+      <div class="diff-name">Demon Turtle</div>
+      <div class="diff-desc">Max depth — nearly unbeatable!!</div>
+    </button>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+    <button class="ov-btn" onclick="startFromDiff()">🐢 Let's Battle!!</button>
+  </div>
+</div>
+
+<!-- Name entry -->
+<div class="ov hide" id="nameOv">
+  <div class="ov-turtles">🐢</div>
+  <div class="ov-title" style="font-size:clamp(20px,5vw,28px);">What's Your Name?</div>
+  <div class="ov-sub">Join the <strong style="color:#69f0ae;">Global Turtle Leaderboard!</strong></div>
+            <div class="signup-form">
+            <span class="signup-label">Your Full Name</span>
+            <input class="signup-input" id="playerName"
+              placeholder="e.g. Sarah Johnson" maxlength="30"
+              onkeydown="if(event.key==='Enter')document.getElementById('playerUser').focus()">
+            <span class="signup-label">Choose a Username</span>
+            <input class="signup-input" id="playerUser"
+              placeholder="e.g. SurfQueen808" maxlength="20"
+              onkeydown="if(event.key==='Enter')document.getElementById('playerLoc').focus()">
+            <span class="signup-label">Country, City or Island 🌺</span>
+            <input class="signup-input" id="playerLoc"
+              placeholder="e.g. Maui, Hawaii" maxlength="30"
+              onkeydown="if(event.key==='Enter')beginGame()">
+          </div>
+  <button class="ov-btn" onclick="beginGame()">🐢 Into the Ocean!! 🌊</button>
+  <button onclick="beginGame()" style="
+    padding:14px 40px;
+    border:3px solid #00ff88;
+    border-radius:99px;
+    background:linear-gradient(160deg,#00cc44,#008833,#00ff66,#007722);
+    background-size:200% 200%;
+    color:#fff;
+    font-size:17px;
+    font-weight:900;
+    font-family:inherit;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    cursor:pointer;
+    margin-top:4px;
+    box-shadow:0 7px 0 #004422,
+               0 0 22px #00ff66,
+               0 0 45px rgba(0,255,100,0.5),
+               inset 0 1px 0 rgba(255,255,255,0.3);
+    text-shadow:0 0 12px #00ff88,0 2px 4px rgba(0,0,0,0.8);
+    animation:turtleGreenPulse 1.6s ease-in-out infinite alternate,
+              turtleShift 3s ease infinite;
+    -webkit-font-smoothing:antialiased;
+    transition:all 0.12s;
+  ">🌊 Play as Guest!</button>
+</div>
+
+<!-- Result overlay -->
+<div class="ov hide" id="resultOv">
+  <div id="resultTurtles">🐢🐢</div>
+  <div class="ov-title" id="resultTitle">You Win!</div>
+  <div class="ov-sub" id="resultSub">Amazing turtle moves!!</div>
+  <div class="lb-wrap" id="lbWrap">
+    <div class="lb-hdr">🐢 Turtle Champions — Global</div>
+    <div style="padding:12px;text-align:center;color:#4caf50;font-size:12px;">Loading...</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+    <button class="ov-btn" onclick="newGame()">🐢 Play Again!</button>
+    <button style="background:rgba(255,255,255,0.07);border:1px solid rgba(0,200,100,0.3);
+      border-radius:99px;padding:10px 24px;color:#4caf50;font-size:13px;font-weight:700;cursor:pointer;"
+      onclick="showDifficulty()">⚡ Change Level</button>
+  </div>
+  <a href="/games" style="
+    display:inline-block;
+    margin-top:8px;
+    padding:10px 28px;
+    background:linear-gradient(135deg,rgba(0,200,80,0.15),rgba(0,100,40,0.2));
+    border:2px solid rgba(0,255,100,0.5);
+    border-radius:99px;
+    color:#69f0ae;
+    font-size:14px;
+    font-weight:800;
+    text-decoration:none;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    box-shadow:0 0 16px rgba(0,200,80,0.3);
+    transition:all 0.2s;
+    -webkit-font-smoothing:antialiased;
+    animation:hubPulse 2s ease-in-out infinite alternate;
+    ">🎮 ← Games Hub</a>
+  <style>@keyframes hubPulse{
+    0%{box-shadow:0 0 10px rgba(0,200,80,0.2);border-color:rgba(0,255,100,0.4);}
+    100%{box-shadow:0 0 25px rgba(0,255,100,0.6);border-color:rgba(0,255,100,0.9);}
+  }</style>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// TURTLE CHECKERS
+// Today in Hawaii © 2026
+// ═══════════════════════════════════════════════════
+
+const canvas = document.getElementById('boardCanvas');
+const ctx    = canvas.getContext('2d');
+let SZ, PR; // cell size, pixel ratio
+
+function sizeBoard(){
+  PR = window.devicePixelRatio||1;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const isMobile = vw <= 768;
+
+  // Calculate space taken by other elements
+  const hdrH   = document.getElementById('hdr').offsetHeight       || 36;
+  const statH  = document.getElementById('statusBar').offsetHeight  || 44;
+  const ctrlH  = document.getElementById('controls').offsetHeight   || 50;
+  const gaps   = 40; // padding + gaps between elements
+  const availH = vh - hdrH - statH - ctrlH - gaps;
+  const availW = vw - 16; // side padding
+
+  if(isMobile){
+    // Mobile: fill as much screen as possible (10%+ bigger)
+    const avail = Math.min(availW, availH);
+    SZ = Math.floor(avail / 8);
+  } else {
+    // Desktop: use up to 720px board (50% bigger than before 480px)
+    const avail = Math.min(availW * 0.85, availH, 720);
+    SZ = Math.floor(avail / 8);
+  }
+
+  // Ensure minimum playable size
+  SZ = Math.max(SZ, 44);
+
+  const total = SZ * 8;
+  canvas.width  = total * PR;
+  canvas.height = total * PR;
+  canvas.style.width  = total + 'px';
+  canvas.style.height = total + 'px';
+}
+// Run immediately so SZ has a value before drawBoard() starts
+sizeBoard();
+// Then run again after layout fully settles for accurate sizing
+setTimeout(sizeBoard, 80);
+
+// ── GAME STATE ─────────────────────────────────────
+// board[row][col]: null | {player:1or2, king:bool}
+// Player 1 = YOU (dark turtles, move up the board = toward row 0)
+// Player 2 = AI  (light turtles, move down = toward row 7)
+let board=[], selected=null, validMoves=[], turn=1;
+let difficulty=1, gameOver=false;
+let playerName='', playerLoc='', diffLabel='Baby';
+let history=[]; // for undo
+let fromDiffScreen=false;
+let moveablePieces=[]; // pieces that can move this turn
+let chainPiece=null;   // piece locked mid-chain
+// turn values: 1=human, 2=AI, 'chain'=human must continue jumping
+
+// ── TURTLE EMOJI ───────────────────────────────────
+// Draw big turtle emoji on each piece
+function drawTurtle(ctx, cx, cy, r, isPlayer1, isKing, selected=false, pulse=0){
+  ctx.save();
+  // Glow ring
+  if(selected){
+    ctx.beginPath(); ctx.arc(cx,cy,r*1.08,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(255,255,100,${0.7+0.3*Math.sin(pulse)})`;
+    ctx.lineWidth=r*0.15;ctx.stroke();
+  }
+  // Shadow
+  ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=r*0.5;
+  // Base circle
+  const grad=ctx.createRadialGradient(cx-r*0.2,cy-r*0.2,0,cx,cy,r);
+  if(isPlayer1){
+    grad.addColorStop(0,'#6d4c41');
+    grad.addColorStop(0.5,'#4e342e');
+    grad.addColorStop(1,'#2d1b0e');
+  } else {
+    grad.addColorStop(0,'#f5f5f5');
+    grad.addColorStop(0.5,'#e0e0e0');
+    grad.addColorStop(1,'#bdbdbd');
+  }
+  ctx.beginPath();ctx.arc(cx,cy,r*0.88,0,Math.PI*2);
+  ctx.fillStyle=grad;ctx.fill();
+  ctx.shadowBlur=0;
+
+  // Turtle shell pattern
+  const shellColor=isPlayer1?'rgba(0,0,0,0.25)':'rgba(0,0,0,0.12)';
+  ctx.strokeStyle=shellColor;ctx.lineWidth=r*0.08;
+  // Hex pattern on shell
+  for(let i=0;i<6;i++){
+    const a=i/6*Math.PI*2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(a)*r*0.65,cy+Math.sin(a)*r*0.65);
+    ctx.stroke();
+  }
+  ctx.beginPath();ctx.arc(cx,cy,r*0.45,0,Math.PI*2);
+  ctx.stroke();
+
+  // Turtle head (small circle at top)
+  const hx=cx, hy=cy-r*0.82;
+  ctx.beginPath();ctx.arc(hx,hy,r*0.22,0,Math.PI*2);
+  ctx.fillStyle=isPlayer1?'#5d4037':'#eeeeee';
+  ctx.fill();
+  ctx.strokeStyle=shellColor;ctx.lineWidth=r*0.06;ctx.stroke();
+  // Eyes
+  ctx.fillStyle=isPlayer1?'#69f0ae':'#388e3c';
+  ctx.beginPath();ctx.arc(hx-r*0.08,hy-r*0.06,r*0.06,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(hx+r*0.08,hy-r*0.06,r*0.06,0,Math.PI*2);ctx.fill();
+  // 4 legs
+  const legAngles=[[-0.7,0.6],[0.7,0.6],[-0.5,-0.4],[0.5,-0.4]];
+  legAngles.forEach(([lx,ly])=>{
+    ctx.beginPath();ctx.arc(cx+lx*r,cy+ly*r,r*0.18,0,Math.PI*2);
+    ctx.fillStyle=isPlayer1?'#5d4037':'#eeeeee';ctx.fill();
+    ctx.strokeStyle=shellColor;ctx.lineWidth=r*0.06;ctx.stroke();
+  });
+  // King crown
+  if(isKing){
+    ctx.font=`bold ${Math.round(r*0.7)}px system-ui`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.globalAlpha=0.9;
+    ctx.fillText('👑',cx,cy+r*0.1);
+  }
+  ctx.restore();
+}
+
+// ── DRAW BOARD ─────────────────────────────────────
+let pulse=0, animId=null;
+function drawBoard(){
+  pulse+=0.08;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();ctx.scale(PR,PR);
+  const total=SZ*8;
+
+  // Board squares
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    const dark=(r+c)%2===1;
+    if(dark){
+      const grad=ctx.createLinearGradient(c*SZ,r*SZ,(c+1)*SZ,(r+1)*SZ);
+      grad.addColorStop(0,'#1b5e20');
+      grad.addColorStop(1,'#2e7d32');
+      ctx.fillStyle=grad;
+    } else {
+      ctx.fillStyle='#e8f5e9';
+    }
+    ctx.fillRect(c*SZ,r*SZ,SZ,SZ);
+    // Subtle texture on dark squares
+    if(dark){
+      ctx.strokeStyle='rgba(0,0,0,0.12)';ctx.lineWidth=0.5;
+      ctx.strokeRect(c*SZ+0.5,r*SZ+0.5,SZ-1,SZ-1);
+    }
+  }
+
+  // Valid move highlights
+  validMoves.forEach(m=>{
+    ctx.fillStyle=`rgba(255,255,100,${0.2+0.15*Math.sin(pulse)})`;
+    ctx.fillRect(m.toCol*SZ,m.toRow*SZ,SZ,SZ);
+    ctx.strokeStyle=`rgba(255,220,0,${0.6+0.3*Math.sin(pulse)})`;
+    ctx.lineWidth=2;ctx.strokeRect(m.toCol*SZ+1,m.toRow*SZ+1,SZ-2,SZ-2);
+    // Dot in center
+    ctx.beginPath();ctx.arc(m.toCol*SZ+SZ/2,m.toRow*SZ+SZ/2,SZ*0.12,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,220,0,${0.5+0.3*Math.sin(pulse)})`;ctx.fill();
+  });
+
+  // Chain piece — urgent flashing orange ring
+  if(chainPiece){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(chainPiece.col*SZ+SZ/2, chainPiece.row*SZ+SZ/2, SZ*0.5, 0, Math.PI*2);
+    ctx.strokeStyle=`rgba(255,80,0,${0.6+0.4*Math.abs(Math.sin(pulse*3))})`;
+    ctx.lineWidth=SZ*0.12; ctx.stroke();
+    ctx.restore();
+  }
+  // Glow on moveable pieces (human turn, not in chain)
+  if((turn===1) && !chainPiece){
+    moveablePieces.forEach(({row:r,col:c})=>{
+      if(selected&&selected.row===r&&selected.col===c) return;
+      ctx.save();
+      ctx.beginPath(); ctx.arc(c*SZ+SZ/2,r*SZ+SZ/2,SZ*0.47,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(100,255,150,${0.2+0.2*Math.sin(pulse)})`;
+      ctx.lineWidth=SZ*0.07; ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  // Pieces
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    const p=board[r][c];
+    if(!p) continue;
+    const cx=c*SZ+SZ/2, cy=r*SZ+SZ/2, rad=SZ*0.42;
+    // Don't double-highlight chain piece (chain ring handles it)
+    const isChainPiece = chainPiece&&chainPiece.row===r&&chainPiece.col===c;
+    const isSel = !isChainPiece && selected&&selected.row===r&&selected.col===c;
+    drawTurtle(ctx,cx,cy,rad,p.player===1,p.king,isSel,pulse);
+  }
+
+  // Board border
+  ctx.strokeStyle='rgba(0,180,80,0.4)';ctx.lineWidth=3;
+  ctx.strokeRect(1.5,1.5,total-3,total-3);
+
+  ctx.restore();
+  animId=requestAnimationFrame(drawBoard);
+}
+
+// ── INIT BOARD ─────────────────────────────────────
+function initBoard(){
+  board=Array.from({length:8},()=>Array(8).fill(null));
+  for(let r=0;r<3;r++)
+    for(let c=0;c<8;c++)
+      if((r+c)%2===1) board[r][c]={player:2,king:false}; // AI top
+  for(let r=5;r<8;r++)
+    for(let c=0;c<8;c++)
+      if((r+c)%2===1) board[r][c]={player:1,king:false}; // Human bottom
+}
+
+// ── MOVE GENERATION ────────────────────────────────
+// Get ALL moves for a piece at (pr,pc) — both walks and jumps
+function getPieceMoves(b, pr, pc){
+  const p=b[pr][pc];
+  if(!p) return [];
+  const moves=[];
+  const dirs=p.king?[-1,1]:[p.player===1?-1:1];
+  dirs.forEach(dr=>{
+    [-1,1].forEach(dc=>{
+      const nr=pr+dr, nc=pc+dc;
+      if(nr<0||nr>7||nc<0||nc>7) return;
+      if(!b[nr][nc]){
+        // Simple step
+        moves.push({fromRow:pr,fromCol:pc,toRow:nr,toCol:nc,capRow:undefined,jumps:[]});
+      } else if(b[nr][nc].player!==p.player){
+        // Jump
+        const jr=pr+dr*2, jc=pc+dc*2;
+        if(jr>=0&&jr<=7&&jc>=0&&jc<=7&&!b[jr][jc])
+          moves.push({fromRow:pr,fromCol:pc,toRow:jr,toCol:jc,
+            capRow:nr,capCol:nc,jumps:[{r:nr,c:nc}]});
+      }
+    });
+  });
+  return moves;
+}
+
+// Get ALL moves for a player (no forced capture — casual mode!)
+function getMoves(b, player){
+  const all=[];
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    if(b[r][c]?.player===player) all.push(...getPieceMoves(b,r,c));
+  }
+  return all;
+}
+
+// ── BOARD UTILS ────────────────────────────────────
+function cloneBoard(b){return b.map(r=>r.map(c=>c?{...c}:null));}
+function applyMove(b,m){
+  const p=b[m.fromRow][m.fromCol];
+  b[m.toRow][m.toCol]=p;
+  b[m.fromRow][m.fromCol]=null;
+  if(m.capRow!==undefined) b[m.capRow][m.capCol]=null;
+  if(m.jumps) m.jumps.forEach(j=>b[j.r][j.c]=null);
+  // Kinging
+  if(p.player===1&&m.toRow===0) p.king=true;
+  if(p.player===2&&m.toRow===7) p.king=true;
+}
+function countPieces(b){
+  let p1=0,p2=0;
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    if(b[r][c]) b[r][c].player===1?p1++:p2++;
+  }
+  return{p1,p2};
+}
+
+// ── AI ─────────────────────────────────────────────
+function evaluate(b){
+  let score=0;
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    const p=b[r][c];
+    if(!p) continue;
+    let val=p.king?3:1;
+    // Bonus for advancement
+    if(p.player===2&&!p.king) val+=r*0.1;
+    if(p.player===1&&!p.king) val+=(7-r)*0.1;
+    // Edge protection
+    if(c===0||c===7) val+=0.15;
+    score += p.player===2 ? val : -val;
+  }
+  return score;
+}
+
+let aiDeadline=0; // time limit for AI search
+
+function minimax(b, depth, alpha, beta, maximizing){
+  // Hard time limit — never think more than 800ms
+  if(Date.now()>aiDeadline) return evaluate(b);
+  const moves=getMoves(b, maximizing?2:1);
+  if(depth===0||moves.length===0) return evaluate(b);
+  if(maximizing){
+    let best=-Infinity;
+    for(const m of moves){
+      const nb=cloneBoard(b);applyMove(nb,m);
+      const v=minimax(nb,depth-1,alpha,beta,false);
+      best=Math.max(best,v);alpha=Math.max(alpha,v);
+      if(beta<=alpha) break;
+    }
+    return best;
+  } else {
+    let best=Infinity;
+    for(const m of moves){
+      const nb=cloneBoard(b);applyMove(nb,m);
+      const v=minimax(nb,depth-1,alpha,beta,true);
+      best=Math.min(best,v);beta=Math.min(beta,v);
+      if(beta<=alpha) break;
+    }
+    return best;
+  }
+}
+
+function aiPickBest(moves, depth){
+  if(!moves.length) return null;
+  // Baby = random pick (but still forced to jump if jumps passed in)
+  if(difficulty===1) return moves[Math.floor(Math.random()*moves.length)];
+  let best=null, bestVal=-Infinity;
+  aiDeadline=Date.now()+800;
+  moves.forEach(m=>{
+    const nb=cloneBoard(board);
+    applyMove(nb,m);
+    const v=minimax(nb,depth,-Infinity,Infinity,false);
+    if(v>bestVal){bestVal=v;best=m;}
+  });
+  return best||moves[0];
+}
+
+function aiMove(){
+  const allMoves=getMoves(board,2);
+  if(!allMoves.length){ endAiTurn(); return; }
+
+  // AI ALWAYS jumps when it can — on every difficulty level!
+  const jumps=allMoves.filter(m=>m.capRow!==undefined);
+  const moves=jumps.length>0 ? jumps : allMoves;
+
+  const depths=[0,1,2,3];
+  const depth=depths[Math.min(difficulty-1,3)];
+
+  // Pick and execute the first move
+  const best=aiPickBest(moves,depth);
+  if(!best){ endAiTurn(); return; }
+
+  history.push(cloneBoard(board));
+  applyMove(board,best);
+  checkKings();
+
+  // ── AI MULTI-JUMP CHAIN ─────────────────────────
+  if(best.capRow!==undefined){
+    let cr=best.toRow, cc=best.toCol;
+    for(let safety=0; safety<8; safety++){
+      // Find all available jump moves from current landing position
+      const jumps=getJumpsFor(board, cr, cc);
+      if(!jumps.length) break; // no more jumps available
+
+      // Pick the best follow-up jump
+      let next;
+      if(difficulty===1){
+        next=jumps[Math.floor(Math.random()*jumps.length)];
+      } else {
+        let bestV=-Infinity;
+        jumps.forEach(j=>{
+          const nb=cloneBoard(board);
+          applyMove(nb,j);
+          const v=evaluate(nb);
+          if(v>bestV){bestV=v;next=j;}
+        });
+      }
+      if(!next) break;
+      applyMove(board,next);
+      checkKings();
+      cr=next.toRow;
+      cc=next.toCol;
+    }
+  }
+
+  updateStatus();
+  if(checkGameOver()) return;
+  endAiTurn();
+}
+
+function endAiTurn(){
+  turn=1;
+  chainPiece=null;
+  selected=null;
+  validMoves=[];
+  setStatus('Your turn — pick a glowing turtle! 🐢');
+  document.getElementById('turnLabel').textContent='Your turn';
+  document.getElementById('turnTurtle').textContent='🐢';
+  refreshMoveables();
+}
+
+function aiMove(){
+  const moves=getMoves(board,2);
+  if(!moves.length) return;
+  const depths=[0,1,2,3];
+  const depth=depths[Math.min(difficulty-1,3)];
+  aiDeadline=Date.now()+800;
+
+  // Pick the best first move
+  const best=aiPickBest(moves, depth);
+  if(!best) return;
+
+  history.push(cloneBoard(board));
+  applyMove(board,best);
+  checkKings();
+
+  // ── MULTI-JUMP CHAIN for AI ──────────────────────
+  // If the AI just jumped, keep jumping with the same piece!
+  if(best.capRow!==undefined){
+    let cr=best.toRow, cc=best.toCol;
+    let safetyCount=0; // prevent infinite loop
+    while(safetyCount++<8){
+      const moreJumps=getPieceMoves(board,cr,cc)
+        .filter(m=>m.capRow!==undefined);
+      if(!moreJumps.length) break;
+      // Pick best follow-up jump (or random for Baby)
+      let next;
+      if(difficulty===1){
+        next=moreJumps[Math.floor(Math.random()*moreJumps.length)];
+      } else {
+        // Pick jump that captures the most valuable position
+        let bestScore=-Infinity;
+        moreJumps.forEach(m=>{
+          const nb=cloneBoard(board);applyMove(nb,m);
+          const v=evaluate(nb);
+          if(v>bestScore){bestScore=v;next=m;}
+        });
+      }
+      applyMove(board,next);
+      checkKings();
+      cr=next.toRow; cc=next.toCol;
+    }
+  }
+
+  updateStatus();
+  if(checkGameOver()) return;
+  turn=1;
+  chainPiece=null;
+  selected=null;
+  validMoves=[];
+  setStatus('Your turn — pick a glowing turtle! 🐢');
+  document.getElementById('turnLabel').textContent='Your turn';
+  document.getElementById('turnTurtle').textContent='🐢';
+  refreshMoveables();
+}
+
+// ── PLAYER INTERACTION ─────────────────────────────
+canvas.addEventListener('click', e=>{
+  // Allow clicks during human turn AND chain mode
+  if((turn!==1 && turn!=='chain') || gameOver) return;
+  const rect=canvas.getBoundingClientRect();
+  const x=(e.clientX-rect.left), y=(e.clientY-rect.top);
+  const col=Math.floor(x/SZ), row=Math.floor(y/SZ);
+  handleClick(row,col);
+});
+canvas.addEventListener('touchend', e=>{
+  if((turn!==1 && turn!=='chain') || gameOver) return;
+  e.preventDefault();
+  const rect=canvas.getBoundingClientRect();
+  const t=e.changedTouches[0];
+  const x=t.clientX-rect.left, y=t.clientY-rect.top;
+  const col=Math.floor(x/SZ), row=Math.floor(y/SZ);
+  handleClick(row,col);
+},{passive:false});
+
+function handleClick(row, col){
+  if(gameOver) return;
+  if(turn === 2) return; // AI's turn, ignore clicks
+
+  // ──────────────────────────────────────────────────
+  // CHAIN MODE: human MUST keep jumping with chainPiece
+  // ──────────────────────────────────────────────────
+  if(turn === 'chain'){
+    const mv = validMoves.find(m => m.toRow===row && m.toCol===col);
+    if(mv){
+      // Execute next jump in chain
+      applyMove(board, mv);
+      checkKings();
+      updateStatus();
+
+      // Check for ANOTHER jump from new landing spot
+      const nextJumps = getJumpsFor(board, mv.toRow, mv.toCol);
+      if(nextJumps.length){
+        // Keep chain going!
+        chainPiece = {row:mv.toRow, col:mv.toCol};
+        selected   = {row:mv.toRow, col:mv.toCol};
+        validMoves = nextJumps;
+        setStatus('🔥🔥 CHAIN!! Jump again!! Take another!!');
+        return;
+      }
+      // Chain complete — hand to AI
+      endHumanTurn();
+      return;
+    }
+    // Clicked wrong square — remind them
+    setStatus('🔥 Must keep jumping that turtle!!');
+    return;
+  }
+
+  // ──────────────────────────────────────────────────
+  // NORMAL TURN: select piece or execute move
+  // ──────────────────────────────────────────────────
+
+  // Did they click a valid destination for already-selected piece?
+  if(selected){
+    const mv = validMoves.find(m => m.toRow===row && m.toCol===col);
+    if(mv){
+      history.push(cloneBoard(board));
+      applyMove(board, mv);
+      checkKings();
+      updateStatus();
+      if(checkGameOver()) return;
+
+      // Was it a jump? Check for chain
+      if(mv.capRow !== undefined){
+        const nextJumps = getJumpsFor(board, mv.toRow, mv.toCol);
+        if(nextJumps.length){
+          // Start chain!
+          chainPiece = {row:mv.toRow, col:mv.toCol};
+          selected   = {row:mv.toRow, col:mv.toCol};
+          validMoves = nextJumps;
+          turn       = 'chain';
+          setStatus('🔥🔥 KEEP JUMPING!! Take another!!');
+          return;
+        }
+      }
+      // Normal end of turn
+      endHumanTurn();
+      return;
+    }
+  }
+
+  // Clicked one of the human's pieces — select it
+  if(board[row] && board[row][col] && board[row][col].player === 1){
+    selected   = {row, col};
+    validMoves = getPieceMoves(board, row, col);
+    const hasJump = validMoves.some(m => m.capRow !== undefined);
+    if(validMoves.length === 0){
+      setStatus('This turtle is blocked! Pick another 🐢');
+    } else {
+      setStatus(hasJump
+        ? `🔥 ${validMoves.length} move(s) — including a JUMP!`
+        : `${validMoves.length} move(s) available — pick a square!`);
+    }
+    return;
+  }
+
+  // Clicked empty/opponent square with nothing selected
+  if(selected){
+    selected = null;
+    validMoves = [];
+    setStatus('Pick one of your dark turtles! 🐢');
+  }
+}
+
+// Get ONLY jump moves for a specific piece
+function getJumpsFor(b, r, c){
+  return getPieceMoves(b, r, c).filter(m => m.capRow !== undefined);
+}
+
+function endHumanTurn(){
+  chainPiece = null;
+  selected   = null;
+  validMoves = [];
+  moveablePieces = [];
+  turn = 2;
+  document.getElementById('turnLabel').textContent = 'AI thinking...';
+  document.getElementById('turnTurtle').textContent = '🤖';
+  setStatus('AI is thinking... 🤖');
+  setTimeout(() => { aiMove(); }, 350 + Math.random()*200);
+}
+
+function checkKings(){
+  for(let c=0;c<8;c++){
+    if(board[0][c]?.player===1) board[0][c].king=true;
+    if(board[7][c]?.player===2) board[7][c].king=true;
+  }
+}
+
+function checkGameOver(){
+  const {p1,p2}=countPieces(board);
+  updateScoreDisplay(p1,p2);
+  const p1Moves=getMoves(board,1);
+  const p2Moves=getMoves(board,2);
+  if(p1===0||p1Moves.length===0){showResult(false);return true;}
+  if(p2===0||p2Moves.length===0){showResult(true);return true;}
+  return false;
+}
+
+function updateStatus(){
+  const {p1,p2}=countPieces(board);
+  updateScoreDisplay(p1,p2);
+}
+function updateScoreDisplay(p1,p2){
+  document.getElementById('scYou').textContent=p1;
+  document.getElementById('scAI').textContent=p2;
+}
+function setStatus(msg){document.getElementById('statusMsg').textContent=msg;}
+
+// ── UNDO ───────────────────────────────────────────
+function undoMove(){
+  if(history.length<2) return; // undo both AI and player move
+  history.pop(); // remove AI move
+  history.pop(); // remove player move
+  board=cloneBoard(history[history.length-1]||initBoardState());
+  selected=null;validMoves=[];chainPiece=null;turn=1;turn=1;gameOver=false;
+  updateStatus();setStatus('Move undone! Your turn.');
+  document.getElementById('turnLabel').textContent='Your turn';
+  document.getElementById('turnTurtle').textContent='🐢';
+  showToast('↩️ Move undone!');
+}
+function initBoardState(){initBoard();return cloneBoard(board);}
+
+// ── RESULT ─────────────────────────────────────────
+function showResult(playerWon){
+  gameOver=true;
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('resultTurtles').textContent=playerWon?'🐢🏆':'🤖💀';
+  document.getElementById('resultTitle').textContent=playerWon?'You Win!! 🎉':'AI Wins...';
+  const diffs=['','Baby','Sea','Old','Demon'];
+  document.getElementById('resultSub').textContent=playerWon
+    ?`You defeated the ${diffs[difficulty]} Turtle AI!! Amazing!!`
+    :`The ${diffs[difficulty]} Turtle AI got you this time! Try again!`;
+  document.getElementById('resultOv').classList.remove('hide');
+  if(playerWon) submitScore();
+  loadLeaderboard();
+}
+
+// ── SCORE / LEADERBOARD ────────────────────────────
+async function submitScore(){
+  if(!playerName) return;
+  const {p1}=countPieces(board);
+  const score=(p1*10)+(difficulty*25);
+  try{
+    await fetch('/turtle_score',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:playerName,location:playerLoc,score,difficulty})
+    });
+  }catch(e){}
+}
+async function loadLeaderboard(){
+  const wrap=document.getElementById('lbWrap');
+  try{
+    const res=await fetch('/turtle_scores');
+    const data=await res.json();
+    const medals=['🥇','🥈','🥉'];
+    const diffs=['','🐣','🐢','🦾','👹'];
+    wrap.innerHTML='<div class="lb-hdr">🐢 Turtle Champions — Global</div>'+
+      (data.length===0
+        ?'<div style="padding:12px;text-align:center;color:#4caf50;font-size:12px;">No wins yet — be first!! 🐢</div>'
+        :data.slice(0,10).map((s,i)=>`
+          <div class="lb-row${s.name===playerName?' me':''}">
+            <div class="lb-rank">${medals[i]||'#'+(i+1)}</div>
+            <div class="lb-name">${s.name||'?'}</div>
+            <div class="lb-loc">${diffs[s.difficulty]||'🐢'}📍${s.location||'Hawaii'}</div>
+            <div class="lb-pts">${s.score||0}</div>
+          </div>`).join(''));
+  }catch(e){
+    wrap.innerHTML='<div class="lb-hdr">🐢 Turtle Champions</div><div style="padding:12px;text-align:center;color:#4caf50;font-size:12px;">Loading...</div>';
+  }
+}
+
+// ── GAME FLOW ──────────────────────────────────────
+function newGame(){
+  document.getElementById('resultOv').classList.add('hide');
+  initBoard();
+  history=[cloneBoard(board)];
+  selected=null;validMoves=[];
+  turn=1;gameOver=false;
+  updateStatus();
+  setStatus('Pick a glowing turtle! 🐢');
+  document.getElementById('turnLabel').textContent='Your turn';
+  document.getElementById('turnTurtle').textContent='🐢';
+  refreshMoveables();
+}
+
+function showDifficultyFirst(){
+  document.getElementById('welcomeOv').classList.add('hide');
+  document.getElementById('diffOv').classList.remove('hide');
+  fromDiffScreen=true;
+  highlightDiff();
+}
+function showDifficulty(){
+  document.getElementById('resultOv').classList.add('hide');
+  document.getElementById('diffOv').classList.remove('hide');
+  fromDiffScreen=false;
+  highlightDiff();
+}
+function highlightDiff(){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('d'+i).classList.toggle('sel',i===difficulty);
+  });
+}
+function setDiff(d){
+  difficulty=d;
+  const labels=['','Baby 🐣','Sea 🐢','Old 🦾','Demon 👹'];
+  document.getElementById('diffLabel').textContent=labels[d];
+  highlightDiff();
+}
+function startFromDiff(){
+  document.getElementById('diffOv').classList.add('hide');
+  if(fromDiffScreen){
+    document.getElementById('nameOv').classList.remove('hide');
+    setTimeout(()=>document.getElementById('playerName').focus(),200);
+  } else {
+    newGame();
+    showToast('⚡ Difficulty changed!');
+  }
+}
+function beginGame(){
+  // Content filter — block bad words and politics
+  const _fc = checkInputs('playerName', 'playerLoc');
+  if(!_fc.ok){
+    const _fi = document.getElementById('playerName');
+    if(_fi){ _fi.style.borderColor='#ff4444'; _fi.style.boxShadow='0 0 10px rgba(255,0,0,0.4)'; }
+    // Show error message
+    const _fe = document.getElementById('filterError') || (()=>{
+      const d=document.createElement('div');
+      d.id='filterError';
+      d.style.cssText='color:#ff6666;font-size:12px;font-weight:700;text-align:center;margin-top:-8px;';
+      const btn=document.querySelector('.ov-btn');
+      if(btn&&btn.parentNode)btn.parentNode.insertBefore(d,btn);
+      return d;
+    })();
+    _fe.textContent='⚠️ '+_fc.msg;
+    setTimeout(()=>{if(_fi){_fi.style.borderColor='';_fi.style.boxShadow='';}if(_fe)_fe.textContent='';},3000);
+    return;
+  }
+  playerName = document.getElementById('playerName')?.value.trim() || 'Turtle Warrior';
+  const _u  = document.getElementById('playerUser')?.value.trim() || '';
+  const _l  = document.getElementById('playerLoc')?.value.trim()  || 'Hawaii';
+  playerLoc = (_u ? _u + ' · ' : '') + _l;
+  document.getElementById('nameOv').classList.add('hide');
+  newGame();
+}
+
+// ── TOAST ──────────────────────────────────────────
+function showToast(msg){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2300);
+}
+
+// ── BOOT ───────────────────────────────────────────
+initBoard();
+history=[cloneBoard(board)];
+updateStatus();
+cancelAnimationFrame(animId);
+drawBoard();
+window.addEventListener('resize',()=>{setTimeout(sizeBoard,60);});
+// Re-size once page fully rendered
+window.addEventListener('load',()=>{setTimeout(sizeBoard,100);});
+
+// ── CONTENT FILTER ──────────────────────────────
+// Checks names/locations for inappropriate content
+// Returns {ok:true} or {ok:false, msg:"reason"}
+function filterInput(text){
+  if(!text||text.trim().length===0) return {ok:true};
+  const t = text.toLowerCase().replace(/[^a-z0-9\s]/g,'');
+  const words = t.split(/\s+/);
+
+  // Bad words list (partial — catches roots)
+  const BAD = [
+    'fuck','shit','ass','bitch','cunt','dick','cock','pussy','bastard',
+    'whore','slut','nigger','nigga','faggot','retard','rape','pedo',
+    'porn','sex','naked','nude','boob','tit','butt','anus','penis',
+    'vagina','dildo','boner','horny','cum','jizz','anal','xxx',
+    'drugs','meth','cocaine','heroin','weed','kike','spic','chink',
+    'cracker','tranny','crap','piss','damn','hell','idiot','moron',
+    'stupid','loser','hate','kill','murder','suicide','terrorist',
+    'jihad','nazi','racist','slavery'
+  ];
+
+  // Political / divisive names to block
+  const POLITICAL = [
+    'trump','biden','obama','clinton','hillary','harris','desantis',
+    'pelosi','maga','democrat','republican','liberal','conservative',
+    'socialist','communist','fascist','antifa','kkk','proud boys',
+    'blm','qanon','isis','taliban','putin','kim jong','xi jinping',
+    'zelensky','netanyahu','aoc','bernie','elon','musk','soros',
+    'rothschild','illuminati'
+  ];
+
+  // Check each word
+  for(const w of words){
+    for(const bad of BAD){
+      if(w.includes(bad)) return {ok:false, msg:'Please keep it family-friendly! 🌺'};
+    }
+    for(const pol of POLITICAL){
+      if(t.includes(pol)) return {ok:false, msg:'Please keep names neutral — no politics here! 🌺'};
+    }
+  }
+  // Max length check
+  if(text.trim().length > 25) return {ok:false, msg:'Please keep it under 25 characters! 🌺'};
+  return {ok:true};
+}
+
+function checkInputs(nameId, locId){
+  const name = document.getElementById(nameId)?.value.trim()||'';
+  const loc  = document.getElementById(locId)?.value.trim()||'';
+  const nCheck = filterInput(name);
+  const lCheck = filterInput(loc);
+  if(!nCheck.ok) return {ok:false, msg:'Name: '+nCheck.msg};
+  if(!lCheck.ok) return {ok:false, msg:'Location: '+lCheck.msg};
+  return {ok:true};
+}
+// ────────────────────────────────────────────────
+
+// ── FLYING TURTLES BACKGROUND ──────────────────────
+(function spawnTurtles(){
+  const turtles = ['🐢','🐢','🐢','🌊','🌴','🐢','🐢','⭐','🐢'];
+  const count = 12;
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.className = 'fly-turtle';
+    el.textContent = turtles[Math.floor(Math.random()*turtles.length)];
+    const dur   = 6 + Math.random()*10;  // 6–16 seconds crossing
+    const delay = Math.random()*12;       // staggered start
+    const top   = 5 + Math.random()*85;  // vertical position %
+    const size  = 20 + Math.random()*28; // size variation
+    el.style.cssText = [
+      `top:${top}%`,
+      `font-size:${size}px`,
+      `animation-duration:${dur}s`,
+      `animation-delay:-${delay}s`,  // negative = already in progress
+    ].join(';');
+    document.body.appendChild(el);
+  }
+})();
+
+</script>
+</body>
+</html>
