@@ -245,20 +245,6 @@
 
   <div class="spin-count" id="spinCount">😂 Who are you TODAY? Spin and find out!</div>
 
-  <div class="signup-form">
-            <span class="signup-label">Your Full Name</span>
-            <input class="signup-input" id="playerName"
-              placeholder="e.g. Sarah Johnson" maxlength="30"
-              onkeydown="if(event.key==='Enter')document.getElementById('playerUser').focus()">
-            <span class="signup-label">Choose a Username</span>
-            <input class="signup-input" id="playerUser"
-              placeholder="e.g. SurfQueen808" maxlength="20"
-              onkeydown="if(event.key==='Enter')document.getElementById('playerLoc').focus()">
-            <span class="signup-label">Country, City or Island 🌺</span>
-            <input class="signup-input" id="playerLoc"
-              placeholder="e.g. Maui, Hawaii" maxlength="30"
-              onkeydown="if(event.key==='Enter')beginGame()">
-          </div>
           <button class="spin-btn glowing" id="spinBtn" onclick="beginGame()">
     🎰 SPIN TO FIND OUT!
   </button>
@@ -272,6 +258,23 @@
     <div class="result-emoji" id="resultEmoji"></div>
     <div id="bigWord"></div>
     <div id="descText"><span class="result-placeholder">😂 Spin the wheel to reveal who you are today! 😂</span></div>
+  </div>
+
+
+  <!-- Name inputs below result box -->
+  <div class="signup-form" id="nameForm" style="margin:10px 0 4px;">
+            <span class="signup-label">Your Full Name</span>
+            <input class="signup-input" id="playerName"
+              placeholder="e.g. Sarah Johnson" maxlength="30"
+              onkeydown="if(event.key==='Enter')document.getElementById('playerUser').focus()">
+            <span class="signup-label">Choose a Username</span>
+            <input class="signup-input" id="playerUser"
+              placeholder="e.g. SurfQueen808" maxlength="20"
+              onkeydown="if(event.key==='Enter')document.getElementById('playerLoc').focus()">
+            <span class="signup-label">Country, City or Island 🌺</span>
+            <input class="signup-input" id="playerLoc"
+              placeholder="e.g. Maui, Hawaii" maxlength="30"
+              onkeydown="if(event.key==='Enter')beginGame()">
   </div>
 
   <button class="share-btn" id="shareBtn" onclick="shareResult()">📘 Share Who I Am!</button>
