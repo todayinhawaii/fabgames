@@ -640,8 +640,13 @@ function renderZone(zone){
       cleanIndicators();
     });
 
-    // Touch support — tap to move between zones
+    // Tap to move between zones (quick tap)
     btn.addEventListener('click',()=>tapTile(t.id));
+
+    // Touch drag to reorder within zone or move between zones
+    btn.addEventListener('touchstart', e=>touchDragStart(e, t.id), {passive:false});
+    btn.addEventListener('touchmove',  e=>touchDragMove(e),         {passive:false});
+    btn.addEventListener('touchend',   e=>touchDragEnd(e),          {passive:false});
 
     container.appendChild(btn);
   });
@@ -668,6 +673,120 @@ function tapTile(id){
   vibrate(10);
   burstTile(id);
   render();
+}
+
+// ── Touch Drag (mobile reordering) ─────────────
+let touchDragId=null, touchGhost=null, touchStartX=0, touchStartY=0, touchMoved=false;
+
+function touchDragStart(e, id){
+  touchMoved=false;
+  touchDragId=id;
+  const touch=e.touches[0];
+  touchStartX=touch.clientX;
+  touchStartY=touch.clientY;
+
+  // Create ghost element that follows finger
+  const src=document.getElementById('tile-'+id);
+  if(!src)return;
+  touchGhost=src.cloneNode(true);
+  touchGhost.id='touch-ghost';
+  touchGhost.style.cssText=`
+    position:fixed;z-index:9999;pointer-events:none;opacity:0.85;
+    transform:scale(1.15) rotate(-3deg);
+    left:${touch.clientX-30}px;top:${touch.clientY-30}px;
+    transition:none;box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    width:${src.offsetWidth}px;height:${src.offsetHeight}px;
+  `;
+  document.body.appendChild(touchGhost);
+  src.style.opacity='0.35';
+}
+
+function touchDragMove(e){
+  e.preventDefault();
+  if(!touchDragId||!touchGhost)return;
+  const touch=e.touches[0];
+  const dx=Math.abs(touch.clientX-touchStartX);
+  const dy=Math.abs(touch.clientY-touchStartY);
+  if(dx>5||dy>5) touchMoved=true;
+
+  // Move ghost with finger
+  touchGhost.style.left=(touch.clientX-30)+'px';
+  touchGhost.style.top=(touch.clientY-30)+'px';
+
+  // Highlight target zone
+  const rack=document.getElementById('rack');
+  const word=document.getElementById('wordArea');
+  const rr=rack.getBoundingClientRect();
+  const wr=word.getBoundingClientRect();
+  rack.classList.remove('drag-over');
+  word.classList.remove('drag-over');
+  if(touch.clientY>=rr.top&&touch.clientY<=rr.bottom) rack.classList.add('drag-over');
+  if(touch.clientY>=wr.top&&touch.clientY<=wr.bottom) word.classList.add('drag-over');
+}
+
+function touchDragEnd(e){
+  if(!touchDragId){return;}
+
+  // Remove ghost
+  if(touchGhost){touchGhost.remove();touchGhost=null;}
+  const src=document.getElementById('tile-'+touchDragId);
+  if(src)src.style.opacity='';
+  document.getElementById('rack')?.classList.remove('drag-over');
+  document.getElementById('wordArea')?.classList.remove('drag-over');
+
+  // If barely moved, treat as tap
+  if(!touchMoved){
+    tapTile(touchDragId);
+    touchDragId=null;touchMoved=false;
+    return;
+  }
+
+  const touch=e.changedTouches[0];
+  const rack=document.getElementById('rack');
+  const word=document.getElementById('wordArea');
+  const rr=rack.getBoundingClientRect();
+  const wr=word.getBoundingClientRect();
+
+  let targetZone=null;
+  let targetContainer=null;
+  if(touch.clientY>=rr.top&&touch.clientY<=rr.bottom){targetZone='rack';targetContainer=rack;}
+  else if(touch.clientY>=wr.top&&touch.clientY<=wr.bottom){targetZone='word';targetContainer=word;}
+
+  if(!targetZone){touchDragId=null;touchMoved=false;return;}
+
+  const t=tiles.find(x=>x.id===touchDragId);
+  if(!t){touchDragId=null;touchMoved=false;return;}
+
+  // Find insertion index based on finger x position
+  const tileEls=[...targetContainer.querySelectorAll('.tile')];
+  const zoneTilesFiltered=tiles.filter(x=>x.zone===targetZone&&x.id!==touchDragId);
+  let insertIdx=zoneTilesFiltered.length;
+  for(let i=0;i<tileEls.length;i++){
+    const r=tileEls[i].getBoundingClientRect();
+    if(touch.clientX<r.left+r.width/2){insertIdx=i;break;}
+  }
+
+  // Reposition tile in array
+  tiles=tiles.filter(x=>x.id!==touchDragId);
+  t.zone=targetZone;
+  const zoneArr=tiles.filter(x=>x.zone===targetZone);
+  const idx2=Math.min(insertIdx,zoneArr.length);
+  if(zoneArr.length===0){
+    tiles.push(t);
+  } else if(idx2>=zoneArr.length){
+    const lastTile=zoneArr[zoneArr.length-1];
+    const pos=tiles.indexOf(lastTile);
+    tiles.splice(pos+1,0,t);
+  } else {
+    const target=zoneArr[idx2];
+    const pos=tiles.indexOf(target);
+    tiles.splice(pos,0,t);
+  }
+
+  playTileSound(t.val);
+  vibrate(10);
+  render();
+  touchDragId=null;touchMoved=false;
 }
 
 // ── Drag & Drop ─────────────────────────────
