@@ -679,6 +679,10 @@ function tapTile(id){
 let touchDragId=null, touchGhost=null, touchStartX=0, touchStartY=0, touchMoved=false;
 
 function touchDragStart(e, id){
+  // Clean up any stuck ghost from previous drag
+  document.querySelectorAll('#touch-ghost').forEach(g=>g.remove());
+  const prevSrc = document.querySelector('[data-dragging="1"]');
+  if(prevSrc){prevSrc.style.opacity='';prevSrc.removeAttribute('data-dragging');}
   touchMoved=false;
   touchDragId=id;
   const touch=e.touches[0];
@@ -688,11 +692,12 @@ function touchDragStart(e, id){
   // Create ghost element that follows finger
   const src=document.getElementById('tile-'+id);
   if(!src)return;
+  src.setAttribute('data-dragging','1');
   touchGhost=src.cloneNode(true);
   touchGhost.id='touch-ghost';
   touchGhost.style.cssText=`
     position:fixed;z-index:9999;pointer-events:none;opacity:0.85;
-    transform:scale(1.15) rotate(-3deg);
+    transform:scale(1.1);
     left:${touch.clientX-30}px;top:${touch.clientY-30}px;
     transition:none;box-shadow:0 8px 24px rgba(0,0,0,0.4);
     width:${src.offsetWidth}px;height:${src.offsetHeight}px;
@@ -727,10 +732,15 @@ function touchDragMove(e){
 function touchDragEnd(e){
   if(!touchDragId){return;}
 
-  // Remove ghost
-  if(touchGhost){touchGhost.remove();touchGhost=null;}
+  // Remove ghost — bulletproof cleanup
+  document.querySelectorAll('#touch-ghost').forEach(g=>g.remove());
+  if(touchGhost){try{touchGhost.remove();}catch(e){} touchGhost=null;}
+  // Reset ALL tiles that might have been left in drag state
+  document.querySelectorAll('[data-dragging="1"]').forEach(t=>{
+    t.style.opacity='';t.removeAttribute('data-dragging');
+  });
   const src=document.getElementById('tile-'+touchDragId);
-  if(src)src.style.opacity='';
+  if(src){src.style.opacity='';src.removeAttribute('data-dragging');}
   document.getElementById('rack')?.classList.remove('drag-over');
   document.getElementById('wordArea')?.classList.remove('drag-over');
 
@@ -788,6 +798,14 @@ function touchDragEnd(e){
   render();
   touchDragId=null;touchMoved=false;
 }
+
+// Clean up ghost if touch is cancelled
+document.addEventListener('touchcancel',()=>{
+  document.querySelectorAll('#touch-ghost').forEach(g=>g.remove());
+  document.querySelectorAll('[data-dragging="1"]').forEach(t=>{t.style.opacity='';t.removeAttribute('data-dragging');});
+  if(touchGhost){try{touchGhost.remove();}catch(e){} touchGhost=null;}
+  touchDragId=null;touchMoved=false;
+});
 
 // ── Drag & Drop ─────────────────────────────
 function onDragOver(e, zone){
