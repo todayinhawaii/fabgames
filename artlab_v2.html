@@ -402,6 +402,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
   <img id="shPrev" alt="artwork">
   <div class="sh-btns">
     <button class="sh-btn" onclick="dlArt()">⬇ Download PNG</button>
+    <button class="sh-btn" onclick="shareArt()">↗ Share</button>
     <button class="sh-btn" onclick="printArt()">🖨 Print</button>
     <button class="sh-btn sh-close" onclick="closeShare()">✕ Close</button>
   </div>
@@ -1104,6 +1105,37 @@ function openShare(){
   document.getElementById('shareModal').classList.add('show');
 }
 function closeShare(){document.getElementById('shareModal').classList.remove('show');}
+function shareArt(){
+  const mc=getMerged();
+  mc.toBlob(async blob=>{
+    const file=new File([blob],'my-artwork.png',{type:'image/png'});
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({
+          title:'My Art Lab Creation',
+          text:'Created with Art Lab on fab.games 🎨',
+          files:[file],
+        });
+      } catch(e){
+        // User cancelled or error — fallback to download
+        if(e.name!=='AbortError') dlArt();
+      }
+    } else if(navigator.share){
+      // Share without file (older browsers)
+      try{
+        await navigator.share({
+          title:'My Art Lab Creation',
+          text:'Created with Art Lab on fab.games 🎨 — '+window.location.href,
+        });
+      } catch(e){ if(e.name!=='AbortError') dlArt(); }
+    } else {
+      // No Web Share API — fallback to download
+      dlArt();
+      alert('Tip: Download the image then share from your gallery!');
+    }
+  },'image/png');
+}
+
 function dlArt(){
   const a=document.createElement('a');a.download='artlab-'+Date.now()+'.png';
   a.href=getMerged().toDataURL('image/png');a.click();
