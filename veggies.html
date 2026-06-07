@@ -1814,12 +1814,12 @@ const QUIZ_QUESTIONS = [];
 DATA.forEach(d=>{
   // MC: What vitamin is in X?
   const vit = d.vitamins[0];
-  const wrongs = DATA.filter(x=>x.name!==d.name).map(x=>x.vitamins[0]);
+  const wrongs = [...new Set(DATA.filter(x=>x.name!==d.name).map(x=>x.vitamins[0]).filter(v=>v!==vit))];
   const opts = shuffle([vit,...shuffle(wrongs).slice(0,3)]);
   QUIZ_QUESTIONS.push({
     type:'mc',emoji:d.emoji,
     q:`Which vitamin or mineral is ${d.name} especially known for?`,
-    options:opts, answer:vit,
+    options:[...new Set(opts)].slice(0,4), answer:vit,
     explanation:`${d.name} is an excellent source of ${vit}! ${d.benefits[0]}.`
   });
 
@@ -2047,11 +2047,11 @@ function buildFoodQuiz(d){
   const topNutrient = Object.keys(d.nutrition)[0];
   const topValue = Object.values(d.nutrition)[0];
   const wrongFoods = DATA.filter(x=>x.name!==d.name);
-  const wrongNutrients = shuffle(wrongFoods.map(x=>Object.keys(x.nutrition)[0])).slice(0,3);
+  const wrongNutrients = shuffle([...new Set(wrongFoods.map(x=>Object.keys(x.nutrition)[0]).filter(n=>n!==topNutrient))]).slice(0,3);
   foodQuestions.push({
     type:'mc', emoji:d.emoji,
     q:`What is ${d.name} most famous for nutritionally?`,
-    options:shuffle([topNutrient,...wrongNutrients]),
+    options:[...new Set(shuffle([topNutrient,...wrongNutrients]))].slice(0,4),
     answer:topNutrient,
     explanation:`${d.name} is an exceptional source of ${topNutrient}! ${topValue}`
   });
@@ -2097,7 +2097,7 @@ function buildFoodQuiz(d){
 
   // Q6: Benefit MC
   const benefit = d.benefits[1];
-  const wrongBenefits = shuffle(DATA.filter(x=>x.name!==d.name).map(x=>x.benefits[0])).slice(0,3);
+  const wrongBenefits = shuffle([...new Set(DATA.filter(x=>x.name!==d.name).map(x=>x.benefits[0]).filter(b=>b!==d.benefits[0]))]).slice(0,3);
   foodQuestions.push({
     type:'mc', emoji:d.emoji,
     q:`Which of these is a benefit of eating ${d.name}?`,
@@ -2148,7 +2148,7 @@ function resetGeneralQuiz(){
   QUIZ_QUESTIONS.length = 0;
   DATA.forEach(d=>{
     const vit = d.vitamins[0];
-    const wrongs = DATA.filter(x=>x.name!==d.name).map(x=>x.vitamins[0]);
+    const wrongs = [...new Set(DATA.filter(x=>x.name!==d.name).map(x=>x.vitamins[0]).filter(v=>v!==vit))];
     const opts = shuffle([vit,...shuffle(wrongs).slice(0,3)]);
     QUIZ_QUESTIONS.push({type:'mc',emoji:d.emoji,foodName:d.name,q:`Which nutrient is ${d.name} especially known for?`,options:opts,answer:vit,explanation:`${d.name} is an excellent source of ${vit}!`});
     QUIZ_QUESTIONS.push({type:'tf',emoji:d.emoji,foodName:d.name,q:`TRUE or FALSE: ${d.name} ${d.benefits[0].toLowerCase()}.`,answer:true,explanation:`TRUE! ${d.name} ${d.benefits[0].toLowerCase()}.`});
