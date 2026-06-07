@@ -276,3 +276,57 @@ def static_files(filename):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
+
+# ── MIGRATED GAMES FROM TODAYINHAWAII ──────────────
+
+@app.route('/dolphins')
+def dolphins():
+    return send_from_directory('.', 'dolphin.html')
+
+@app.route('/peles-fury')
+def peles_fury():
+    return send_from_directory('.', 'lava.html')
+
+@app.route('/turtle-checkers')
+def turtle_checkers():
+    return send_from_directory('.', 'turtles.html')
+
+@app.route('/mermaid-chess')
+def mermaid_chess():
+    return send_from_directory('.', 'chess.html')
+
+@app.route('/trivia')
+def trivia():
+    return send_from_directory('.', 'trivia.html')
+
+@app.route('/word-search')
+def word_search():
+    return send_from_directory('.', 'wordsearch.html')
+
+@app.route('/balloons')
+def balloons():
+    return send_from_directory('.', 'balloons.html')
+
+@app.route('/fortune')
+def fortune():
+    return send_from_directory('.', 'fortune.html')
+
+@app.route('/slime')
+def slime():
+    return send_from_directory('.', 'slime.html')
+
+@app.route('/film-lab')
+def film_lab():
+    return send_from_directory('.', 'camera.html')
+
+@app.route('/memory')
+def memory():
+    return send_from_directory('.', 'hulaCrush.html')
+
+@app.route('/aloha-letters')
+def aloha_letters():
+    return send_from_directory('.', 'scrabble.html')
+
+@app.route('/who-are-you')
+def who_are_you():
+    return send_from_directory('.', 'humor.html')
