@@ -279,23 +279,8 @@ const n=localStorage.getItem('fabName')||'Player';
 document.getElementById('welcomeName').textContent=n.split(' ')[0];
 
 // Games
-const GAMES=[
-  {emoji:'🥕',cat:'Encyclopedia · Quiz',title:'Veggie & Fruit Bible',href:'/veggies',color:'rgba(184,147,63,0.12)',neon:'#c9a84c',neonbg:'rgba(184,147,63,0.08)',featured:true},
-  
-  {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',href:'https://todayinhawaii.com/dolphins',color:'rgba(34,211,238,0.1)',neon:'#22d3ee',neonbg:'rgba(34,211,238,0.08)'},
-  {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",href:'https://todayinhawaii.com/lava',color:'rgba(255,60,0,0.1)',neon:'#ff5500',neonbg:'rgba(255,60,0,0.1)'},
-  {emoji:'🐢',cat:'Strategy · AI',title:'Turtle Checkers',href:'https://todayinhawaii.com/turtles',color:'rgba(34,197,94,0.1)',neon:'#22c55e',neonbg:'rgba(34,197,94,0.08)'},
-  {emoji:'♛',cat:'Strategy · AI',title:'Mermaid Chess',href:'https://todayinhawaii.com/chess',color:'rgba(148,163,184,0.1)',neon:'#a78bfa',neonbg:'rgba(148,100,255,0.08)'},
-  {emoji:'🌺',cat:'Trivia · Knowledge',title:'Hawaii Trivia',href:'https://todayinhawaii.com/trivia',color:'rgba(251,191,36,0.1)',neon:'#fbbf24',neonbg:'rgba(251,191,36,0.08)'},
-  {emoji:'🧠',cat:'Memory · Speed',title:'Aloha Memory',href:'https://todayinhawaii.com/memorygame',color:'rgba(255,100,200,0.1)',neon:'#f472b6',neonbg:'rgba(255,100,200,0.08)'},
-  {emoji:'🔤',cat:'Word · Puzzle',title:'Hawaii Word Search',href:'https://todayinhawaii.com/wordsearch',color:'rgba(167,139,250,0.1)',neon:'#c084fc',neonbg:'rgba(192,132,252,0.08)'},
-  {emoji:'🎰',cat:'Word · Strategy',title:'Aloha Letters',href:'https://todayinhawaii.com/scrabble',color:'rgba(255,200,0,0.1)',neon:'#ffd700',neonbg:'rgba(255,200,0,0.08)'},
-  {emoji:'🎈',cat:'Action · Fun',title:'Pop That Balloon!',href:'https://todayinhawaii.com/balloons',color:'rgba(255,105,180,0.1)',neon:'#ff69b4',neonbg:'rgba(255,105,180,0.08)'},
-  {emoji:'🔮',cat:'Fortune · Fun',title:'Fortune Roulette',href:'https://todayinhawaii.com/fortune',color:'rgba(155,89,182,0.1)',neon:'#d946ef',neonbg:'rgba(217,70,239,0.08)'},
-  {emoji:'🎭',cat:'Personality · Fun',title:'Who Are You?',href:'https://todayinhawaii.com/humor',color:'rgba(255,80,80,0.1)',neon:'#ff4444',neonbg:'rgba(255,80,80,0.08)'},
-  {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists Factory',href:'https://todayinhawaii.com/slime',color:'rgba(0,220,80,0.1)',neon:'#00dc50',neonbg:'rgba(0,220,80,0.08)'},
-  {emoji:'🎞️',cat:'Photography · Creative',title:'Film Lab',href:'https://todayinhawaii.com/camera',color:'rgba(212,168,67,0.1)',neon:'#c9a84c',neonbg:'rgba(212,168,67,0.08)'},
-];
+// Games loaded from /games.js
+
 
 const grid=document.getElementById('gamesGrid');
 GAMES.forEach(function(g,i){
