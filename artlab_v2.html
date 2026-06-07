@@ -1,0 +1,1074 @@
+<!DOCTYPE html><!-- artlab v4 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Art Lab — fab.games</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0e0c0a;--panel:#1a1714;--panel2:#211e1a;--panel3:#2a2622;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --gold:#c9a84c;--gold2:#e8c96a;--goldglow:rgba(201,168,76,0.15);
+  --text:rgba(255,255,255,0.88);--muted:rgba(255,255,255,0.38);--dim:rgba(255,255,255,0.55);
+  --accent:#c9a84c;
+  --left:82px;--right:220px;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;}
+
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+#hdr{
+  height:54px;flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+  padding:0 14px;
+  background:var(--panel);
+  border-bottom:1px solid var(--border2);
+  box-shadow:0 1px 0 rgba(0,0,0,0.4);
+  z-index:200;
+}
+.hdr-logo{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold2);letter-spacing:2px;white-space:nowrap;margin-right:8px;text-shadow:0 0 20px rgba(201,168,76,0.3);}
+.hdr-sep{width:1px;height:22px;background:var(--border2);flex-shrink:0;}
+.hdr-btn{height:30px;padding:0 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:10px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;letter-spacing:0.8px;text-transform:uppercase;transition:all .18s;display:flex;align-items:center;gap:5px;}
+.hdr-btn:hover{border-color:rgba(201,168,76,0.35);color:var(--gold);background:var(--goldglow);}
+.hdr-btn.gold{border-color:rgba(201,168,76,0.4);color:var(--gold);background:var(--goldglow);}
+.hdr-btn.gold:hover{background:rgba(201,168,76,0.22);}
+.hdr-spacer{flex:1;}
+#canvasTitle{font-size:11px;color:var(--muted);letter-spacing:0.5px;}
+
+/* ═══════════════════════════════════════
+   MEDIUM BAR
+═══════════════════════════════════════ */
+#medBar{
+  height:80px;flex-shrink:0;
+  background:var(--panel2);
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;
+  overflow:hidden;
+  z-index:100;
+}
+.med-scroll{
+  display:flex;align-items:center;
+  height:100%;width:100%;
+  overflow-x:auto;
+  padding:0 10px;gap:3px;
+  scrollbar-width:none;
+}
+.med-scroll::-webkit-scrollbar{display:none;}
+.mg-label{
+  font-size:7.5px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(201,168,76,0.35);white-space:nowrap;
+  padding:0 8px;flex-shrink:0;
+  border-left:1px solid var(--border2);
+  height:100%;display:flex;align-items:center;
+  margin:0 4px;
+}
+.mg-label:first-child{border-left:none;}
+.mb{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:5px 9px;border-radius:9px;
+  cursor:pointer;flex-shrink:0;min-width:54px;
+  border:1px solid transparent;
+  transition:all .16s;
+}
+.mb:hover{background:rgba(255,255,255,0.05);}
+.mb.on{background:var(--goldglow);border-color:rgba(201,168,76,0.4);}
+.mb-icon{font-size:17px;line-height:1;}
+.mb-name{font-size:8.5px;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);white-space:nowrap;margin-top:2px;}
+.mb.on .mb-name{color:var(--gold);}
+.med-sep{width:1px;height:36px;background:var(--border2);flex-shrink:0;margin:0 5px;}
+
+/* ═══════════════════════════════════════
+   BODY ROW  (left | canvas | right)
+═══════════════════════════════════════ */
+#bodyRow{flex:1;display:flex;overflow:hidden;}
+
+/* ═══════════════════════════════════════
+   LEFT TOOL PANEL
+═══════════════════════════════════════ */
+#leftPanel{
+  width:var(--left);flex-shrink:0;
+  background:var(--panel);
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;align-items:center;
+  padding:10px 0 14px;gap:3px;
+  overflow-y:auto;overflow-x:hidden;
+  z-index:50;
+}
+.tb{
+  width:60px;height:60px;border-radius:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;border:1px solid transparent;
+  transition:all .16s;gap:3px;font-size:25px!important;color:var(--muted);flex-shrink:0;
+}
+.tb:hover{background:rgba(255,255,255,0.06);color:var(--text);}
+.tb.on{background:var(--goldglow);border-color:rgba(201,168,76,0.4);color:var(--gold);}
+.tb-lbl{font-size:10px!important;letter-spacing:.4px;text-transform:uppercase;line-height:1;color:inherit;}
+.t-sep{width:40px;height:1px;background:var(--border2);margin:4px 0;flex-shrink:0;}
+/* Colour swatches */
+#swatchWrap{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0 2px;}
+#swWrap{position:relative;width:44px;height:44px;flex-shrink:0;}
+.sw{width:28px;height:28px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.25);cursor:pointer;position:absolute;transition:all .15s;}
+#fgSw{background:#1a1a1a;top:0;left:0;z-index:2;}
+#bgSw{background:#ffffff;bottom:0;right:0;z-index:1;border-color:rgba(255,255,255,0.14);}
+.sw:hover{transform:scale(1.1);}
+#cpick{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
+
+/* ═══════════════════════════════════════
+   CANVAS AREA
+═══════════════════════════════════════ */
+#cvArea{
+  flex:1;overflow:auto;
+  background:radial-gradient(ellipse at center, #1a1814 0%, #0e0c0a 100%);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;cursor:crosshair;
+}
+#cvWrap{
+  position:relative;flex-shrink:0;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.1),0 8px 40px rgba(0,0,0,0.7),0 20px 80px rgba(0,0,0,0.5);
+  border-radius:2px;
+}
+#cvWrap canvas{position:absolute;top:0;left:0;display:block;}
+#txCanvas{pointer-events:none;mix-blend-mode:multiply;opacity:.32;}
+#mergeC{display:none;}
+
+/* ═══════════════════════════════════════
+   RIGHT PANEL
+═══════════════════════════════════════ */
+#rightPanel{
+  width:var(--right);flex-shrink:0;
+  background:var(--panel);
+  border-left:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+/* Section block */
+.rps{padding:12px 14px;border-bottom:1px solid var(--border);}
+.rp-lbl{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,76,0.5);margin-bottom:10px;display:block;}
+/* Slider rows */
+.sr{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.sr-lbl{font-size:11px;color:var(--muted);width:56px;flex-shrink:0;}
+.sr-sl{flex:1;-webkit-appearance:none;appearance:none;height:3px;border-radius:2px;background:rgba(255,255,255,0.1);outline:none;cursor:pointer;}
+.sr-sl::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--gold);box-shadow:0 0 5px rgba(201,168,76,0.4);cursor:pointer;}
+.sr-val{font-size:11px;color:var(--muted);width:30px;text-align:right;flex-shrink:0;}
+/* Palette */
+#pal{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.pc{width:19px;height:19px;border-radius:4px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);flex-shrink:0;transition:transform .12s,box-shadow .12s;}
+.pc:hover{transform:scale(1.18);box-shadow:0 0 7px rgba(255,255,255,0.2);}
+.pc.sel{outline:2px solid var(--gold);outline-offset:2px;}
+#custColorRow{display:flex;align-items:center;gap:8px;margin-top:4px;}
+#custColor{width:26px;height:26px;padding:0;border:none;background:none;cursor:pointer;border-radius:4px;overflow:hidden;}
+/* Layers */
+#layersWrap{flex:1;overflow-y:auto;overflow-x:hidden;}
+#layerList{padding:6px 8px;}
+.li{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 8px;border-radius:7px;margin-bottom:3px;
+  cursor:pointer;border:1px solid transparent;transition:all .14s;
+}
+.li:hover{background:rgba(255,255,255,0.04);}
+.li.on{background:var(--goldglow);border-color:rgba(201,168,76,0.28);}
+.li-eye{font-size:11px;cursor:pointer;opacity:.55;transition:opacity .14s;width:14px;text-align:center;flex-shrink:0;}
+.li-eye:hover{opacity:1;}
+.li-th{width:30px;height:30px;border-radius:4px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);flex-shrink:0;}
+.li-info{flex:1;min-width:0;}
+.li-name{font-size:10px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.li-pct{font-size:8.5px;color:var(--muted);}
+.li-del{font-size:10px;color:var(--muted);cursor:pointer;opacity:0;transition:opacity .14s;flex-shrink:0;}
+.li:hover .li-del,.li.on .li-del{opacity:.6;}
+#layerActs{
+  display:flex;gap:5px;padding:8px 12px;
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.la-btn{
+  flex:1;padding:7px 2px;border-radius:6px;
+  border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-size:9.5px;font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:all .16s;text-align:center;letter-spacing:.5px;
+}
+.la-btn:hover{border-color:rgba(201,168,76,0.35);color:var(--gold);background:var(--goldglow);}
+
+/* ═══════════════════════════════════════
+   FOOTER / STATUS
+═══════════════════════════════════════ */
+#foot{
+  height:28px;flex-shrink:0;
+  background:var(--panel);border-top:1px solid var(--border);
+  display:flex;align-items:center;padding:0 14px;gap:10px;
+  font-size:9.5px;color:var(--muted);z-index:200;
+}
+.zm-btn{width:20px;height:20px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.zm-btn:hover{border-color:rgba(201,168,76,0.3);color:var(--gold);}
+#zLbl{min-width:36px;text-align:center;}
+#cursorPt{margin-left:auto;}
+
+/* ═══════════════════════════════════════
+   SETUP MODAL
+═══════════════════════════════════════ */
+#setupModal{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(8,6,4,0.94);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(10px);
+}
+.setup-box{
+  background:var(--panel2);
+  border:1px solid rgba(201,168,76,0.2);
+  border-top:2px solid rgba(201,168,76,0.5);
+  border-radius:18px;
+  padding:36px 32px 28px;
+  width:min(480px,94vw);
+  box-shadow:0 30px 80px rgba(0,0,0,0.7);
+}
+.s-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--gold2);margin-bottom:3px;}
+.s-sub{font-size:12px;color:var(--muted);margin-bottom:26px;letter-spacing:.3px;}
+.s-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.sf{display:flex;flex-direction:column;gap:5px;}
+.sf label{font-size:8px;letter-spacing:2.2px;text-transform:uppercase;color:rgba(201,168,76,0.55);}
+.sf select,.sf input{
+  padding:9px 11px;border-radius:8px;
+  border:1px solid rgba(255,255,255,0.09);
+  background:rgba(255,255,255,0.04);
+  color:var(--text);font-size:12.5px;
+  font-family:'DM Sans',sans-serif;outline:none;
+  -webkit-appearance:none;transition:border-color .2s;
+}
+.sf select:focus,.sf input:focus{border-color:rgba(201,168,76,0.45);}
+/* Custom size row */
+#customRow{display:none;grid-column:1/-1;}
+#customRow.show{display:grid;grid-template-columns:1fr auto 1fr auto;gap:8px;align-items:end;}
+#customRow .sf{margin:0;}
+#customRow span{font-size:12px;color:var(--muted);padding-bottom:9px;text-align:center;}
+.s-ok{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,rgba(201,168,76,0.14),rgba(201,168,76,0.07));
+  border:1px solid rgba(201,168,76,0.45);
+  border-radius:10px;color:var(--gold2);font-size:13px;
+  font-weight:600;font-family:'DM Sans',sans-serif;
+  cursor:pointer;letter-spacing:1px;transition:all .2s;
+}
+.s-ok:hover{background:rgba(201,168,76,0.2);border-color:rgba(201,168,76,0.7);transform:translateY(-1px);}
+
+/* SHARE MODAL */
+#shareModal{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(8,6,4,0.88);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);
+}
+#shareModal.show{display:flex;}
+.share-box{
+  background:var(--panel2);border:1px solid rgba(201,168,76,0.2);
+  border-top:2px solid rgba(201,168,76,0.45);
+  border-radius:16px;padding:26px;width:min(380px,90vw);
+}
+.sh-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold2);margin-bottom:14px;}
+#shPrev{width:100%;max-height:180px;object-fit:contain;border-radius:8px;margin-bottom:14px;background:rgba(255,255,255,0.04);}
+.sh-btns{display:flex;gap:7px;flex-wrap:wrap;}
+.sh-btn{flex:1;min-width:80px;padding:9px;border-radius:7px;border:1px solid var(--border2);background:rgba(255,255,255,0.04);color:var(--text);font-size:10.5px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .16s;text-align:center;letter-spacing:.5px;}
+.sh-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold);background:var(--goldglow);}
+.sh-close{border-color:var(--border);color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- ═══ SETUP MODAL ═══ -->
+<div id="setupModal">
+<div class="setup-box">
+  <div class="s-title">🎨 Art Lab</div>
+  <div class="s-sub">Set up your canvas — choose medium after</div>
+  <div class="s-grid">
+    <div class="sf"><label>Paper Size</label>
+      <select id="selSize" onchange="onSzChg()">
+        <option value="a4">A4 — 210 × 297 mm</option>
+        <option value="a3">A3 — 297 × 420 mm</option>
+        <option value="a5">A5 — 148 × 210 mm</option>
+        <option value="letter">US Letter — 8.5 × 11″</option>
+        <option value="tabloid">Tabloid — 11 × 17″</option>
+        <option value="square">Square — 12 × 12″</option>
+        <option value="custom">Custom…</option>
+      </select>
+    </div>
+    <div class="sf"><label>Orientation</label>
+      <select id="selOrient">
+        <option value="portrait">Portrait</option>
+        <option value="landscape">Landscape</option>
+      </select>
+    </div>
+    <div class="sf"><label>Paper Type</label>
+      <select id="selPaper">
+        <option value="smooth">Smooth Paper</option>
+        <option value="textured">Textured Paper</option>
+        <option value="canvas">Canvas</option>
+        <option value="watercolor">Watercolour Paper</option>
+        <option value="kraft">Kraft / Brown Paper</option>
+        <option value="black">Black Paper</option>
+      </select>
+    </div>
+    <div class="sf"><label>Resolution</label>
+      <select id="selRes">
+        <option value="1">Screen — 72 dpi</option>
+        <option value="1.5">High — 108 dpi</option>
+        <option value="2">Print — 150 dpi</option>
+      </select>
+    </div>
+    <!-- Custom size row -->
+    <div id="customRow">
+      <div class="sf"><label>Width</label><input type="number" id="cwVal" value="1200" min="100" max="8000"></div>
+      <span>×</span>
+      <div class="sf"><label>Height</label><input type="number" id="chVal" value="900" min="100" max="8000"></div>
+      <div class="sf"><label>Unit</label>
+        <select id="cwUnit" onchange="onUnitChg()">
+          <option value="px">px</option>
+          <option value="in">inches</option>
+          <option value="cm">cm</option>
+          <option value="mm">mm</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <button class="s-ok" onclick="startLab()">Create Canvas →</button>
+</div>
+</div>
+
+<!-- ═══ SHARE MODAL ═══ -->
+<div id="shareModal">
+<div class="share-box">
+  <div class="sh-title">Share Your Art</div>
+  <img id="shPrev" alt="artwork">
+  <div class="sh-btns">
+    <button class="sh-btn" onclick="dlArt()">⬇ Download PNG</button>
+    <button class="sh-btn" onclick="printArt()">🖨 Print</button>
+    <button class="sh-btn sh-close" onclick="closeShare()">✕ Close</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<div id="hdr">
+  <span class="hdr-logo">Art Lab</span>
+  <div class="hdr-sep"></div>
+  <button class="hdr-btn" onclick="undo()" title="Ctrl+Z">↩ Undo</button>
+  <button class="hdr-btn" onclick="redo()" title="Ctrl+Y">↪ Redo</button>
+  <div class="hdr-sep"></div>
+  <button class="hdr-btn" onclick="clearLyr()">Clear Layer</button>
+  <button class="hdr-btn" onclick="flatAll()">Flatten All</button>
+  <div class="hdr-spacer"></div>
+  <span id="canvasTitle">—</span>
+  <div class="hdr-sep"></div>
+  <button class="hdr-btn gold" onclick="openShare()">↑ Share / Print</button>
+  <button class="hdr-btn" onclick="newCv()">New Canvas</button>
+</div>
+
+<!-- ═══ MEDIUM BAR ═══ -->
+<div id="medBar">
+  <div class="med-scroll">
+    <span class="mg-label">Pencils</span>
+    <div class="mb on" data-m="pencil_hb" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22,4 26,6 26,34 22,34 18,34 18,6" stroke-width="1" fill="rgba(255,215,100,0.12)"/><line x1="18" y1="6" x2="18" y2="34" stroke-width="0.5" opacity="0.4"/><line x1="26" y1="6" x2="26" y2="34" stroke-width="0.5" opacity="0.4"/><rect x="18" y="30" width="8" height="4" stroke-width="0.8" fill="rgba(200,200,200,0.15)"/><rect x="19" y="34" width="6" height="3" rx="1" stroke-width="0.8" fill="rgba(255,160,160,0.2)"/><path d="M18 30 L22 40 L26 30" stroke-width="1" fill="rgba(80,60,40,0.2)"/><line x1="20" y1="30" x2="21" y2="39" stroke-width="0.4" opacity="0.3"/><line x1="24" y1="30" x2="23" y2="39" stroke-width="0.4" opacity="0.3"/><line x1="18" y1="10" x2="26" y2="10" stroke-width="0.4" opacity="0.25"/><line x1="18" y1="15" x2="26" y2="15" stroke-width="0.4" opacity="0.25"/><line x1="18" y1="20" x2="26" y2="20" stroke-width="0.4" opacity="0.25"/></g></svg></div><div class="mb-name">HB</div></div>
+    <div class="mb" data-m="pencil_2b" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22,4 27,6 27,33 22,33 17,33 17,6" stroke-width="1.2" fill="rgba(255,200,80,0.12)"/><line x1="17" y1="6" x2="17" y2="33" stroke-width="0.5" opacity="0.45"/><line x1="27" y1="6" x2="27" y2="33" stroke-width="0.5" opacity="0.45"/><rect x="17" y="29" width="10" height="4" stroke-width="0.9" fill="rgba(200,200,200,0.15)"/><rect x="18" y="33" width="8" height="3" rx="1" stroke-width="0.9" fill="rgba(255,150,150,0.2)"/><path d="M17 29 L22 41 L27 29" stroke-width="1.2" fill="rgba(60,50,30,0.2)"/><line x1="19" y1="29" x2="20.5" y2="40" stroke-width="0.4" opacity="0.3"/><line x1="25" y1="29" x2="23.5" y2="40" stroke-width="0.4" opacity="0.3"/><line x1="17" y1="9" x2="27" y2="9" stroke-width="0.4" opacity="0.25"/><line x1="17" y1="14" x2="27" y2="14" stroke-width="0.4" opacity="0.25"/><line x1="17" y1="19" x2="27" y2="19" stroke-width="0.4" opacity="0.25"/><line x1="17" y1="24" x2="27" y2="24" stroke-width="0.4" opacity="0.2"/></g></svg></div><div class="mb-name">2B</div></div>
+    <div class="mb" data-m="pencil_4b" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22,3 28,5 28,32 22,32 16,32 16,5" stroke-width="1.3" fill="rgba(200,180,60,0.14)"/><line x1="16" y1="5" x2="16" y2="32" stroke-width="0.6" opacity="0.5"/><line x1="28" y1="5" x2="28" y2="32" stroke-width="0.6" opacity="0.5"/><rect x="16" y="28" width="12" height="4" stroke-width="1" fill="rgba(190,190,190,0.2)"/><rect x="17" y="32" width="10" height="4" rx="1.5" stroke-width="1" fill="rgba(255,140,140,0.2)"/><path d="M16 28 L22 42 L28 28" stroke-width="1.3" fill="rgba(50,40,20,0.2)"/><line x1="19" y1="28" x2="21" y2="41" stroke-width="0.5" opacity="0.3"/><line x1="25" y1="28" x2="23" y2="41" stroke-width="0.5" opacity="0.3"/><line x1="16" y1="8" x2="28" y2="8" stroke-width="0.5" opacity="0.3"/><line x1="16" y1="13" x2="28" y2="13" stroke-width="0.5" opacity="0.3"/><line x1="16" y1="18" x2="28" y2="18" stroke-width="0.5" opacity="0.3"/><line x1="16" y1="23" x2="28" y2="23" stroke-width="0.5" opacity="0.25"/></g></svg></div><div class="mb-name">4B</div></div>
+    <div class="mb" data-m="charcoal" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="5" width="14" height="30" rx="3" stroke-width="1.3" fill="rgba(60,60,60,0.2)"/><path d="M15 35 L17 40 L20 38 L22 41 L24 38 L27 40 L29 35" stroke-width="1" fill="rgba(40,40,40,0.15)"/><line x1="17" y1="10" x2="27" y2="10" stroke-width="0.5" opacity="0.3"/><line x1="17" y1="15" x2="27" y2="15" stroke-width="0.5" opacity="0.3"/><line x1="17" y1="20" x2="27" y2="20" stroke-width="0.5" opacity="0.3"/><line x1="17" y1="25" x2="27" y2="25" stroke-width="0.5" opacity="0.3"/><line x1="17" y1="30" x2="27" y2="30" stroke-width="0.5" opacity="0.3"/><line x1="17" y1="8" x2="20" y2="12" stroke-width="0.4" opacity="0.2"/><line x1="21" y1="8" x2="24" y2="12" stroke-width="0.4" opacity="0.2"/><line x1="17" y1="16" x2="19" y2="20" stroke-width="0.4" opacity="0.2"/><circle cx="19" cy="38" r="1" stroke-width="0.6" opacity="0.35"/><circle cx="23" cy="40" r="0.8" stroke-width="0.6" opacity="0.3"/><circle cx="27" cy="37" r="1.2" stroke-width="0.6" opacity="0.25"/></g></svg></div><div class="mb-name">Charcoal</div></div>
+    <div class="med-sep"></div>
+    <span class="mg-label">Colour</span>
+    <div class="mb" data-m="cpencil" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="22,4 26,6 26,33 22,33 18,33 18,6" stroke-width="1" fill="rgba(74,144,226,0.14)"/><line x1="18" y1="6" x2="18" y2="33" stroke-width="0.5" opacity="0.4"/><line x1="26" y1="6" x2="26" y2="33" stroke-width="0.5" opacity="0.4"/><rect x="18" y="29" width="8" height="4" stroke-width="0.8" fill="rgba(180,180,180,0.2)"/><path d="M18 29 L22 40 L26 29" stroke-width="1" fill="rgba(74,144,226,0.3)"/><line x1="18" y1="10" x2="26" y2="10" stroke-width="1.5" opacity="0.4" stroke="rgba(226,74,74,0.6)"/><line x1="18" y1="14" x2="26" y2="14" stroke-width="1.5" opacity="0.4" stroke="rgba(74,226,120,0.6)"/><line x1="18" y1="18" x2="26" y2="18" stroke-width="1.5" opacity="0.4" stroke="rgba(226,180,74,0.6)"/><line x1="18" y1="22" x2="26" y2="22" stroke-width="1.5" opacity="0.4" stroke="rgba(180,74,226,0.6)"/></g></svg></div><div class="mb-name">Col. Pencil</div></div>
+    <div class="mb" data-m="crayon" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="8" width="16" height="26" rx="4" stroke-width="1.4" fill="rgba(231,76,60,0.14)"/><path d="M14 34 L18 42 L22 43 L26 42 L30 34" stroke-width="1.2" fill="rgba(231,76,60,0.2)"/><rect x="14" y="8" width="16" height="8" rx="4" stroke-width="1" fill="rgba(255,255,255,0.08)"/><line x1="16" y1="8" x2="16" y2="34" stroke-width="0.5" opacity="0.3"/><line x1="28" y1="8" x2="28" y2="34" stroke-width="0.5" opacity="0.3"/><line x1="14" y1="16" x2="30" y2="16" stroke-width="1" opacity="0.3"/><line x1="14" y1="20" x2="30" y2="20" stroke-width="0.4" opacity="0.2"/><line x1="14" y1="26" x2="30" y2="26" stroke-width="0.4" opacity="0.2"/></g></svg></div><div class="mb-name">Crayon</div></div>
+    <div class="mb" data-m="pastel" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="6" width="12" height="28" rx="5" stroke-width="1.2" fill="rgba(155,89,182,0.12)"/><ellipse cx="22" cy="34" rx="6" ry="3" stroke-width="1" fill="rgba(155,89,182,0.18)"/><ellipse cx="22" cy="6" rx="6" ry="2.5" stroke-width="0.9" fill="rgba(255,255,255,0.06)"/><line x1="18" y1="10" x2="18" y2="32" stroke-width="0.5" opacity="0.3"/><line x1="26" y1="10" x2="26" y2="32" stroke-width="0.5" opacity="0.3"/><path d="M18 20 Q22 22 26 20" stroke-width="0.6" opacity="0.3"/><circle cx="32" cy="16" r="1.5" stroke-width="0.6" opacity="0.25" fill="rgba(155,89,182,0.1)"/><circle cx="35" cy="24" r="1" stroke-width="0.6" opacity="0.2"/><circle cx="31" cy="30" r="1.8" stroke-width="0.6" opacity="0.2" fill="rgba(155,89,182,0.08)"/><circle cx="9" cy="20" r="1.2" stroke-width="0.6" opacity="0.2"/><circle cx="11" cy="12" r="0.8" stroke-width="0.5" opacity="0.15"/></g></svg></div><div class="mb-name">Pastel</div></div>
+    <div class="mb" data-m="chalk" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="17" y="7" width="10" height="26" rx="2" stroke-width="1.2" fill="rgba(240,240,240,0.1)"/><path d="M17 33 L18 36 L22 38 L26 36 L27 33" stroke-width="1" fill="rgba(220,220,220,0.12)"/><line x1="17" y1="7" x2="17" y2="33" stroke-width="0.5" opacity="0.35"/><line x1="27" y1="7" x2="27" y2="33" stroke-width="0.5" opacity="0.35"/><line x1="17" y1="12" x2="27" y2="12" stroke-width="0.4" opacity="0.25"/><line x1="17" y1="17" x2="27" y2="17" stroke-width="0.4" opacity="0.25"/><line x1="17" y1="22" x2="27" y2="22" stroke-width="0.4" opacity="0.25"/><line x1="17" y1="27" x2="27" y2="27" stroke-width="0.4" opacity="0.25"/><circle cx="15" cy="37" r="1.2" stroke-width="0.6" opacity="0.3"/><circle cx="30" cy="34" r="0.9" stroke-width="0.5" opacity="0.25"/><circle cx="11" cy="28" r="0.7" stroke-width="0.5" opacity="0.2"/><circle cx="33" cy="22" r="1" stroke-width="0.5" opacity="0.2"/></g></svg></div><div class="mb-name">Chalk</div></div>
+    <div class="med-sep"></div>
+    <span class="mg-label">Paint</span>
+    <div class="mb" data-m="watercolor" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="4" x2="22" y2="24" stroke-width="2.5"/><rect x="20" y="24" width="4" height="6" rx="0.5" stroke-width="1" fill="rgba(180,180,180,0.2)"/><path d="M20 30 Q18 34 20 37 Q21 40 22 41 Q23 40 24 37 Q26 34 24 30 Z" stroke-width="1.1" fill="rgba(52,152,219,0.12)"/><path d="M21 31 Q20.5 35 22 41" stroke-width="0.4" opacity="0.35"/><path d="M23 31 Q23.5 35 22 41" stroke-width="0.4" opacity="0.35"/><line x1="22" y1="4" x2="19" y2="7" stroke-width="1.8" opacity="0.6"/><line x1="22" y1="7" x2="25" y2="5" stroke-width="1.2" opacity="0.4"/><line x1="22" y1="10" x2="19" y2="12" stroke-width="0.8" opacity="0.25"/></g></svg></div><div class="mb-name">Watercolour</div></div>
+    <div class="mb" data-m="oil" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="3" x2="22" y2="20" stroke-width="3.5"/><rect x="18" y="20" width="8" height="7" rx="1" stroke-width="1.2" fill="rgba(180,180,180,0.2)"/><path d="M18 27 Q14 30 14 34 Q14 38 22 40 Q30 38 30 34 Q30 30 26 27 Z" stroke-width="1.2" fill="rgba(201,168,76,0.12)"/><line x1="16" y1="29" x2="16" y2="39" stroke-width="0.7" opacity="0.3"/><line x1="19" y1="28" x2="19" y2="40" stroke-width="0.7" opacity="0.3"/><line x1="22" y1="27" x2="22" y2="40" stroke-width="0.7" opacity="0.3"/><line x1="25" y1="28" x2="25" y2="40" stroke-width="0.7" opacity="0.3"/><line x1="28" y1="29" x2="28" y2="39" stroke-width="0.7" opacity="0.3"/><path d="M15 33 Q22 36 29 33" stroke-width="0.6" opacity="0.3"/></g></svg></div><div class="mb-name">Oil</div></div>
+    <div class="mb" data-m="acrylic" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="3" x2="22" y2="21" stroke-width="3"/><rect x="17" y="21" width="10" height="6" rx="1" stroke-width="1.2" fill="rgba(180,180,180,0.2)"/><rect x="15" y="27" width="14" height="12" rx="2" stroke-width="1.2" fill="rgba(46,204,113,0.12)"/><line x1="17" y1="29" x2="17" y2="38" stroke-width="0.6" opacity="0.35"/><line x1="19" y1="28" x2="19" y2="39" stroke-width="0.6" opacity="0.35"/><line x1="21" y1="28" x2="21" y2="39" stroke-width="0.6" opacity="0.35"/><line x1="23" y1="28" x2="23" y2="39" stroke-width="0.6" opacity="0.35"/><line x1="25" y1="28" x2="25" y2="39" stroke-width="0.6" opacity="0.35"/><line x1="27" y1="29" x2="27" y2="38" stroke-width="0.6" opacity="0.35"/><line x1="15" y1="33" x2="29" y2="33" stroke-width="0.8" opacity="0.25"/></g></svg></div><div class="mb-name">Acrylic</div></div>
+    <div class="mb" data-m="gouache" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="3" x2="22" y2="21" stroke-width="2.8"/><rect x="19" y="21" width="6" height="6" rx="0.5" stroke-width="1.1" fill="rgba(180,180,180,0.2)"/><ellipse cx="22" cy="33" rx="7" ry="9" stroke-width="1.2" fill="rgba(231,76,60,0.1)"/><line x1="17" y1="28" x2="17" y2="40" stroke-width="0.6" opacity="0.3"/><line x1="19.5" y1="27" x2="19.5" y2="41" stroke-width="0.6" opacity="0.3"/><line x1="22" y1="27" x2="22" y2="42" stroke-width="0.6" opacity="0.3"/><line x1="24.5" y1="27" x2="24.5" y2="41" stroke-width="0.6" opacity="0.3"/><line x1="27" y1="28" x2="27" y2="40" stroke-width="0.6" opacity="0.3"/><path d="M16 30 Q22 33 28 30" stroke-width="0.6" opacity="0.3"/><path d="M16 35 Q22 38 28 35" stroke-width="0.6" opacity="0.25"/></g></svg></div><div class="mb-name">Gouache</div></div>
+    <div class="med-sep"></div>
+    <span class="mg-label">Ink & Pen</span>
+    <div class="mb" data-m="marker" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;"><svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="13" y="5" width="14" height="24" rx="3" stroke-width="1.3" fill="rgba(52,152,219,0.08)"/><path d="M15 29 L17 36 L20 37 L23 36 L25 29" stroke-width="1" fill="rgba(52,152,219,0.1)"/><line x1="17" y1="9" x2="23" y2="9" stroke-width="0.5" opacity="0.3"/><line x1="17" y1="12" x2="23" y2="12" stroke-width="0.5" opacity="0.3"/><line x1="17" y1="15" x2="23" y2="15" stroke-width="0.5" opacity="0.3"/><line x1="17" y1="18" x2="23" y2="18" stroke-width="0.5" opacity="0.3"/><line x1="17" y1="21" x2="23" y2="21" stroke-width="0.5" opacity="0.3"/><rect x="14" y="5" width="12" height="5" rx="2" stroke-width="0.8" opacity="0.4"/></g></svg></div><div class="mb-name">Marker</div></div>
+    <div class="mb" data-m="inkpen" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;"><svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5 L14 28 L20 36 L26 28 Z" stroke-width="1.2" fill="rgba(201,168,76,0.08)"/><path d="M20 5 L17 20 L20 36 L23 20 Z" stroke-width="0.7" opacity="0.4" fill="rgba(201,168,76,0.05)"/><path d="M14 28 L26 28" stroke-width="1"/><path d="M16 22 L24 22" stroke-width="0.6" opacity="0.4"/><path d="M17 16 L23 16" stroke-width="0.6" opacity="0.4"/><circle cx="20" cy="36" r="1.5" stroke-width="1" fill="rgba(0,0,0,0.3)"/><line x1="20" y1="4" x2="20" y2="6" stroke-width="1.5"/></g></svg></div><div class="mb-name">Ink Pen</div></div>
+    <div class="mb" data-m="ballpoint" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;"><svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="17" y="4" width="6" height="20" rx="2" stroke-width="1.2" fill="rgba(201,168,76,0.06)"/><path d="M17 24 L18 32 L20 34 L22 32 L23 24" stroke-width="1"/><line x1="20" y1="34" x2="20" y2="37" stroke-width="1.8"/><circle cx="20" cy="37.5" r="1.2" stroke-width="0.8" fill="rgba(0,0,0,0.2)"/><line x1="19" y1="8" x2="21" y2="8" stroke-width="0.4" opacity="0.3"/><line x1="19" y1="12" x2="21" y2="12" stroke-width="0.4" opacity="0.3"/><line x1="19" y1="16" x2="21" y2="16" stroke-width="0.4" opacity="0.3"/><line x1="19" y1="20" x2="21" y2="20" stroke-width="0.4" opacity="0.3"/></g></svg></div><div class="mb-name">Ballpoint</div></div>
+    <div class="mb" data-m="felttip" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;"><svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="4" width="12" height="22" rx="4" stroke-width="1.3" fill="rgba(155,89,182,0.08)"/><path d="M16 26 L18 33 L20 35 L22 33 L24 26" stroke-width="1.1"/><path d="M17 33 Q20 37 23 33" stroke-width="0.7" opacity="0.4"/><rect x="15" y="4" width="10" height="6" rx="3" stroke-width="0.8" opacity="0.45"/><line x1="16" y1="14" x2="24" y2="14" stroke-width="0.4" opacity="0.3"/><line x1="16" y1="18" x2="24" y2="18" stroke-width="0.4" opacity="0.3"/><line x1="16" y1="22" x2="24" y2="22" stroke-width="0.4" opacity="0.3"/></g></svg></div><div class="mb-name">Felt Tip</div></div>
+    <div class="med-sep"></div>
+    <div class="mb" data-m="eraser" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="15" width="34" height="18" rx="3" stroke-width="1.3" fill="rgba(255,255,255,0.07)"/><rect x="5" y="15" width="14" height="18" rx="3" stroke-width="1" fill="rgba(255,150,150,0.14)"/><line x1="19" y1="15" x2="19" y2="33" stroke-width="1.2"/><line x1="8" y1="20" x2="17" y2="20" stroke-width="0.5" opacity="0.3"/><line x1="8" y1="24" x2="17" y2="24" stroke-width="0.5" opacity="0.3"/><line x1="8" y1="28" x2="17" y2="28" stroke-width="0.5" opacity="0.3"/><line x1="22" y1="20" x2="36" y2="20" stroke-width="0.4" opacity="0.2"/><line x1="22" y1="24" x2="36" y2="24" stroke-width="0.4" opacity="0.2"/><line x1="22" y1="28" x2="36" y2="28" stroke-width="0.4" opacity="0.2"/><path d="M5 33 L12 40 L39 40 L39 33" stroke-width="0.8" opacity="0.35"/></g></svg></div><div class="mb-name">Eraser</div></div>
+    <div class="mb" data-m="smudge" onclick="selMed(this)"><div class="mb-icon" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="36" height="36"><g stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5 L14 34 L22 40 L30 34 L25 5 Z" stroke-width="1.2" fill="rgba(201,168,76,0.08)"/><path d="M20 5 L16 32 L22 40 L28 32 L24 5" stroke-width="0.5" opacity="0.3" fill="rgba(201,168,76,0.04)"/><path d="M14 34 L30 34" stroke-width="1"/><path d="M16 28 L28 28" stroke-width="0.6" opacity="0.4"/><path d="M17 22 L27 22" stroke-width="0.6" opacity="0.4"/><path d="M18 16 L26 16" stroke-width="0.6" opacity="0.35"/><path d="M19 10 L25 10" stroke-width="0.6" opacity="0.3"/><circle cx="22" cy="40" r="2.5" stroke-width="1" fill="rgba(201,168,76,0.12)"/></g></svg></div><div class="mb-name">Smudge</div></div>
+  </div>
+</div>
+
+<!-- ═══ BODY ROW ═══ -->
+<div id="bodyRow">
+
+  <!-- LEFT TOOLS -->
+  <div id="leftPanel" style="width:82px;min-width:82px;">
+    <div class="tb" id="tb-eraser" onclick="setTool('eraser')" title="Eraser (E)" style="width:60px;height:60px;font-size:25px;">◻<div class="tb-lbl" style="font-size:10px;">Erase</div></div>
+    <div class="tb" id="tb-fill" onclick="setTool('fill')" title="Fill (F)" style="width:60px;height:60px;font-size:25px;">🪣<div class="tb-lbl" style="font-size:10px;">Fill</div></div>
+    <div class="tb" id="tb-eyedropper" onclick="setTool('eyedropper')" title="Pick colour (I)" style="width:60px;height:60px;font-size:25px;">💉<div class="tb-lbl" style="font-size:10px;">Pick</div></div>
+    <div class="t-sep"></div>
+    <div class="tb" id="tb-line" onclick="setTool('line')" title="Line (L)" style="width:60px;height:60px;font-size:25px;">╱<div class="tb-lbl" style="font-size:10px;">Line</div></div>
+    <div class="tb" id="tb-rect" onclick="setTool('rect')" title="Rectangle (R)" style="width:60px;height:60px;font-size:25px;">▭<div class="tb-lbl" style="font-size:10px;">Rect</div></div>
+    <div class="tb" id="tb-circle" onclick="setTool('circle')" title="Ellipse (C)" style="width:60px;height:60px;font-size:25px;">◯<div class="tb-lbl" style="font-size:10px;">Ellipse</div></div>
+    <div id="swatchWrap">
+      <div id="swWrap">
+        <div class="sw" id="bgSw" onclick="pickSw('bg')" title="Background colour"></div>
+        <div class="sw" id="fgSw" onclick="pickSw('fg')" title="Foreground colour"></div>
+      </div>
+      <input type="color" id="cpick" onchange="applyCp()">
+    </div>
+  </div>
+
+  <!-- CANVAS AREA -->
+  <div id="cvArea">
+    <div id="cvWrap"></div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="rightPanel">
+    <!-- Brush settings -->
+    <div class="rps">
+      <span class="rp-lbl">Brush Settings</span>
+      <div class="sr"><span class="sr-lbl">Size</span><input class="sr-sl" type="range" id="slSize" min="1" max="120" value="12" oninput="S.brushSize=+this.value;document.getElementById('vSize').textContent=this.value"><span class="sr-val" id="vSize">12</span></div>
+      <div class="sr"><span class="sr-lbl">Opacity</span><input class="sr-sl" type="range" id="slOp" min="1" max="100" value="80" oninput="S.opacity=this.value/100;document.getElementById('vOp').textContent=this.value+'%'"><span class="sr-val" id="vOp">80%</span></div>
+      <div class="sr"><span class="sr-lbl">Hardness</span><input class="sr-sl" type="range" id="slHard" min="0" max="100" value="60" oninput="S.hardness=this.value/100;document.getElementById('vHard').textContent=this.value+'%'"><span class="sr-val" id="vHard">60%</span></div>
+      <div class="sr"><span class="sr-lbl">Flow</span><input class="sr-sl" type="range" id="slFlow" min="5" max="100" value="70" oninput="S.flow=this.value/100;document.getElementById('vFlow').textContent=this.value+'%'"><span class="sr-val" id="vFlow">70%</span></div>
+    </div>
+    <!-- Palette -->
+    <div class="rps">
+      <span class="rp-lbl">Colour Palette</span>
+      <div id="pal"></div>
+      <div id="custColorRow">
+        <input type="color" id="custColor" value="#c9a84c" onchange="setCol(this.value)">
+        <span style="font-size:10px;color:var(--muted);">Custom colour</span>
+      </div>
+    </div>
+    <!-- Layers -->
+    <div style="padding:10px 14px 4px;flex-shrink:0;border-bottom:1px solid var(--border);">
+      <span class="rp-lbl" style="margin-bottom:0;">Layers</span>
+    </div>
+    <div id="layersWrap"><div id="layerList"></div></div>
+    <div id="layerActs">
+      <button class="la-btn" onclick="addLayer()">+ New</button>
+      <button class="la-btn" onclick="dupeLayer()">Dupe</button>
+      <button class="la-btn" onclick="mergeDn()">Merge ↓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<div id="foot">
+  <button class="zm-btn" onclick="zmOut()">−</button>
+  <span id="zLbl">100%</span>
+  <button class="zm-btn" onclick="zmIn()">+</button>
+  <button class="zm-btn" onclick="zmFit()" title="Fit">⊡</button>
+  <span id="cvInfo" style="margin-left:8px;">—</span>
+  <span id="cursorPt">x:— y:—</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const S={
+  W:0,H:0,paper:'smooth',medium:'pencil_hb',tool:'brush',
+  brushSize:12,opacity:.8,hardness:.6,flow:.7,
+  fg:'#1a1a1a',bg:'#ffffff',zoom:1,
+  layers:[],active:0,
+  undo:[],redo:[],
+  painting:false,lx:0,ly:0,
+  cpTarget:'fg',
+  shapeStart:null,
+  pathCtx:null,   // active drawing context for continuous strokes
+  pathMedium:'',  // medium when stroke started
+};
+
+// ═══════════════════════════════════════════════
+//  PAPER SIZES + COLOURS
+// ═══════════════════════════════════════════════
+const SIZES={
+  a4:[794,1123],a3:[1123,1587],a5:[559,794],
+  letter:[816,1056],tabloid:[1056,1632],square:[864,864],
+};
+const PAPER_BG={
+  smooth:'#f9f8f4',textured:'#f4f0e8',canvas:'#eee5cc',
+  watercolor:'#f6f2ea',kraft:'#c5a46a',black:'#0a0a0a',
+};
+const DPI=96;
+
+function onSzChg(){
+  document.getElementById('customRow').className=
+    document.getElementById('selSize').value==='custom'?'show':'';
+}
+function onUnitChg(){
+  const u=document.getElementById('cwUnit').value;
+  const hints={px:'e.g. 1200',in:'e.g. 10',cm:'e.g. 25',mm:'e.g. 250'};
+  document.getElementById('cwVal').placeholder=hints[u];
+  document.getElementById('chVal').placeholder=hints[u];
+}
+function unitToPx(v,u){
+  const n=parseFloat(v)||100;
+  return Math.round(u==='px'?n:u==='in'?n*DPI:u==='cm'?n/2.54*DPI:u==='mm'?n/25.4*DPI:n);
+}
+
+function startLab(){
+  const sz=document.getElementById('selSize').value;
+  const ori=document.getElementById('selOrient').value;
+  const res=parseFloat(document.getElementById('selRes').value);
+  const paper=document.getElementById('selPaper').value;
+  let w,h;
+  if(sz==='custom'){
+    const u=document.getElementById('cwUnit').value;
+    w=unitToPx(document.getElementById('cwVal').value,u);
+    h=unitToPx(document.getElementById('chVal').value,u);
+  } else {
+    const sz2=SIZES[sz];w=sz2[0];h=sz2[1];
+  }
+  if(ori==='landscape'&&w<h)[w,h]=[h,w];
+  S.W=Math.round(w*res); S.H=Math.round(h*res); S.paper=paper;
+  document.getElementById('setupModal').style.display='none';
+  initCanvas();
+}
+
+// ═══════════════════════════════════════════════
+//  CANVAS INIT
+// ═══════════════════════════════════════════════
+let lzIdx=1;
+function initCanvas(){
+  const wrap=document.getElementById('cvWrap');
+  wrap.innerHTML='';
+  wrap.style.width=S.W+'px'; wrap.style.height=S.H+'px';
+  S.layers=[]; lzIdx=1;
+
+  // Paper background
+  const bgC=mkC('bgC',0); drawPaper(bgC);
+  // Texture overlay
+  const txC=mkC('txCanvas',999); txC.style.pointerEvents='none';
+  txC.style.mixBlendMode='multiply'; txC.style.opacity='.3';
+  drawTexture(txC);
+  // Merge (hidden export)
+  const mc=mkC('mergeC',998); mc.style.display='none';
+
+  wrap.appendChild(bgC); wrap.appendChild(txC); wrap.appendChild(mc);
+  addLayer('Layer 1');
+  setupEvents();
+  buildPalette();
+  zmFit();
+  document.getElementById('cvInfo').textContent=`${S.W} × ${S.H} px · ${S.paper}`;
+}
+
+function mkC(id,z){
+  const c=document.createElement('canvas');
+  c.width=S.W; c.height=S.H; c.id=id;
+  c.style.cssText=`position:absolute;top:0;left:0;z-index:${z};display:block;`;
+  return c;
+}
+function drawPaper(c){
+  const x=c.getContext('2d');
+  x.fillStyle=PAPER_BG[S.paper]||'#f9f8f4';
+  x.fillRect(0,0,c.width,c.height);
+}
+function drawTexture(c){
+  const x=c.getContext('2d');
+  x.clearRect(0,0,c.width,c.height);
+  if(S.paper==='smooth')return;
+  const strength={textured:.3,canvas:.42,watercolor:.22,kraft:.18,black:.14}[S.paper]||0;
+  if(!strength)return;
+  const id=x.createImageData(c.width,c.height),d=id.data;
+  for(let i=0;i<d.length;i+=4){
+    const n=(Math.random()-.5)*strength*255;
+    d[i]=d[i+1]=d[i+2]=128+n; d[i+3]=35;
+  }
+  x.putImageData(id,0,0);
+  if(S.paper==='canvas'){
+    x.globalAlpha=.07;
+    for(let y=0;y<c.height;y+=4){
+      x.strokeStyle=y%8===0?'rgba(0,0,0,.3)':'rgba(0,0,0,.1)';
+      x.lineWidth=1;
+      x.beginPath();x.moveTo(0,y);x.lineTo(c.width,y);x.stroke();
+    }
+    x.globalAlpha=1;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  LAYERS
+// ═══════════════════════════════════════════════
+function addLayer(name){
+  const wrap=document.getElementById('cvWrap');
+  const c=mkC('',lzIdx++);
+  wrap.appendChild(c);
+  const ly={c,name:name||'Layer '+(S.layers.length+1),opacity:1,vis:true};
+  S.layers.push(ly);
+  S.active=S.layers.length-1;
+  renderLayers();
+  return ly;
+}
+function getCtx(){return S.layers[S.active]?.c.getContext('2d');}
+function renderLayers(){
+  const list=document.getElementById('layerList');
+  list.innerHTML='';
+  for(let i=S.layers.length-1;i>=0;i--){
+    const l=S.layers[i],ai=i;
+    const item=document.createElement('div');
+    item.className='li'+(i===S.active?' on':'');
+    item.onclick=()=>{S.active=ai;renderLayers();};
+    const eye=document.createElement('div');eye.className='li-eye';
+    eye.textContent=l.vis?'👁':'○';
+    eye.onclick=e=>{e.stopPropagation();l.vis=!l.vis;l.c.style.opacity=l.vis?l.opacity:0;renderLayers();};
+    const th=document.createElement('canvas');
+    th.width=30;th.height=30;th.className='li-th';
+    th.getContext('2d').drawImage(l.c,0,0,30,30);
+    const info=document.createElement('div');info.className='li-info';
+    info.innerHTML=`<div class="li-name">${l.name}</div>`;
+    // Opacity slider per layer
+    const opRow=document.createElement('div');
+    opRow.style.cssText='display:flex;align-items:center;gap:4px;margin-top:3px;';
+    const opSl=document.createElement('input');
+    opSl.type='range';opSl.min=0;opSl.max=100;opSl.value=Math.round(l.opacity*100);
+    opSl.className='sr-sl';opSl.style.cssText='flex:1;height:3px;';
+    const opVal=document.createElement('span');
+    opVal.style.cssText='font-size:8px;color:var(--muted);width:24px;text-align:right;flex-shrink:0;';
+    opVal.textContent=Math.round(l.opacity*100)+'%';
+    const layerRef=l;
+    opSl.oninput=function(e){
+      e.stopPropagation();
+      layerRef.opacity=this.value/100;
+      opVal.textContent=this.value+'%';
+      if(layerRef.vis) layerRef.c.style.opacity=layerRef.opacity;
+    };
+    opSl.addEventListener('mousedown',e=>e.stopPropagation());
+    opSl.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+    opRow.appendChild(opSl);opRow.appendChild(opVal);
+    info.appendChild(opRow);
+    const del=document.createElement('div');del.className='li-del';del.textContent='🗑';
+    del.onclick=e=>{e.stopPropagation();if(S.layers.length>1)delLayer(ai);};
+    item.append(eye,th,info,del);
+    list.appendChild(item);
+  }
+}
+function delLayer(i){S.layers[i].c.remove();S.layers.splice(i,1);S.active=Math.min(S.active,S.layers.length-1);renderLayers();}
+function dupeLayer(){const l=S.layers[S.active],nl=addLayer(l.name+' copy');nl.c.getContext('2d').drawImage(l.c,0,0);renderLayers();}
+function mergeDn(){
+  const i=S.active;if(i===0)return;
+  const above=S.layers[i],below=S.layers[i-1];
+  const bx=below.c.getContext('2d');bx.globalAlpha=above.opacity;bx.drawImage(above.c,0,0);bx.globalAlpha=1;
+  delLayer(i);
+}
+function flatAll(){
+  saveUndo();
+  const f=S.layers[0],fx=f.c.getContext('2d');
+  fx.clearRect(0,0,S.W,S.H);
+  fx.fillStyle=PAPER_BG[S.paper]||'#f9f8f4';fx.fillRect(0,0,S.W,S.H);
+  S.layers.forEach((l,i)=>{if(l.vis){fx.globalAlpha=l.opacity;fx.drawImage(l.c,0,0);fx.globalAlpha=1;}});
+  while(S.layers.length>1)delLayer(S.layers.length-1);
+  f.name='Flattened';S.active=0;renderLayers();
+}
+function clearLyr(){saveUndo();const x=getCtx();if(x)x.clearRect(0,0,S.W,S.H);renderLayers();}
+
+// ═══════════════════════════════════════════════
+//  UNDO / REDO
+// ═══════════════════════════════════════════════
+function snap(){return S.layers.map(l=>{const d=document.createElement('canvas');d.width=S.W;d.height=S.H;d.getContext('2d').drawImage(l.c,0,0);return d;});}
+function saveUndo(){S.undo.push({s:snap(),a:S.active});if(S.undo.length>20)S.undo.shift();S.redo=[];}
+function undo(){
+  if(!S.undo.length)return;
+  S.redo.push({s:snap(),a:S.active});
+  const {s,a}=S.undo.pop();
+  s.forEach((d,i)=>{if(S.layers[i]){const x=S.layers[i].c.getContext('2d');x.clearRect(0,0,S.W,S.H);x.drawImage(d,0,0);}});
+  S.active=a;renderLayers();
+}
+function redo(){
+  if(!S.redo.length)return;
+  saveUndo();
+  const {s,a}=S.redo.pop();
+  s.forEach((d,i)=>{if(S.layers[i]){const x=S.layers[i].c.getContext('2d');x.clearRect(0,0,S.W,S.H);x.drawImage(d,0,0);}});
+  S.active=a;renderLayers();
+}
+
+// ═══════════════════════════════════════════════
+//  DRAWING — Procreate "wet layer" stroke buffer
+//  All points → one temp canvas → one stroke() call
+//  Zero blobs guaranteed
+// ═══════════════════════════════════════════════
+let pts=[], wetCanvas=null, wetCtx=null;
+
+function ensureWetCanvas(){
+  if(wetCanvas) return;
+  wetCanvas=document.createElement('canvas');
+  wetCanvas.width=S.W; wetCanvas.height=S.H;
+  wetCanvas.style.cssText='position:absolute;top:0;left:0;z-index:995;pointer-events:none;';
+  document.getElementById('cvWrap').appendChild(wetCanvas);
+  wetCtx=wetCanvas.getContext('2d');
+}
+
+function setupEvents(){
+  const w=document.getElementById('cvWrap');
+  w.addEventListener('mousedown',onDn);
+  w.addEventListener('mousemove',onMv);
+  w.addEventListener('mouseup',onUp);
+  w.addEventListener('mouseleave',onUp);
+  w.addEventListener('touchstart',e=>{e.preventDefault();onDn(nt(e));},{passive:false});
+  w.addEventListener('touchmove', e=>{e.preventDefault();onMv(nt(e));},{passive:false});
+  w.addEventListener('touchend',  e=>{e.preventDefault();onUp(nt(e));},{passive:false});
+  document.getElementById('cvArea').addEventListener('mousemove',updCursor);
+}
+function nt(e){const t=e.touches[0]||e.changedTouches[0];return{clientX:t.clientX,clientY:t.clientY};}
+function gpt(e){const r=document.getElementById('cvWrap').getBoundingClientRect();return{x:(e.clientX-r.left)/S.zoom,y:(e.clientY-r.top)/S.zoom};}
+
+function onDn(e){
+  if(!getCtx())return;
+  const{x,y}=gpt(e);
+  if(S.tool==='eyedropper'){pickClr(x,y);return;}
+  if(S.tool==='fill'){flood(x,y);return;}
+  if(['line','rect','circle'].includes(S.tool)){
+    saveUndo();S.painting=true;S.lx=x;S.ly=y;
+    S.shapeStart={x,y};
+    shapeOv=mkC('',990);shapeOv.style.pointerEvents='none';
+    document.getElementById('cvWrap').appendChild(shapeOv);
+    return;
+  }
+  // Start wet layer stroke
+  saveUndo();
+  S.painting=true; S.lx=x; S.ly=y;
+  pts=[{x,y}];
+  ensureWetCanvas();
+  wetCtx.clearRect(0,0,S.W,S.H);
+}
+
+function onMv(e){
+  if(!S.painting)return;
+  const{x,y}=gpt(e);
+  if(['line','rect','circle'].includes(S.tool)&&shapeOv){drawShPrev(x,y);S.lx=x;S.ly=y;return;}
+  // Accumulate point + redraw wet layer
+  pts.push({x,y});
+  drawWet();
+  S.lx=x;S.ly=y;
+}
+
+function onUp(e){
+  if(!S.painting){S.painting=false;return;}
+  const p=gpt(e);
+  if(['line','rect','circle'].includes(S.tool)&&shapeOv){
+    commitSh(p.x,p.y);shapeOv.remove();shapeOv=null;
+    S.painting=false;renderLayers();return;
+  }
+  // If only one point (click, no drag), draw a dot
+  if(pts.length===1) pts.push({x:pts[0].x+0.1,y:pts[0].y+0.1});
+  drawWet();
+  // Commit wet layer to active layer
+  const ctx=getCtx();
+  if(ctx&&wetCanvas){
+    ctx.drawImage(wetCanvas,0,0);
+    wetCtx.clearRect(0,0,S.W,S.H);
+  }
+  pts=[];
+  S.painting=false;
+  renderLayers();
+}
+
+function updCursor(e){
+  const r=document.getElementById('cvWrap').getBoundingClientRect();
+  const x=Math.floor((e.clientX-r.left)/S.zoom),y=Math.floor((e.clientY-r.top)/S.zoom);
+  document.getElementById('cursorPt').textContent=`x:${x}  y:${y}`;
+}
+
+// ── WET LAYER DRAW ─────────────────────────────────
+// Procreate method for ALL mediums:
+// Clear temp canvas → draw ONE smooth bezier path → ONE stroke() call
+// Zero blobs guaranteed on every single medium
+
+function drawWet(){
+  if(!wetCtx||pts.length<1)return;
+  const m=S.tool==='eraser'?'eraser':S.medium;
+  wetCtx.clearRect(0,0,S.W,S.H);
+  wetCtx.save();
+
+  // Ensure at least 2 points
+  const p=pts.length===1?[pts[0],{x:pts[0].x+0.1,y:pts[0].y+0.1}]:pts;
+
+  // ── Medium settings ───────────────────────────────
+  const cfg={
+    pencil_hb: {lw:0.22,al:0.40,blur:0,   op:'source-over'},
+    pencil_2b: {lw:0.32,al:0.58,blur:0,   op:'source-over'},
+    pencil_4b: {lw:0.44,al:0.72,blur:0,   op:'source-over'},
+    charcoal:  {lw:0.55,al:0.65,blur:1.2, op:'source-over'},
+    cpencil:   {lw:0.32,al:0.62,blur:0,   op:'multiply'},
+    crayon:    {lw:0.42,al:0.78,blur:0,   op:'source-over'},
+    pastel:    {lw:0.60,al:0.50,blur:3.0, op:'source-over'},
+    chalk:     {lw:0.40,al:0.68,blur:0.5, op:'source-over'},
+    watercolor:{lw:1.60,al:0.22,blur:4.0, op:'source-over'},
+    oil:       {lw:1.00,al:0.92,blur:0,   op:'source-over'},
+    acrylic:   {lw:1.00,al:0.93,blur:0,   op:'source-over'},
+    gouache:   {lw:1.00,al:1.00,blur:0,   op:'source-over'},
+    marker:    {lw:0.65,al:0.80,blur:0,   op:'source-over'},
+    inkpen:    {lw:0.22,al:0.96,blur:0,   op:'source-over'},
+    ballpoint: {lw:0.16,al:0.50,blur:0,   op:'multiply'},
+    felttip:   {lw:0.58,al:0.82,blur:0.8, op:'source-over'},
+    eraser:    {lw:1.00,al:1.00,blur:0,   op:'destination-out'},
+    smudge:    {lw:0.50,al:0.50,blur:0,   op:'source-over'},
+  };
+  const c=cfg[m]||{lw:0.5,al:0.8,blur:0,op:'source-over'};
+
+  wetCtx.globalCompositeOperation=c.op;
+  wetCtx.lineWidth  = Math.max(0.5, S.brushSize*c.lw);
+  wetCtx.strokeStyle= m==='eraser'
+    ? 'rgba(0,0,0,1)'
+    : h2r(S.fg, S.opacity*c.al);
+  wetCtx.lineCap   ='round';
+  wetCtx.lineJoin  ='round';
+  if(c.blur>0) wetCtx.filter=`blur(${c.blur}px)`;
+
+  // ── ONE smooth bezier path through ALL points ──────
+  wetCtx.beginPath();
+  wetCtx.moveTo(p[0].x,p[0].y);
+  if(p.length===2){
+    wetCtx.lineTo(p[1].x,p[1].y);
+  } else {
+    for(let i=1;i<p.length-1;i++){
+      const mx=(p[i].x+p[i+1].x)/2;
+      const my=(p[i].y+p[i+1].y)/2;
+      wetCtx.quadraticCurveTo(p[i].x,p[i].y,mx,my);
+    }
+    wetCtx.lineTo(p[p.length-1].x,p[p.length-1].y);
+  }
+  wetCtx.stroke(); // ← the ONE and ONLY stroke() call
+
+  // ── Charcoal: second soft pass for body width ──────
+  if(m==='charcoal'){
+    wetCtx.filter='blur(2.5px)';
+    wetCtx.lineWidth=Math.max(1,S.brushSize*0.9);
+    wetCtx.strokeStyle=h2r(S.fg,S.opacity*0.28);
+    wetCtx.beginPath();
+    wetCtx.moveTo(p[0].x,p[0].y);
+    for(let i=1;i<p.length-1;i++){
+      const mx=(p[i].x+p[i+1].x)/2,my=(p[i].y+p[i+1].y)/2;
+      wetCtx.quadraticCurveTo(p[i].x,p[i].y,mx,my);
+    }
+    wetCtx.lineTo(p[p.length-1].x,p[p.length-1].y);
+    wetCtx.stroke();
+  }
+
+  // ── Pastel: second crisp core ──────────────────────
+  if(m==='pastel'){
+    wetCtx.filter='none';
+    wetCtx.lineWidth=Math.max(0.5,S.brushSize*0.18);
+    wetCtx.strokeStyle=h2r(S.fg,S.opacity*0.35);
+    wetCtx.beginPath();
+    wetCtx.moveTo(p[0].x,p[0].y);
+    for(let i=1;i<p.length-1;i++){
+      const mx=(p[i].x+p[i+1].x)/2,my=(p[i].y+p[i+1].y)/2;
+      wetCtx.quadraticCurveTo(p[i].x,p[i].y,mx,my);
+    }
+    wetCtx.lineTo(p[p.length-1].x,p[p.length-1].y);
+    wetCtx.stroke();
+  }
+
+  wetCtx.filter='none';
+  wetCtx.restore();
+}
+
+function h2r(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${Math.min(1,Math.max(0,a))})`;
+}
+
+// ═══════════════════════════════════════════════
+//  SHAPES
+// ═══════════════════════════════════════════════
+function stk(ctx){ctx.strokeStyle=h2r(S.fg,S.opacity);ctx.lineWidth=S.brushSize;ctx.lineCap='round';ctx.lineJoin='round';ctx.globalCompositeOperation='source-over';}
+function drawShPrev(x,y){
+  if(!shapeOv||!S.shapeStart)return;
+  const ctx=shapeOv.getContext('2d');ctx.clearRect(0,0,S.W,S.H);stk(ctx);
+  const{x:sx,y:sy}=S.shapeStart;
+  ctx.beginPath();
+  if(S.tool==='line'){ctx.moveTo(sx,sy);ctx.lineTo(x,y);}
+  else if(S.tool==='rect'){ctx.rect(sx,sy,x-sx,y-sy);}
+  else{ctx.ellipse(sx+(x-sx)/2,sy+(y-sy)/2,Math.abs(x-sx)/2,Math.abs(y-sy)/2,0,0,Math.PI*2);}
+  ctx.stroke();
+}
+function commitSh(x,y){
+  const ctx=getCtx();if(!ctx)return;stk(ctx);
+  const{x:sx,y:sy}=S.shapeStart;
+  ctx.beginPath();
+  if(S.tool==='line'){ctx.moveTo(sx,sy);ctx.lineTo(x,y);}
+  else if(S.tool==='rect'){ctx.rect(sx,sy,x-sx,y-sy);}
+  else{ctx.ellipse(sx+(x-sx)/2,sy+(y-sy)/2,Math.abs(x-sx)/2,Math.abs(y-sy)/2,0,0,Math.PI*2);}
+  ctx.stroke();S.shapeStart=null;
+}
+
+// ═══════════════════════════════════════════════
+//  FILL
+// ═══════════════════════════════════════════════
+function flood(px,py){
+  const ctx=getCtx();if(!ctx)return;saveUndo();
+  px=Math.floor(px);py=Math.floor(py);
+  const id=ctx.getImageData(0,0,S.W,S.H),d=id.data;
+  const tw=S.W,idx=(x,y)=>(y*tw+x)*4;
+  const ti=idx(px,py),tr=d[ti],tg=d[ti+1],tb=d[ti+2],ta=d[ti+3];
+  const tmp=document.createElement('canvas');tmp.width=1;tmp.height=1;
+  const tc=tmp.getContext('2d');tc.fillStyle=h2r(S.fg,S.opacity);tc.fillRect(0,0,1,1);
+  const fi=tc.getImageData(0,0,1,1).data;
+  const fr=fi[0],fg=fi[1],fb=fi[2],fa=fi[3];
+  if(tr===fr&&tg===fg&&tb===fb&&ta===fa)return;
+  const match=i=>Math.abs(d[i]-tr)<30&&Math.abs(d[i+1]-tg)<30&&Math.abs(d[i+2]-tb)<30&&Math.abs(d[i+3]-ta)<30;
+  const stk2=[[px,py]],vis=new Uint8Array(tw*S.H);
+  while(stk2.length){
+    const[x,y]=stk2.pop();
+    if(x<0||x>=tw||y<0||y>=S.H)continue;
+    const i=y*tw+x;if(vis[i])continue;vis[i]=1;
+    const di=i*4;if(!match(di))continue;
+    d[di]=fr;d[di+1]=fg;d[di+2]=fb;d[di+3]=fa;
+    stk2.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+  }
+  ctx.putImageData(id,0,0);
+}
+
+// ═══════════════════════════════════════════════
+//  EYEDROPPER
+// ═══════════════════════════════════════════════
+function pickClr(x,y){
+  const mc=getMerged(),ctx=mc.getContext('2d');
+  const p=ctx.getImageData(Math.floor(x),Math.floor(y),1,1).data;
+  setCol('#'+[p[0],p[1],p[2]].map(v=>v.toString(16).padStart(2,'0')).join(''));
+  setTool('brush');
+}
+
+// ═══════════════════════════════════════════════
+//  COLOUR
+// ═══════════════════════════════════════════════
+const COLORS=[
+  '#000000','#1a1a1a','#3d3d3d','#666','#999','#ccc','#fff',
+  '#8B4513','#A0522D','#CD853F','#DEB887','#F4A460','#D2691E',
+  '#C0392B','#E74C3C','#E67E22','#F39C12','#F1C40F','#2ECC71',
+  '#27AE60','#1ABC9C','#16A085','#3498DB','#2980B9','#2471A3',
+  '#8E44AD','#9B59B6','#6C3483','#E91E63','#FF4081','#FF5722',
+  '#FF9800','#FFEB3B','#4CAF50','#009688','#2196F3','#673AB7',
+  '#c9a84c','#e8c96a','#ffd700','#b8860b','#795548','#607D8B',
+];
+function buildPalette(){
+  const p=document.getElementById('pal');p.innerHTML='';
+  COLORS.forEach(c=>{const d=document.createElement('div');d.className='pc';d.style.background=c;d.title=c;d.onclick=()=>setCol(c);p.appendChild(d);});
+}
+function setCol(c){
+  S.fg=c;
+  document.getElementById('fgSw').style.background=c;
+  document.getElementById('custColor').value=c;
+  document.querySelectorAll('.pc').forEach(d=>d.classList.toggle('sel',d.style.background===c||d.title===c));
+}
+function pickSw(t){S.cpTarget=t;const p=document.getElementById('cpick');p.value=t==='fg'?S.fg:S.bg;p.click();}
+function applyCp(){const v=document.getElementById('cpick').value;if(S.cpTarget==='fg'){setCol(v);}else{S.bg=v;document.getElementById('bgSw').style.background=v;}}
+
+// ═══════════════════════════════════════════════
+//  TOOL / MEDIUM
+// ═══════════════════════════════════════════════
+function setTool(t){
+  S.tool=t;
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  const b=document.getElementById('tb-'+t);if(b)b.classList.add('on');
+}
+function selMed(el){
+  document.querySelectorAll('.mb').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  S.medium=el.dataset.m;
+  // Auto-set sensible brush size + opacity per medium
+  const presets={
+    pencil_hb: {size:10,op:85,hard:80,flow:75},
+    pencil_2b: {size:12,op:80,hard:65,flow:70},
+    pencil_4b: {size:14,op:75,hard:50,flow:65},
+    charcoal:  {size:18,op:70,hard:40,flow:60},
+    cpencil:   {size:10,op:75,hard:70,flow:70},
+    crayon:    {size:14,op:80,hard:60,flow:75},
+    pastel:    {size:20,op:60,hard:30,flow:55},
+    chalk:     {size:14,op:65,hard:40,flow:60},
+    watercolor:{size:22,op:55,hard:20,flow:45},
+    oil:       {size:16,op:90,hard:75,flow:85},
+    acrylic:   {size:14,op:92,hard:80,flow:88},
+    gouache:   {size:12,op:95,hard:85,flow:90},
+    marker:    {size:12,op:80,hard:90,flow:85},
+    inkpen:    {size:8, op:95,hard:95,flow:95},
+    ballpoint: {size:6, op:70,hard:85,flow:75},
+    felttip:   {size:10,op:78,hard:70,flow:78},
+    eraser:    {size:18,op:80,hard:60,flow:80},
+    smudge:    {size:14,op:60,hard:50,flow:60},
+  };
+  const pr=presets[S.medium];
+  if(pr){
+    S.brushSize=pr.size; S.opacity=pr.op/100;
+    S.hardness=pr.hard/100; S.flow=pr.flow/100;
+    document.getElementById('slSize').value=pr.size;
+    document.getElementById('vSize').textContent=pr.size;
+    document.getElementById('slOp').value=pr.op;
+    document.getElementById('vOp').textContent=pr.op+'%';
+    document.getElementById('slHard').value=pr.hard;
+    document.getElementById('vHard').textContent=pr.hard+'%';
+    document.getElementById('slFlow').value=pr.flow;
+    document.getElementById('vFlow').textContent=pr.flow+'%';
+  }
+  if(S.medium==='eraser')setTool('eraser');
+  else setTool('brush');
+}
+
+// ═══════════════════════════════════════════════
+//  ZOOM
+// ═══════════════════════════════════════════════
+function applyZm(){
+  const w=document.getElementById('cvWrap');
+  w.style.transform=`scale(${S.zoom})`;
+  w.style.transformOrigin='center center';
+  document.getElementById('zLbl').textContent=Math.round(S.zoom*100)+'%';
+}
+function zmIn(){S.zoom=Math.min(8,S.zoom*1.25);applyZm();}
+function zmOut(){S.zoom=Math.max(.1,S.zoom/1.25);applyZm();}
+function zmFit(){
+  const a=document.getElementById('cvArea');
+  S.zoom=Math.min((a.clientWidth-40)/S.W,(a.clientHeight-40)/S.H,1);
+  applyZm();
+}
+
+// ═══════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════
+function getMerged(){
+  const mc=document.getElementById('mergeC');
+  const ctx=mc.getContext('2d');
+  ctx.clearRect(0,0,S.W,S.H);
+  ctx.fillStyle=PAPER_BG[S.paper]||'#f9f8f4';ctx.fillRect(0,0,S.W,S.H);
+  S.layers.forEach(l=>{if(l.vis){ctx.globalAlpha=l.opacity;ctx.drawImage(l.c,0,0);ctx.globalAlpha=1;}});
+  return mc;
+}
+function openShare(){
+  const mc=getMerged();
+  document.getElementById('shPrev').src=mc.toDataURL('image/png');
+  document.getElementById('shareModal').classList.add('show');
+}
+function closeShare(){document.getElementById('shareModal').classList.remove('show');}
+function dlArt(){
+  const a=document.createElement('a');a.download='artlab-'+Date.now()+'.png';
+  a.href=getMerged().toDataURL('image/png');a.click();
+}
+function printArt(){
+  const w=window.open('','_blank');
+  w.document.write(`<html><head><style>*{margin:0}body{display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;max-height:100vh}</style></head><body><img src="${getMerged().toDataURL()}" onload="window.print();window.close()"></body></html>`);
+  w.document.close();
+}
+function newCv(){document.getElementById('setupModal').style.display='flex';}
+
+// ═══════════════════════════════════════════════
+//  KEYBOARD
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  const cm=e.ctrlKey||e.metaKey;
+  if(cm&&e.key==='z'){e.preventDefault();e.shiftKey?redo():undo();}
+  if(cm&&e.key==='y'){e.preventDefault();redo();}
+  if(!cm){
+    ({b:()=>setTool('brush'),e:()=>setTool('eraser'),f:()=>setTool('fill'),
+      i:()=>setTool('eyedropper'),l:()=>setTool('line'),r:()=>setTool('rect'),c:()=>setTool('circle')}
+    [e.key]||(() => {}))();
+    if(e.key==='['){S.brushSize=Math.max(1,S.brushSize-2);document.getElementById('slSize').value=S.brushSize;document.getElementById('vSize').textContent=S.brushSize;}
+    if(e.key===']'){S.brushSize=Math.min(120,S.brushSize+2);document.getElementById('slSize').value=S.brushSize;document.getElementById('vSize').textContent=S.brushSize;}
+  }
+});
+document.getElementById('cvArea').addEventListener('wheel',e=>{
+  if(e.ctrlKey||e.metaKey){e.preventDefault();e.deltaY<0?zmIn():zmOut();}
+},{passive:false});
+</script>
+</body>
+</html>
