@@ -271,6 +271,67 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 .sh-btn{flex:1;min-width:80px;padding:9px;border-radius:7px;border:1px solid var(--border2);background:rgba(255,255,255,0.04);color:var(--text);font-size:10.5px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .16s;text-align:center;letter-spacing:.5px;}
 .sh-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold);background:var(--goldglow);}
 .sh-close{border-color:var(--border);color:var(--muted);}
+
+/* ═══════════════════════════════════════
+   MOBILE LAYOUT — canvas fills screen
+═══════════════════════════════════════ */
+@media(max-width:768px){
+
+  /* Hide right panel and left panel by default */
+  #rightPanel{ display:none; position:fixed; top:0; right:0; height:100%;
+    z-index:500; width:220px; overflow-y:auto;
+    box-shadow:-4px 0 20px rgba(0,0,0,0.5); }
+  #rightPanel.mob-open{ display:flex; }
+
+  #leftPanel{ display:none; position:fixed; top:54px; left:0;
+    z-index:500; height:auto; padding:8px 4px;
+    box-shadow:4px 0 20px rgba(0,0,0,0.5); border-radius:0 10px 10px 0; }
+  #leftPanel.mob-open{ display:flex; }
+
+  /* Medium bar scrolls horizontally — compact */
+  #medBar{ height:58px; }
+  .mb{ min-width:44px; padding:4px 6px; }
+  .mb-icon svg{ width:26px!important; height:26px!important; }
+  .mb-name{ font-size:6.5px; }
+  .mg-label{ font-size:7px; padding:0 5px; }
+
+  /* Canvas area fills everything */
+  #cvArea{ background:#111; }
+
+  /* Header compact */
+  #hdr{ height:44px; padding:0 8px; gap:6px; }
+  .hdr-logo{ font-size:16px!important; }
+  .hdr-btn{ padding:0 8px; font-size:9px; height:26px; }
+  #canvasTitle{ display:none; }
+
+  /* Footer compact */
+  #foot{ height:26px; font-size:9px; padding:0 8px; gap:6px; }
+
+  /* Floating action buttons */
+  #mobTools{
+    display:flex!important;
+    position:fixed; bottom:32px; left:8px;
+    flex-direction:column; gap:6px; z-index:400;
+  }
+  #mobPanel{
+    display:flex!important;
+    position:fixed; bottom:32px; right:8px;
+    flex-direction:column; gap:6px; z-index:400;
+  }
+  .mob-fab{
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(26,23,20,0.92);
+    border:1px solid rgba(201,168,76,0.4);
+    color:var(--gold); font-size:16px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,0.5);
+    backdrop-filter:blur(8px);
+  }
+  .mob-fab:active{ background:rgba(201,168,76,0.2); }
+}
+
+/* Hide floating buttons on desktop */
+#mobTools,#mobPanel{ display:none; }
 </style>
 </head>
 <body>
@@ -507,6 +568,8 @@ function unitToPx(v,u){
   const n=parseFloat(v)||100;
   return Math.round(u==='px'?n:u==='in'?n*DPI:u==='cm'?n/2.54*DPI:u==='mm'?n/25.4*DPI:n);
 }
+
+function isMobile(){ return window.innerWidth <= 768; }
 
 function startLab(){
   const sz=document.getElementById('selSize').value;
@@ -1019,7 +1082,8 @@ function zmIn(){S.zoom=Math.min(8,S.zoom*1.25);applyZm();}
 function zmOut(){S.zoom=Math.max(.1,S.zoom/1.25);applyZm();}
 function zmFit(){
   const a=document.getElementById('cvArea');
-  S.zoom=Math.min((a.clientWidth-40)/S.W,(a.clientHeight-40)/S.H,1);
+  const pad=isMobile()?8:40;
+  S.zoom=Math.min((a.clientWidth-pad)/S.W,(a.clientHeight-pad)/S.H,1);
   applyZm();
 }
 
@@ -1046,7 +1110,17 @@ function dlArt(){
 }
 function printArt(){
   const w=window.open('','_blank');
-  w.document.write(`<html><head><style>*{margin:0}body{display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;max-height:100vh}</style></head><body><img src="${getMerged().toDataURL()}" onload="window.print();window.close()"></body></html>`);
+  w.document.write(`<html><head><style>*{margin:0}body{display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;max-height:100vh}</style></head><body><img src="${getMerged().toDataURL()}" onload="window.print();window.close()">
+<!-- MOBILE FLOATING BUTTONS -->
+<div id="mobTools">
+  <div class="mob-fab" onclick="toggleMobLeft()" title="Tools">🛠</div>
+  <div class="mob-fab" onclick="zmFit()" title="Fit canvas">⊡</div>
+</div>
+<div id="mobPanel">
+  <div class="mob-fab" onclick="toggleMobRight()" title="Brushes & Layers">🎨</div>
+  <div class="mob-fab" onclick="openShare()" title="Share">↑</div>
+</div>
+</body></html>`);
   w.document.close();
 }
 function newCv(){document.getElementById('setupModal').style.display='flex';}
@@ -1069,6 +1143,31 @@ document.addEventListener('keydown',e=>{
 document.getElementById('cvArea').addEventListener('wheel',e=>{
   if(e.ctrlKey||e.metaKey){e.preventDefault();e.deltaY<0?zmIn():zmOut();}
 },{passive:false});
+
+// ── MOBILE PANEL TOGGLES ─────────────────────────
+function toggleMobLeft(){
+  document.getElementById('leftPanel').classList.toggle('mob-open');
+  document.getElementById('rightPanel').classList.remove('mob-open');
+}
+function toggleMobRight(){
+  document.getElementById('rightPanel').classList.toggle('mob-open');
+  document.getElementById('leftPanel').classList.remove('mob-open');
+}
+// Close panels when tapping canvas on mobile
+document.getElementById('cvArea').addEventListener('touchstart',()=>{
+  document.getElementById('leftPanel').classList.remove('mob-open');
+  document.getElementById('rightPanel').classList.remove('mob-open');
+},{passive:true});
 </script>
+
+<!-- MOBILE FLOATING BUTTONS -->
+<div id="mobTools">
+  <div class="mob-fab" onclick="toggleMobLeft()" title="Tools">🛠</div>
+  <div class="mob-fab" onclick="zmFit()" title="Fit canvas">⊡</div>
+</div>
+<div id="mobPanel">
+  <div class="mob-fab" onclick="toggleMobRight()" title="Brushes & Layers">🎨</div>
+  <div class="mob-fab" onclick="openShare()" title="Share">↑</div>
+</div>
 </body>
 </html>
