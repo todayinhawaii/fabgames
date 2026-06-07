@@ -553,7 +553,7 @@
     <div id="historyList"></div>
   </div>
 
-  <div class="back"><a href="/games">← Back to Games Hub 🎮</a></div>
+  <div class="back"><a href="/play">← Back to Games Hub 🎮</a></div>
 </div>
 
 <script>
@@ -887,8 +887,8 @@ function updateHistory(){
 // ── Share ──────────────────────────────────────
 function shareFortune(){
   if(!currentFortune) return;
-  const txt = `🔮 My Fortune Roulette reading: "${currentFortune.text}" ✨ What does YOUR fortune say? todayinhawaii.com/fortune`;
-  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://www.todayinhawaii.com/fortune')+'&quote='+encodeURIComponent(txt),'_blank');
+  const txt = `🔮 My Fortune Roulette reading: "${currentFortune.text}" ✨ What does YOUR fortune say? fab.games/fortune`;
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('/fortune')+'&quote='+encodeURIComponent(txt),'_blank');
 }
 
 // ── Celebration ───────────────────────────────
