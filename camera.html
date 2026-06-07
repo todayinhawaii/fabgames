@@ -306,7 +306,7 @@ video,canvas{
 
   <!-- Viewfinder -->
   <div class="viewfinder-wrap" id="viewfinderWrap">
-    <a href="/games" class="hub-link">← Games</a>
+    <a href="/play" class="hub-link">← Games</a>
     <video id="preview" autoplay playsinline muted></video>
     <canvas id="overlay-canvas"></canvas>
     <div class="vf-corner tl"></div>
@@ -819,7 +819,7 @@ function capturePhoto(){
   cctx.font=`bold ${Math.floor(cap.width*0.028)}px 'Courier New'`;
   cctx.fillStyle='rgba(255,255,255,0.6)';
   cctx.textAlign='left';
-  cctx.fillText('📷 '+selectedFilter.name+' — todayinhawaii.com',
+  cctx.fillText('📷 '+selectedFilter.name+' — fab.games',
     cap.width*0.025, cap.height*0.97);
 
   capturedDataURL=cap.toDataURL('image/jpeg',0.92);
