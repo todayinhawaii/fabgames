@@ -83,6 +83,10 @@ def veggies():
 def pinball():
     return send_from_directory('.', 'pinball.html')
 
+@app.route('/games.js')
+def games_js():
+    return send_from_directory('.', 'games.js', mimetype='application/javascript')
+
 @app.route('/artlab')
 def artlab():
     return send_from_directory('.', 'artlab_v2.html')
