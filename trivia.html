@@ -274,7 +274,7 @@
 
   </div>
 
-  <div class="back"><a href="/games">← Back to Hawaii Games Hub 🎮</a></div>
+  <div class="back"><a href="/play">← Back to Hawaii Games Hub 🎮</a></div>
 </div>
 
 <!-- Result Overlay -->
@@ -566,7 +566,7 @@ function shareScore() {
   const txt = myRank === 1
     ? '🥇 I scored ' + score.toLocaleString() + ' points on the Hawaii Trivia Challenge and I\'m #1!! Can YOU beat me? 🌺'
     : '🌺 I scored ' + score.toLocaleString() + ' points (' + correct + '/' + QUESTIONS_PER_GAME + ' correct) on the Hawaii Trivia Challenge from ' + playerLoc + '! Can you beat me? 🏆';
-  window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://www.todayinhawaii.com/trivia') + '&quote=' + encodeURIComponent(txt), '_blank');
+  window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('/trivia') + '&quote=' + encodeURIComponent(txt), '_blank');
 }
 
 // ── Sound ──────────────────────────────────────
