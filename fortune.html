@@ -505,20 +505,6 @@
   <div class="spin-count" id="spinCount">🌟 Your destiny awaits...</div>
 
   <!-- Spin button -->
-  <div class="signup-form">
-            <span class="signup-label">Your Full Name</span>
-            <input class="signup-input" id="playerName"
-              placeholder="e.g. Sarah Johnson" maxlength="30"
-              onkeydown="if(event.key==='Enter')document.getElementById('playerUser').focus()">
-            <span class="signup-label">Choose a Username</span>
-            <input class="signup-input" id="playerUser"
-              placeholder="e.g. SurfQueen808" maxlength="20"
-              onkeydown="if(event.key==='Enter')document.getElementById('playerLoc').focus()">
-            <span class="signup-label">Country, City or Island 🌺</span>
-            <input class="signup-input" id="playerLoc"
-              placeholder="e.g. Maui, Hawaii" maxlength="30"
-              onkeydown="if(event.key==='Enter')beginGame()">
-          </div>
           <button class="spin-btn glowing" id="spinBtn" onclick="beginGame()">
     🔮 SPIN YOUR FORTUNE!
   </button>
@@ -542,6 +528,23 @@
   </div>
 
   <!-- Share -->
+
+  <!-- Name inputs — below fortune box -->
+  <div class="signup-form" id="nameForm" style="margin:12px 0 4px;">
+            <span class="signup-label">Your Full Name</span>
+            <input class="signup-input" id="playerName"
+              placeholder="e.g. Sarah Johnson" maxlength="30"
+              onkeydown="if(event.key==='Enter')document.getElementById('playerUser').focus()">
+            <span class="signup-label">Choose a Username</span>
+            <input class="signup-input" id="playerUser"
+              placeholder="e.g. SurfQueen808" maxlength="20"
+              onkeydown="if(event.key==='Enter')document.getElementById('playerLoc').focus()">
+            <span class="signup-label">Country, City or Island 🌺</span>
+            <input class="signup-input" id="playerLoc"
+              placeholder="e.g. Maui, Hawaii" maxlength="30"
+              onkeydown="if(event.key==='Enter')beginGame()">
+          </div>
+
   <button class="share-btn" id="shareBtn" onclick="shareFortune()">
     📘 Share My Fortune!
   </button>
