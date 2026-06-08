@@ -354,7 +354,7 @@ video,canvas{
   <img id="capturedImg" src="" alt="Captured photo">
   <div class="photo-label" id="photoLabel">📷 The Duke</div>
   <div class="photo-btns">
-    <button class="photo-btn save" onclick="savePhoto()">💾 Save to Device</button>
+    <button class="photo-btn save" onclick="autoSaveToGallery()">💾 Save to Gallery</button>
     <button class="photo-btn close" onclick="closeModal()">✕ Retake</button>
   </div>
 </div>
@@ -1024,6 +1024,63 @@ function showPhoto(){
   document.getElementById('photoLabel').textContent='📷 '+selectedFilter.name;
   document.getElementById('photoModal').classList.add('show');
   playShutter();
+  // Auto-save to gallery immediately!
+  autoSaveToGallery();
+}
+
+async function autoSaveToGallery(){
+  try{
+    // Get the blob from the captured data
+    let blob;
+    if(capturedDataURL.startsWith('blob:')){
+      const r=await fetch(capturedDataURL);
+      blob=await r.blob();
+    } else {
+      // Convert dataURL to blob
+      const res=await fetch(capturedDataURL);
+      blob=await res.blob();
+    }
+    const filename='FilmLab-'+selectedFilter.name.replace(/\s+/g,'-')+'-'+Date.now()+'.jpg';
+
+    // Method 1: Web Share with file (Samsung native save)
+    if(navigator.share && navigator.canShare){
+      const file=new File([blob],filename,{type:'image/jpeg'});
+      if(navigator.canShare({files:[file]})){
+        try{
+          await navigator.share({
+            files:[file],
+            title:'Film Lab — '+selectedFilter.name,
+            text:'Shot with Film Lab on fab.games 📷'
+          });
+          // Update button to show saved
+          const saveBtn=document.querySelector('.photo-btn.save');
+          if(saveBtn){saveBtn.textContent='✅ Shared!';}
+          return;
+        }catch(e){
+          if(e.name==='AbortError') return; // User cancelled share sheet
+        }
+      }
+    }
+
+    // Method 2: Programmatic download (goes to Downloads → Gallery picks it up)
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=filename;
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+
+    // Update button
+    const saveBtn=document.querySelector('.photo-btn.save');
+    if(saveBtn){saveBtn.textContent='✅ Saved!';}
+    setTimeout(()=>{if(saveBtn)saveBtn.textContent='💾 Save to Device';},3000);
+
+  }catch(e){
+    console.error('Auto-save failed:',e);
+  }
 }
 
 
