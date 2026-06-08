@@ -810,18 +810,8 @@ async function startCamera(){
     // Explicitly play - required on mobile browsers!
     try{ await video.play(); }catch(e){}
 
-    // Android Chrome fix: multiple repaint strategies
-    video.style.opacity='0.99';
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{ video.style.opacity='1'; }));
-
-    // Strategy 2: nudge once after 800ms if video not yet showing
-    setTimeout(async ()=>{
-      if(video.videoWidth===0){
-        try{ await video.play(); }catch(e){}
-        video.style.opacity='0.99';
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{ video.style.opacity='1'; }));
-      }
-    },800);
+    // Force GPU layer once - no opacity toggling
+    video.style.transform = facingMode==='user' ? 'scale(-1,1) translateZ(0)' : 'translateZ(0)';
 
     video.onloadedmetadata=()=>{
       document.getElementById('noCamera').style.display='none';
@@ -873,7 +863,9 @@ function startRender(){
 }
 
 function applyVideoFilter(){
-  video.style.filter=selectedFilter.css;
+  // Do NOT apply CSS filter to video - breaks Samsung viewfinder
+  // Filter applied at capture time only
+  video.style.filter='none';
 }
 
 // Watch for filter changes
@@ -1133,7 +1125,8 @@ function getPinchDist(e){
 // Apply zoom to video via CSS transform + hardware zoom if available
 async function applyZoom(z){
   currentZoom=Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
-  video.style.transform=`scaleX(${facingMode==='user'?-currentZoom:currentZoom}) scaleY(${currentZoom})`;
+  const flip=facingMode==='user'?-1:1;
+  video.style.transform=`scale(${flip*currentZoom}, ${currentZoom}) translateZ(0)`;
   // Try hardware zoom first
   if(stream){
     try{
