@@ -295,16 +295,15 @@
     @keyframes tpop{0%{opacity:0;transform:translate(-50%,-8px);}12%{opacity:1;transform:translate(-50%,0);}78%{opacity:1;}100%{opacity:0;}}
   
 @keyframes tabGlow{0%,100%{box-shadow:3px 0 12px rgba(255,215,0,0.2);}50%{box-shadow:3px 0 22px rgba(255,215,0,0.55);}}
-#mobToolBtn{display:none;position:fixed;left:0;top:calc(50% + 96px);transform:translateY(-50%);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:22px;padding:10px 0;background:rgba(20,10,30,0.95);border:1px solid rgba(255,105,180,0.45);border-left:none;border-radius:0 10px 10px 0;cursor:pointer;animation:tabGlow 2.5s ease-in-out infinite;}
-#mobTabLabel{font-size:6px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,105,180,0.9);writing-mode:vertical-rl;transform:rotate(180deg);}
-#mobTabArrow{font-size:11px;color:rgba(255,105,180,0.8);transition:transform 0.28s;}
+#mobToolBtn{display:none;}
+
+
 @keyframes slimePulse{0%,100%{box-shadow:0 0 8px rgba(255,215,0,0.4);}50%{box-shadow:0 0 18px rgba(255,215,0,0.9);}}
 @media(max-width:768px){
-  #toolWrap{transform:translateX(-100%)!important;transition:transform 0.28s ease;}
+  #toolWrap{transform:translateX(calc(-100% + 36px))!important;transition:transform 0.28s ease;}
   #toolWrap.mob-open{transform:translateX(0)!important;}
-  #tbToggle{display:none!important;}
-  #mobToolBtn{display:flex!important;}
-  #toolBar{max-width:148px;padding:8px 4px 12px;}
+  #tbToggle{display:flex!important;}
+  #toolBar{max-width:148px;padding:8px 4px 12px;overflow-y:auto;max-height:calc(100svh - 48px - 60px);}
   .tool-btn{font-size:13px;padding:6px 4px;}
   .tlbl{font-size:10px;}
 }
@@ -816,6 +815,12 @@ document.getElementById('brushSz').addEventListener('input',e=>{brushSz=parseInt
 
 let tbVisible=true;
 function toggleToolbar(){
+  const isMob=window.innerWidth<=768;
+  if(isMob){
+    const open=document.getElementById('toolWrap').classList.toggle('mob-open');
+    document.getElementById('tbToggle').textContent=open?'◀':'▶';
+    return;
+  }
   tbVisible=!tbVisible;
   document.getElementById('toolWrap').classList.toggle('hidden',!tbVisible);
   document.getElementById('toolBar').classList.toggle('hidden',!tbVisible);
@@ -1518,16 +1523,12 @@ loop();
 
 showToast('🧪 Draw inside the slime — it squishes and moves your art!');
 </script>
-<div id="mobToolBtn" onclick="toggleMobTools()">
-  <div style="font-size:12px;">🎨</div>
-  <div id="mobTabLabel">TOOLS</div>
-  <div id="mobTabArrow">›</div>
-</div>
+
 </body>
 </html>
 
 <script>
-function toggleMobTools(){
+function toggleMobTools(){document.getElementById("tbToggle").click();return;
   const w=document.getElementById('toolWrap');
   const open=w.classList.toggle('mob-open');
   const arr=document.getElementById('mobTabArrow');
