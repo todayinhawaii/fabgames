@@ -1032,6 +1032,24 @@ let repaintCheck=setInterval(()=>{
   }
 },500);
 
+
+// ── SHUTTER SOUND ─────────────────────────────────
+function playShutter(){
+  try{
+    const ac=new(window.AudioContext||window.webkitAudioContext)();
+    // Click sound
+    const buf=ac.createBuffer(1,ac.sampleRate*0.1,ac.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(ac.sampleRate*0.02));
+    const src=ac.createBufferSource();
+    src.buffer=buf;
+    const g=ac.createGain();
+    g.gain.setValueAtTime(0.3,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.1);
+    src.connect(g);g.connect(ac.destination);
+    src.start();
+  }catch(e){}
+}
 </script>
 </body>
 </html>
