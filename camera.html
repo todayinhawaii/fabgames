@@ -204,6 +204,7 @@ video,canvas{
 }
 .filter-thumb{
   height:100px;width:100%;flex-shrink:0;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;background:#0a0a0a;
 }
 .filter-thumb canvas{
   width:100%;height:100%;
@@ -595,7 +596,7 @@ Object.keys(FILTERS).forEach(era=>{
 
 // ── VINTAGE CAMERA SVGs BY ERA ──────────────────────
 const CAMERA_SVGS = {
-  '1920s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+  '1920s': `<svg viewBox="0 0 96 66" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <rect width="96" height="66" fill="#2a1a0a"/>
     <rect x="8" y="14" width="58" height="38" rx="3" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
     <rect x="12" y="18" width="50" height="30" rx="2" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
@@ -607,7 +608,7 @@ const CAMERA_SVGS = {
     <rect x="16" y="8" width="20" height="8" rx="1" fill="none" stroke="#c9a84c" stroke-width="1"/>
     <circle cx="55" cy="24" r="3" fill="none" stroke="#c9a84c" stroke-width="1"/>
   </svg>`,
-  '1930s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+  '1930s': `<svg viewBox="0 0 96 66" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <rect width="96" height="66" fill="#1a0a1a"/>
     <rect x="10" y="12" width="76" height="42" rx="4" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
     <circle cx="48" cy="33" r="14" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
@@ -619,7 +620,7 @@ const CAMERA_SVGS = {
     <line x1="14" y1="26" x2="82" y2="26" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
     <rect x="22" y="6" width="52" height="7" rx="2" fill="none" stroke="#c9a84c" stroke-width="1"/>
   </svg>`,
-  '1950s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+  '1950s': `<svg viewBox="0 0 96 66" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <rect width="96" height="66" fill="#0a1a0a"/>
     <rect x="6" y="18" width="84" height="34" rx="5" fill="none" stroke="#44ff88" stroke-width="1.5"/>
     <circle cx="36" cy="35" r="13" fill="none" stroke="#44ff88" stroke-width="1.5"/>
@@ -631,7 +632,7 @@ const CAMERA_SVGS = {
     <rect x="14" y="10" width="30" height="9" rx="2" fill="none" stroke="#44ff88" stroke-width="1"/>
     <circle cx="76" cy="14" r="4" fill="none" stroke="#44ff88" stroke-width="1"/>
   </svg>`,
-  '1960s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+  '1960s': `<svg viewBox="0 0 96 66" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <rect width="96" height="66" fill="#1a0a2a"/>
     <rect x="8" y="16" width="80" height="36" rx="6" fill="none" stroke="#ff69b4" stroke-width="1.5"/>
     <rect x="8" y="16" width="80" height="36" rx="6" fill="rgba(255,105,180,0.04)"/>
@@ -643,7 +644,7 @@ const CAMERA_SVGS = {
     <rect x="14" y="8" width="26" height="9" rx="3" fill="none" stroke="#ff69b4" stroke-width="1"/>
     <line x1="14" y1="22" x2="14" y2="50" stroke="#ff69b4" stroke-width="1.5" opacity="0.5"/>
   </svg>`,
-  '1970s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+  '1970s': `<svg viewBox="0 0 96 66" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <rect width="96" height="66" fill="#1a1000"/>
     <rect x="5" y="15" width="86" height="40" rx="4" fill="none" stroke="#ff8800" stroke-width="1.5"/>
     <circle cx="35" cy="35" r="14" fill="none" stroke="#ff8800" stroke-width="2"/>
@@ -655,7 +656,7 @@ const CAMERA_SVGS = {
     <circle cx="80" cy="45" r="4" fill="none" stroke="#ff8800" stroke-width="1"/>
     <line x1="72" y1="15" x2="72" y2="55" stroke="#ff8800" stroke-width="0.5" opacity="0.4"/>
   </svg>`,
-  '1980s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+  '1980s': `<svg viewBox="0 0 96 66" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <rect width="96" height="66" fill="#001a2a"/>
     <rect x="4" y="12" width="88" height="46" rx="3" fill="none" stroke="#00ffff" stroke-width="1.5"/>
     <rect x="10" y="18" width="38" height="28" rx="2" fill="none" stroke="#00ffff" stroke-width="1"/>
@@ -668,7 +669,7 @@ const CAMERA_SVGS = {
     <rect x="68" y="40" width="10" height="10" rx="2" fill="none" stroke="#00ffff" stroke-width="0.8"/>
     <rect x="82" y="40" width="6" height="10" rx="1" fill="none" stroke="#00ffff" stroke-width="0.8"/>
   </svg>`,
-  '1990s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+  '1990s': `<svg viewBox="0 0 96 66" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <rect width="96" height="66" fill="#0a0a1a"/>
     <rect x="6" y="10" width="84" height="50" rx="8" fill="none" stroke="#87ceeb" stroke-width="1.5"/>
     <rect x="6" y="10" width="84" height="50" rx="8" fill="rgba(135,206,235,0.03)"/>
@@ -695,17 +696,15 @@ function buildFilterCards(era){
     const card=document.createElement('div');
     card.className='filter-card'+(f===selectedFilter?' selected':'');
     card.innerHTML=`
-      <div class="filter-thumb">
-        <canvas id="thumb-${era.replace(/[^a-z0-9]/gi,'')}-${i}" width="96" height="66"></canvas>
+      <div class="filter-thumb" style="background:#000;display:flex;align-items:center;justify-content:center;">
+        ${getCameraSVG(era)}
       </div>
       <div class="filter-info">
-        <div class="filter-fname">${f.name}</div>
-        <div class="filter-fdate">${f.date.split(' ')[0]}</div>
+        <div class="filter-fname" style="font-size:13px;font-weight:700;color:#f5edd6;">${f.name}</div>
+        <div class="filter-fdate" style="font-size:11px;color:rgba(245,237,214,0.6);">${f.date}</div>
       </div>`;
     card.onclick=()=>selectFilter(f,card);
     scroll.appendChild(card);
-    // Draw thumb preview
-    setTimeout(()=>drawThumb(era,i,f),50);
   });
 }
 
@@ -767,8 +766,12 @@ function selectFilter(f,card){
 async function startCamera(){
   try{
     if(stream){ stream.getTracks().forEach(t=>t.stop()); }
+    // Front camera: avoid strict size constraints that can fail on mobile
+    const videoConstraints = facingMode==='user'
+      ? {facingMode:{ideal:'user'}}
+      : {facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080}};
     stream = await navigator.mediaDevices.getUserMedia({
-      video:{facingMode, width:{ideal:1920}, height:{ideal:1080}},
+      video: videoConstraints,
       audio:false
     });
     video.srcObject=stream;
