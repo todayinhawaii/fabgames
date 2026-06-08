@@ -308,6 +308,7 @@ video,canvas{
   <div class="viewfinder-wrap" id="viewfinderWrap">
     <a href="/play" class="hub-link">← Games</a>
     <video id="preview" autoplay playsinline muted></video>
+<canvas id="cap-canvas" style="display:none;"></canvas>
     <canvas id="overlay-canvas"></canvas>
     <div class="vf-corner tl"></div>
     <div class="vf-corner tr"></div>
@@ -570,6 +571,8 @@ let rafId = null;
 let capturedDataURL = null;
 const video  = document.getElementById('preview');
 const canvas = document.getElementById('overlay-canvas');
+const capCanvas = document.getElementById('cap-canvas');
+const capCtx = capCanvas.getContext('2d');
 const ctx    = canvas.getContext('2d');
 
 // ── FILM STRIP ────────────────────────────────────────────
@@ -800,12 +803,21 @@ function startRender(){
   if(rafId) cancelAnimationFrame(rafId);
   function render(){
     if(video.readyState>=2){
+      // Sync capture canvas size
+      if(capCanvas.width!==video.videoWidth||capCanvas.height!==video.videoHeight){
+        capCanvas.width=video.videoWidth||320;
+        capCanvas.height=video.videoHeight||240;
+      }
+      // Draw video+filter to capture canvas every frame
+      try{
+        capCtx.filter=selectedFilter.css||'none';
+        capCtx.drawImage(video,0,0,capCanvas.width,capCanvas.height);
+        capCtx.filter='none';
+      }catch(e){}
+
       ctx.clearRect(0,0,canvas.width,canvas.height);
-      // Apply grain overlay
       applyGrain(selectedFilter.grain);
-      // Apply vignette
       applyVignette(selectedFilter.vignette);
-      // Apply warm/cool tint
       if(selectedFilter.warm!==0) applyWarmTint(selectedFilter.warm);
     }
     rafId=requestAnimationFrame(render);
@@ -870,31 +882,32 @@ function capturePhoto(){
 
   // Draw video + filter + overlays to a capture canvas
   const cap=document.createElement('canvas');
-  const overlayCvs=document.getElementById('overlay-canvas');
-  const vid=document.getElementById('preview');
-  cap.width = vid?.videoWidth || overlayCvs?.width || 1280;
-  cap.height = vid?.videoHeight || overlayCvs?.height || 720;
+  const capCvsEl=document.getElementById('cap-canvas');
+  cap.width = capCvsEl?.width || video.videoWidth || 1280;
+  cap.height = capCvsEl?.height || video.videoHeight || 720;
   const cctx=cap.getContext('2d');
 
-  // Step 1: Draw VIDEO with CSS filter applied
-  const vidEl=document.getElementById('preview');
-  if(vidEl && vidEl.readyState>=2){
-    cctx.filter = selectedFilter.css||'none';
-    // Mirror if front camera
+  // Draw from pre-rendered capture canvas (video+filter already applied in render loop!)
+  const capCvs=document.getElementById('cap-canvas');
+  if(capCvs && capCvs.width>0){
+    // Mirror for front camera
     if(facingMode==='user'){
-      cctx.save();
-      cctx.scale(-1,1);
-      cctx.drawImage(vidEl,-cap.width,0,cap.width,cap.height);
+      cctx.save();cctx.scale(-1,1);
+      cctx.drawImage(capCvs,-cap.width,0,cap.width,cap.height);
       cctx.restore();
     } else {
-      cctx.drawImage(vidEl,0,0,cap.width,cap.height);
+      cctx.drawImage(capCvs,0,0,cap.width,cap.height);
     }
+    // Add overlay (grain/vignette) on top
+    const overlayEl=document.getElementById('overlay-canvas');
+    if(overlayEl && overlayEl.width>0){
+      cctx.drawImage(overlayEl,0,0,cap.width,cap.height);
+    }
+  } else {
+    // Fallback
+    cctx.filter=selectedFilter.css||'none';
+    cctx.drawImage(video,0,0,cap.width,cap.height);
     cctx.filter='none';
-  }
-  // Step 2: Draw overlay canvas (grain/vignette/tint) on top
-  const overlayEl=document.getElementById('overlay-canvas');
-  if(overlayEl && overlayEl.width>0){
-    cctx.drawImage(overlayEl,0,0,cap.width,cap.height);
   }
 
   // Add grain
