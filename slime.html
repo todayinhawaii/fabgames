@@ -446,7 +446,7 @@
     <h3>✍️ Write in your slime!</h3>
     <input type="text" id="tInput" placeholder="I ❤️ Slime! 🌺" maxlength="30">
     <select id="fSel">
-      <option value="900 42px Arial Black, Arial, sans-serif">Bold Modern</option>
+      <option value="900 42px 'Arial Black', Arial, sans-serif">Bold Modern</option>
       <option value="900 42px Georgia">Bold Serif</option>
       <option value="900 38px 'Courier New'">Typewriter</option>
       <option value="italic 900 42px Georgia">Fancy Italic</option>
@@ -531,11 +531,12 @@ function physicsTick(){
     // ── Idle breathing animation ──────────────────────
     // Slow gentle sine wave rippling around the blob
     const idleAngle = (i/N)*Math.PI*2;
-    const idleWave  = Math.sin(idleTick*0.018 + idleAngle*2) * 0.09;
-    const idlePush  = Math.cos(idleTick*0.012 + idleAngle)   * 0.07;
+    const idleWave  = Math.sin(idleTick*0.022 + idleAngle*2) * 0.22;
+    const idlePush  = Math.cos(idleTick*0.015 + idleAngle*3) * 0.16;
+    const idleSlow  = Math.sin(idleTick*0.008 + idleAngle)   * 0.12;
     const idleNx = Math.cos(idleAngle), idleNy = Math.sin(idleAngle);
-    fx += idleNx * idleWave + idleNy * idlePush;
-    fy += idleNy * idleWave - idleNx * idlePush;
+    fx += idleNx * idleWave + idleNy * idlePush + idleNx * idleSlow;
+    fy += idleNy * idleWave - idleNx * idlePush + idleNy * idleSlow;
     // ───────────────────────────────────────────────────
     p.vx=(p.vx+fx)*DAMP; p.vy=(p.vy+fy)*DAMP;
     p.x+=p.vx; p.y+=p.vy;
@@ -1293,7 +1294,7 @@ loop();
   const div=document.createElement('div');
   div.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0.001;font-size:42px;pointer-events:none;';
   div.innerHTML=
-    '<span style="font:900 42px Arial Black, Arial">Aa</span>'+
+    '<span style="font:900 42px \'Arial Black\', Arial">Aa</span>'+
     '<span style="font:900 42px Georgia">Aa</span>'+
     '<span style="font:900 38px Courier New">Aa</span>'+
     '<span style="font:italic 900 42px Georgia">Aa</span>'+
