@@ -370,7 +370,12 @@
     <button class="stab on" onclick="stab('colors')">🎨 Slime Colors</button>
     <button class="stab"    onclick="stab('addins')">✨ Add-ins</button>
   </div>
-  <div id="sp-colors" class="spanel on"><div class="srow" id="colorRow"></div></div>
+  <div id="sp-colors" class="spanel on">
+  <div style="font-size:8px;color:#aaa;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:4px 8px 2px;">🎨 Brush Color</div>
+  <div id="brushColorRow" style="display:flex;flex-wrap:wrap;gap:5px;padding:4px 8px 8px;"></div>
+  <div style="font-size:8px;color:#aaa;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;">🟢 Slime Color</div>
+  <div class="srow" id="colorRow"></div>
+</div>
   <div id="sp-addins" class="spanel"><div class="srow" id="addinsRow"></div></div>
   <div class="arow">
     <button class="abtn bsq" onclick="doSquish()">💦 SQUISH</button>
@@ -430,7 +435,7 @@
   <!-- Buttons -->
   <div style="display:flex;gap:8px;">
     <button onclick="closeTxt()" style="flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.08);color:#aaa;font-size:13px;font-weight:700;cursor:pointer;">Close</button>
-    <button onclick="addText()" style="flex:1;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#ff69b4,#a855f7);color:#fff;font-size:13px;font-weight:700;cursor:pointer;" id="addBtn">Add ✓</button>
+    <button onclick="addText()" style="flex:1;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#ff69b4,#a855f7);color:#fff;font-size:13px;font-weight:700;cursor:pointer;" id="addBtn">+ Add New Type Layer</button>
   </div>
 </div>
 </div>
@@ -488,6 +493,7 @@ function reNatural(){
   for(let i=0;i<N;i++){const a=(i/N)*Math.PI*2;nPts[i].x=CX+Math.cos(a)*NR;nPts[i].y=CY+Math.sin(a)*NR;}
 }
 initSlime();
+  initBrushColors();
 
 const NAT_AREA=Math.PI*NR*NR;
 const NAT_DIST=NR*(2*Math.PI/N);
@@ -926,15 +932,18 @@ canvas.addEventListener('pointerdown',e=>{
 },{passive:false});
 
 canvas.addEventListener('pointermove',e=>{
-  if(e.target !== canvas && !fingers[e.pointerId]) return;
-  if(!fingers[e.pointerId]) return;
-  e.preventDefault();
-  const pos=getPos(e);
+  // Text drag FIRST — before any finger gates
   if(typeof draggingTextIdx!=='undefined' && draggingTextIdx>=0){
+    e.preventDefault();
+    const pos=getPos(e);
     const m=textMsgs[draggingTextIdx];
     if(m){m.x=pos.x-textDragOX; m.y=pos.y-textDragOY;}
     return;
   }
+  if(e.target !== canvas && !fingers[e.pointerId]) return;
+  if(!fingers[e.pointerId]) return;
+  e.preventDefault();
+  const pos=getPos(e);
   const prev=fingers[e.pointerId];
   const dx=pos.x-prev.x, dy=pos.y-prev.y;
   fingers[e.pointerId]={...pos};
@@ -947,9 +956,9 @@ canvas.addEventListener('pointermove',e=>{
 canvas.addEventListener('pointerup',e=>{
   delete fingers[e.pointerId];
   if(isPointerDown) finishStroke();
-  isPointerDown=false; playRelease();
+  isPointerDown=false; draggingTextIdx=-1; playRelease();
 });
-canvas.addEventListener('pointercancel',e=>{delete fingers[e.pointerId];isPointerDown=false;finishStroke();});
+canvas.addEventListener('pointercancel',e=>{delete fingers[e.pointerId];draggingTextIdx=-1;isPointerDown=false;finishStroke();});
 
 function getPos(e){
   const r=canvas.getBoundingClientRect();
@@ -1025,7 +1034,7 @@ function addText(){
   const sz=parseInt(document.getElementById('tSize').value)||60;
   const op=parseInt(document.getElementById('tOp').value)/100;
   const col=document.getElementById('tColor').value||'#ffffff';
-  const offsets=[0,-NR*0.35,NR*0.35,-NR*0.6,NR*0.6];
+  const offsets=[-NR*0.18,-NR*0.45,NR*0.3,-NR*0.6,NR*0.5];
   if(editIdx>=0 && textMsgs[editIdx]){
     // Update existing
     const m=textMsgs[editIdx];
@@ -1262,6 +1271,35 @@ let idleTick=0;
 function loop(){idleTick++;physicsTick();render();requestAnimationFrame(loop);}
 
 // ── UI ─────────────────────────────────────────
+// ── BRUSH COLORS ───────────────────────────────
+function initBrushColors(){
+  const brow=document.getElementById('brushColorRow');
+  if(!brow)return;
+  const cols=['#ffffff','#000000','#ff3366','#ff8800','#ffdd00','#44ff66',
+    '#00ccff','#aa44ff','#ff44cc','#884422','#aaaaaa','#ffaaaa'];
+  cols.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.style.cssText='width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);cursor:pointer;background:'+c+';flex-shrink:0;';
+    btn.title=c;
+    btn.onclick=()=>{
+      drawColor=c;
+      // Update brush preview
+      updatePreview();
+      // Highlight selected
+      brow.querySelectorAll('button').forEach(b=>b.style.borderColor='rgba(255,255,255,0.2)');
+      btn.style.borderColor='#fff';
+      btn.style.boxShadow='0 0 8px '+c;
+    };
+    brow.appendChild(btn);
+  });
+  // Custom color picker
+  const custom=document.createElement('input');
+  custom.type='color'; custom.value='#ff3366';
+  custom.style.cssText='width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);cursor:pointer;padding:0;background:none;flex-shrink:0;';
+  custom.oninput=()=>{drawColor=custom.value;updatePreview();};
+  brow.appendChild(custom);
+}
+
 const COLORS=[
   {l:'Green',i:'🟢',r:0,g:200,b:80},{l:'Purple',i:'🟣',r:160,g:32,b:240},
   {l:'Pink',i:'🩷',r:255,g:80,b:180},{l:'Blue',i:'🔵',r:30,g:140,b:255},
