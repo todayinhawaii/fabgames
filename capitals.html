@@ -129,6 +129,7 @@ body{
   transform-style:preserve-3d;
   transition:transform 0.8s cubic-bezier(0.23,1,0.32,1);
   flex-shrink:0;
+  opacity:1; /* always visible - never let animation leave it at 0 */
 }
 .card-wrap.flip{transform:rotateY(180deg);}
 .card-face{
@@ -271,7 +272,7 @@ body{
 #timerWrap{
   position:relative;
   z-index:10;
-  margin-bottom:6px;
+  display:inline-block;
 }
 #timerSvg{width:44px;height:44px;filter:drop-shadow(0 0 8px rgba(201,168,76,0.5));}
 
@@ -290,12 +291,12 @@ body{
 }
 
 /* SLIDE ANIMATIONS */
-@keyframes slideInRight{from{transform:translateX(120%) rotate(8deg);opacity:0;}to{transform:translateX(0) rotate(0);opacity:1;}}
-@keyframes slideInLeft{from{transform:translateX(-120%) rotate(-8deg);opacity:0;}to{transform:translateX(0) rotate(0);opacity:1;}}
-@keyframes slideOutLeft{from{transform:translateX(0) rotate(0);opacity:1;}to{transform:translateX(-120%) rotate(-8deg);opacity:0;}}
-@keyframes slideOutRight{from{transform:translateX(0) rotate(0);opacity:1;}to{transform:translateX(120%) rotate(8deg);opacity:0;}}
-.slide-in{animation:slideInRight 0.6s cubic-bezier(0.23,1,0.32,1) forwards;}
-.slide-out{animation:slideOutLeft 0.5s cubic-bezier(0.23,1,0.32,1) forwards;}
+@keyframes slideInRight{from{transform:translateX(110%) rotate(6deg);}to{transform:translateX(0) rotate(0);}}
+@keyframes slideInLeft{from{transform:translateX(-110%) rotate(-6deg);}to{transform:translateX(0) rotate(0);}}
+@keyframes slideOutLeft{from{transform:translateX(0) rotate(0);}to{transform:translateX(-110%) rotate(-6deg);}}
+@keyframes slideOutRight{from{transform:translateX(0) rotate(0);}to{transform:translateX(110%) rotate(6deg);}}
+.slide-in{animation:slideInRight 0.6s cubic-bezier(0.23,1,0.32,1) both;opacity:1;}
+.slide-out{animation:slideOutLeft 0.5s cubic-bezier(0.23,1,0.32,1) both;}
 
 /* BACK CARD CONTENT */
 .back-ornament{font-size:36px;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(201,168,76,0.6));}
