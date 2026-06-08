@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!-- slime v7 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -1385,7 +1385,7 @@ function doShareNative(){
   canvas.toBlob(async blob=>{
     const file=new File([blob],'my-slime-art.png',{type:'image/png'});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      try{ await navigator.share({title:'My Slime Art!',text:'My Slime Art from www.fab.games 🧪🌺',files:[file]}); }
+      try{ await navigator.share({title:'My Slime Art from fab.games',text:'My Slime Art from www.fab.games 🧪🌺',files:[file]}); }
       catch(e){ if(e.name!=='AbortError') doSave(); }
     } else { doSave(); }
   },'image/png');
