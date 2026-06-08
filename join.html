@@ -28,9 +28,14 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:20px 4
 h1{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;text-align:center;margin-bottom:6px;}
 h1 em{font-style:italic;color:var(--gold);}
 .card-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:28px;line-height:1.7;}
-.tabs{display:flex;gap:2px;margin-bottom:24px;background:rgba(255,255,255,0.04);padding:4px;border-radius:3px;}
-.tab{flex:1;padding:10px;text-align:center;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-radius:2px;transition:all 0.2s;}
-.tab.active{background:rgba(201,168,76,0.15);color:var(--gold);}
+.tabs{display:flex;gap:6px;margin-bottom:24px;}
+.tab{flex:1;padding:13px 8px;text-align:center;font-size:12px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:10px;
+  transition:all 0.2s;border:1.5px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.45);background:rgba(255,255,255,0.04);}
+.tab:hover{border-color:rgba(135,206,235,0.3);color:rgba(135,206,235,0.7);}
+.tab.active{color:#fff;background:rgba(201,168,76,0.15);border-color:rgba(201,168,76,0.5);}
+.tab.active.paid-tab{background:rgba(135,206,235,0.12);border-color:rgba(135,206,235,0.5);color:#87ceeb;}
 .form-group{margin-bottom:14px;}
 .form-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;display:block;}
 .form-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:2px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;}
@@ -87,8 +92,8 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2)
     </div>
 
     <div class="tabs">
-      <div class="tab active" onclick="showTab('free')">🎁 Free Month</div>
-      <div class="tab" onclick="showTab('paid')">💳 Subscribe $4.99/mo</div>
+      <div class="tab active" id="freeTabBtn" onclick="showTab('free')">🎁 Free Month</div>
+      <div class="tab paid-tab" id="paidTabBtn" onclick="showTab('paid')">💳 Subscribe $4.99/mo</div>
     </div>
 
     <div id="msgBox" class="msg"></div>
@@ -154,29 +159,36 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2)
 <footer>© 2026 fab.games — Made with 🌺 in Hawaii</footer>
 
 <script>
-let supabase;
+let sbClient;
 
 async function init(){
   try{
     const res = await fetch('/api/config');
     const config = await res.json();
-    supabase = window.supabase.createClient(config.supabase_url, config.supabase_anon_key);
+    sbClient = window.supabase.createClient(config.supabase_url, config.supabase_anon_key);
 
     // Check tab from URL
     const params = new URLSearchParams(window.location.search);
-    if(params.get('tab')==='paid') showTab('paid');
+    // Show correct tab based on URL param
+    const tabParam = params.get('tab');
+    if(tabParam==='paid'){
+      showTab('paid');
+      // Scroll to form
+      setTimeout(()=>document.querySelector('.card')?.scrollIntoView({behavior:'smooth'}),300);
+    }
 
     // Check if already logged in
-    const { data:{ session } } = await supabase.auth.getSession();
+    const { data:{ session } } = await sbClient.auth.getSession();
     if(session) window.location.href='/play';
   }catch(e){ console.log('Init error:', e); }
 }
 init();
 
 function showTab(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active',(i===0&&tab==='free')||(i===1&&tab==='paid'));
-  });
+  const freeBtn=document.getElementById('freeTabBtn');
+  const paidBtn=document.getElementById('paidTabBtn');
+  if(freeBtn){ freeBtn.classList.toggle('active', tab==='free'); freeBtn.classList.remove('paid-tab'); }
+  if(paidBtn){ paidBtn.classList.toggle('active', tab==='paid'); if(tab==='paid') paidBtn.classList.add('paid-tab'); }
   document.getElementById('freeTab').style.display = tab==='free'?'block':'none';
   document.getElementById('paidTab').style.display = tab==='paid'?'block':'none';
   hideMsg();
@@ -222,7 +234,7 @@ async function startFreeTrial(){
 
   try{
     // Try to sign up with Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await sbClient.auth.signUp({
       email, password,
       options:{
         data:{ name, status:'trial' },
@@ -284,7 +296,7 @@ async function startFreeTrial(){
   }
 }
 
-async async function startSubscription(){
+async function startSubscription(){
   const email=document.getElementById('paidEmail').value.trim();
   if(!email||!email.includes('@')){ showMsg('Please enter a valid email address!'); return; }
   showMsg('Redirecting to secure checkout...','info');
