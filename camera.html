@@ -301,21 +301,7 @@ video,canvas{
 </style>
 </head>
 <body>
-<!-- On-screen debug panel -->
-<div id="debugPanel" style="display:none;position:fixed;inset:0;
-  z-index:9999;background:rgba(0,0,0,0.95);color:#00ff00;font-size:18px;
-  font-family:monospace;padding:20px;overflow-y:auto;">
-  <div style="color:#ffff00;font-size:22px;font-weight:bold;margin-bottom:12px;">
-    📷 Debug Log — Take a photo then read here:
-  </div>
-  <div id="debugLog" style="line-height:2;"></div>
-  <button onclick="toggleDebug()" style="margin-top:20px;width:100%;padding:16px;
-    background:#ff0000;color:#fff;border:none;border-radius:10px;
-    font-size:20px;font-weight:bold;cursor:pointer;">✕ Close Debug</button>
-</div>
-<button onclick="toggleDebug()" style="position:fixed;top:60px;right:8px;
-  z-index:10000;background:rgba(0,0,0,0.8);color:#ffff00;border:2px solid #ffff00;
-  border-radius:8px;padding:8px 14px;font-size:14px;font-weight:bold;cursor:pointer;">🐛 DEBUG</button>
+
 
 <!-- Film strip -->
 <div class="filmstrip">
@@ -912,12 +898,12 @@ async function capturePhoto(){
   const flash=document.getElementById('flashOverlay');
   flash.classList.add('flash');
   setTimeout(()=>flash.classList.remove('flash'),150);
-  dbg('🔴 CAPTURE START','#f0f');
+  console.log('🔴 CAPTURE START');
 
   try{
     const w=video.videoWidth||1280;
     const h=video.videoHeight||720;
-    dbg('📐 '+w+'x'+h+' ready:'+video.readyState,'#0ff');
+    console.log('📐 ');
 
     // ── METHOD A: ImageCapture.takePhoto() ──────────────
     // Captures direct from hardware - bypasses canvas taint!
@@ -925,9 +911,9 @@ async function capturePhoto(){
       try{
         const track=stream.getVideoTracks()[0];
         const ic=new ImageCapture(track);
-        dbg('📸 Trying takePhoto()...','#ff0');
+        console.log('📸 Trying takePhoto()...');
         const blob=await ic.takePhoto();
-        dbg('✅ takePhoto blob: '+blob.size+' bytes','#0f0');
+        console.log('✅ takePhoto blob: ');
 
         // Convert blob to data URL
         const reader=new FileReader();
@@ -969,7 +955,7 @@ async function capturePhoto(){
         dbg('✅ Photo ready! '+Math.round(capturedDataURL.length/1024)+'KB','#0f0');
         showPhoto();
         return;
-      }catch(e){ dbg('❌ takePhoto: '+e.message,'#f44'); }
+      }catch(e){ console.log('❌ takePhoto: '); }
     }
 
     // ── METHOD B: createImageBitmap → OffscreenCanvas ───
@@ -977,7 +963,7 @@ async function capturePhoto(){
     // Use OffscreenCanvas to avoid taint on main canvas
     if(window.createImageBitmap && window.OffscreenCanvas){
       try{
-        dbg('🔄 Trying OffscreenCanvas...','#ff0');
+        console.log('🔄 Trying OffscreenCanvas...');
         const bitmap=await createImageBitmap(video);
         const oc=new OffscreenCanvas(w,h);
         const octx=oc.getContext('2d');
@@ -990,16 +976,16 @@ async function capturePhoto(){
         const blob=await oc.convertToBlob({type:'image/jpeg',quality:0.92});
         const url=URL.createObjectURL(blob);
         capturedDataURL=url;
-        dbg('✅ OffscreenCanvas worked!','#0f0');
+        console.log('✅ OffscreenCanvas worked!');
         showPhoto();
         return;
-      }catch(e){ dbg('❌ OffscreenCanvas: '+e.message,'#f44'); }
+      }catch(e){ console.log('❌ OffscreenCanvas: '); }
     }
 
     // ── METHOD C: createImageBitmap → img → canvas ─────
     if(window.createImageBitmap){
       try{
-        dbg('🔄 Trying bitmap→img→canvas...','#ff0');
+        console.log('🔄 Trying bitmap→img→canvas...');
         const bitmap=await createImageBitmap(video);
         const cap=document.createElement('canvas');
         cap.width=w;cap.height=h;
@@ -1018,17 +1004,17 @@ async function capturePhoto(){
           cctx.fillStyle=vg;cctx.fillRect(0,0,w,h);
         }
         capturedDataURL=cap.toDataURL('image/jpeg',0.92);
-        dbg('Method C result len:'+capturedDataURL.length,'#fa0');
+        console.log('Method C result len:');
         showPhoto();
         return;
-      }catch(e){ dbg('❌ Method C: '+e.message,'#f44'); }
+      }catch(e){ console.log('❌ Method C: '); }
     }
 
-    dbg('❌ ALL METHODS FAILED','#f00');
+    console.log('❌ ALL METHODS FAILED');
     alert('Camera capture not supported on this browser. Try updating Chrome!');
 
   }catch(err){
-    dbg('💥 OUTER ERROR: '+err.message,'#f44');
+    console.log('💥 OUTER ERROR: ');
     alert('Error: '+err.message);
   }
 }
@@ -1057,23 +1043,6 @@ function playShutter(){
     src.connect(g);g.connect(ac.destination);
     src.start();
   }catch(e){}
-}
-
-// ── ON-SCREEN DEBUG ───────────────────────────────
-let debugVisible=false;
-function toggleDebug(){
-  debugVisible=!debugVisible;
-  document.getElementById('debugPanel').style.display=debugVisible?'block':'none';
-}
-function dbg(msg,color='#0f0'){
-  const log=document.getElementById('debugLog');
-  if(!log)return;
-  const line=document.createElement('div');
-  line.style.color=color;
-  line.textContent=new Date().toLocaleTimeString()+' '+msg;
-  log.appendChild(line);
-  log.scrollTop=log.scrollHeight;
-  console.log(msg);
 }
 </script>
 </body>
