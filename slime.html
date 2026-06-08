@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- slime v7 -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -269,30 +269,13 @@
     }
 
     /* Text modal */
-    #txtModal{display:none;position:fixed;top:8px;right:8px;z-index:200;
-      background:transparent;pointer-events:none;
-      width:340px;max-height:90vh;}
-    #txtModal.on{display:flex;pointer-events:all;}
-    #txtModal .tcard{pointer-events:all;}
-    .tcard{background:rgba(20,15,40,0.97);border:2px solid rgba(255,255,255,0.12);
+    #txtModal{display:none;position:fixed;inset:0;z-index:200;
+      background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);
+      align-items:center;justify-content:center;}
+    #txtModal.on{display:flex;}
+    .tcard{background:#1a1a2e;border:2px solid rgba(255,255,255,0.12);
       border-radius:20px;padding:20px;width:min(320px,90vw);}
-    .tcard h3{color:#fff;font-size:15px;margin-bottom:10px;text-align:center;}
-    .font-preview-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
-    .font-opt{padding:8px 10px;border-radius:8px;border:2px solid rgba(255,255,255,0.1);
-      background:rgba(255,255,255,0.04);color:#fff;cursor:pointer;text-align:center;
-      font-size:15px;transition:all .18s;}
-    .font-opt.sel{border-color:#ff69b4;background:rgba(255,105,180,0.15);}
-    .font-opt:hover{border-color:rgba(255,255,255,0.3);}
-    .tmodal-slider-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-    .tmodal-lbl{font-size:9px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;width:40px;flex-shrink:0;}
-    .tmodal-sl{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;
-      background:rgba(255,255,255,0.15);outline:none;cursor:pointer;}
-    .tmodal-sl::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
-      background:#ff69b4;cursor:pointer;box-shadow:0 0 6px rgba(255,105,180,0.5);}
-    .tmodal-val{font-size:10px;color:#aaa;width:32px;text-align:right;flex-shrink:0;}
-    #txtPreview{width:100%;height:44px;display:flex;align-items:center;justify-content:center;
-      border-radius:8px;background:rgba(255,255,255,0.06);margin-bottom:10px;
-      font-size:22px;color:#fff;overflow:hidden;transition:all .2s;}
+    .tcard h3{color:#fff;font-size:15px;margin-bottom:12px;text-align:center;}
     #tInput{width:100%;padding:10px;background:rgba(255,255,255,0.08);
       border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;
       color:#fff;font-size:16px;font-family:inherit;outline:none;margin-bottom:10px;}
@@ -311,81 +294,18 @@
       white-space:nowrap;pointer-events:none;}
     @keyframes tpop{0%{opacity:0;transform:translate(-50%,-8px);}12%{opacity:1;transform:translate(-50%,0);}78%{opacity:1;}100%{opacity:0;}}
   
-/* ── MOBILE TOOLS ── */
+@keyframes tabGlow{0%,100%{box-shadow:3px 0 12px rgba(255,215,0,0.2);}50%{box-shadow:3px 0 22px rgba(255,215,0,0.55);}}
+#mobToolBtn{display:none;position:fixed;left:0;top:calc(50% + 96px);transform:translateY(-50%);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:32px;padding:14px 0;background:linear-gradient(180deg,rgba(20,10,30,0.97),rgba(13,5,20,0.97));border:1px solid rgba(255,215,0,0.5);border-left:none;border-radius:0 14px 14px 0;cursor:pointer;animation:tabGlow 2.5s ease-in-out infinite;}
+#mobTabLabel{font-size:7px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:rgba(255,215,0,0.8);writing-mode:vertical-rl;transform:rotate(180deg);}
+#mobTabArrow{font-size:16px;color:rgba(255,215,0,0.7);transition:transform 0.28s;}
+@keyframes slimePulse{0%,100%{box-shadow:0 0 8px rgba(255,215,0,0.4);}50%{box-shadow:0 0 18px rgba(255,215,0,0.9);}}
+@media(max-width:768px){#toolWrap{transform:translateX(-155px)!important;transition:transform 0.28s ease;}#toolWrap.mob-open{transform:translateX(0)!important;}#tbToggle{display:none!important;}#mobToolBtn{display:flex!important;}#toolCloseBtn{display:flex!important;}}
+#toolCloseBtn{display:none;}
 
-/* Side pull tab */
-#mobToolBtn{
-  display:none;
-  position:fixed;
-  left:0; top:calc(50% + 96px);
-  transform:translateY(-50%);
-  z-index:200;
-  flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:4px;
-  width:32px;
-  padding:14px 0;
-  background:linear-gradient(180deg,rgba(20,10,30,0.97),rgba(13,5,20,0.97));
-  border:1px solid rgba(255,215,0,0.5);
-  border-left:none;
-  border-radius:0 14px 14px 0;
-  cursor:pointer;
-  box-shadow:3px 0 16px rgba(255,215,0,0.25),inset -2px 0 8px rgba(255,215,0,0.08);
-  animation:tabGlow 2.5s ease-in-out infinite;
-  backdrop-filter:blur(8px);
-}
-@keyframes tabGlow{
-  0%,100%{box-shadow:3px 0 12px rgba(255,215,0,0.2),inset -2px 0 6px rgba(255,215,0,0.05);}
-  50%{box-shadow:3px 0 22px rgba(255,215,0,0.55),inset -2px 0 12px rgba(255,215,0,0.15);}
-}
-#mobTabIcon{ font-size:16px; line-height:1; }
-#mobTabLabel{
-  font-size:7px;font-weight:900;
-  letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,215,0,0.8);
-  writing-mode:vertical-rl;
-  text-orientation:mixed;
-  transform:rotate(180deg);
-  line-height:1;
-}
-#mobTabArrow{
-  font-size:16px;color:rgba(255,215,0,0.7);
-  line-height:1;
-  transition:transform 0.28s;
-}
-
-@media(max-width:768px){
-  /* Hide toolbar by default on mobile */
-  #toolWrap{
-    transform:translateX(-155px)!important;
-    transition:transform 0.28s ease;
-  }
-  #toolWrap.mob-open{
-    transform:translateX(0)!important;
-  }
-  /* Push side tab right when panel open */
-  #toolWrap.mob-open ~ #mobToolBtn,
-  body.tools-open #mobToolBtn{
-    left:155px;
-    border-radius:0 14px 14px 0;
-    border-left:none;
-    border-right:1px solid rgba(255,215,0,0.5);
-  }
-  /* Flip arrow when open */
-  body.tools-open #mobTabArrow{ transform:rotate(180deg); }
-  /* Hide original toggle */
-  #tbToggle{ display:none!important; }
-  /* Show mobile elements */
-  #mobToolBtn{ display:flex!important; }
-  #toolCloseBtn{ display:flex!important; }
-}
-/* Hide on desktop */
-#toolCloseBtn{ display:none; }
-
-@keyframes slimePulse{
-  0%,100%{box-shadow:0 0 8px rgba(255,215,0,0.4);}
-  50%{box-shadow:0 0 18px rgba(255,215,0,0.9),0 0 28px rgba(255,215,0,0.3);}
-}
+.tf{padding:7px 4px;border-radius:7px;font-size:13px;text-align:center;cursor:pointer;
+  font-weight:700;color:#fff;border:1.5px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.05);transition:all .15s;}
+.tf:hover{background:rgba(255,255,255,0.1);}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Dancing+Script:wght@700&family=Space+Mono:wght@700&family=Abril+Fatface&family=Permanent+Marker&display=block" rel="stylesheet">
 </head>
@@ -439,7 +359,9 @@
       </div>
     </div>
   </div>
-  <button id="tbToggle" onclick="toggleToolbar()" title="Hide/show tools">◀</button>
+  <button id="toolCloseBtn" onclick="toggleMobTools()"
+    style="margin-top:8px;width:100%;padding:10px 0;background:linear-gradient(135deg,#ffd700,#c9a84c);border:none;border-radius:8px;color:#1a1a1a;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;animation:slimePulse 2s ease-in-out infinite;">✕ Close</button>
+<button id="tbToggle" onclick="toggleToolbar()" title="Hide/show tools">◀</button>
 </div>
 
 <!-- Shelf -->
@@ -455,21 +377,10 @@
     <button class="abtn bmx" onclick="doMix()">🌀 MIX</button>
     <div style="position:relative;display:inline-block;">
   <button class="abtn bsv" onclick="toggleSaveMenu()" id="saveMenuBtn">📸 SAVE ▾</button>
-  <div id="saveMenu" style="display:none;position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
-    background:rgba(13,17,23,0.97);border:1px solid rgba(255,215,0,0.3);border-radius:10px;
-    min-width:160px;z-index:300;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.5);">
-    <div onclick="doSave();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;
-      color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.08);"
-      onmouseover="this.style.background='rgba(255,215,0,0.1)'"
-      onmouseout="this.style.background=''">📸 Save to Gallery</div>
-    <div onclick="doShareNative();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;
-      color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.08);"
-      onmouseover="this.style.background='rgba(255,215,0,0.1)'"
-      onmouseout="this.style.background=''">↗ Share to Social</div>
-    <div onclick="doShareFacebook();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;
-      color:#4267B2;cursor:pointer;"
-      onmouseover="this.style.background='rgba(255,215,0,0.1)'"
-      onmouseout="this.style.background=''">📘 Share on Facebook</div>
+  <div id="saveMenu" style="display:none;position:absolute;bottom:110%;left:50%;transform:translateX(-50%);background:rgba(13,17,23,0.97);border:1px solid rgba(255,215,0,0.3);border-radius:10px;min-width:160px;z-index:300;overflow:hidden;">
+    <div onclick="doSave();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.08);" onmouseover="this.style.background='rgba(255,215,0,0.1)'" onmouseout="this.style.background=''">📸 Save to Gallery</div>
+    <div onclick="doShareNative();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.08);" onmouseover="this.style.background='rgba(255,215,0,0.1)'" onmouseout="this.style.background=''">↗ Share to Social</div>
+    <div onclick="doShareFacebook();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;color:#4267B2;cursor:pointer;" onmouseover="this.style.background='rgba(255,215,0,0.1)'" onmouseout="this.style.background=''">📘 Share on Facebook</div>
   </div>
 </div>
     <button class="abtn brs" onclick="doReset()">🔄 RESET</button>
@@ -477,21 +388,51 @@
 </div>
 
 <!-- Text modal -->
-<div id="txtModal" style="display:none;position:fixed;inset:0;z-index:200;
-  align-items:center;justify-content:center;background:rgba(0,0,0,0.5);">
-  <div style="background:#1a1a2e;border:2px solid rgba(255,255,255,0.2);border-radius:16px;
-    padding:20px;width:min(300px,88vw);text-align:center;">
-    <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:14px;">✍️ Add Text to Slime</div>
-    <input type="text" id="tInput" placeholder="Type your message..." maxlength="40"
-      style="width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);
-        border-radius:10px;color:#fff;font-size:16px;text-align:center;outline:none;margin-bottom:14px;font-family:inherit;">
-    <div style="display:flex;gap:8px;">
-      <button onclick="closeTxt()" style="flex:1;padding:12px;border-radius:10px;border:none;
-        background:rgba(255,255,255,0.08);color:#aaa;font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
-      <button onclick="addText()" style="flex:1;padding:12px;border-radius:10px;border:none;
-        background:linear-gradient(135deg,#ff69b4,#a855f7);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Add 🎉</button>
-    </div>
+<div id="txtModal" style="display:none;position:fixed;top:10px;right:10px;z-index:300;width:min(320px,92vw);">
+<div style="background:rgba(15,10,30,0.97);border:2px solid rgba(255,105,180,0.3);border-radius:16px;padding:16px;max-height:85vh;overflow-y:auto;">
+  <div id="dragHandle" style="cursor:grab;padding:4px 0 10px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-size:13px;font-weight:800;color:#fff;">✍️ Text on Slime</span>
+    <span style="font-size:10px;color:#888;">⠿ drag me</span>
   </div>
+  <textarea id="tInput" rows="2" maxlength="80" placeholder="Type here... Enter for new line"
+    style="width:100%;padding:10px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;font-size:15px;outline:none;resize:none;margin-bottom:10px;font-family:inherit;"></textarea>
+  <!-- Font -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px;" id="fontGrid">
+    <div class="tf" data-f="Anton,Impact,sans-serif" data-fw="700" onclick="pickFont(this)" style="background:rgba(255,105,180,0.2);border:1.5px solid rgba(255,105,180,0.6);">Bold</div>
+    <div class="tf" data-f="'Dancing Script',cursive" data-fw="700" onclick="pickFont(this)" style="font-family:'Dancing Script',cursive;">Fancy</div>
+    <div class="tf" data-f="'Space Mono',monospace" data-fw="700" onclick="pickFont(this)" style="font-family:'Space Mono',monospace;font-size:11px;">Mono</div>
+    <div class="tf" data-f="'Abril Fatface',serif" data-fw="400" onclick="pickFont(this)" style="font-family:'Abril Fatface',serif;">Block</div>
+    <div class="tf" data-f="'Permanent Marker',cursive" data-fw="400" onclick="pickFont(this)" style="font-family:'Permanent Marker',cursive;font-size:11px;">Marker</div>
+    <div class="tf" data-f="Georgia,serif" data-fw="700" data-fi="italic" onclick="pickFont(this)" style="font-family:Georgia,serif;font-style:italic;">Italic</div>
+  </div>
+  <!-- Color + Align -->
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+    <span style="font-size:9px;color:#aaa;flex-shrink:0;">Color:</span>
+    <input type="color" id="tColor" value="#ffffff" style="width:32px;height:26px;border:none;background:none;cursor:pointer;border-radius:4px;padding:0;flex-shrink:0;">
+    <span style="font-size:9px;color:#aaa;flex-shrink:0;margin-left:6px;">Align:</span>
+    <button onclick="tAlign='left';updateAlignBtns()" id="al-l" style="flex:1;padding:5px;border-radius:6px;border:1.5px solid rgba(255,105,180,0.5);background:rgba(255,105,180,0.15);color:#fff;font-size:12px;cursor:pointer;">⬅</button>
+    <button onclick="tAlign='center';updateAlignBtns()" id="al-c" style="flex:1;padding:5px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:#fff;font-size:12px;cursor:pointer;">↔</button>
+    <button onclick="tAlign='right';updateAlignBtns()" id="al-r" style="flex:1;padding:5px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:#fff;font-size:12px;cursor:pointer;">➡</button>
+  </div>
+  <!-- Size + Opacity -->
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+    <span style="font-size:9px;color:#aaa;width:36px;flex-shrink:0;">Size</span>
+    <input type="range" id="tSize" min="16" max="200" value="60" style="flex:1;height:3px;" oninput="document.getElementById('tSzV').textContent=this.value+'pt'">
+    <span style="font-size:9px;color:#aaa;width:34px;flex-shrink:0;" id="tSzV">60pt</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+    <span style="font-size:9px;color:#aaa;width:36px;flex-shrink:0;">Opacity</span>
+    <input type="range" id="tOp" min="10" max="100" value="90" style="flex:1;height:3px;" oninput="document.getElementById('tOpV').textContent=this.value+'%'">
+    <span style="font-size:9px;color:#aaa;width:34px;flex-shrink:0;" id="tOpV">90%</span>
+  </div>
+  <!-- Message list -->
+  <div id="msgList" style="margin-bottom:10px;"></div>
+  <!-- Buttons -->
+  <div style="display:flex;gap:8px;">
+    <button onclick="closeTxt()" style="flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.08);color:#aaa;font-size:13px;font-weight:700;cursor:pointer;">Close</button>
+    <button onclick="addText()" style="flex:1;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#ff69b4,#a855f7);color:#fff;font-size:13px;font-weight:700;cursor:pointer;" id="addBtn">Add ✓</button>
+  </div>
+</div>
 </div>
 
 <script>
@@ -551,7 +492,6 @@ initSlime();
 const NAT_AREA=Math.PI*NR*NR;
 const NAT_DIST=NR*(2*Math.PI/N);
 
-let idleTick=0;
 function physicsTick(){
   let area=0;
   for(let i=0;i<N;i++){const j=(i+1)%N;area+=(pts[i].x*pts[j].y-pts[j].x*pts[i].y);}
@@ -563,16 +503,13 @@ function physicsTick(){
     sp(prev);sp(next);
     const nx=p.x-CX,ny=p.y-CY,nl=Math.sqrt(nx*nx+ny*ny)||1;
     fx-=(nx/nl)*pe*PREK*NR; fy-=(ny/nl)*pe*PREK*NR;
-    // ── Idle breathing animation ──────────────────────
-    // Slow gentle sine wave rippling around the blob
-    const idleAngle = (i/N)*Math.PI*2;
-    const idleWave  = Math.sin(idleTick*0.022 + idleAngle*2) * 0.22;
-    const idlePush  = Math.cos(idleTick*0.015 + idleAngle*3) * 0.16;
-    const idleSlow  = Math.sin(idleTick*0.008 + idleAngle)   * 0.12;
-    const idleNx = Math.cos(idleAngle), idleNy = Math.sin(idleAngle);
-    fx += idleNx * idleWave + idleNy * idlePush + idleNx * idleSlow;
-    fy += idleNy * idleWave - idleNx * idlePush + idleNy * idleSlow;
-    // ───────────────────────────────────────────────────
+    const idleAngle=(i/N)*Math.PI*2;
+    const idleWave=Math.sin(idleTick*0.022+idleAngle*2)*0.22;
+    const idlePush=Math.cos(idleTick*0.015+idleAngle*3)*0.16;
+    const idleSlow=Math.sin(idleTick*0.008+idleAngle)*0.12;
+    const idleNx=Math.cos(idleAngle),idleNy=Math.sin(idleAngle);
+    fx+=idleNx*idleWave+idleNy*idlePush+idleNx*idleSlow;
+    fy+=idleNy*idleWave-idleNx*idlePush+idleNy*idleSlow;
     p.vx=(p.vx+fx)*DAMP; p.vy=(p.vy+fy)*DAMP;
     p.x+=p.vx; p.y+=p.vy;
   });
@@ -804,7 +741,19 @@ function renderStroke(stroke){
       }
       break;}
 
-    case 'text': break; // handled by renderLiveText()
+    case 'text':
+      if(stroke.text){
+        const wp=warpPoint(stroke.pts[0].x,stroke.pts[0].y);
+        ctx.globalAlpha   = op;
+        ctx.font          = stroke.font||`900 ${sz*3}px system-ui`;
+        ctx.fillStyle     = stroke.color;
+        ctx.textAlign     = 'center';
+        ctx.textBaseline  = 'middle';
+        ctx.shadowColor   = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur    = 4*PR;
+        ctx.fillText(stroke.text, wp.x, wp.y);
+      }
+      break;
   }
   ctx.restore();
 }
@@ -954,6 +903,20 @@ canvas.addEventListener('pointerdown',e=>{
   if(e.target !== canvas) return;
   e.preventDefault();
   const pos=getPos(e);
+  // Hit test text messages
+  if(typeof textMsgs!=='undefined'){
+    for(let ti=textMsgs.length-1;ti>=0;ti--){
+      const m=textMsgs[ti];
+      const wp=warpPoint(m.x||CX,m.y||CY);
+      const hw=((m.text||'').length*(m.size||60)*0.55)+20;
+      const hh=(m.size||60)*1.5;
+      if(pos.x>=wp.x-hw&&pos.x<=wp.x+hw&&pos.y>=wp.y-hh/2&&pos.y<=wp.y+hh/2){
+        draggingTextIdx=ti;
+        textDragOX=pos.x-m.x; textDragOY=pos.y-m.y;
+        return;
+      }
+    }
+  }
   fingers[e.pointerId]={...pos};
   canvas.setPointerCapture(e.pointerId);
   isPointerDown=true; lastPos={...pos};
@@ -964,15 +927,14 @@ canvas.addEventListener('pointerdown',e=>{
 
 canvas.addEventListener('pointermove',e=>{
   if(e.target !== canvas && !fingers[e.pointerId]) return;
+  if(!fingers[e.pointerId]) return;
   e.preventDefault();
   const pos=getPos(e);
-  // Drag text message
-  if(draggingTextIdx>=0){
-    const m=textMessages[draggingTextIdx];
-    if(m){m.x=(pos.x-textDragOffX); m.y=(pos.y-textDragOffY);}
+  if(typeof draggingTextIdx!=='undefined' && draggingTextIdx>=0){
+    const m=textMsgs[draggingTextIdx];
+    if(m){m.x=pos.x-textDragOX; m.y=pos.y-textDragOY;}
     return;
   }
-  if(!fingers[e.pointerId]) return;
   const prev=fingers[e.pointerId];
   const dx=pos.x-prev.x, dy=pos.y-prev.y;
   fingers[e.pointerId]={...pos};
@@ -985,7 +947,7 @@ canvas.addEventListener('pointermove',e=>{
 canvas.addEventListener('pointerup',e=>{
   delete fingers[e.pointerId];
   if(isPointerDown) finishStroke();
-  isPointerDown=false; draggingTextIdx=-1; playRelease();
+  isPointerDown=false; playRelease();
 });
 canvas.addEventListener('pointercancel',e=>{delete fingers[e.pointerId];isPointerDown=false;finishStroke();});
 
@@ -1016,1127 +978,114 @@ function moveBlobs(fx,fy,dx,dy){
 }
 
 // ── TEXT ───────────────────────────────────────
-function showTxt(){
-  ['700 42px Anton','700 42px Dancing Script','700 38px Space Mono','400 44px Abril Fatface','400 38px Permanent Marker'].forEach(f=>document.fonts.load(f).catch(()=>{}));
-  renderTextSlots();
-  setTimeout(updateTxtPreview,100);
-  // Close mobile tools panel so it doesn't overlay the text modal
-  document.getElementById('toolWrap').classList.remove('mob-open');
-  document.body.classList.remove('tools-open');
-  if(document.getElementById('mobToolBtn')) document.getElementById('mobToolBtn').style.left='0';
-  if(document.getElementById('mobTabArrow')) document.getElementById('mobTabArrow').style.transform='rotate(0)';setTool('text');document.getElementById('txtModal').classList.add('on');setTimeout(()=>document.getElementById('tInput').focus(),100);}
-function closeTxt(){
-  document.getElementById('txtModal').classList.remove('on');
-  editingMsgId=null; textEditColor=null;
-  const btn=document.querySelector('.tbok');
-  if(btn) btn.textContent='Add to Slime 🎉';
-  setTool('squish');
-}
-// ── TEXT SYSTEM — simple & works ──────────────
-let textMessages = [];
+let textMsgs=[], editIdx=-1;
+let tFontFamily='Anton,Impact,sans-serif', tFontWeight='700', tFontStyle='normal', tAlign='left';
 
 function showTxt(){
   setTool('text');
-  document.getElementById('txtModal').style.display='flex';
-  const inp=document.getElementById('tInput');
-  if(inp){ inp.value=''; setTimeout(()=>inp.focus(),100); }
+  document.getElementById('txtModal').style.display='block';
+  // Preload fonts
+  ['700 42px Anton','700 42px Dancing Script','700 38px Space Mono',
+   '400 44px Abril Fatface','400 38px Permanent Marker'].forEach(f=>document.fonts.load(f).catch(()=>{}));
+  renderMsgList();
 }
 function closeTxt(){
   document.getElementById('txtModal').style.display='none';
+  editIdx=-1;
+  document.getElementById('addBtn').textContent='Add ✓';
   setTool('squish');
 }
-function addText(){
-  const inp=document.getElementById('tInput');
-  const txt=(inp?inp.value:'').trim();
-  if(!txt){ closeTxt(); return; }
-  if(textMessages.length>=5){ showToast('Max 5 messages!'); return; }
-  const offsets=[0,-NR*0.3,NR*0.3,-NR*0.55,NR*0.55];
-  const yOff=offsets[textMessages.length]||0;
-  textMessages.push({
-    id:Date.now(), text:txt,
-    x:CX, y:CY+yOff,
-    size:Math.round(NR*0.18),
-    color:'#ffffff', opacity:0.95
+function pickFont(el){
+  document.querySelectorAll('.tf').forEach(e=>{
+    e.style.background='rgba(255,255,255,0.05)';
+    e.style.borderColor='rgba(255,255,255,0.12)';
   });
-  showToast('✍️ Drag text to move it!');
-  closeTxt();
-}  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🧪 The Slime Artists Factory — Today in Hawaii</title>
-  <link rel="icon" href="/icon-192.png">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-    html,body{width:100%;height:100%;overflow:hidden;background:#0d1117;
-      font-family:system-ui,sans-serif;user-select:none;-webkit-user-select:none;}
-
-    #hdr{
-      position:fixed;top:0;left:0;right:0;height:48px;z-index:60;
-      padding:0 10px;display:flex;align-items:center;justify-content:space-between;
-      background:rgba(13,17,23,0.95);backdrop-filter:blur(12px);
-      border-bottom:1px solid rgba(255,255,255,0.07);
-    }
-    .hdr-title{font-size:15px;font-weight:900;
-      background:linear-gradient(90deg,#00ff88,#00ccff,#ff00ff,#00ff88);
-      background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      animation:shimmer 3s linear infinite;}
-    @keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
-    .hdr-hint{font-size:8px;color:#555;margin-top:1px;}
-    .icon-btn{width:34px;height:34px;border-radius:50%;cursor:pointer;
-      background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
-      font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;}
-    .hdr-right{display:flex;gap:6px;}
-
-    /* Canvas covers full viewport — slime centered in usable area via JS */
-    #mainCanvas{
-      position:fixed;top:0;left:0;
-      width:100%!important;height:100%!important;
-      touch-action:none;cursor:crosshair;
-      display:block;z-index:1;
-    }
-
-    /* Tool bar — left side, collapsible */
-    #toolWrap{
-      position:fixed;left:0;
-      top:48px;
-      z-index:55;
-      display:flex;align-items:flex-start;
-      transition:transform 0.28s ease;
-    }
-    /* When hidden, shift whole wrap LEFT by toolbar width so only toggle peeks out */
-    #toolWrap.hidden{
-      transform:translateX(-138px);
-    }
-    #toolBar{
-      pointer-events:all;
-      padding:8px 6px 12px;
-      display:flex;flex-direction:column;gap:4px;
-      background:rgba(13,17,23,0.97);
-      border-radius:0 14px 14px 0;
-      border:1px solid rgba(255,255,255,0.08);border-left:none;
-      transition:transform 0.25s ease, opacity 0.25s;
-      overflow-y:auto;overflow-x:hidden;
-      max-width:155px;
-      /* Fit between header and shelf with scroll */
-      max-height:calc(100svh - 48px - 185px);
-      scrollbar-width:none;
-      touch-action:pan-y;
-    }
-    #toolBar::-webkit-scrollbar{display:none;}
-    #toolBar.hidden{opacity:0;pointer-events:none;}
-
-    /* Big flashing pink arrow */
-    #tbToggle{
-      width:36px;height:80px;
-      border-radius:0 18px 18px 0;
-      background:linear-gradient(180deg,rgba(13,17,23,0.97),rgba(30,10,30,0.97));
-      border:3px solid #ff69b4;border-left:none;
-      cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      font-size:22px;font-weight:900;color:#ff69b4;
-      flex-shrink:0;
-      align-self:center;
-      margin-left:0px;
-      animation:togglePulse 1s ease-in-out infinite;
-      box-shadow:0 0 16px rgba(255,105,180,0.6),0 0 32px rgba(255,105,180,0.25);
-      z-index:56;
-    }
-    @keyframes togglePulse{
-      0%,100%{
-        color:#ff69b4;
-        border-color:#ff69b4;
-        box-shadow:0 0 14px rgba(255,105,180,0.5),0 0 28px rgba(255,105,180,0.2);
-        background:linear-gradient(180deg,rgba(13,17,23,0.97),rgba(30,10,30,0.97));
-      }
-      50%{
-        color:#fff;
-        border-color:#ffaadd;
-        box-shadow:0 0 28px rgba(255,105,180,1),0 0 56px rgba(255,105,180,0.6);
-        background:linear-gradient(180deg,rgba(60,10,60,0.97),rgba(13,17,23,0.97));
-      }
-    }
-
-    .tool-btn{
-      width:130px;height:38px;border-radius:11px;cursor:pointer;
-      background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.09);
-      font-size:17px;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;
-      gap:8px;padding:0 10px;transition:all 0.12s;color:#fff;
-      white-space:nowrap;overflow:hidden;
-      flex-shrink:0;
-    }
-    .tool-btn:active{transform:scale(0.88);}
-    .tool-btn.on{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.5);
-      box-shadow:0 0 10px rgba(255,255,255,0.2);}
-    .tlbl{font-size:11px;color:rgba(255,255,255,0.75);font-weight:700;}
-    .tool-btn.on .tlbl{color:#fff;}
-
-    /* Color + sliders section */
-    .tool-ctrl{
-      display:flex;flex-direction:column;align-items:stretch;
-      gap:8px;padding:6px 0 4px;width:100%;
-      border-top:1px solid rgba(255,255,255,0.08);
-      margin-top:2px;
-    }
-    /* Live brush preview area */
-    #brushPreview{
-      width:130px;height:60px;border-radius:12px;
-      background:rgba(0,0,0,0.4);
-      border:2px solid rgba(255,255,255,0.15);
-      position:relative;overflow:hidden;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:inset 0 0 10px rgba(0,0,0,0.5);
-    }
-    #previewCanvas{width:130px;height:60px;border-radius:10px;display:block;}
-    #cpick{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-    .prev-lbl{
-      position:absolute;bottom:3px;left:0;right:0;
-      text-align:center;font-size:7px;font-weight:800;color:rgba(255,255,255,0.5);
-      pointer-events:none;
-    }
-    .slider-wrap{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;padding:4px 0;}
-    .sldr-lbl{
-      font-size:8px;color:#aaa;font-weight:900;
-      text-transform:uppercase;letter-spacing:0.1em;
-      text-shadow:0 0 6px rgba(255,255,255,0.3);
-    }
-    /* Horizontal neon sliders — mobile friendly! */
-    .sldr-row{display:flex;align-items:center;gap:6px;width:100%;padding:5px 4px;background:rgba(255,255,255,0.03);border-radius:8px;}
-    .sldr-lbl{font-size:8px;color:#aaa;font-weight:900;
-      text-transform:uppercase;white-space:nowrap;width:24px;text-align:right;flex-shrink:0;
-      text-shadow:0 0 6px rgba(255,255,255,0.3);}
-    .hslider{
-      -webkit-appearance:none;appearance:none;
-      flex:1;height:20px;border-radius:10px;
-      outline:none;cursor:pointer;
-      border:1px solid rgba(255,255,255,0.12);
-      touch-action:manipulation;
-      min-width:60px;
-      -webkit-user-select:none;
-    }
-    .hslider::-webkit-slider-runnable-track{
-      height:20px;border-radius:10px;
-    }
-    .hslider::-webkit-slider-thumb{
-      -webkit-appearance:none;
-      width:28px;height:28px;border-radius:50%;
-      cursor:grab;
-      border:2px solid rgba(255,255,255,0.3);
-    }
-    /* Vegas opacity display */
-    #opacityVal{
-      font-size:9px;font-weight:900;color:#ffd700;
-      text-shadow:0 0 8px rgba(255,215,0,0.6);
-      width:26px;text-align:right;flex-shrink:0;
-    }
-    /* Gold opacity slider */
-    #brushOpacity{background:linear-gradient(90deg,rgba(255,215,0,0.06),rgba(255,140,0,0.25));}
-    #brushOpacity::-webkit-slider-thumb{
-      background:radial-gradient(circle,#ffd700 30%,#ff8c00 100%);
-      box-shadow:0 0 14px rgba(255,215,0,0.9),0 0 28px rgba(255,140,0,0.5);
-    }
-    /* Cyan size slider */
-    #brushSz{background:linear-gradient(90deg,rgba(34,211,238,0.06),rgba(34,211,238,0.25));}
-    #brushSz::-webkit-slider-thumb{
-      background:radial-gradient(circle,#88ffee 30%,#22d3ee 100%);
-      box-shadow:0 0 14px rgba(34,211,238,0.9),0 0 28px rgba(34,211,238,0.4);
-    }
-    /* Pink hardness slider */
-    #brushHard{background:linear-gradient(90deg,rgba(255,100,180,0.06),rgba(255,100,180,0.25));}
-    #brushHard::-webkit-slider-thumb{
-      background:radial-gradient(circle,#ffaadd 30%,#ff69b4 100%);
-      box-shadow:0 0 14px rgba(255,105,180,0.9),0 0 28px rgba(255,105,180,0.4);
-    }
-
-    /* Shelf */
-    #shelf{
-      position:fixed;bottom:0;left:0;right:0;z-index:50;
-      background:rgba(13,17,23,0.97);border-top:1px solid rgba(255,255,255,0.08);
-      padding:5px 8px 8px;
-    }
-    .stabs{display:flex;gap:6px;margin-bottom:6px;}
-    .stab{
-      flex:1;padding:8px 4px;border:none;border-radius:10px;
-      font-size:12px;font-weight:900;cursor:pointer;
-      font-family:inherit;letter-spacing:0.04em;
-      transition:all 0.18s;position:relative;overflow:hidden;
-    }
-    .stab:nth-child(1){
-      color:#22d3ee;
-      background:rgba(34,211,238,0.08);
-      border:1.5px solid rgba(34,211,238,0.2);
-      text-shadow:0 0 8px rgba(34,211,238,0.4);
-    }
-    .stab:nth-child(2){
-      color:#00e676;
-      background:rgba(0,230,118,0.08);
-      border:1.5px solid rgba(0,230,118,0.2);
-      text-shadow:0 0 8px rgba(0,230,118,0.4);
-    }
-    .stab:nth-child(1).on{
-      background:linear-gradient(135deg,rgba(34,211,238,0.25),rgba(34,211,238,0.1));
-      border-color:rgba(34,211,238,0.7);
-      box-shadow:0 0 16px rgba(34,211,238,0.35),0 0 32px rgba(34,211,238,0.1),inset 0 1px 0 rgba(255,255,255,0.15);
-      color:#88ffee;
-      transform:scale(1.03);
-    }
-    .stab:nth-child(2).on{
-      background:linear-gradient(135deg,rgba(0,230,118,0.25),rgba(0,200,80,0.1));
-      border-color:rgba(0,230,118,0.7);
-      box-shadow:0 0 16px rgba(0,230,118,0.35),0 0 32px rgba(0,200,80,0.1),inset 0 1px 0 rgba(255,255,255,0.15);
-      color:#69ffb4;
-      transform:scale(1.03);
-    }
-    .stab:active{transform:scale(0.96)!important;}
-    .spanel{display:none;}.spanel.on{display:block;}
-    .srow{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none;}
-    .srow::-webkit-scrollbar{display:none;}
-    .ibtn{
-      flex-shrink:0;width:56px;height:56px;border-radius:14px;
-      border:2px solid rgba(255,255,255,0.12);cursor:pointer;font-size:24px;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:2px;transition:all 0.12s;
-      background:rgba(255,255,255,0.07);
-      box-shadow:0 3px 0 rgba(0,0,0,0.4),0 0 0 rgba(255,255,255,0);
-    }
-    .ibtn:active{transform:scale(0.84) translateY(2px);}
-    .ibtn.on{
-      border-color:rgba(255,255,255,0.6);
-      box-shadow:0 0 16px rgba(255,255,255,0.3),0 0 32px rgba(255,255,255,0.1),0 3px 0 rgba(0,0,0,0.3);
-      transform:scale(1.1);
-      background:rgba(255,255,255,0.15);
-    }
-    .inm{font-size:7px;color:rgba(255,255,255,0.65);font-weight:800;letter-spacing:0.02em;}
-    .arow{display:flex;gap:6px;margin-top:5px;}
-    .abtn{
-      flex:1;padding:10px 3px;border:none;border-radius:11px;
-      font-size:11px;font-weight:900;cursor:pointer;
-      font-family:inherit;color:#fff;min-height:42px;
-      transition:all 0.12s;letter-spacing:0.03em;
-      border:1px solid rgba(255,255,255,0.08);
-      box-shadow:0 4px 0 rgba(0,0,0,0.3),0 2px 8px rgba(0,0,0,0.2);
-    }
-    .abtn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,0.3);}
-    .bsq{background:linear-gradient(180deg,#06d6a0,#0891b2);
-      box-shadow:0 4px 0 #045f6b,0 0 12px rgba(8,145,178,0.3);}
-    .bmx{background:linear-gradient(180deg,#a855f7,#db2777);
-      box-shadow:0 4px 0 #7c1b4f,0 0 12px rgba(168,85,247,0.3);}
-    .bsv{background:linear-gradient(180deg,#fbbf24,#ef4444);
-      box-shadow:0 4px 0 #b91c1c,0 0 12px rgba(251,191,36,0.3);}
-    .brs{
-      background:linear-gradient(180deg,#b0b0b0,#888);
-      color:#fff;
-      box-shadow:0 4px 0 #555,0 0 8px rgba(180,180,180,0.15);
-    }
-
-    /* Text modal */
-    #txtModal{display:none;position:fixed;top:8px;right:8px;z-index:200;
-      background:transparent;pointer-events:none;
-      width:340px;max-height:90vh;}
-    #txtModal.on{display:flex;pointer-events:all;}
-    #txtModal .tcard{pointer-events:all;}
-    .tcard{background:rgba(20,15,40,0.97);border:2px solid rgba(255,255,255,0.12);
-      border-radius:20px;padding:20px;width:min(320px,90vw);}
-    .tcard h3{color:#fff;font-size:15px;margin-bottom:10px;text-align:center;}
-    .font-preview-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
-    .font-opt{padding:8px 10px;border-radius:8px;border:2px solid rgba(255,255,255,0.1);
-      background:rgba(255,255,255,0.04);color:#fff;cursor:pointer;text-align:center;
-      font-size:15px;transition:all .18s;}
-    .font-opt.sel{border-color:#ff69b4;background:rgba(255,105,180,0.15);}
-    .font-opt:hover{border-color:rgba(255,255,255,0.3);}
-    .tmodal-slider-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-    .tmodal-lbl{font-size:9px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;width:40px;flex-shrink:0;}
-    .tmodal-sl{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;
-      background:rgba(255,255,255,0.15);outline:none;cursor:pointer;}
-    .tmodal-sl::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
-      background:#ff69b4;cursor:pointer;box-shadow:0 0 6px rgba(255,105,180,0.5);}
-    .tmodal-val{font-size:10px;color:#aaa;width:32px;text-align:right;flex-shrink:0;}
-    #txtPreview{width:100%;height:44px;display:flex;align-items:center;justify-content:center;
-      border-radius:8px;background:rgba(255,255,255,0.06);margin-bottom:10px;
-      font-size:22px;color:#fff;overflow:hidden;transition:all .2s;}
-    #tInput{width:100%;padding:10px;background:rgba(255,255,255,0.08);
-      border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;
-      color:#fff;font-size:16px;font-family:inherit;outline:none;margin-bottom:10px;}
-    #fSel{width:100%;padding:8px;background:rgba(13,17,23,0.9);
-      border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;
-      color:#fff;font-size:13px;font-family:inherit;margin-bottom:12px;}
-    .tbtns{display:flex;gap:8px;}
-    .tbok{flex:1;padding:10px;border:none;border-radius:10px;font-size:13px;
-      font-weight:800;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#00ccff);color:#fff;}
-    .tbno{flex:1;padding:10px;border:none;border-radius:10px;font-size:13px;
-      font-weight:800;cursor:pointer;background:rgba(255,255,255,0.08);color:#aaa;}
-
-    .toast{position:fixed;top:58px;left:50%;transform:translateX(-50%);
-      background:rgba(0,0,0,0.88);color:#fff;padding:7px 18px;border-radius:99px;
-      font-size:12px;font-weight:700;z-index:300;animation:tpop 2.2s ease forwards;
-      white-space:nowrap;pointer-events:none;}
-    @keyframes tpop{0%{opacity:0;transform:translate(-50%,-8px);}12%{opacity:1;transform:translate(-50%,0);}78%{opacity:1;}100%{opacity:0;}}
-  
-/* ── MOBILE TOOLS ── */
-
-/* Side pull tab */
-#mobToolBtn{
-  display:none;
-  position:fixed;
-  left:0; top:calc(50% + 96px);
-  transform:translateY(-50%);
-  z-index:200;
-  flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:4px;
-  width:32px;
-  padding:14px 0;
-  background:linear-gradient(180deg,rgba(20,10,30,0.97),rgba(13,5,20,0.97));
-  border:1px solid rgba(255,215,0,0.5);
-  border-left:none;
-  border-radius:0 14px 14px 0;
-  cursor:pointer;
-  box-shadow:3px 0 16px rgba(255,215,0,0.25),inset -2px 0 8px rgba(255,215,0,0.08);
-  animation:tabGlow 2.5s ease-in-out infinite;
-  backdrop-filter:blur(8px);
+  el.style.background='rgba(255,105,180,0.2)';
+  el.style.borderColor='rgba(255,105,180,0.6)';
+  tFontFamily=el.dataset.f;
+  tFontWeight=el.dataset.fw||'700';
+  tFontStyle=el.dataset.fi||'normal';
 }
-@keyframes tabGlow{
-  0%,100%{box-shadow:3px 0 12px rgba(255,215,0,0.2),inset -2px 0 6px rgba(255,215,0,0.05);}
-  50%{box-shadow:3px 0 22px rgba(255,215,0,0.55),inset -2px 0 12px rgba(255,215,0,0.15);}
-}
-#mobTabIcon{ font-size:16px; line-height:1; }
-#mobTabLabel{
-  font-size:7px;font-weight:900;
-  letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,215,0,0.8);
-  writing-mode:vertical-rl;
-  text-orientation:mixed;
-  transform:rotate(180deg);
-  line-height:1;
-}
-#mobTabArrow{
-  font-size:16px;color:rgba(255,215,0,0.7);
-  line-height:1;
-  transition:transform 0.28s;
-}
-
-@media(max-width:768px){
-  /* Hide toolbar by default on mobile */
-  #toolWrap{
-    transform:translateX(-155px)!important;
-    transition:transform 0.28s ease;
-  }
-  #toolWrap.mob-open{
-    transform:translateX(0)!important;
-  }
-  /* Push side tab right when panel open */
-  #toolWrap.mob-open ~ #mobToolBtn,
-  body.tools-open #mobToolBtn{
-    left:155px;
-    border-radius:0 14px 14px 0;
-    border-left:none;
-    border-right:1px solid rgba(255,215,0,0.5);
-  }
-  /* Flip arrow when open */
-  body.tools-open #mobTabArrow{ transform:rotate(180deg); }
-  /* Hide original toggle */
-  #tbToggle{ display:none!important; }
-  /* Show mobile elements */
-  #mobToolBtn{ display:flex!important; }
-  #toolCloseBtn{ display:flex!important; }
-}
-/* Hide on desktop */
-#toolCloseBtn{ display:none; }
-
-@keyframes slimePulse{
-  0%,100%{box-shadow:0 0 8px rgba(255,215,0,0.4);}
-  50%{box-shadow:0 0 18px rgba(255,215,0,0.9),0 0 28px rgba(255,215,0,0.3);}
-}
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Dancing+Script:wght@700&family=Space+Mono:wght@700&family=Abril+Fatface&family=Permanent+Marker&display=block" rel="stylesheet">
-</head>
-<body>
-
-<div id="hdr">
-  <div><div class="hdr-title">🧪 THE SLIME ARTISTS FACTORY</div>
-    <div class="hdr-hint" id="hdrHint">👆 Squish · ✏️ Draw · 💬 Write!</div></div>
-  <div class="hdr-right">
-    <button class="icon-btn" onclick="undoStroke()" title="Undo">↩️</button>
-    <button class="icon-btn" onclick="clearDrawings()" title="Clear art">🗑</button>
-    <button class="icon-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
-  </div>
-</div>
-
-<canvas id="mainCanvas"></canvas>
-
-<!-- Tool bar — collapsible -->
-<div id="toolWrap">
-  <div id="toolBar">
-    <button class="tool-btn on" id="t-squish" onclick="setTool('squish')">🖐️<span class="tlbl">Squish</span></button>
-    <button class="tool-btn"    id="t-pencil" onclick="setTool('pencil')">✏️<span class="tlbl">Pencil</span></button>
-    <button class="tool-btn"    id="t-crayon" onclick="setTool('crayon')">🖍️<span class="tlbl">Crayon</span></button>
-    <button class="tool-btn"    id="t-chalk"  onclick="setTool('chalk')">🪨<span class="tlbl">Chalk</span></button>
-    <button class="tool-btn"    id="t-water"  onclick="setTool('water')">🎨<span class="tlbl">Watercolour</span></button>
-    <button class="tool-btn"    id="t-oil"    onclick="setTool('oil')">🖌️<span class="tlbl">Oil Paint</span></button>
-    <button class="tool-btn"    id="t-air"    onclick="setTool('air')">💨<span class="tlbl">Spray</span></button>
-    <button class="tool-btn"    id="t-text"   onclick="showTxt()">💬<span class="tlbl">Add Text</span></button>
-    <div class="tool-ctrl">
-      <div id="brushPreview" onclick="document.getElementById('cpick').click()">
-        <canvas id="previewCanvas" width="260" height="120"></canvas>
-        <span class="prev-lbl">TAP COLOR</span>
-      </div>
-      <input type="color" id="cpick" value="#ff3366"
-        style="position:fixed;left:-999px;top:-999px;width:1px;height:1px;opacity:0;pointer-events:none;"
-        oninput="setColor(this.value)">
-      <div class="slider-wrap">
-        <div class="sldr-row">
-          <span class="sldr-lbl">SZ</span>
-          <input type="range" class="hslider" id="brushSz" min="1" max="50" value="8">
-        </div>
-        <div class="sldr-row">
-          <span class="sldr-lbl">HRD</span>
-          <input type="range" class="hslider" id="brushHard" min="0" max="100" value="50">
-        </div>
-        <div class="sldr-row">
-          <span class="sldr-lbl">OPC</span>
-          <input type="range" class="hslider" id="brushOpacity" min="5" max="100" value="80">
-          <span id="opacityVal">80%</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <button id="tbToggle" onclick="toggleToolbar()" title="Hide/show tools">◀</button>
-</div>
-
-<!-- Shelf -->
-<div id="shelf">
-  <div class="stabs">
-    <button class="stab on" onclick="stab('colors')">🎨 Slime Colors</button>
-    <button class="stab"    onclick="stab('addins')">✨ Add-ins</button>
-  </div>
-  <div id="sp-colors" class="spanel on"><div class="srow" id="colorRow"></div></div>
-  <div id="sp-addins" class="spanel"><div class="srow" id="addinsRow"></div></div>
-  <div class="arow">
-    <button class="abtn bsq" onclick="doSquish()">💦 SQUISH</button>
-    <button class="abtn bmx" onclick="doMix()">🌀 MIX</button>
-    <div style="position:relative;display:inline-block;">
-  <button class="abtn bsv" onclick="toggleSaveMenu()" id="saveMenuBtn">📸 SAVE ▾</button>
-  <div id="saveMenu" style="display:none;position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
-    background:rgba(13,17,23,0.97);border:1px solid rgba(255,215,0,0.3);border-radius:10px;
-    min-width:160px;z-index:300;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.5);">
-    <div onclick="doSave();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;
-      color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.08);"
-      onmouseover="this.style.background='rgba(255,215,0,0.1)'"
-      onmouseout="this.style.background=''">📸 Save to Gallery</div>
-    <div onclick="doShareNative();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;
-      color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.08);"
-      onmouseover="this.style.background='rgba(255,215,0,0.1)'"
-      onmouseout="this.style.background=''">↗ Share to Social</div>
-    <div onclick="doShareFacebook();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;
-      color:#4267B2;cursor:pointer;"
-      onmouseover="this.style.background='rgba(255,215,0,0.1)'"
-      onmouseout="this.style.background=''">📘 Share on Facebook</div>
-  </div>
-</div>
-    <button class="abtn brs" onclick="doReset()">🔄 RESET</button>
-  </div>
-</div>
-
-<!-- Text modal -->
-<div id="txtModal" style="display:none;position:fixed;inset:0;z-index:200;
-  align-items:center;justify-content:center;background:rgba(0,0,0,0.5);">
-  <div style="background:#1a1a2e;border:2px solid rgba(255,255,255,0.2);border-radius:16px;
-    padding:20px;width:min(300px,88vw);text-align:center;">
-    <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:14px;">✍️ Add Text to Slime</div>
-    <input type="text" id="tInput" placeholder="Type your message..." maxlength="40"
-      style="width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);
-        border-radius:10px;color:#fff;font-size:16px;text-align:center;outline:none;margin-bottom:14px;font-family:inherit;">
-    <div style="display:flex;gap:8px;">
-      <button onclick="closeTxt()" style="flex:1;padding:12px;border-radius:10px;border:none;
-        background:rgba(255,255,255,0.08);color:#aaa;font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
-      <button onclick="addText()" style="flex:1;padding:12px;border-radius:10px;border:none;
-        background:linear-gradient(135deg,#ff69b4,#a855f7);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Add 🎉</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ════════════════════════════════════════════════
-// THE SLIME ARTISTS FACTORY — Live Warp Art Studio
-// Today in Hawaii © 2026
-//
-// KEY ARCHITECTURE:
-// • Single canvas renders everything each frame
-// • Strokes stored as NORMALIZED coords (r, angle)
-//   relative to slime center + natural radius
-// • Each frame: strokes WARPED by boundary deformation
-// • Touch ALWAYS squishes slime regardless of tool
-// • Drawing happens as secondary effect on top
-// ════════════════════════════════════════════════
-
-const canvas = document.getElementById('mainCanvas');
-const ctx    = canvas.getContext('2d');
-let W,H,CX,CY,NR,PR; // NR = natural radius
-
-function shelfH(){const v=window.innerHeight;return v<=680?175:v>=800?215:195;}
-
-function setSize(){
-  PR = window.devicePixelRatio||1;
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  // Full screen canvas
-  W = canvas.width  = Math.round(vw*PR);
-  H = canvas.height = Math.round(vh*PR);
-  canvas.style.width  = vw+'px';
-  canvas.style.height = vh+'px';
-  // Center slime in the USABLE area (between header 48px and shelf)
-  const usableTop = 48;
-  const usableH   = vh - 48 - shelfH();
-  CX = W/2;
-  CY = Math.round((usableTop + usableH/2) * PR);
-  NR = Math.min(W, usableH*PR) * 0.42;
-}
-setSize();
-
-// ── PHYSICS ───────────────────────────────────
-const N=48, STIFF=0.0008, NBK=0.012, PREK=0.0006, DAMP=0.64;
-let pts=[], nPts=[];
-function initSlime(){
-  pts=[]; nPts=[];
-  for(let i=0;i<N;i++){
-    const a=(i/N)*Math.PI*2;
-    pts.push({x:CX+Math.cos(a)*NR, y:CY+Math.sin(a)*NR, vx:0,vy:0});
-    nPts.push({x:CX+Math.cos(a)*NR, y:CY+Math.sin(a)*NR});
-  }
-}
-function reNatural(){
-  for(let i=0;i<N;i++){const a=(i/N)*Math.PI*2;nPts[i].x=CX+Math.cos(a)*NR;nPts[i].y=CY+Math.sin(a)*NR;}
-}
-initSlime();
-
-const NAT_AREA=Math.PI*NR*NR;
-const NAT_DIST=NR*(2*Math.PI/N);
-
-let idleTick=0;
-function physicsTick(){
-  let area=0;
-  for(let i=0;i<N;i++){const j=(i+1)%N;area+=(pts[i].x*pts[j].y-pts[j].x*pts[i].y);}
-  const pe=(Math.abs(area)*0.5-NAT_AREA)/NAT_AREA;
-  pts.forEach((p,i)=>{
-    const prev=pts[(i-1+N)%N], next=pts[(i+1)%N], n=nPts[i];
-    let fx=(n.x-p.x)*STIFF, fy=(n.y-p.y)*STIFF;
-    function sp(o){const dx=o.x-p.x,dy=o.y-p.y,d=Math.sqrt(dx*dx+dy*dy)||1,s=d-NAT_DIST;fx+=(dx/d)*s*NBK;fy+=(dy/d)*s*NBK;}
-    sp(prev);sp(next);
-    const nx=p.x-CX,ny=p.y-CY,nl=Math.sqrt(nx*nx+ny*ny)||1;
-    fx-=(nx/nl)*pe*PREK*NR; fy-=(ny/nl)*pe*PREK*NR;
-    // ── Idle breathing animation ──────────────────────
-    // Slow gentle sine wave rippling around the blob
-    const idleAngle = (i/N)*Math.PI*2;
-    const idleWave  = Math.sin(idleTick*0.022 + idleAngle*2) * 0.22;
-    const idlePush  = Math.cos(idleTick*0.015 + idleAngle*3) * 0.16;
-    const idleSlow  = Math.sin(idleTick*0.008 + idleAngle)   * 0.12;
-    const idleNx = Math.cos(idleAngle), idleNy = Math.sin(idleAngle);
-    fx += idleNx * idleWave + idleNy * idlePush + idleNx * idleSlow;
-    fy += idleNy * idleWave - idleNx * idlePush + idleNy * idleSlow;
-    // ───────────────────────────────────────────────────
-    p.vx=(p.vx+fx)*DAMP; p.vy=(p.vy+fy)*DAMP;
-    p.x+=p.vx; p.y+=p.vy;
-  });
-  blobs.forEach(b=>{
-    b.x+=b.vx; b.y+=b.vy; b.vx*=0.97; b.vy*=0.97; b.rot+=b.rotV;
-    const bx=b.x-CX,by=b.y-CY,bd=Math.sqrt(bx*bx+by*by);
-    if(bd>NR*0.88){b.vx-=(bx/bd)*0.4;b.vy-=(by/bd)*0.4;}
+function updateAlignBtns(){
+  ['l','c','r'].forEach(x=>{
+    const b=document.getElementById('al-'+x);
+    if(!b)return;
+    const active=(x==='l'&&tAlign==='left')||(x==='c'&&tAlign==='center')||(x==='r'&&tAlign==='right');
+    b.style.borderColor=active?'rgba(255,105,180,0.6)':'rgba(255,255,255,0.15)';
+    b.style.background=active?'rgba(255,105,180,0.2)':'rgba(255,255,255,0.05)';
   });
 }
-
-// ── WARP FUNCTION ─────────────────────────────
-// Map any canvas point through the slime deformation
-// Points near boundary warp more, center barely moves
-function warpPoint(px,py){
-  const dx=px-CX, dy=py-CY;
-  const dist=Math.sqrt(dx*dx+dy*dy);
-  if(dist<0.1) return {x:px,y:py};
-  const angle=Math.atan2(dy,dx);
-  // Normalized angle 0..N
-  const seg=((angle+Math.PI)/(Math.PI*2))*N;
-  const i0=Math.floor(seg)%N, i1=(i0+1)%N;
-  const t=seg-Math.floor(seg);
-  // Boundary displacement at this angle (interpolated)
-  const bdx=(pts[i0].x-nPts[i0].x)*(1-t)+(pts[i1].x-nPts[i1].x)*t;
-  const bdy=(pts[i0].y-nPts[i0].y)*(1-t)+(pts[i1].y-nPts[i1].y)*t;
-  // Influence = how much this point warps (0=center, 1=boundary edge)
-  const r=dist/NR;
-  const infl=Math.min(1, r*r * 1.3); // quadratic falloff — center barely moves
-  return {x:px+bdx*infl, y:py+bdy*infl};
-}
-
-// ── STROKES (stored in natural coords, warped on render) ──
-// Each stroke: {tool, color, size, pts:[{x,y}]}
-// pts stored as ABSOLUTE canvas coords at time of drawing
-// Each frame we warp them through warpPoint()
-let strokes=[];
-let activeStroke=null;
-
-// Point decimation — only add point if moved enough (stops runaway array growth!)
-const MIN_DIST=3; // minimum pixels between stored points
-function startStroke(x,y){
-  activeStroke={
-    tool:currentTool, color:drawColor,
-    size:brushSz*PR*0.6,
-    hardness:brushHardness,
-    opacity:brushOpacity,   // store opacity with each stroke!
-    pts:[{x,y}]
-  };
-}
-function extendStroke(x,y){
-  if(!activeStroke) return;
-  const last=activeStroke.pts[activeStroke.pts.length-1];
-  const dx=x-last.x, dy=y-last.y;
-  // Only add point if moved enough — prevents freeze from too many points!
-  if(Math.sqrt(dx*dx+dy*dy) >= MIN_DIST*PR){
-    activeStroke.pts.push({x,y});
-    // Hard cap per stroke to prevent runaway
-    if(activeStroke.pts.length>300) activeStroke.pts.shift();
-  }
-}
-function finishStroke(){
-  if(activeStroke && activeStroke.pts.length>0){
-    strokes.push(activeStroke);
-    if(strokes.length>40) strokes.shift(); // strict limit!
-  }
-  activeStroke=null;
-}
-function undoStroke(){
-  if(strokes.length>0){strokes.pop();showToast('↩️ Undone!');}
-}
-function clearDrawings(){
-  strokes=[];activeStroke=null;showToast('🗑 Art cleared!');
-}
-
-// ── RENDER A STROKE WITH WARP ─────────────────
-function renderStroke(stroke){
-  if(!stroke||stroke.pts.length<1) return;
-  const warped=stroke.pts.map(p=>warpPoint(p.x,p.y));
-  const sz    = stroke.size;
-  const op    = stroke.opacity!==undefined ? stroke.opacity : 0.8;
-  const hard  = stroke.hardness!==undefined ? stroke.hardness : 0.5;
-  // blur = 0 when hard=1, blur = 10px when hard=0
-  const blur  = (1-hard) * 10;
-
-  ctx.save();
-  ctx.lineCap='round'; ctx.lineJoin='round';
-  ctx.globalAlpha = op;
-  // KEY: apply blur filter for ALL soft brushes in one go!
-  if(blur > 0.4) ctx.filter = `blur(${blur.toFixed(1)}px)`;
-
-  switch(stroke.tool){
-
-    case 'pencil':{
-      // Hard pencil = crisp thin line
-      // Soft pencil = feathered, lighter, wider
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth   = Math.max(1, sz * (0.4 + hard*0.3));
-      ctx.globalAlpha = op * (0.7 + hard*0.3);
-      ctx.beginPath();
-      warped.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-      ctx.stroke();
-      // Soft pencil gets a second wider ghost pass
-      if(hard < 0.6){
-        ctx.globalAlpha = op * 0.2;
-        ctx.lineWidth   = sz * 1.2;
-        ctx.beginPath();
-        warped.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-        ctx.stroke();
-      }
-      break;}
-
-    case 'crayon':{
-      // Hard crayon = solid waxy stroke
-      // Soft crayon = light pressure, multiple thin layered passes
-      const passes = hard > 0.65 ? 1 : 3;
-      for(let pass=0; pass<passes; pass++){
-        ctx.globalAlpha = op * (hard>0.65 ? 0.88 : 0.35 + pass*0.05);
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth   = sz * (0.8 + pass*0.15);
-        const jitter    = sz * (1-hard) * 0.8;
-        ctx.beginPath();
-        warped.forEach((p,i)=>{
-          const jx = p.x+(Math.random()-0.5)*jitter;
-          const jy = p.y+(Math.random()-0.5)*jitter;
-          i===0 ? ctx.moveTo(jx,jy) : ctx.lineTo(jx,jy);
-        });
-        ctx.stroke();
-      }
-      break;}
-
-    case 'chalk':{
-      // Hard chalk = denser, more lines, smaller scatter
-      // Soft chalk = very dusty, wide scatter, very transparent
-      const lines   = hard > 0.6 ? 8 : 5;
-      const scatter = sz * (0.4 + (1-hard)*1.8);
-      for(let j=0;j<lines;j++){
-        ctx.globalAlpha = op * (0.08 + Math.random()*(hard>0.6?0.25:0.12));
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth   = sz*(0.2+Math.random()*(hard>0.6?0.5:0.8));
-        ctx.beginPath();
-        warped.forEach((p,i)=>{
-          const ox=(Math.random()-0.5)*scatter;
-          const oy=(Math.random()-0.5)*scatter;
-          i===0?ctx.moveTo(p.x+ox,p.y+oy):ctx.lineTo(p.x+ox,p.y+oy);
-        });
-        ctx.stroke();
-      }
-      break;}
-
-    case 'water':{
-      // Hard watercolor = more defined wash, stronger colour
-      // Soft watercolor = very diffuse, wide bloom
-      const baseAlpha = op * (hard*0.12 + 0.03);
-      const width     = sz * (1.5 + (1-hard)*2.5);
-      // Core stroke
-      ctx.globalAlpha = baseAlpha * 2;
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth   = sz * 0.8;
-      ctx.beginPath();
-      warped.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-      ctx.stroke();
-      // Soft blooming halo passes
-      const passes = hard > 0.7 ? 2 : 5;
-      for(let j=0;j<passes;j++){
-        ctx.globalAlpha = baseAlpha * (1-j/passes);
-        ctx.lineWidth   = width * (1 + j*0.6);
-        ctx.beginPath();
-        warped.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-        ctx.stroke();
-      }
-      break;}
-
-    case 'oil':{
-      // Hard oil = thick crisp impasto stroke
-      // Soft oil = wide blended brushstroke, feathered edges
-      const thick = sz * (1.0 + hard*0.6);
-      ctx.globalAlpha = op * (0.7 + hard*0.28);
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth   = thick;
-      ctx.beginPath();
-      warped.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-      ctx.stroke();
-      // Soft oil gets wide feathered under-pass first
-      if(hard < 0.6){
-        ctx.globalAlpha = op * 0.18;
-        ctx.lineWidth   = thick * 2.2;
-        ctx.beginPath();
-        warped.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-        ctx.stroke();
-      }
-      // Hard oil gets a bright highlight streak on top
-      if(hard > 0.5){
-        ctx.globalAlpha = op * 0.28 * hard;
-        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-        ctx.lineWidth   = sz * 0.3;
-        ctx.beginPath();
-        warped.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-        ctx.stroke();
-      }
-      break;}
-
-    case 'air':{
-      // Hard air = tight concentrated dots (sharp edge)
-      // Soft air = wide diffuse cloud (airbrushed fade)
-      const step   = Math.max(1, Math.floor(warped.length/30));
-      const spread = sz * (1.2 + (1-hard)*3.5);
-      const dots   = Math.round(6 + (1-hard)*8); // more dots = softer cloud
-      for(let pi=0;pi<warped.length;pi+=step){
-        const p=warped[pi];
-        for(let j=0;j<dots;j++){
-          // Soft: dots cluster toward center via gaussian-like distribution
-          const ang = Math.random()*Math.PI*2;
-          const dist = hard > 0.6
-            ? Math.random()*spread*0.5          // hard = tight
-            : spread * Math.sqrt(Math.random()); // soft = gaussian spread
-          const alpha = hard > 0.6
-            ? op*(0.06+Math.random()*0.1)        // hard = stronger dots
-            : op*(0.025+Math.random()*0.04);     // soft = very wispy
-          ctx.globalAlpha = alpha;
-          ctx.fillStyle   = stroke.color;
-          ctx.beginPath();
-          ctx.arc(
-            p.x+Math.cos(ang)*dist,
-            p.y+Math.sin(ang)*dist,
-            sz*(0.15+hard*0.1), 0, Math.PI*2
-          );
-          ctx.fill();
-        }
-      }
-      break;}
-
-    case 'text': break; // handled by renderLiveText()
-  }
-  ctx.restore();
-}
-
-// ── PARTICLES ──────────────────────────────────
-let blobs=[], activeAddins=new Set();
-function addBlobs(type,count){
-  const sc=NR/160;
-  for(let k=0;k<count;k++){
-    const a=Math.random()*Math.PI*2, r=NR*(0.1+Math.random()*0.72);
-    const b={x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r,
-      vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5,
-      rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.04,
-      type,size:0,emoji:'',color:'',shape:'circle'};
-    switch(type){
-      case 'bubble': b.size=(32+Math.random()*30)*sc; break; // bigger!
-      case 'glitter':b.color=`hsl(${Math.random()*360},100%,75%)`;b.size=(6+Math.random()*6)*sc;break;
-      case 'stars':  b.emoji='⭐';b.size=(26+Math.random()*18)*sc;break;
-      case 'sprinkles':b.color=`hsl(${Math.random()*360},95%,65%)`;b.size=(9+Math.random()*7)*sc;b.shape='rect';break;
-      case 'sparkles':b.emoji='✨';b.size=(28+Math.random()*16)*sc;break;
-      case 'foam':   b.color=`rgba(255,255,255,${0.5+Math.random()*0.4})`;b.size=(18+Math.random()*20)*sc;break;
-      case 'hearts': b.emoji='💕';b.size=(30+Math.random()*16)*sc;break;
-      case 'candy':  b.color=`hsl(${Math.random()*360},95%,65%)`;b.size=(15+Math.random()*12)*sc;break;
-      case 'confetti':b.color=`hsl(${Math.random()*360},95%,65%)`;b.size=(12+Math.random()*10)*sc;b.shape='rect';break;
-      case 'pearls': b.color=`rgba(240,240,255,0.9)`;b.size=(16+Math.random()*10)*sc;break;
-      case 'ice':    b.color=`rgba(180,230,255,0.75)`;b.size=(15+Math.random()*12)*sc;break;
-      case 'beads':  b.color=`hsl(${Math.random()*360},85%,65%)`;b.size=(14+Math.random()*10)*sc;break;
-      case 'glow':   b.color=`hsl(${160+Math.random()*80},100%,70%)`;b.size=(13+Math.random()*10)*sc;break;
-    }
-    blobs.push(b);
-  }
-}
-
-// ── SLIME COLOR ────────────────────────────────
-let sR=0,sG=200,sB=80,isRainbow=false,rainbowHue=0;
-
-// ── TOOL STATE ─────────────────────────────────
-let currentTool='squish', drawColor='#ff3366', brushSz=8;
-let isPointerDown=false, lastPos={x:0,y:0};
-const fingers={};
-
-document.getElementById('brushSz').addEventListener('input',e=>{brushSz=parseInt(e.target.value);});
-
-let tbVisible=true;
-function toggleToolbar(){
-  tbVisible=!tbVisible;
-  document.getElementById('toolWrap').classList.toggle('hidden',!tbVisible);
-  document.getElementById('toolBar').classList.toggle('hidden',!tbVisible);
-  document.getElementById('tbToggle').textContent=tbVisible?'◀':'▶';
-}
-
-let brushHardness=0.5; // 0=soft 1=hard
-let brushOpacity=0.8;  // 0.05 to 1.0
-
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('brushHard').addEventListener('input',e=>{
-    brushHardness=parseInt(e.target.value)/100;
-    updateBrushPreview();
-  });
-  document.getElementById('brushSz').addEventListener('input',e=>{
-    brushSz=parseInt(e.target.value);
-    updateBrushPreview(); // LIVE UPDATE!
-  });
-  document.getElementById('brushOpacity').addEventListener('input',e=>{
-    brushOpacity=parseInt(e.target.value)/100;
-    document.getElementById('opacityVal').textContent=e.target.value+'%';
-    updateBrushPreview(); // LIVE UPDATE!
-  });
-  setTimeout(updateBrushPreview, 200); // init preview after DOM ready
-});
-
-
-function setTool(t){
-  currentTool=t;
-  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('on'));
-  const btn=document.getElementById('t-'+t);
-  if(btn) btn.classList.add('on');
-  const hints={squish:'👆 Squish and push the slime!',pencil:'✏️ Draw — slime still squishes!',
-    crayon:'🖍️ Crayon — try soft vs hard brush!',chalk:'🪨 Chalk texture!',water:'🎨 Watercolour wash!',
-    oil:'🖌️ Thick oil paint!',air:'💨 Spray paint!',text:'💬 Write in the slime!'};
-  document.getElementById('hdrHint').textContent=hints[t]||'';
-  updateBrushPreview(); // update preview for new tool
-}
-function setColor(c){
-  drawColor=c;
-  updateBrushPreview();
-}
-
-// Live brush preview — shows size, color, hardness, opacity
-function updateBrushPreview(){
-  const pc=document.getElementById('previewCanvas');
-  if(!pc) return;
-  const pCtx=pc.getContext('2d');
-  const pw=pc.width, ph=pc.height;
-  pCtx.clearRect(0,0,pw,ph);
-
-  // Dark background
-  pCtx.fillStyle='#111';
-  pCtx.fillRect(0,0,pw,ph);
-
-  // Checkerboard to show opacity
-  const csz=8;
-  for(let gy=0;gy<Math.ceil(ph/csz);gy++){
-    for(let gx=0;gx<Math.ceil(pw/csz);gx++){
-      pCtx.fillStyle=(gx+gy)%2===0?'rgba(80,80,80,0.6)':'rgba(40,40,40,0.6)';
-      pCtx.fillRect(gx*csz,gy*csz,csz,csz);
-    }
-  }
-
-  const pcx=pw/2, pcy=ph/2;
-  const previewR=Math.max(5,Math.min(ph*0.42,brushSz*0.85));
-  const blurPx=(1-brushHardness)*10;
-
-  pCtx.save();
-  pCtx.globalAlpha=brushOpacity;
-  if(blurPx>0.5) pCtx.filter='blur('+blurPx+'px)';
-
-  const pg=pCtx.createRadialGradient(pcx-previewR*0.3,pcy-previewR*0.3,0,pcx,pcy,previewR*1.1);
-  pg.addColorStop(0,'white');
-  pg.addColorStop(0.25,drawColor);
-  pg.addColorStop(1,drawColor);
-  pCtx.fillStyle=pg;
-  pCtx.beginPath();pCtx.arc(pcx,pcy,previewR,0,Math.PI*2);pCtx.fill();
-
-  if(blurPx>2){
-    pCtx.globalAlpha=brushOpacity*0.25;
-    pCtx.filter='blur('+(blurPx*2)+'px)';
-    pCtx.fillStyle=drawColor;
-    pCtx.beginPath();pCtx.arc(pcx,pcy,previewR*1.5,0,Math.PI*2);pCtx.fill();
-  }
-  pCtx.restore();
-
-  // Glow border
-  const bp=document.getElementById('brushPreview');
-  if(bp){
-    bp.style.borderColor=drawColor;
-    bp.style.boxShadow='0 0 10px '+drawColor+'88, inset 0 0 8px rgba(0,0,0,0.6)';
-  }
-}
-
-// ── POINTER HANDLING ───────────────────────────
-// CRITICAL: touch ALWAYS squishes slime regardless of tool!
-// Drawing is ADDED ON TOP — slime is never locked!
-
-canvas.addEventListener('pointerdown',e=>{
-  // ONLY capture if directly touching the canvas — never steal from UI controls!
-  if(e.target !== canvas) return;
-  e.preventDefault();
-  const pos=getPos(e);
-  fingers[e.pointerId]={...pos};
-  canvas.setPointerCapture(e.pointerId);
-  isPointerDown=true; lastPos={...pos};
-  applyForce(pos.x,pos.y,0,0);
-  playTouch();
-  if(currentTool!=='squish'&&currentTool!=='text') startStroke(pos.x,pos.y);
-},{passive:false});
-
-canvas.addEventListener('pointermove',e=>{
-  if(e.target !== canvas && !fingers[e.pointerId]) return;
-  e.preventDefault();
-  const pos=getPos(e);
-  // Drag text message
-  if(draggingTextIdx>=0){
-    const m=textMessages[draggingTextIdx];
-    if(m){m.x=(pos.x-textDragOffX); m.y=(pos.y-textDragOffY);}
-    return;
-  }
-  if(!fingers[e.pointerId]) return;
-  const prev=fingers[e.pointerId];
-  const dx=pos.x-prev.x, dy=pos.y-prev.y;
-  fingers[e.pointerId]={...pos};
-  applyForce(pos.x,pos.y,dx,dy);
-  moveBlobs(pos.x,pos.y,dx*0.3,dy*0.3);
-  playStretch(Math.sqrt(dx*dx+dy*dy));
-  if(currentTool!=='squish'&&currentTool!=='text'&&isPointerDown) extendStroke(pos.x,pos.y);
-},{passive:false});
-
-canvas.addEventListener('pointerup',e=>{
-  delete fingers[e.pointerId];
-  if(isPointerDown) finishStroke();
-  isPointerDown=false; draggingTextIdx=-1; playRelease();
-});
-canvas.addEventListener('pointercancel',e=>{delete fingers[e.pointerId];isPointerDown=false;finishStroke();});
-
-function getPos(e){
-  const r=canvas.getBoundingClientRect();
-  return{x:(e.clientX-r.left)*PR, y:(e.clientY-r.top)*PR};
-}
-
-function applyForce(fx,fy,dx,dy){
-  const FR=NR*0.62, FF=1.2;
-  const speed=Math.sqrt(dx*dx+dy*dy);
-  pts.forEach(p=>{
-    const ex=p.x-fx,ey=p.y-fy,dist=Math.sqrt(ex*ex+ey*ey);
-    if(dist<FR*1.4){
-      const inf=Math.pow(Math.max(0,1-dist/(FR*1.4)),2);
-      // Even without movement, pressing creates a small indent
-      if(speed>0.3){p.vx+=dx*FF*inf;p.vy+=dy*FF*inf;}
-      else{const nx=(p.x-CX),ny=(p.y-CY),nl=Math.sqrt(nx*nx+ny*ny)||1;
-        p.vx-=(nx/nl)*inf*0.3;p.vy-=(ny/nl)*inf*0.3;}
-    }
-  });
-}
-function moveBlobs(fx,fy,dx,dy){
-  blobs.forEach(b=>{
-    const d=Math.sqrt((b.x-fx)**2+(b.y-fy)**2);
-    if(d<NR){const i=Math.max(0,1-d/NR);b.vx+=dx*i*1.5;b.vy+=dy*i*1.5;}
-  });
-}
-
-// ── TEXT ───────────────────────────────────────
-function showTxt(){
-  ['700 42px Anton','700 42px Dancing Script','700 38px Space Mono','400 44px Abril Fatface','400 38px Permanent Marker'].forEach(f=>document.fonts.load(f).catch(()=>{}));
-  renderTextSlots();
-  setTimeout(updateTxtPreview,100);
-  // Close mobile tools panel so it doesn't overlay the text modal
-  document.getElementById('toolWrap').classList.remove('mob-open');
-  document.body.classList.remove('tools-open');
-  if(document.getElementById('mobToolBtn')) document.getElementById('mobToolBtn').style.left='0';
-  if(document.getElementById('mobTabArrow')) document.getElementById('mobTabArrow').style.transform='rotate(0)';setTool('text');document.getElementById('txtModal').classList.add('on');setTimeout(()=>document.getElementById('tInput').focus(),100);}
-function closeTxt(){
-  document.getElementById('txtModal').classList.remove('on');
-  editingMsgId=null; textEditColor=null;
-  const btn=document.querySelector('.tbok');
-  if(btn) btn.textContent='Add to Slime 🎉';
-  setTool('squish');
-}
-let selectedFont='700 42px Anton', selectedAlign='left';
-let textMessages=[]; let editingMsgId=null; let textEditColor=null; // up to 5 independent text messages
-
-
-
-
-
-
-
-
-
-
 function addText(){
   const txt=(document.getElementById('tInput')||{}).value||'';
-  if(!txt.trim()){if(editingMsgId){closeTxt();}return;}
-  if(!editingMsgId && textMessages.length>=5){showToast('Max 5 messages! Remove one first.');return;}
-  const sz=parseInt((document.getElementById('tSize')||{value:60}).value);
-  const op=parseInt((document.getElementById('tOpacity')||{value:90}).value)/100;
-  const fontStr=selectedFont.replace(/(\d+)px/,sz+'px');
-  // If editing existing message - just update it, don't add new
-  if(editingMsgId){
-    const m=textMessages.find(x=>x.id===editingMsgId);
-    if(m){
-      m.text=txt; m.size=sz; m.opacity=op;
-      m.font=fontStr; m.align=selectedAlign; m.color=textEditColor||m.color;
-    }
-    editingMsgId=null; textEditColor=null;
-    document.getElementById('tInput').value='';
-    renderTextSlots(); closeTxt(); return;
+  if(!txt.trim()) return;
+  const sz=parseInt(document.getElementById('tSize').value)||60;
+  const op=parseInt(document.getElementById('tOp').value)/100;
+  const col=document.getElementById('tColor').value||'#ffffff';
+  const offsets=[0,-NR*0.35,NR*0.35,-NR*0.6,NR*0.6];
+  if(editIdx>=0 && textMsgs[editIdx]){
+    // Update existing
+    const m=textMsgs[editIdx];
+    m.text=txt; m.size=sz; m.opacity=op; m.color=col;
+    m.fontFamily=tFontFamily; m.fontWeight=tFontWeight; m.fontStyle=tFontStyle;
+    m.align=tAlign;
+    editIdx=-1;
+    document.getElementById('addBtn').textContent='Add ✓';
+  } else {
+    if(textMsgs.length>=5){showToast('Max 5 messages!');return;}
+    const yo=offsets[textMsgs.length]||0;
+    textMsgs.push({text:txt,size:sz,opacity:op,color:col,
+      fontFamily:tFontFamily,fontWeight:tFontWeight,fontStyle:tFontStyle,
+      align:tAlign, x:CX, y:CY+yo});
   }
-  const fontStr2=fontStr; // alias for catch block
-
-  // Add as live text object - never burned into canvas
-  const msgId = Date.now();
-  textMessages.push({
-    id:msgId, text:txt, size:sz, opacity:op,
-    font:fontStr, align:selectedAlign,
-    color:drawColor, x:CX, y:CY
-  });
-  renderTextSlots();
   document.getElementById('tInput').value='';
-  updateTxtPreview();
-  showToast('✍️ Added! Edit anytime in the list below.');
+  renderMsgList();
 }
+function renderMsgList(){
+  const wrap=document.getElementById('msgList');if(!wrap)return;
+  if(!textMsgs.length){wrap.innerHTML='';return;}
+  wrap.innerHTML='<div style="font-size:8px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Messages ('+textMsgs.length+'/5)</div>'+
+  textMsgs.map((m,i)=>`<div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;margin-bottom:5px;border:1px solid rgba(255,255,255,0.1);">
+    <div style="display:flex;gap:4px;align-items:center;margin-bottom:5px;">
+      <span style="flex:1;font-size:11px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(m.text||'').replace(/\n/g,' ↵ ')}</span>
+      <button onclick="editMsg(${i})" style="background:rgba(100,180,255,0.15);border:1px solid rgba(100,180,255,0.4);border-radius:5px;color:#88ccff;font-size:10px;padding:2px 7px;cursor:pointer;flex-shrink:0;">✏️</button>
+      <button onclick="delMsg(${i})" style="background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.35);border-radius:5px;color:#ff8888;font-size:10px;padding:2px 6px;cursor:pointer;flex-shrink:0;">✕</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+      <span style="font-size:8px;color:#888;width:34px;flex-shrink:0;">Color</span>
+      <input type="color" value="${m.color||'#ffffff'}" oninput="textMsgs[${i}].color=this.value" style="width:28px;height:20px;border:none;background:none;cursor:pointer;flex-shrink:0;">
+      <span style="font-size:8px;color:#888;margin-left:4px;">← tap</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+      <span style="font-size:8px;color:#888;width:34px;flex-shrink:0;">Size</span>
+      <input type="range" min="16" max="200" value="${m.size||60}" style="flex:1;height:3px;" oninput="textMsgs[${i}].size=+this.value;this.nextElementSibling.textContent=this.value+'pt';">
+      <span style="font-size:8px;color:#888;width:28px;flex-shrink:0;">${m.size||60}pt</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;">
+      <span style="font-size:8px;color:#888;width:34px;flex-shrink:0;">Opacity</span>
+      <input type="range" min="10" max="100" value="${Math.round((m.opacity||0.9)*100)}" style="flex:1;height:3px;" oninput="textMsgs[${i}].opacity=+this.value/100;this.nextElementSibling.textContent=this.value+'%';">
+      <span style="font-size:8px;color:#888;width:28px;flex-shrink:0;">${Math.round((m.opacity||0.9)*100)}%</span>
+    </div>
+  </div>`).join('');
+}
+function editMsg(i){
+  const m=textMsgs[i];if(!m)return;
+  editIdx=i;
+  document.getElementById('tInput').value=m.text||'';
+  document.getElementById('tSize').value=m.size||60;
+  document.getElementById('tSzV').textContent=(m.size||60)+'pt';
+  document.getElementById('tOp').value=Math.round((m.opacity||0.9)*100);
+  document.getElementById('tOpV').textContent=Math.round((m.opacity||0.9)*100)+'%';
+  document.getElementById('tColor').value=m.color||'#ffffff';
+  tFontFamily=m.fontFamily||'Anton,Impact,sans-serif';
+  tFontWeight=m.fontWeight||'700';
+  tFontStyle=m.fontStyle||'normal';
+  tAlign=m.align||'left';
+  updateAlignBtns();
+  document.getElementById('addBtn').textContent='Update ✓';
+}
+function delMsg(i){textMsgs.splice(i,1);renderMsgList();}
 
-// ── SLIME PATH BUILDER ─────────────────────────
+
 function buildPath(){
   ctx.beginPath();
   for(let i=0;i<N;i++){
@@ -2259,14 +1208,34 @@ function render(){
 
   // ★ ART STROKES — warped by slime physics!
   strokes.forEach(s=>renderStroke(s));
-
   // Active stroke being drawn right now
   if(activeStroke&&activeStroke.pts.length>1) renderStroke(activeStroke);
 
   ctx.restore(); // end clip
 
-  // ★ LIVE TEXT — drawn OUTSIDE clip so always visible
-  try{renderLiveText();}catch(e){}
+  // ★ LIVE TEXT — rendered OUTSIDE clip, always visible
+  if(typeof textMsgs!=='undefined' && textMsgs.length){
+    textMsgs.forEach(m=>{
+      try{
+        const wp=warpPoint(m.x!==undefined?m.x:CX, m.y!==undefined?m.y:CY);
+        ctx.save();
+        ctx.filter='none';ctx.shadowBlur=0;
+        ctx.globalAlpha=m.opacity||0.9;
+        ctx.font=(m.fontStyle&&m.fontStyle!=='normal'?m.fontStyle+' ':'')+
+                 (m.fontWeight||'700')+' '+(m.size||60)+'px '+
+                 (m.fontFamily||'Anton,Impact,sans-serif');
+        ctx.fillStyle=m.color||'#ffffff';
+        ctx.textAlign=m.align||'center';
+        ctx.textBaseline='middle';
+        ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=4;
+        const lines=(m.text||'').split('\n');
+        const lh=(m.size||60)*1.25;
+        const totalH=lh*(lines.length-1);
+        lines.forEach((ln,li)=>ctx.fillText(ln, wp.x, wp.y-totalH/2+li*lh));
+        ctx.restore();
+      }catch(e){}
+    });
+  }
 
   // 3. Rim highlight
   buildPath();
@@ -2274,31 +1243,8 @@ function render(){
   ctx.lineWidth=2.5;ctx.stroke();
 }
 
-// ── LIVE TEXT RENDER ──────────────────────────
-function renderLiveText(){
-  if(!textMessages||!textMessages.length) return;
-  textMessages.forEach(m=>{
-    try{
-    if(!m||!m.text) return;
-    const wp=warpPoint(m.x!==undefined?m.x:CX, m.y!==undefined?m.y:CY);
-    ctx.save();
-    ctx.filter='none';
-    ctx.globalAlpha=m.opacity||0.95;
-    ctx.font='bold '+(m.size||50)+'px Anton,Impact,sans-serif';
-    ctx.fillStyle=m.color||'#ffffff';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.shadowColor='rgba(0,0,0,0.6)';
-    ctx.shadowBlur=5;
-    const ls=(m.text||'').split('\n');
-    const lh=(m.size||50)*1.25;
-    ls.forEach((l,i)=>ctx.fillText(l,wp.x,wp.y-lh*(ls.length-1)/2+i*lh));
-    ctx.restore();
-    }catch(e){} // never crash the render loop
-  });
-}
-
 // ── MAIN LOOP ─────────────────────────────────
+let idleTick=0;
 function loop(){idleTick++;physicsTick();render();requestAnimationFrame(loop);}
 
 // ── UI ─────────────────────────────────────────
@@ -2433,7 +1379,7 @@ loop();
   const div=document.createElement('div');
   div.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0.001;font-size:42px;pointer-events:none;';
   div.innerHTML=
-    '<span style="font:400 46px Anton, Impact">Aa</span>'+
+    '<span style="font:900 42px system-ui">Aa</span>'+
     '<span style="font:900 42px Georgia">Aa</span>'+
     '<span style="font:900 38px Courier New">Aa</span>'+
     '<span style="font:italic 900 42px Georgia">Aa</span>'+
@@ -2443,7 +1389,7 @@ loop();
   // Also draw each onto canvas to warm GPU texture cache
   function warmCanvas(){
     const fonts=[
-      '400 '+Math.round(46*PR)+'px Anton',
+      '900 '+Math.round(42*PR)+'px system-ui',
       '900 '+Math.round(42*PR)+'px Georgia',
       '900 '+Math.round(38*PR)+'px Courier New',
       'italic 900 '+Math.round(42*PR)+'px Georgia',
@@ -2470,104 +1416,37 @@ loop();
 })();
 
 showToast('🧪 Draw inside the slime — it squishes and moves your art!');
-
-function toggleMobTools(){
-  const wrap = document.getElementById('toolWrap');
-  const tab  = document.getElementById('mobToolBtn');
-  const open = wrap.classList.toggle('mob-open');
-  document.body.classList.toggle('tools-open', open);
-  // Move tab flush against the panel
-  tab.style.left = open ? '155px' : '0';
-  document.getElementById('mobTabArrow').style.transform = open ? 'rotate(180deg)' : 'rotate(0)';
-}
-
-function toggleSaveMenu(){
-  const m=document.getElementById('saveMenu');
-  m.style.display=m.style.display==='none'?'block':'none';
-}
-function closeSaveMenu(){
-  document.getElementById('saveMenu').style.display='none';
-}
-// Close menu if tapping outside
-document.addEventListener('touchstart',e=>{
-  const btn=document.getElementById('saveMenuBtn');
-  const menu=document.getElementById('saveMenu');
-  if(menu&&btn&&!btn.contains(e.target)&&!menu.contains(e.target)){
-    menu.style.display='none';
-  }
-});
-function doShareNative(){
-  const canvas=document.getElementById('mainCanvas');
-  canvas.toBlob(async blob=>{
-    const file=new File([blob],'my-slime-art.png',{type:'image/png'});
-    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      try{ await navigator.share({title:'My Slime Art from fab.games',text:'My Slime Art from www.fab.games 🧪🌺',files:[file]}); }
-      catch(e){ if(e.name!=='AbortError') doSave(); }
-    } else { doSave(); }
-  },'image/png');
-}
-function doShareFacebook(){
-  const url=encodeURIComponent('https://www.fab.games/slime');
-  const txt=encodeURIComponent('Check out this amazing slime art I made on fab.games! 🧪🌺');
-  window.open('https://www.facebook.com/sharer/sharer.php?u='+url+'&quote='+txt,'_blank');
-}
-
-// ── DRAGGABLE TEXT MODAL ───────────────────────
-(function(){
-  let dragging=false,dx=0,dy=0,modalX=0,modalY=0;
-  document.addEventListener('DOMContentLoaded',()=>{
-    const modal=document.getElementById('txtModal');
-    const handle=document.getElementById('dragHandle');
-    if(!modal||!handle)return;
-    handle.addEventListener('mousedown',e=>{
-      dragging=true;
-      const r=modal.getBoundingClientRect();
-      dx=e.clientX-r.left; dy=e.clientY-r.top;
-      handle.style.cursor='grabbing';
-      e.preventDefault();
-    });
-    handle.addEventListener('touchstart',e=>{
-      dragging=true;
-      const t=e.touches[0];
-      const r=modal.getBoundingClientRect();
-      dx=t.clientX-r.left; dy=t.clientY-r.top;
-      e.preventDefault();
-    },{passive:false});
-    document.addEventListener('mousemove',e=>{
-      if(!dragging)return;
-      modal.style.justifyContent='flex-start';
-      modal.style.alignItems='flex-start';
-      const card=document.getElementById('txtCard');
-      if(card){
-        card.style.position='fixed';
-        card.style.left=Math.max(0,Math.min(window.innerWidth-300,e.clientX-dx))+'px';
-        card.style.top=Math.max(0,Math.min(window.innerHeight-200,e.clientY-dy))+'px';
-        card.style.margin='0';
-      }
-    });
-    document.addEventListener('touchmove',e=>{
-      if(!dragging)return;
-      const t=e.touches[0];
-      const card=document.getElementById('txtCard');
-      if(card){
-        card.style.position='fixed';
-        card.style.left=Math.max(0,Math.min(window.innerWidth-300,t.clientX-dx))+'px';
-        card.style.top=Math.max(0,Math.min(window.innerHeight-200,t.clientY-dy))+'px';
-        card.style.margin='0';
-      }
-      e.preventDefault();
-    },{passive:false});
-    document.addEventListener('mouseup',()=>{dragging=false;if(handle)handle.style.cursor='grab';});
-    document.addEventListener('touchend',()=>{dragging=false;});
-  });
-})();
 </script>
-
-<!-- Mobile side tab — glowing wall-attached pull tab -->
 <div id="mobToolBtn" onclick="toggleMobTools()">
-  <div id="mobTabIcon">🎨</div>
+  <div style="font-size:16px;">🎨</div>
   <div id="mobTabLabel">TOOLS</div>
   <div id="mobTabArrow">›</div>
 </div>
 </body>
 </html>
+
+<script>
+function toggleMobTools(){
+  const w=document.getElementById('toolWrap');
+  const tab=document.getElementById('mobToolBtn');
+  const open=w.classList.toggle('mob-open');
+  document.getElementById('mobTabArrow').style.transform=open?'rotate(180deg)':'rotate(0)';
+  tab.style.left=open?'155px':'0';
+}
+function toggleSaveMenu(){const m=document.getElementById('saveMenu');m.style.display=m.style.display==='none'?'block':'none';}
+function closeSaveMenu(){document.getElementById('saveMenu').style.display='none';}
+function doShareNative(){const c=document.getElementById('mainCanvas');c.toBlob(async b=>{const f=new File([b],'slime.png',{type:'image/png'});if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({title:'My Slime Art from fab.games',text:'My Slime Art from www.fab.games 🧪🌺',files:[f]});}catch(e){if(e.name!=='AbortError')doSave();}}else doSave();},'image/png');}
+function doShareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://www.fab.games/slime'),'_blank');}
+// Draggable text modal
+(function(){
+  let dragging=false,ox=0,oy=0;
+  document.addEventListener('DOMContentLoaded',()=>{
+    const h=document.getElementById('dragHandle');
+    const m=document.getElementById('txtModal');
+    if(!h||!m)return;
+    h.onmousedown=e=>{dragging=true;const r=m.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;e.preventDefault();};
+    document.onmousemove=e=>{if(!dragging)return;m.style.left=Math.max(0,e.clientX-ox)+'px';m.style.top=Math.max(0,e.clientY-oy)+'px';m.style.right='auto';};
+    document.onmouseup=()=>dragging=false;
+  });
+})();
+</script>
