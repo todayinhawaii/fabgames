@@ -370,7 +370,7 @@
   50%{box-shadow:0 0 18px rgba(255,215,0,0.9),0 0 28px rgba(255,215,0,0.3);}
 }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=block" rel="stylesheet">
 </head>
 <body>
 
@@ -791,8 +791,10 @@ function renderStroke(stroke){
     case 'text':
       if(stroke.text){
         const wp=warpPoint(stroke.pts[0].x,stroke.pts[0].y);
+        ctx.filter        = 'none';
+        ctx.shadowBlur    = 0;
         ctx.globalAlpha   = op;
-        ctx.font          = stroke.font||`900 ${sz*3}px system-ui`;
+        ctx.font          = stroke.font||`bold ${sz*3}px Anton, Impact, sans-serif`;
         ctx.fillStyle     = stroke.color;
         ctx.textAlign     = 'center';
         ctx.textBaseline  = 'middle';
@@ -1007,6 +1009,8 @@ function moveBlobs(fx,fy,dx,dy){
 
 // ── TEXT ───────────────────────────────────────
 function showTxt(){
+  // Ensure Anton font loaded before opening text modal
+  document.fonts.load('400 46px Anton').catch(()=>{});
   // Close mobile tools panel so it doesn't overlay the text modal
   document.getElementById('toolWrap').classList.remove('mob-open');
   document.body.classList.remove('tools-open');
@@ -1018,7 +1022,7 @@ function addText(){
   if(!txt){closeTxt();return;}
   const font=document.getElementById('fSel').value;
   const sz=parseInt(font.match(/(\d+)px/)[1]);
-  const fontStr=font.replace(/(\d+)px/,Math.round(sz*PR)+'px');
+  const fontStr=font.replace(/(\d+)px/,sz+'px'); // no PR multiply - canvas not scaled
 
   // Make absolutely sure font is loaded before adding stroke
   document.fonts.load(fontStr).then(()=>{
