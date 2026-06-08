@@ -1006,9 +1006,15 @@ canvas.addEventListener('pointerdown',e=>{
 
 canvas.addEventListener('pointermove',e=>{
   if(e.target !== canvas && !fingers[e.pointerId]) return;
-  if(!fingers[e.pointerId]) return;
   e.preventDefault();
   const pos=getPos(e);
+  // Drag text message
+  if(draggingTextIdx>=0){
+    const m=textMessages[draggingTextIdx];
+    if(m){m.x=(pos.x-textDragOffX); m.y=(pos.y-textDragOffY);}
+    return;
+  }
+  if(!fingers[e.pointerId]) return;
   const prev=fingers[e.pointerId];
   const dx=pos.x-prev.x, dy=pos.y-prev.y;
   fingers[e.pointerId]={...pos};
@@ -1021,7 +1027,7 @@ canvas.addEventListener('pointermove',e=>{
 canvas.addEventListener('pointerup',e=>{
   delete fingers[e.pointerId];
   if(isPointerDown) finishStroke();
-  isPointerDown=false; playRelease();
+  isPointerDown=false; draggingTextIdx=-1; playRelease();
 });
 canvas.addEventListener('pointercancel',e=>{delete fingers[e.pointerId];isPointerDown=false;finishStroke();});
 
@@ -1108,6 +1114,16 @@ function renderTextSlots(){
         <button onclick="editTextMsg(${i})" style="background:rgba(100,180,255,0.15);border:1px solid rgba(100,180,255,0.4);border-radius:5px;color:#88ccff;font-size:10px;padding:3px 8px;cursor:pointer;">✏️ Edit</button>
         <button onclick="removeTextMsg(${i})" style="background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.35);border-radius:5px;color:#ff8888;font-size:10px;padding:3px 7px;cursor:pointer;">✕</button>
       </div>
+      <!-- Font picker per message -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px;">
+        <div onclick="changeTextFont(${i},'700 42px Anton')" style="padding:5px 4px;border-radius:6px;font-size:12px;text-align:center;cursor:pointer;font-family:Anton,Impact;border:1.5px solid ${(m.font||'').includes('Anton')?'rgba(255,105,180,0.7)':'rgba(255,255,255,0.12)'};background:${(m.font||'').includes('Anton')?'rgba(255,105,180,0.15)':'rgba(255,255,255,0.04)'};color:#fff;">Bold</div>
+        <div onclick="changeTextFont(${i},'700 42px \'Dancing Script\'')" style="padding:5px 4px;border-radius:6px;font-size:12px;text-align:center;cursor:pointer;font-family:'Dancing Script',cursive;border:1.5px solid ${(m.font||'').includes('Dancing')?'rgba(255,105,180,0.7)':'rgba(255,255,255,0.12)'};background:${(m.font||'').includes('Dancing')?'rgba(255,105,180,0.15)':'rgba(255,255,255,0.04)'};color:#fff;">Fancy</div>
+        <div onclick="changeTextFont(${i},'700 38px \'Space Mono\'')" style="padding:5px 4px;border-radius:6px;font-size:12px;text-align:center;cursor:pointer;font-family:'Space Mono',monospace;border:1.5px solid ${(m.font||'').includes('Space')?'rgba(255,105,180,0.7)':'rgba(255,255,255,0.12)'};background:${(m.font||'').includes('Space')?'rgba(255,105,180,0.15)':'rgba(255,255,255,0.04)'};color:#fff;">Mono</div>
+        <div onclick="changeTextFont(${i},'400 44px \'Abril Fatface\'')" style="padding:5px 4px;border-radius:6px;font-size:12px;text-align:center;cursor:pointer;font-family:'Abril Fatface',serif;border:1.5px solid ${(m.font||'').includes('Abril')?'rgba(255,105,180,0.7)':'rgba(255,255,255,0.12)'};background:${(m.font||'').includes('Abril')?'rgba(255,105,180,0.15)':'rgba(255,255,255,0.04)'};color:#fff;">Block</div>
+        <div onclick="changeTextFont(${i},'400 38px \'Permanent Marker\'')" style="padding:5px 4px;border-radius:6px;font-size:11px;text-align:center;cursor:pointer;font-family:'Permanent Marker',cursive;border:1.5px solid ${(m.font||'').includes('Permanent')?'rgba(255,105,180,0.7)':'rgba(255,255,255,0.12)'};background:${(m.font||'').includes('Permanent')?'rgba(255,105,180,0.15)':'rgba(255,255,255,0.04)'};color:#fff;">Marker</div>
+        <div onclick="changeTextFont(${i},'italic 700 42px Georgia')" style="padding:5px 4px;border-radius:6px;font-size:12px;text-align:center;cursor:pointer;font-family:Georgia;font-style:italic;border:1.5px solid ${(m.font||'').includes('Georgia')?'rgba(255,105,180,0.7)':'rgba(255,255,255,0.12)'};background:${(m.font||'').includes('Georgia')?'rgba(255,105,180,0.15)':'rgba(255,255,255,0.04)'};color:#fff;font-style:italic;">Italic</div>
+      </div>
+      <!-- Color -->
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
         <span style="font-size:8px;color:#aaa;width:36px;flex-shrink:0;">Color</span>
         <input type="color" value="${m.color||'#ffffff'}"
@@ -1155,9 +1171,16 @@ function editTextMsg(i){
   updateTxtPreview();
 }
 function updateTextFont(i,newSize){
-  const m=textMessages[i];
-  if(!m)return;
+  const m=textMessages[i]; if(!m)return;
   m.font=m.font.replace(/(\d+)px/,newSize+'px');
+}
+function changeTextFont(i,newFontBase){
+  const m=textMessages[i]; if(!m)return;
+  // Extract current size from existing font
+  const sizeMatch=m.font.match(/(\d+)px/);
+  const currentSize=sizeMatch?sizeMatch[1]:m.size||60;
+  m.font=newFontBase.replace(/(\d+)px/,currentSize+'px');
+  renderTextSlots(); // re-render to update highlight
 }
 function removeTextMsg(i){
   textMessages.splice(i,1);
