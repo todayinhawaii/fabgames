@@ -798,8 +798,8 @@ async function startCamera(){
     if(stream){ stream.getTracks().forEach(t=>t.stop()); }
     // Front camera: avoid strict size constraints that can fail on mobile
     const videoConstraints = facingMode==='user'
-      ? {facingMode:{ideal:'user'}, width:{ideal:1920}, height:{ideal:1080}}
-      : {facingMode:{ideal:'environment'}, width:{ideal:4096}, height:{ideal:2160}};
+      ? {facingMode:{ideal:'user'}, width:{ideal:1280}, height:{ideal:720}}
+      : {facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080}};
     stream = await navigator.mediaDevices.getUserMedia({
       video: videoConstraints,
       audio:false
@@ -811,7 +811,7 @@ async function startCamera(){
     try{ await video.play(); }catch(e){}
 
     // Force GPU layer once - no opacity toggling
-    video.style.transform = facingMode==='user' ? 'scale(-1,1) translateZ(0)' : 'translateZ(0)';
+    video.style.transform = facingMode==='user' ? 'scaleX(-1)' : 'none';
 
     video.onloadedmetadata=()=>{
       document.getElementById('noCamera').style.display='none';
@@ -1125,8 +1125,9 @@ function getPinchDist(e){
 // Apply zoom to video via CSS transform + hardware zoom if available
 async function applyZoom(z){
   currentZoom=Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
-  const flip=facingMode==='user'?-1:1;
-  video.style.transform=`scale(${flip*currentZoom}, ${currentZoom}) translateZ(0)`;
+  video.style.transform = facingMode==='user'
+    ? `scale(${-currentZoom}, ${currentZoom})`
+    : currentZoom===1 ? 'none' : `scale(${currentZoom})`;
   // Try hardware zoom first
   if(stream){
     try{
