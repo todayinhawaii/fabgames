@@ -477,10 +477,23 @@
 
 <!-- Text modal -->
 <div id="txtModal">
-  <div class="tcard">
-    <h3>✍️ Write in your slime!</h3>
-    <input type="text" id="tInput" placeholder="I ❤️ Slime! 🌺" maxlength="30" oninput="updateTxtPreview()">
-    <div id="txtPreview" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,0.06);margin:8px 0;font-size:22px;color:#fff;overflow:hidden;">I ❤️ Slime!</div>
+  <div class="tcard" style="max-width:360px;width:94vw;max-height:90vh;overflow-y:auto;">
+    <h3>✍️ Add Text to Slime</h3>
+
+    <!-- Live preview -->
+    <div id="txtPreview" style="width:100%;min-height:52px;display:flex;align-items:center;
+      border-radius:8px;background:rgba(255,255,255,0.06);margin-bottom:10px;
+      font-size:22px;color:#fff;overflow:hidden;padding:6px 10px;word-break:break-word;
+      white-space:pre-wrap;"></div>
+
+    <!-- Textarea for multi-line -->
+    <textarea id="tInput" placeholder="Type here...&#10;Hit Enter for new line!" maxlength="120"
+      rows="3" oninput="updateTxtPreview()"
+      style="width:100%;padding:10px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.2);
+        border-radius:8px;color:#fff;font-size:15px;font-family:inherit;outline:none;
+        resize:none;margin-bottom:10px;"></textarea>
+
+    <!-- Font buttons -->
     <div class="font-preview-row">
       <div class="font-opt sel" data-font="700 42px Anton" onclick="selFont(this)" style="font-family:Anton,Impact,sans-serif;">Bold</div>
       <div class="font-opt" data-font="700 42px 'Dancing Script'" onclick="selFont(this)" style="font-family:'Dancing Script',cursive;">Fancy</div>
@@ -489,19 +502,36 @@
       <div class="font-opt" data-font="400 38px 'Permanent Marker'" onclick="selFont(this)" style="font-family:'Permanent Marker',cursive;">Marker</div>
       <div class="font-opt" data-font="italic 700 42px Georgia" onclick="selFont(this)" style="font-family:Georgia,serif;font-style:italic;">Italic</div>
     </div>
+
+    <!-- Alignment -->
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <button class="align-btn on" id="align-left"   onclick="selAlign('left')"   style="flex:1;padding:8px;border-radius:7px;border:1.5px solid rgba(255,105,180,0.5);background:rgba(255,105,180,0.15);color:#fff;font-size:14px;cursor:pointer;">⬅ Left</button>
+      <button class="align-btn"   id="align-center" onclick="selAlign('center')" style="flex:1;padding:8px;border-radius:7px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:14px;cursor:pointer;">↔ Centre</button>
+      <button class="align-btn"   id="align-right"  onclick="selAlign('right')"  style="flex:1;padding:8px;border-radius:7px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:14px;cursor:pointer;">Right ➡</button>
+    </div>
+
+    <!-- Size 20-200 -->
     <div class="tmodal-slider-row">
       <span class="tmodal-lbl">Size</span>
-      <input type="range" class="tmodal-sl" id="tSize" min="20" max="80" value="42" oninput="document.getElementById('tSizeVal').textContent=this.value;updateTxtPreview()">
-      <span class="tmodal-val" id="tSizeVal">42</span>
+      <input type="range" class="tmodal-sl" id="tSize" min="20" max="200" value="60"
+        oninput="document.getElementById('tSizeVal').textContent=this.value;updateTxtPreview()">
+      <span class="tmodal-val" id="tSizeVal">60</span>
     </div>
+
+    <!-- Opacity -->
     <div class="tmodal-slider-row">
       <span class="tmodal-lbl">Opacity</span>
-      <input type="range" class="tmodal-sl" id="tOpacity" min="10" max="100" value="90" oninput="document.getElementById('tOpVal').textContent=this.value+'%';updateTxtPreview()">
+      <input type="range" class="tmodal-sl" id="tOpacity" min="10" max="100" value="90"
+        oninput="document.getElementById('tOpVal').textContent=this.value+'%';updateTxtPreview()">
       <span class="tmodal-val" id="tOpVal">90%</span>
     </div>
+
+    <!-- Up to 5 messages -->
+    <div id="textSlots" style="margin:8px 0;"></div>
+
     <div class="tbtns">
       <button class="tbno" onclick="closeTxt()">Cancel</button>
-      <button class="tbok" onclick="addText()">Squish it in! 🎉</button>
+      <button class="tbok" onclick="addText()">Add to Slime 🎉</button>
     </div>
   </div>
 </div>
@@ -819,16 +849,22 @@ function renderStroke(stroke){
     case 'text':
       if(stroke.text){
         const wp=warpPoint(stroke.pts[0].x,stroke.pts[0].y);
-        ctx.filter        = 'none';
-        ctx.shadowBlur    = 0;
-        ctx.globalAlpha   = op;
-        ctx.font          = stroke.font||`bold ${sz*3}px Anton, Impact, sans-serif`;
-        ctx.fillStyle     = stroke.color;
-        ctx.textAlign     = 'center';
-        ctx.textBaseline  = 'middle';
-        ctx.shadowColor   = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur    = 4*PR;
-        ctx.fillText(stroke.text, wp.x, wp.y);
+        ctx.filter      ='none';
+        ctx.shadowBlur  =0;
+        ctx.globalAlpha = stroke.opacity!==undefined ? stroke.opacity : op;
+        ctx.font        = stroke.font||`bold ${sz}px Anton,Impact,sans-serif`;
+        ctx.fillStyle   = stroke.color;
+        ctx.textAlign   = stroke.align||'center';
+        ctx.textBaseline='middle';
+        ctx.shadowColor ='rgba(0,0,0,0.4)';
+        ctx.shadowBlur  =3;
+        // Multi-line support
+        const txtLines=(stroke.text||'').split('\n');
+        const lineH=sz*1.2;
+        const totalH=lineH*(txtLines.length-1);
+        txtLines.forEach((line,li)=>{
+          ctx.fillText(line, wp.x, wp.y - totalH/2 + li*lineH);
+        });
       }
       break;
   }
@@ -1037,42 +1073,90 @@ function moveBlobs(fx,fy,dx,dy){
 
 // ── TEXT ───────────────────────────────────────
 function showTxt(){
-  // Preload all fonts
   ['700 42px Anton','700 42px Dancing Script','700 38px Space Mono','400 44px Abril Fatface','400 38px Permanent Marker'].forEach(f=>document.fonts.load(f).catch(()=>{}));
-  setTimeout(updateTxtPreview, 100);
+  renderTextSlots();
+  setTimeout(updateTxtPreview,100);
   // Close mobile tools panel so it doesn't overlay the text modal
   document.getElementById('toolWrap').classList.remove('mob-open');
   document.body.classList.remove('tools-open');
   if(document.getElementById('mobToolBtn')) document.getElementById('mobToolBtn').style.left='0';
   if(document.getElementById('mobTabArrow')) document.getElementById('mobTabArrow').style.transform='rotate(0)';setTool('text');document.getElementById('txtModal').classList.add('on');setTimeout(()=>document.getElementById('tInput').focus(),100);}
-function closeTxt(){document.getElementById('txtModal').classList.remove('on');setTool('squish');}
-let selectedFont = '700 42px Anton';
+function closeTxt(){
+  document.getElementById('txtModal').classList.remove('on');
+  textMessages=[];
+  strokes=strokes; // keep strokes on canvas
+  setTool('squish');
+}
+let selectedFont='700 42px Anton', selectedAlign='left';
+let textMessages=[]; // up to 5 independent text messages
+
 function selFont(el){
   document.querySelectorAll('.font-opt').forEach(e=>e.classList.remove('sel'));
-  el.classList.add('sel');
-  selectedFont = el.dataset.font;
+  el.classList.add('sel'); selectedFont=el.dataset.font; updateTxtPreview();
+}
+function selAlign(a){
+  selectedAlign=a;
+  ['left','center','right'].forEach(x=>{
+    const btn=document.getElementById('align-'+x);
+    if(!btn)return;
+    if(x===a){btn.style.borderColor='rgba(255,105,180,0.5)';btn.style.background='rgba(255,105,180,0.15)';}
+    else{btn.style.borderColor='rgba(255,255,255,0.15)';btn.style.background='rgba(255,255,255,0.06)';}
+  });
   updateTxtPreview();
 }
 function updateTxtPreview(){
-  const txt = document.getElementById('tInput').value || 'I ❤️ Slime!';
-  const sz  = document.getElementById('tSize').value;
-  const op  = document.getElementById('tOpacity').value/100;
-  const el  = document.getElementById('txtPreview');
-  // Get font family from selected font option
-  const fontEl = document.querySelector('.font-opt.sel');
-  const ff = fontEl ? fontEl.style.fontFamily : 'Anton,Impact';
-  el.style.fontFamily = ff;
-  el.style.fontSize   = Math.min(sz, 36)+'px';
-  el.style.opacity    = op;
-  el.textContent      = txt;
+  const txt=(document.getElementById('tInput')||{}).value||'Your text here';
+  const sz=parseInt((document.getElementById('tSize')||{value:60}).value);
+  const op=parseInt((document.getElementById('tOpacity')||{value:90}).value)/100;
+  const el=document.getElementById('txtPreview'); if(!el)return;
+  const fontEl=document.querySelector('.font-opt.sel');
+  el.style.fontFamily=fontEl?fontEl.style.fontFamily:'Anton,Impact,sans-serif';
+  el.style.fontSize=Math.min(sz*0.45,38)+'px';
+  el.style.opacity=op;
+  el.style.textAlign=selectedAlign;
+  el.textContent=txt;
+}
+function renderTextSlots(){
+  const wrap=document.getElementById('textSlots'); if(!wrap)return;
+  if(!textMessages.length){wrap.innerHTML='';return;}
+  wrap.innerHTML='<div style="font-size:9px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Your Messages ('+textMessages.length+'/5)</div>'+
+  textMessages.map((m,i)=>`
+    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.1);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <span style="font-size:11px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">${m.text.replace(/\n/g,' ↵ ')}</span>
+        <button onclick="removeTextMsg(${i})" style="background:rgba(255,80,80,0.2);border:1px solid rgba(255,80,80,0.4);border-radius:5px;color:#ff8888;font-size:10px;padding:2px 7px;cursor:pointer;">✕</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+        <span style="font-size:8px;color:#aaa;width:36px;">Size</span>
+        <input type="range" min="20" max="200" value="${m.size}" style="flex:1;height:3px;" oninput="updateTextMsg(${i},'size',+this.value);this.nextElementSibling.textContent=this.value;">
+        <span style="font-size:9px;color:#aaa;width:28px;">${m.size}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:8px;color:#aaa;width:36px;">Opacity</span>
+        <input type="range" min="10" max="100" value="${Math.round(m.opacity*100)}" style="flex:1;height:3px;" oninput="updateTextMsg(${i},'opacity',+this.value/100);this.nextElementSibling.textContent=this.value+'%';">
+        <span style="font-size:9px;color:#aaa;width:28px;">${Math.round(m.opacity*100)}%</span>
+      </div>
+    </div>`).join('');
+}
+function removeTextMsg(i){
+  // Remove matching strokes
+  const m=textMessages[i];
+  strokes=strokes.filter(s=>!(s.tool==='text'&&s.msgId===m.id));
+  textMessages.splice(i,1);
+  renderTextSlots();
+}
+function updateTextMsg(i,prop,val){
+  textMessages[i][prop]=val;
+  // Update matching stroke
+  strokes.forEach(s=>{if(s.tool==='text'&&s.msgId===textMessages[i].id){s[prop]=val;}});
 }
 function addText(){
-  const txt=document.getElementById('tInput').value.trim();
-  if(!txt){closeTxt();return;}
-  const sz  = parseInt(document.getElementById('tSize').value);
-  const op  = document.getElementById('tOpacity').value/100;
-  // Build font string with chosen size
-  const fontStr = selectedFont.replace(/(\d+)px/, sz+'px');
+  const txt=(document.getElementById('tInput')||{}).value||'';
+  if(!txt.trim()){closeTxt();return;}
+  if(textMessages.length>=5){showToast('Max 5 messages! Remove one first.');return;}
+  const sz=parseInt((document.getElementById('tSize')||{value:60}).value);
+  const op=parseInt((document.getElementById('tOpacity')||{value:90}).value)/100;
+  const fontStr=selectedFont.replace(/(\d+)px/,sz+'px');
 
   // Make absolutely sure font is loaded before adding stroke
   document.fonts.load(fontStr).then(()=>{
