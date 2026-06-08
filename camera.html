@@ -589,6 +589,101 @@ Object.keys(FILTERS).forEach(era=>{
   eraTabs.appendChild(tab);
 });
 
+
+// ── VINTAGE CAMERA SVGs BY ERA ──────────────────────
+const CAMERA_SVGS = {
+  '1920s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+    <rect width="96" height="66" fill="#2a1a0a"/>
+    <rect x="8" y="14" width="58" height="38" rx="3" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+    <rect x="12" y="18" width="50" height="30" rx="2" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+    <circle cx="37" cy="33" r="12" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+    <circle cx="37" cy="33" r="7" fill="none" stroke="#c9a84c" stroke-width="1"/>
+    <circle cx="37" cy="33" r="3" fill="#c9a84c" opacity="0.6"/>
+    <rect x="66" y="20" width="22" height="26" rx="2" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+    <line x1="66" y1="30" x2="88" y2="30" stroke="#c9a84c" stroke-width="0.8"/>
+    <rect x="16" y="8" width="20" height="8" rx="1" fill="none" stroke="#c9a84c" stroke-width="1"/>
+    <circle cx="55" cy="24" r="3" fill="none" stroke="#c9a84c" stroke-width="1"/>
+  </svg>`,
+  '1930s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+    <rect width="96" height="66" fill="#1a0a1a"/>
+    <rect x="10" y="12" width="76" height="42" rx="4" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+    <circle cx="48" cy="33" r="14" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+    <circle cx="48" cy="33" r="9" fill="none" stroke="#c9a84c" stroke-width="1"/>
+    <circle cx="48" cy="33" r="4" fill="none" stroke="#ffd700" stroke-width="1.2"/>
+    <circle cx="48" cy="33" r="1.5" fill="#ffd700"/>
+    <rect x="18" y="18" width="14" height="10" rx="1" fill="none" stroke="#c9a84c" stroke-width="0.8"/>
+    <rect x="64" y="18" width="14" height="10" rx="1" fill="none" stroke="#c9a84c" stroke-width="0.8"/>
+    <line x1="14" y1="26" x2="82" y2="26" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
+    <rect x="22" y="6" width="52" height="7" rx="2" fill="none" stroke="#c9a84c" stroke-width="1"/>
+  </svg>`,
+  '1950s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+    <rect width="96" height="66" fill="#0a1a0a"/>
+    <rect x="6" y="18" width="84" height="34" rx="5" fill="none" stroke="#44ff88" stroke-width="1.5"/>
+    <circle cx="36" cy="35" r="13" fill="none" stroke="#44ff88" stroke-width="1.5"/>
+    <circle cx="36" cy="35" r="8" fill="none" stroke="#44ff88" stroke-width="1"/>
+    <circle cx="36" cy="35" r="3.5" fill="#44ff88" opacity="0.4"/>
+    <rect x="58" y="22" width="26" height="22" rx="3" fill="none" stroke="#44ff88" stroke-width="1"/>
+    <line x1="58" y1="31" x2="84" y2="31" stroke="#44ff88" stroke-width="0.7"/>
+    <rect x="64" y="34" width="14" height="7" rx="1" fill="none" stroke="#44ff88" stroke-width="0.7"/>
+    <rect x="14" y="10" width="30" height="9" rx="2" fill="none" stroke="#44ff88" stroke-width="1"/>
+    <circle cx="76" cy="14" r="4" fill="none" stroke="#44ff88" stroke-width="1"/>
+  </svg>`,
+  '1960s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+    <rect width="96" height="66" fill="#1a0a2a"/>
+    <rect x="8" y="16" width="80" height="36" rx="6" fill="none" stroke="#ff69b4" stroke-width="1.5"/>
+    <rect x="8" y="16" width="80" height="36" rx="6" fill="rgba(255,105,180,0.04)"/>
+    <circle cx="40" cy="34" r="13" fill="none" stroke="#ff69b4" stroke-width="1.5"/>
+    <circle cx="40" cy="34" r="8" fill="none" stroke="#c9a84c" stroke-width="1"/>
+    <circle cx="40" cy="34" r="3" fill="#ff69b4" opacity="0.5"/>
+    <rect x="62" y="22" width="20" height="14" rx="2" fill="none" stroke="#ff69b4" stroke-width="1"/>
+    <circle cx="72" cy="42" r="5" fill="none" stroke="#ff69b4" stroke-width="1"/>
+    <rect x="14" y="8" width="26" height="9" rx="3" fill="none" stroke="#ff69b4" stroke-width="1"/>
+    <line x1="14" y1="22" x2="14" y2="50" stroke="#ff69b4" stroke-width="1.5" opacity="0.5"/>
+  </svg>`,
+  '1970s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+    <rect width="96" height="66" fill="#1a1000"/>
+    <rect x="5" y="15" width="86" height="40" rx="4" fill="none" stroke="#ff8800" stroke-width="1.5"/>
+    <circle cx="35" cy="35" r="14" fill="none" stroke="#ff8800" stroke-width="2"/>
+    <circle cx="35" cy="35" r="9" fill="none" stroke="#ffd700" stroke-width="1"/>
+    <circle cx="35" cy="35" r="4" fill="none" stroke="#ff8800" stroke-width="1"/>
+    <rect x="58" y="19" width="28" height="22" rx="2" fill="none" stroke="#ff8800" stroke-width="1"/>
+    <line x1="58" y1="28" x2="86" y2="28" stroke="#ff8800" stroke-width="0.8"/>
+    <rect x="10" y="7" width="40" height="9" rx="2" fill="none" stroke="#ff8800" stroke-width="1"/>
+    <circle cx="80" cy="45" r="4" fill="none" stroke="#ff8800" stroke-width="1"/>
+    <line x1="72" y1="15" x2="72" y2="55" stroke="#ff8800" stroke-width="0.5" opacity="0.4"/>
+  </svg>`,
+  '1980s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+    <rect width="96" height="66" fill="#001a2a"/>
+    <rect x="4" y="12" width="88" height="46" rx="3" fill="none" stroke="#00ffff" stroke-width="1.5"/>
+    <rect x="10" y="18" width="38" height="28" rx="2" fill="none" stroke="#00ffff" stroke-width="1"/>
+    <circle cx="29" cy="32" r="10" fill="none" stroke="#00ccff" stroke-width="1.2"/>
+    <circle cx="29" cy="32" r="5" fill="none" stroke="#00ffff" stroke-width="1"/>
+    <circle cx="29" cy="32" r="2" fill="#00ffff" opacity="0.6"/>
+    <rect x="54" y="16" width="34" height="20" rx="2" fill="none" stroke="#00ffff" stroke-width="1"/>
+    <rect x="57" y="19" width="28" height="14" rx="1" fill="rgba(0,255,255,0.05)"/>
+    <rect x="54" y="40" width="10" height="10" rx="2" fill="none" stroke="#00ffff" stroke-width="0.8"/>
+    <rect x="68" y="40" width="10" height="10" rx="2" fill="none" stroke="#00ffff" stroke-width="0.8"/>
+    <rect x="82" y="40" width="6" height="10" rx="1" fill="none" stroke="#00ffff" stroke-width="0.8"/>
+  </svg>`,
+  '1990s': `<svg viewBox="0 0 96 66" xmlns="http://www.w3.org/2000/svg">
+    <rect width="96" height="66" fill="#0a0a1a"/>
+    <rect x="6" y="10" width="84" height="50" rx="8" fill="none" stroke="#87ceeb" stroke-width="1.5"/>
+    <rect x="6" y="10" width="84" height="50" rx="8" fill="rgba(135,206,235,0.03)"/>
+    <circle cx="42" cy="35" r="16" fill="none" stroke="#87ceeb" stroke-width="1.5"/>
+    <circle cx="42" cy="35" r="10" fill="none" stroke="#87ceeb" stroke-width="0.8"/>
+    <circle cx="42" cy="35" r="4" fill="none" stroke="#c9a84c" stroke-width="1"/>
+    <rect x="66" y="16" width="18" height="14" rx="3" fill="none" stroke="#87ceeb" stroke-width="1"/>
+    <line x1="66" y1="22" x2="84" y2="22" stroke="#87ceeb" stroke-width="0.7"/>
+    <circle cx="75" cy="44" r="6" fill="none" stroke="#87ceeb" stroke-width="1.2"/>
+    <circle cx="75" cy="44" r="3" fill="none" stroke="#87ceeb" stroke-width="0.8"/>
+    <rect x="12" y="16" width="16" height="10" rx="2" fill="none" stroke="#87ceeb" stroke-width="0.8"/>
+  </svg>`
+};
+
+function getCameraSVG(era){
+  return CAMERA_SVGS[era] || CAMERA_SVGS['1950s'];
+}
+
 // ── BUILD FILTER CARDS ────────────────────────────────────
 function buildFilterCards(era){
   const scroll=document.getElementById('filtersScroll');
@@ -674,6 +769,8 @@ async function startCamera(){
       audio:false
     });
     video.srcObject=stream;
+    // Mirror front camera
+    video.style.transform = facingMode==='user' ? 'scaleX(-1)' : 'scaleX(1)';
     video.onloadedmetadata=()=>{
       document.getElementById('noCamera').style.display='none';
       video.style.display='block';
@@ -773,21 +870,31 @@ function capturePhoto(){
 
   // Draw video + filter + overlays to a capture canvas
   const cap=document.createElement('canvas');
-  const previewCvs=document.getElementById('canvas');
-  cap.width = previewCvs?.width || video.videoWidth || 1280;
-  cap.height = previewCvs?.height || video.videoHeight || 720;
+  const overlayCvs=document.getElementById('overlay-canvas');
+  const vid=document.getElementById('preview');
+  cap.width = vid?.videoWidth || overlayCvs?.width || 1280;
+  cap.height = vid?.videoHeight || overlayCvs?.height || 720;
   const cctx=cap.getContext('2d');
 
-  // Draw from preview canvas (already has filter applied - avoids black screen on mobile!)
-  // The preview canvas correctly shows the current filtered view
-  const previewCanvas = document.getElementById('canvas');
-  if(previewCanvas && previewCanvas.width > 0){
-    cctx.drawImage(previewCanvas, 0, 0, cap.width, cap.height);
-  } else {
-    // Fallback: draw video directly
+  // Step 1: Draw VIDEO with CSS filter applied
+  const vidEl=document.getElementById('preview');
+  if(vidEl && vidEl.readyState>=2){
     cctx.filter = selectedFilter.css||'none';
-    cctx.drawImage(video, 0, 0, cap.width, cap.height);
-    cctx.filter = 'none';
+    // Mirror if front camera
+    if(facingMode==='user'){
+      cctx.save();
+      cctx.scale(-1,1);
+      cctx.drawImage(vidEl,-cap.width,0,cap.width,cap.height);
+      cctx.restore();
+    } else {
+      cctx.drawImage(vidEl,0,0,cap.width,cap.height);
+    }
+    cctx.filter='none';
+  }
+  // Step 2: Draw overlay canvas (grain/vignette/tint) on top
+  const overlayEl=document.getElementById('overlay-canvas');
+  if(overlayEl && overlayEl.width>0){
+    cctx.drawImage(overlayEl,0,0,cap.width,cap.height);
   }
 
   // Add grain
