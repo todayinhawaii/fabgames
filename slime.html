@@ -275,7 +275,23 @@
     #txtModal.on{display:flex;}
     .tcard{background:#1a1a2e;border:2px solid rgba(255,255,255,0.12);
       border-radius:20px;padding:20px;width:min(320px,90vw);}
-    .tcard h3{color:#fff;font-size:15px;margin-bottom:12px;text-align:center;}
+    .tcard h3{color:#fff;font-size:15px;margin-bottom:10px;text-align:center;}
+    .font-preview-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+    .font-opt{padding:8px 10px;border-radius:8px;border:2px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.04);color:#fff;cursor:pointer;text-align:center;
+      font-size:15px;transition:all .18s;}
+    .font-opt.sel{border-color:#ff69b4;background:rgba(255,105,180,0.15);}
+    .font-opt:hover{border-color:rgba(255,255,255,0.3);}
+    .tmodal-slider-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .tmodal-lbl{font-size:9px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;width:40px;flex-shrink:0;}
+    .tmodal-sl{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;
+      background:rgba(255,255,255,0.15);outline:none;cursor:pointer;}
+    .tmodal-sl::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+      background:#ff69b4;cursor:pointer;box-shadow:0 0 6px rgba(255,105,180,0.5);}
+    .tmodal-val{font-size:10px;color:#aaa;width:32px;text-align:right;flex-shrink:0;}
+    #txtPreview{width:100%;height:44px;display:flex;align-items:center;justify-content:center;
+      border-radius:8px;background:rgba(255,255,255,0.06);margin-bottom:10px;
+      font-size:22px;color:#fff;overflow:hidden;transition:all .2s;}
     #tInput{width:100%;padding:10px;background:rgba(255,255,255,0.08);
       border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;
       color:#fff;font-size:16px;font-family:inherit;outline:none;margin-bottom:10px;}
@@ -370,7 +386,7 @@
   50%{box-shadow:0 0 18px rgba(255,215,0,0.9),0 0 28px rgba(255,215,0,0.3);}
 }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Anton&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Dancing+Script:wght@700&family=Space+Mono:wght@700&family=Abril+Fatface&family=Permanent+Marker&display=block" rel="stylesheet">
 </head>
 <body>
 
@@ -1008,20 +1024,42 @@ function moveBlobs(fx,fy,dx,dy){
 
 // ── TEXT ───────────────────────────────────────
 function showTxt(){
-  // Ensure Anton font loaded before opening text modal
-  document.fonts.load('400 46px Anton').catch(()=>{});
+  // Preload all fonts
+  ['700 42px Anton','700 42px Dancing Script','700 38px Space Mono','400 44px Abril Fatface','400 38px Permanent Marker'].forEach(f=>document.fonts.load(f).catch(()=>{}));
+  setTimeout(updateTxtPreview, 100);
   // Close mobile tools panel so it doesn't overlay the text modal
   document.getElementById('toolWrap').classList.remove('mob-open');
   document.body.classList.remove('tools-open');
   if(document.getElementById('mobToolBtn')) document.getElementById('mobToolBtn').style.left='0';
   if(document.getElementById('mobTabArrow')) document.getElementById('mobTabArrow').style.transform='rotate(0)';setTool('text');document.getElementById('txtModal').classList.add('on');setTimeout(()=>document.getElementById('tInput').focus(),100);}
 function closeTxt(){document.getElementById('txtModal').classList.remove('on');setTool('squish');}
+let selectedFont = '700 42px Anton';
+function selFont(el){
+  document.querySelectorAll('.font-opt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedFont = el.dataset.font;
+  updateTxtPreview();
+}
+function updateTxtPreview(){
+  const txt = document.getElementById('tInput').value || 'I ❤️ Slime!';
+  const sz  = document.getElementById('tSize').value;
+  const op  = document.getElementById('tOpacity').value/100;
+  const el  = document.getElementById('txtPreview');
+  // Get font family from selected font option
+  const fontEl = document.querySelector('.font-opt.sel');
+  const ff = fontEl ? fontEl.style.fontFamily : 'Anton,Impact';
+  el.style.fontFamily = ff;
+  el.style.fontSize   = Math.min(sz, 36)+'px';
+  el.style.opacity    = op;
+  el.textContent      = txt;
+}
 function addText(){
   const txt=document.getElementById('tInput').value.trim();
   if(!txt){closeTxt();return;}
-  const font=document.getElementById('fSel').value;
-  const sz=parseInt(font.match(/(\d+)px/)[1]);
-  const fontStr=font.replace(/(\d+)px/,sz+'px'); // no PR multiply - canvas not scaled
+  const sz  = parseInt(document.getElementById('tSize').value);
+  const op  = document.getElementById('tOpacity').value/100;
+  // Build font string with chosen size
+  const fontStr = selectedFont.replace(/(\d+)px/, sz+'px');
 
   // Make absolutely sure font is loaded before adding stroke
   document.fonts.load(fontStr).then(()=>{
