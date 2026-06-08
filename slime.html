@@ -410,14 +410,11 @@
     <div class="tf" data-f="'Permanent Marker',cursive" data-fw="400" onclick="pickFont(this)" style="font-family:'Permanent Marker',cursive;font-size:11px;">Marker</div>
     <div class="tf" data-f="Georgia,serif" data-fw="700" data-fi="italic" onclick="pickFont(this)" style="font-family:Georgia,serif;font-style:italic;">Italic</div>
   </div>
-  <!-- Color + Align -->
+  <!-- Color -->
   <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-    <span style="font-size:9px;color:#aaa;flex-shrink:0;">Color:</span>
-    <input type="color" id="tColor" value="#ffffff" style="width:32px;height:26px;border:none;background:none;cursor:pointer;border-radius:4px;padding:0;flex-shrink:0;">
-    <span style="font-size:9px;color:#aaa;flex-shrink:0;margin-left:6px;">Align:</span>
-    <button onclick="tAlign='left';updateAlignBtns()" id="al-l" style="flex:1;padding:5px;border-radius:6px;border:1.5px solid rgba(255,105,180,0.5);background:rgba(255,105,180,0.15);color:#fff;font-size:12px;cursor:pointer;">⬅</button>
-    <button onclick="tAlign='center';updateAlignBtns()" id="al-c" style="flex:1;padding:5px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:#fff;font-size:12px;cursor:pointer;">↔</button>
-    <button onclick="tAlign='right';updateAlignBtns()" id="al-r" style="flex:1;padding:5px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:#fff;font-size:12px;cursor:pointer;">➡</button>
+    <span style="font-size:9px;color:#aaa;flex-shrink:0;">Text Color:</span>
+    <input type="color" id="tColor" value="#ffffff" style="width:36px;height:28px;border:none;background:none;cursor:pointer;border-radius:6px;padding:0;flex-shrink:0;">
+    <span style="font-size:10px;color:#888;">← tap to change</span>
   </div>
   <!-- Size + Opacity -->
   <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
@@ -1019,15 +1016,7 @@ function pickFont(el){
     textMsgs[editIdx].fontStyle=tFontStyle;
   }
 }
-function updateAlignBtns(){
-  ['l','c','r'].forEach(x=>{
-    const b=document.getElementById('al-'+x);
-    if(!b)return;
-    const active=(x==='l'&&tAlign==='left')||(x==='c'&&tAlign==='center')||(x==='r'&&tAlign==='right');
-    b.style.borderColor=active?'rgba(255,105,180,0.6)':'rgba(255,255,255,0.15)';
-    b.style.background=active?'rgba(255,105,180,0.2)':'rgba(255,255,255,0.05)';
-  });
-}
+function updateAlignBtns(){} // alignment removed
 function addText(){
   const txt=(document.getElementById('tInput')||{}).value||'';
   if(!txt.trim()) return;
@@ -1051,7 +1040,7 @@ function addText(){
     const yo=offsets[textMsgs.length]||0;
     textMsgs.push({text:txt,size:sz,opacity:op,color:col,
       fontFamily:tFontFamily,fontWeight:tFontWeight,fontStyle:tFontStyle,
-      align:tAlign, x:CX, y:CY+yo});
+      align:'center', x:CX, y:CY+yo});
   }
   document.getElementById('tInput').value='';
   renderMsgList();
@@ -1096,8 +1085,7 @@ function editMsg(i){
   tFontFamily=m.fontFamily||'Anton,Impact,sans-serif';
   tFontWeight=m.fontWeight||'700';
   tFontStyle=m.fontStyle||'normal';
-  tAlign=m.align||'left';
-  updateAlignBtns();
+
   // Highlight active font button
   document.querySelectorAll('.tf').forEach(el=>{
     const match = el.dataset.f===tFontFamily;
