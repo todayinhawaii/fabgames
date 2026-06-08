@@ -798,8 +798,8 @@ async function startCamera(){
     if(stream){ stream.getTracks().forEach(t=>t.stop()); }
     // Front camera: avoid strict size constraints that can fail on mobile
     const videoConstraints = facingMode==='user'
-      ? {facingMode:{ideal:'user'}, width:{ideal:1280}, height:{ideal:720}}
-      : {facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080}};
+      ? {facingMode:{ideal:'user'}, width:{ideal:1920}, height:{ideal:1080}}
+      : {facingMode:{ideal:'environment'}, width:{ideal:4096}, height:{ideal:3072}};
     stream = await navigator.mediaDevices.getUserMedia({
       video: videoConstraints,
       audio:false
@@ -927,41 +927,20 @@ async function capturePhoto(){
     if(window.ImageCapture && stream){
       try{
         const track=stream.getVideoTracks()[0];
-        console.log('📸 Opening hi-res stream for capture...');
-        // Open a separate max-resolution stream just for this shot
-        // Preview stream stays untouched - no flicker!
-        let hiResStream=null;
+        // Capture from the main stream (already at 4K!)
+        console.log('📸 Capturing from main '+track.getSettings().width+'x'+track.getSettings().height+' stream');
+        const ic=new ImageCapture(track);
         let blob=null;
         try{
-          hiResStream=await navigator.mediaDevices.getUserMedia({
-            video:{
-              facingMode:{ideal:facingMode==='user'?'user':'environment'},
-              width:{ideal:9999},
-              height:{ideal:9999}
-            },
-            audio:false
-          });
-          const hiTrack=hiResStream.getVideoTracks()[0];
-          const settings=hiTrack.getSettings();
-          console.log('Hi-res stream: '+settings.width+'x'+settings.height);
-          const hiIc=new ImageCapture(hiTrack);
-          // Try with max photoCapabilities
-          try{
-            const caps=await hiIc.getPhotoCapabilities();
-            if(caps.imageWidth?.max){
-              blob=await hiIc.takePhoto({imageWidth:caps.imageWidth.max,imageHeight:caps.imageHeight.max});
-            } else { blob=await hiIc.takePhoto(); }
-          }catch(e){ blob=await hiIc.takePhoto(); }
-          console.log('Hi-res captured: '+Math.round(blob.size/1024/1024*10)/10+'MB');
+          const caps=await ic.getPhotoCapabilities();
+          console.log('Max photo: '+caps.imageWidth?.max+'x'+caps.imageHeight?.max);
+          if(caps.imageWidth?.max){
+            blob=await ic.takePhoto({imageWidth:caps.imageWidth.max,imageHeight:caps.imageHeight.max});
+          } else { blob=await ic.takePhoto(); }
         }catch(e){
-          console.log('Hi-res stream failed:'+e.message+' - falling back to preview stream');
-          // Fallback: use existing preview stream
-          const ic2=new ImageCapture(track);
-          blob=await ic2.takePhoto();
-        }finally{
-          // Always stop hi-res stream
-          if(hiResStream) hiResStream.getTracks().forEach(t=>t.stop());
+          blob=await ic.takePhoto();
         }
+        console.log('Captured: '+Math.round(blob.size/1024/1024*10)/10+'MB');
         console.log('✅ takePhoto blob: ');
 
         // Convert blob to data URL
