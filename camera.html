@@ -302,16 +302,20 @@ video,canvas{
 </head>
 <body>
 <!-- On-screen debug panel -->
-<div id="debugPanel" style="display:none;position:fixed;bottom:80px;left:8px;right:8px;
-  z-index:9999;background:rgba(0,0,0,0.85);color:#0f0;font-size:11px;
-  font-family:monospace;padding:10px;border-radius:8px;border:1px solid #0f0;
-  max-height:200px;overflow-y:auto;">
-  <div style="color:#ff0;font-weight:bold;margin-bottom:4px;">📷 Debug Log:</div>
-  <div id="debugLog"></div>
+<div id="debugPanel" style="display:none;position:fixed;inset:0;
+  z-index:9999;background:rgba(0,0,0,0.95);color:#00ff00;font-size:18px;
+  font-family:monospace;padding:20px;overflow-y:auto;">
+  <div style="color:#ffff00;font-size:22px;font-weight:bold;margin-bottom:12px;">
+    📷 Debug Log — Take a photo then read here:
+  </div>
+  <div id="debugLog" style="line-height:2;"></div>
+  <button onclick="toggleDebug()" style="margin-top:20px;width:100%;padding:16px;
+    background:#ff0000;color:#fff;border:none;border-radius:10px;
+    font-size:20px;font-weight:bold;cursor:pointer;">✕ Close Debug</button>
 </div>
-<button onclick="toggleDebug()" style="position:fixed;bottom:130px;right:8px;
-  z-index:10000;background:rgba(0,0,0,0.6);color:#ff0;border:1px solid #ff0;
-  border-radius:6px;padding:4px 8px;font-size:10px;cursor:pointer;">🐛 Debug</button>
+<button onclick="toggleDebug()" style="position:fixed;top:60px;right:8px;
+  z-index:10000;background:rgba(0,0,0,0.8);color:#ffff00;border:2px solid #ffff00;
+  border-radius:8px;padding:8px 14px;font-size:14px;font-weight:bold;cursor:pointer;">🐛 DEBUG</button>
 
 <!-- Film strip -->
 <div class="filmstrip">
@@ -905,11 +909,13 @@ function applyWarmTint(warm){
 
 // ── CAPTURE PHOTO ─────────────────────────────────────────
 async function capturePhoto(){
+  dbg('🔴 capturePhoto STARTED','#f0f');
   const flash=document.getElementById('flashOverlay');
   flash.classList.add('flash');
   setTimeout(()=>flash.classList.remove('flash'),150);
 
   try{
+    dbg('✅ try block entered','#0f0');
     const w=video.videoWidth||1280;
     const h=video.videoHeight||720;
     dbg('📐 Video: '+video.videoWidth+'x'+video.videoHeight+' ready:'+video.readyState);
@@ -1010,6 +1016,7 @@ async function capturePhoto(){
     document.getElementById('photoModal').classList.add('show');
     playShutter();
   }catch(err){
+    dbg('💥 ERROR: '+err.message,'#f44');
     console.error('Capture:',err);
     alert('Could not capture. Try again! '+err.message);
   }
