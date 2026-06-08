@@ -270,6 +270,57 @@ def webhook():
     return jsonify({'ok': True})
 
 # ── STATIC FILES ─────────────────────────────────
+
+# ── HULA/MEMORY SCORES ──────────────────────────
+@app.route('/api/hula-scores', methods=['GET','POST'])
+def hula_scores():
+    if request.method=='POST':
+        data = request.get_json() or {}
+        try:
+            supabase_request('POST','hula_scores',{
+                'name':data.get('name','')[:30],
+                'score':int(data.get('score',0)),
+                'island':data.get('island','')[:40],
+                'time_str':data.get('timeStr',''),
+                'time_secs':int(data.get('timeSecs',0)),
+            }, use_service_key=True)
+            return jsonify({'ok':True})
+        except Exception as e:
+            return jsonify({'ok':False,'error':str(e)})
+    else:
+        try:
+            res = supabase_request('GET','hula_scores?select=*&order=score.desc&limit=10')
+            return jsonify(res if isinstance(res,list) else [])
+        except:
+            return jsonify([])
+
+# ── WORDSEARCH SCORES ────────────────────────────
+@app.route('/api/wordsearch-scores', methods=['GET','POST'])
+def wordsearch_scores():
+    if request.method=='POST':
+        data = request.get_json() or {}
+        try:
+            supabase_request('POST','wordsearch_scores',{
+                'name':data.get('name','')[:30],
+                'score':int(data.get('score',0)),
+                'island':data.get('island','')[:40],
+                'puzzles':int(data.get('puzzles',0)),
+            }, use_service_key=True)
+            return jsonify({'ok':True})
+        except Exception as e:
+            return jsonify({'ok':False,'error':str(e)})
+    else:
+        try:
+            res = supabase_request('GET','wordsearch_scores?select=*&order=score.desc&limit=10')
+            return jsonify(res if isinstance(res,list) else [])
+        except:
+            return jsonify([])
+
+# ── CAPITAL CITY CHALLENGE ──────────────────────
+@app.route('/capitals')
+def capitals():
+    return send_from_directory('.', 'capitals.html')
+
 @app.route('/<path:filename>')
 def static_files(filename):
     return send_from_directory('.', filename)
