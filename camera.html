@@ -928,23 +928,40 @@ async function capturePhoto(){
       try{
         const track=stream.getVideoTracks()[0];
         const ic=new ImageCapture(track);
-        console.log('📸 Trying takePhoto() at max resolution...');
-        // Always request absolute maximum sensor resolution
-        let photoSettings={};
+        console.log('📸 Boosting resolution for capture...');
+
+        // Step 1: Boost stream to max resolution just for capture
         try{
+          await track.applyConstraints({
+            width:{ideal:9999}, height:{ideal:9999}
+          });
+          console.log('Stream boosted to: '+track.getSettings().width+'x'+track.getSettings().height);
+        }catch(e){ console.log('Boost failed:',e.message); }
+
+        // Step 2: Capture at boosted resolution
+        let blob;
+        try{
+          // Try getPhotoCapabilities for absolute max
           const caps=await ic.getPhotoCapabilities();
-          console.log('Camera max: '+caps.imageWidth?.max+'x'+caps.imageHeight?.max);
           if(caps.imageWidth?.max){
-            photoSettings={
-              imageWidth: caps.imageWidth.max,
-              imageHeight: caps.imageHeight.max,
-              fillLightMode: 'off',
-              redEyeReduction: false
-            };
+            blob=await ic.takePhoto({
+              imageWidth:caps.imageWidth.max,
+              imageHeight:caps.imageHeight.max
+            });
+          } else {
+            blob=await ic.takePhoto();
           }
-        }catch(e){ console.log('getPhotoCapabilities failed:',e.message); }
-        const blob=await ic.takePhoto(Object.keys(photoSettings).length ? photoSettings : undefined);
-        console.log('Blob size: '+Math.round(blob.size/1024/1024*10)/10+'MB width:'+blob.type);
+        }catch(e){
+          blob=await ic.takePhoto();
+        }
+        console.log('Captured: '+Math.round(blob.size/1024/1024*10)/10+'MB');
+
+        // Step 3: Drop stream back to preview resolution
+        try{
+          await track.applyConstraints({
+            width:{ideal:1920}, height:{ideal:1080}
+          });
+        }catch(e){}
         console.log('✅ takePhoto blob: ');
 
         // Convert blob to data URL
