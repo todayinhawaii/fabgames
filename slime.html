@@ -269,10 +269,11 @@
     }
 
     /* Text modal */
-    #txtModal{display:none;position:fixed;inset:0;z-index:200;
-      background:rgba(0,0,0,0.15);
-      align-items:flex-start;justify-content:flex-end;padding:8px;}
-    #txtModal.on{display:flex;}
+    #txtModal{display:none;position:fixed;top:8px;right:8px;z-index:200;
+      background:transparent;pointer-events:none;
+      width:340px;max-height:90vh;}
+    #txtModal.on{display:flex;pointer-events:all;}
+    #txtModal .tcard{pointer-events:all;}
     .tcard{background:rgba(20,15,40,0.97);border:2px solid rgba(255,255,255,0.12);
       border-radius:20px;padding:20px;width:min(320px,90vw);}
     .tcard h3{color:#fff;font-size:15px;margin-bottom:10px;text-align:center;}
@@ -1327,10 +1328,11 @@ function addText(){
     }
 
     /* Text modal */
-    #txtModal{display:none;position:fixed;inset:0;z-index:200;
-      background:rgba(0,0,0,0.15);
-      align-items:flex-start;justify-content:flex-end;padding:8px;}
-    #txtModal.on{display:flex;}
+    #txtModal{display:none;position:fixed;top:8px;right:8px;z-index:200;
+      background:transparent;pointer-events:none;
+      width:340px;max-height:90vh;}
+    #txtModal.on{display:flex;pointer-events:all;}
+    #txtModal .tcard{pointer-events:all;}
     .tcard{background:rgba(20,15,40,0.97);border:2px solid rgba(255,255,255,0.12);
       border-radius:20px;padding:20px;width:min(320px,90vw);}
     .tcard h3{color:#fff;font-size:15px;margin-bottom:10px;text-align:center;}
@@ -2264,7 +2266,7 @@ function render(){
   ctx.restore(); // end clip
 
   // ★ LIVE TEXT — drawn OUTSIDE clip so always visible
-  renderLiveText();
+  try{renderLiveText();}catch(e){}
 
   // 3. Rim highlight
   buildPath();
@@ -2276,6 +2278,7 @@ function render(){
 function renderLiveText(){
   if(!textMessages||!textMessages.length) return;
   textMessages.forEach(m=>{
+    try{
     if(!m||!m.text) return;
     const wp=warpPoint(m.x!==undefined?m.x:CX, m.y!==undefined?m.y:CY);
     ctx.save();
@@ -2291,6 +2294,7 @@ function renderLiveText(){
     const lh=(m.size||50)*1.25;
     ls.forEach((l,i)=>ctx.fillText(l,wp.x,wp.y-lh*(ls.length-1)/2+i*lh));
     ctx.restore();
+    }catch(e){} // never crash the render loop
   });
 }
 
