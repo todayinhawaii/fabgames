@@ -479,13 +479,26 @@
 <div id="txtModal">
   <div class="tcard">
     <h3>✍️ Write in your slime!</h3>
-    <input type="text" id="tInput" placeholder="I ❤️ Slime! 🌺" maxlength="30">
-    <select id="fSel">
-      <option value="900 42px Georgia">Bold Serif</option>
-      <option value="900 38px 'Courier New'">Typewriter</option>
-      <option value="italic 900 42px Georgia">Fancy Italic</option>
-      <option value="900 48px fantasy">Blocky Fun</option>
-    </select>
+    <input type="text" id="tInput" placeholder="I ❤️ Slime! 🌺" maxlength="30" oninput="updateTxtPreview()">
+    <div id="txtPreview" style="width:100%;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,0.06);margin:8px 0;font-size:22px;color:#fff;overflow:hidden;">I ❤️ Slime!</div>
+    <div class="font-preview-row">
+      <div class="font-opt sel" data-font="700 42px Anton" onclick="selFont(this)" style="font-family:Anton,Impact,sans-serif;">Bold</div>
+      <div class="font-opt" data-font="700 42px 'Dancing Script'" onclick="selFont(this)" style="font-family:'Dancing Script',cursive;">Fancy</div>
+      <div class="font-opt" data-font="700 38px 'Space Mono'" onclick="selFont(this)" style="font-family:'Space Mono',monospace;">Mono</div>
+      <div class="font-opt" data-font="400 44px 'Abril Fatface'" onclick="selFont(this)" style="font-family:'Abril Fatface',serif;">Block</div>
+      <div class="font-opt" data-font="400 38px 'Permanent Marker'" onclick="selFont(this)" style="font-family:'Permanent Marker',cursive;">Marker</div>
+      <div class="font-opt" data-font="italic 700 42px Georgia" onclick="selFont(this)" style="font-family:Georgia,serif;font-style:italic;">Italic</div>
+    </div>
+    <div class="tmodal-slider-row">
+      <span class="tmodal-lbl">Size</span>
+      <input type="range" class="tmodal-sl" id="tSize" min="20" max="80" value="42" oninput="document.getElementById('tSizeVal').textContent=this.value;updateTxtPreview()">
+      <span class="tmodal-val" id="tSizeVal">42</span>
+    </div>
+    <div class="tmodal-slider-row">
+      <span class="tmodal-lbl">Opacity</span>
+      <input type="range" class="tmodal-sl" id="tOpacity" min="10" max="100" value="90" oninput="document.getElementById('tOpVal').textContent=this.value+'%';updateTxtPreview()">
+      <span class="tmodal-val" id="tOpVal">90%</span>
+    </div>
     <div class="tbtns">
       <button class="tbno" onclick="closeTxt()">Cancel</button>
       <button class="tbok" onclick="addText()">Squish it in! 🎉</button>
