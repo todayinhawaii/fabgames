@@ -843,19 +843,13 @@ async function flipCamera(){
 function startRender(){
   if(rafId) cancelAnimationFrame(rafId);
   function render(){
-    if(video.readyState>=2){
-      // Sync canvas to actual display size - critical for correct overlay rendering!
-      const vw=video.clientWidth||window.innerWidth;
-      const vh=video.clientHeight||window.innerHeight;
-      if(canvas.width!==vw||canvas.height!==vh){
-        canvas.width=vw;
-        canvas.height=vh;
-      }
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      applyGrain(selectedFilter.grain);
-      applyVignette(selectedFilter.vignette);
-      if(selectedFilter.warm!==0) applyWarmTint(selectedFilter.warm);
+    // Keep canvas transparent - all filter effects applied at capture only
+    // This prevents any overlay artifacts on the viewfinder
+    if(canvas.width!==window.innerWidth){
+      canvas.width=window.innerWidth;
+      canvas.height=window.innerHeight;
     }
+    ctx.clearRect(0,0,canvas.width,canvas.height);
     rafId=requestAnimationFrame(render);
   }
   // Fire when first real video frame arrives
