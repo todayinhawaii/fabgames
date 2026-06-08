@@ -1083,12 +1083,13 @@ function showTxt(){
   if(document.getElementById('mobTabArrow')) document.getElementById('mobTabArrow').style.transform='rotate(0)';setTool('text');document.getElementById('txtModal').classList.add('on');setTimeout(()=>document.getElementById('tInput').focus(),100);}
 function closeTxt(){
   document.getElementById('txtModal').classList.remove('on');
-  textMessages=[];
-  strokes=strokes; // keep strokes on canvas
+  editingMsgId=null; textEditColor=null;
+  const btn=document.querySelector('.tbok');
+  if(btn) btn.textContent='Add to Slime 🎉';
   setTool('squish');
 }
 let selectedFont='700 42px Anton', selectedAlign='left';
-let textMessages=[]; // up to 5 independent text messages
+let textMessages=[]; let editingMsgId=null; let textEditColor=null; // up to 5 independent text messages
 
 function selFont(el){
   document.querySelectorAll('.font-opt').forEach(e=>e.classList.remove('sel'));
@@ -1119,29 +1120,66 @@ function updateTxtPreview(){
 function renderTextSlots(){
   const wrap=document.getElementById('textSlots'); if(!wrap)return;
   if(!textMessages.length){wrap.innerHTML='';return;}
-  wrap.innerHTML='<div style="font-size:9px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Your Messages ('+textMessages.length+'/5)</div>'+
+  wrap.innerHTML='<div style="font-size:9px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Messages ('+textMessages.length+'/5)</div>'+
   textMessages.map((m,i)=>`
-    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.1);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-        <span style="font-size:11px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">${m.text.replace(/\n/g,' ↵ ')}</span>
-        <button onclick="removeTextMsg(${i})" style="background:rgba(255,80,80,0.2);border:1px solid rgba(255,80,80,0.4);border-radius:5px;color:#ff8888;font-size:10px;padding:2px 7px;cursor:pointer;">✕</button>
+    <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:9px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.1);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:4px;">
+        <span style="font-size:11px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">${(m.text||'').replace(/\n/g,' ↵ ')}</span>
+        <button onclick="editTextMsg(${i})" style="background:rgba(100,180,255,0.15);border:1px solid rgba(100,180,255,0.4);border-radius:5px;color:#88ccff;font-size:10px;padding:3px 8px;cursor:pointer;">✏️ Edit</button>
+        <button onclick="removeTextMsg(${i})" style="background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.35);border-radius:5px;color:#ff8888;font-size:10px;padding:3px 7px;cursor:pointer;">✕</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+        <span style="font-size:8px;color:#aaa;width:36px;flex-shrink:0;">Color</span>
+        <input type="color" value="${m.color||'#ffffff'}"
+          oninput="updateTextMsg(${i},'color',this.value)"
+          style="width:32px;height:22px;border:none;background:none;cursor:pointer;border-radius:4px;padding:0;">
+        <span style="font-size:8px;color:#aaa;margin-left:4px;">Tap to change</span>
       </div>
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-        <span style="font-size:8px;color:#aaa;width:36px;">Size</span>
-        <input type="range" min="20" max="200" value="${m.size}" style="flex:1;height:3px;" oninput="updateTextMsg(${i},'size',+this.value);this.nextElementSibling.textContent=this.value;">
-        <span style="font-size:9px;color:#aaa;width:28px;">${m.size}</span>
+        <span style="font-size:8px;color:#aaa;width:36px;flex-shrink:0;">Size</span>
+        <input type="range" min="20" max="200" value="${m.size}"
+          style="flex:1;height:3px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,0.15);border-radius:2px;outline:none;"
+          oninput="updateTextMsg(${i},'size',+this.value);updateTextFont(${i},+this.value);this.nextElementSibling.textContent=this.value+'pt';">
+        <span style="font-size:9px;color:#aaa;width:30px;flex-shrink:0;">${m.size}pt</span>
       </div>
       <div style="display:flex;align-items:center;gap:6px;">
-        <span style="font-size:8px;color:#aaa;width:36px;">Opacity</span>
-        <input type="range" min="10" max="100" value="${Math.round(m.opacity*100)}" style="flex:1;height:3px;" oninput="updateTextMsg(${i},'opacity',+this.value/100);this.nextElementSibling.textContent=this.value+'%';">
-        <span style="font-size:9px;color:#aaa;width:28px;">${Math.round(m.opacity*100)}%</span>
+        <span style="font-size:8px;color:#aaa;width:36px;flex-shrink:0;">Opacity</span>
+        <input type="range" min="10" max="100" value="${Math.round((m.opacity||0.9)*100)}"
+          style="flex:1;height:3px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,0.15);border-radius:2px;outline:none;"
+          oninput="updateTextMsg(${i},'opacity',+this.value/100);this.nextElementSibling.textContent=this.value+'%';">
+        <span style="font-size:9px;color:#aaa;width:30px;flex-shrink:0;">${Math.round((m.opacity||0.9)*100)}%</span>
       </div>
     </div>`).join('');
 }
-function removeTextMsg(i){
-  // Remove matching strokes
+function editTextMsg(i){
   const m=textMessages[i];
-  strokes=strokes.filter(s=>!(s.tool==='text'&&s.msgId===m.id));
+  editingMsgId=m.id;
+  document.getElementById('tInput').value=m.text||'';
+  // Restore font selection
+  document.querySelectorAll('.font-opt').forEach(el=>{
+    if(el.dataset.font===m.font.replace(/(\d+)px/,'42px')) el.classList.add('sel');
+    else el.classList.remove('sel');
+    if(m.font===el.dataset.font.replace(/(\d+)px/,m.size+'px')) el.classList.add('sel');
+  });
+  selectedFont=m.font.replace(/(\d+)px/,'42px');
+  selectedAlign=m.align||'center';
+  selAlign(selectedAlign);
+  const sizeEl=document.getElementById('tSize');
+  if(sizeEl){sizeEl.value=m.size;document.getElementById('tSizeVal').textContent=m.size;}
+  const opEl=document.getElementById('tOpacity');
+  if(opEl){opEl.value=Math.round((m.opacity||0.9)*100);document.getElementById('tOpVal').textContent=Math.round((m.opacity||0.9)*100)+'%';}
+  textEditColor=m.color;
+  // Change button label
+  const btn=document.querySelector('.tbok');
+  if(btn) btn.textContent='Update Message ✏️';
+  updateTxtPreview();
+}
+function updateTextFont(i,newSize){
+  const m=textMessages[i];
+  if(!m)return;
+  m.font=m.font.replace(/(\d+)px/,newSize+'px');
+}
+function removeTextMsg(i){
   textMessages.splice(i,1);
   renderTextSlots();
 }
@@ -1152,11 +1190,23 @@ function updateTextMsg(i,prop,val){
 }
 function addText(){
   const txt=(document.getElementById('tInput')||{}).value||'';
-  if(!txt.trim()){closeTxt();return;}
-  if(textMessages.length>=5){showToast('Max 5 messages! Remove one first.');return;}
+  if(!txt.trim()){if(editingMsgId){closeTxt();}return;}
+  if(!editingMsgId && textMessages.length>=5){showToast('Max 5 messages! Remove one first.');return;}
   const sz=parseInt((document.getElementById('tSize')||{value:60}).value);
   const op=parseInt((document.getElementById('tOpacity')||{value:90}).value)/100;
   const fontStr=selectedFont.replace(/(\d+)px/,sz+'px');
+  // If editing existing message - just update it, don't add new
+  if(editingMsgId){
+    const m=textMessages.find(x=>x.id===editingMsgId);
+    if(m){
+      m.text=txt; m.size=sz; m.opacity=op;
+      m.font=fontStr; m.align=selectedAlign; m.color=textEditColor||m.color;
+    }
+    editingMsgId=null; textEditColor=null;
+    document.getElementById('tInput').value='';
+    renderTextSlots(); closeTxt(); return;
+  }
+  const fontStr2=fontStr; // alias for catch block
 
   // Make absolutely sure font is loaded before adding stroke
   document.fonts.load(fontStr).then(()=>{
@@ -1305,6 +1355,9 @@ function render(){
 
   // ★ ART STROKES — warped by slime physics!
   strokes.forEach(s=>renderStroke(s));
+
+  // ★ LIVE TEXT — always editable, never burned in
+  renderLiveText();
   // Active stroke being drawn right now
   if(activeStroke&&activeStroke.pts.length>1) renderStroke(activeStroke);
 
@@ -1314,6 +1367,32 @@ function render(){
   buildPath();
   ctx.strokeStyle=isRainbow?`hsla(${(rainbowHue+60)%360},100%,80%,0.4)`:`rgba(${Math.min(255,r+120)},${Math.min(255,g+120)},${Math.min(255,b+120)},0.35)`;
   ctx.lineWidth=2.5;ctx.stroke();
+}
+
+// ── LIVE TEXT RENDER ──────────────────────────
+function renderLiveText(){
+  if(!textMessages||!textMessages.length) return;
+  textMessages.forEach(m=>{
+    if(!m.text) return;
+    const wp = warpPoint(m.x||CX, m.y||CY);
+    ctx.save();
+    ctx.filter     = 'none';
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha= m.opacity||0.9;
+    ctx.font       = m.font||`bold ${m.size}px Anton,Impact,sans-serif`;
+    ctx.fillStyle  = m.color||drawColor;
+    ctx.textAlign  = m.align||'center';
+    ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,0.4)';
+    ctx.shadowBlur  =3;
+    const lines=(m.text||'').split('\n');
+    const lh=m.size*1.25;
+    const totalH=lh*(lines.length-1);
+    lines.forEach((line,i)=>{
+      ctx.fillText(line, wp.x, wp.y - totalH/2 + i*lh);
+    });
+    ctx.restore();
+  });
 }
 
 // ── MAIN LOOP ─────────────────────────────────
