@@ -928,17 +928,23 @@ async function capturePhoto(){
       try{
         const track=stream.getVideoTracks()[0];
         const ic=new ImageCapture(track);
-        console.log('📸 Trying takePhoto()...');
-        // Request max quality from camera hardware
-        const photoSettings={};
+        console.log('📸 Trying takePhoto() at max resolution...');
+        // Always request absolute maximum sensor resolution
+        let photoSettings={};
         try{
-          const caps=ic.getPhotoCapabilities ? await ic.getPhotoCapabilities() : null;
-          if(caps){
-            if(caps.imageWidth?.max) photoSettings.imageWidth=caps.imageWidth.max;
-            if(caps.imageHeight?.max) photoSettings.imageHeight=caps.imageHeight.max;
+          const caps=await ic.getPhotoCapabilities();
+          console.log('Camera max: '+caps.imageWidth?.max+'x'+caps.imageHeight?.max);
+          if(caps.imageWidth?.max){
+            photoSettings={
+              imageWidth: caps.imageWidth.max,
+              imageHeight: caps.imageHeight.max,
+              fillLightMode: 'off',
+              redEyeReduction: false
+            };
           }
-        }catch(e){}
+        }catch(e){ console.log('getPhotoCapabilities failed:',e.message); }
         const blob=await ic.takePhoto(Object.keys(photoSettings).length ? photoSettings : undefined);
+        console.log('Blob size: '+Math.round(blob.size/1024/1024*10)/10+'MB width:'+blob.type);
         console.log('✅ takePhoto blob: ');
 
         // Convert blob to data URL
