@@ -918,11 +918,21 @@ async function capturePhoto(){
     dbg('✅ try block entered','#0f0');
     const w=video.videoWidth||1280;
     const h=video.videoHeight||720;
+
+    // Pre-warm: draw to a small test canvas to check if readback works
+    try{
+      const test=document.createElement('canvas');
+      test.width=4;test.height=4;
+      const tctx=test.getContext('2d',{willReadFrequently:true});
+      tctx.drawImage(video,0,0,4,4);
+      const tpx=tctx.getImageData(1,1,1,1).data;
+      dbg('🔍 Test draw r:'+tpx[0]+' g:'+tpx[1]+' b:'+tpx[2]+(tpx[0]+tpx[1]+tpx[2]>5?' HAS PIXELS ✅':' BLACK ❌'),'#ff0');
+    }catch(e){ dbg('🔍 Test draw error: '+e.message,'#f80'); }
     dbg('📐 Video: '+video.videoWidth+'x'+video.videoHeight+' ready:'+video.readyState);
     dbg('🎬 Filter: '+selectedFilter.name+' | '+selectedFilter.css.substring(0,30));
     const cap=document.createElement('canvas');
     cap.width=w; cap.height=h;
-    const cctx=cap.getContext('2d');
+    const cctx=cap.getContext('2d',{willReadFrequently:true});
 
     // Black background for JPEG
     cctx.fillStyle='#000';
@@ -947,7 +957,7 @@ async function capturePhoto(){
         bitmap.close && bitmap.close();
         // Check if we actually got pixels (not black)
         const px=cctx.getImageData(w/2,h/2,1,1).data;
-        const px0=cctx.getImageData(w/2,h/2,1,1).data;
+        let px0=[0,0,0,0]; try{px0=cctx.getImageData(Math.floor(w/2),Math.floor(h/2),1,1).data;}catch(e){} 
         dbg('🖼 Method1 pixels: r'+px0[0]+' g'+px0[1]+' b'+px0[2]+(px0[0]>5||px0[1]>5||px0[2]>5?' ✅':'❌ BLACK'),'#0ff');
         if(px0[0]>5||px0[1]>5||px0[2]>5) drawn=true;
       }catch(e){ dbg('❌ createImageBitmap: '+e.message,'#f44'); }
@@ -970,7 +980,7 @@ async function capturePhoto(){
         });
       });
       const px=cctx.getImageData(w/2,h/2,1,1).data;
-      const px1=cctx.getImageData(w/2,h/2,1,1).data;
+      let px1=[0,0,0,0]; try{px1=cctx.getImageData(Math.floor(w/2),Math.floor(h/2),1,1).data;}catch(e){} 
       dbg('🖼 Method2 pixels: r'+px1[0]+' g'+px1[1]+' b'+px1[2]+(px1[0]>5||px1[1]>5||px1[2]>5?' ✅':'❌ BLACK'),'#fa0');
       if(px1[0]>5||px1[1]>5||px1[2]>5) drawn=true;
     }
