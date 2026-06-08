@@ -86,12 +86,16 @@ video,canvas{
   object-fit:cover;
 }
 #preview{
-  background:#000;
-  z-index:1;
-  will-change:transform; /* GPU layer for smooth video */
+  display:none !important; /* hidden - canvas is the viewfinder */
 }
-#preview{ z-index:1; }
-#overlay-canvas{ z-index:2; pointer-events:none; }
+#overlay-canvas{
+  z-index:2;
+  background:#000;
+}
+#overlay-canvas{
+  z-index:2;
+  pointer-events:none;
+}
 
 /* Camera overlay decorations */
 .vf-corner{
@@ -314,7 +318,6 @@ video,canvas{
   <div class="viewfinder-wrap" id="viewfinderWrap">
     <a href="/play" class="hub-link">← Games</a>
     <video id="preview" autoplay playsinline muted></video>
-<canvas id="cap-canvas" style="display:none;"></canvas>
     <canvas id="overlay-canvas"></canvas>
     <div class="vf-corner tl"></div>
     <div class="vf-corner tr"></div>
@@ -577,8 +580,7 @@ let rafId = null;
 let capturedDataURL = null;
 const video  = document.getElementById('preview');
 const canvas = document.getElementById('overlay-canvas');
-const capCanvas = document.getElementById('cap-canvas');
-const capCtx = capCanvas.getContext('2d');
+// capCanvas removed - main canvas is now viewfinder
 const ctx    = canvas.getContext('2d');
 
 // ── FILM STRIP ────────────────────────────────────────────
@@ -813,21 +815,23 @@ function startRender(){
   if(rafId) cancelAnimationFrame(rafId);
   function render(){
     if(video.readyState>=2 && video.videoWidth>0){
-      // Sync capture canvas size
-      if(capCanvas.width!==video.videoWidth){
-        capCanvas.width=video.videoWidth;
-        capCanvas.height=video.videoHeight;
+      // Sync canvas size to video
+      if(canvas.width!==video.videoWidth){
+        canvas.width=video.videoWidth;
+        canvas.height=video.videoHeight;
       }
-      // Draw video+filter to capture canvas every frame
-      if(capCtx && capCanvas.width>0){
-        try{
-          capCtx.filter=selectedFilter.css||'none';
-          capCtx.drawImage(video,0,0,capCanvas.width,capCanvas.height);
-          capCtx.filter='none';
-        }catch(e){}
+      // Draw video WITH filter to the main canvas (this IS the viewfinder)
+      ctx.filter = selectedFilter.css||'none';
+      if(facingMode==='user'){
+        ctx.save();
+        ctx.scale(-1,1);
+        ctx.drawImage(video,-canvas.width,0,canvas.width,canvas.height);
+        ctx.restore();
+      } else {
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
       }
-
-      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.filter='none';
+      // Apply overlays on top
       applyGrain(selectedFilter.grain);
       applyVignette(selectedFilter.vignette);
       if(selectedFilter.warm!==0) applyWarmTint(selectedFilter.warm);
@@ -887,97 +891,28 @@ function applyWarmTint(warm){
 
 // ── CAPTURE PHOTO ─────────────────────────────────────────
 async function capturePhoto(){
-  // Flash
   const flash=document.getElementById('flashOverlay');
   flash.classList.add('flash');
   setTimeout(()=>flash.classList.remove('flash'),150);
 
   try{
-    const cap=document.createElement('canvas');
-    let imgBitmap=null;
+    // Canvas already has video+filter+overlays rendered every frame
+    // Just grab it directly!
+    capturedDataURL=canvas.toDataURL('image/jpeg',0.92);
 
-    // Try ImageCapture API first (best quality, works on Android Chrome)
-    if(stream && window.ImageCapture){
-      try{
-        const track=stream.getVideoTracks()[0];
-        const ic=new ImageCapture(track);
-        imgBitmap=await ic.grabFrame();
-        cap.width=imgBitmap.width;
-        cap.height=imgBitmap.height;
-      }catch(e){ imgBitmap=null; }
+    // If canvas returned blank, try one more frame
+    if(!capturedDataURL || capturedDataURL.length < 1000){
+      await new Promise(r=>setTimeout(r,200));
+      capturedDataURL=canvas.toDataURL('image/jpeg',0.92);
     }
 
-    // Fallback to capCanvas (pre-rendered each frame)
-    if(!imgBitmap){
-      const capCvs=document.getElementById('cap-canvas');
-      cap.width=capCvs?.width||video.videoWidth||1280;
-      cap.height=capCvs?.height||video.videoHeight||720;
-    }
-
-    const cctx=cap.getContext('2d');
-
-    // Black background (JPEG needs it)
-    cctx.fillStyle='#000';
-    cctx.fillRect(0,0,cap.width,cap.height);
-
-    if(imgBitmap){
-      // Apply CSS filter via canvas 2D filter
-      cctx.filter=selectedFilter.css||'none';
-      if(facingMode==='user'){
-        cctx.save();cctx.scale(-1,1);
-        cctx.drawImage(imgBitmap,-cap.width,0,cap.width,cap.height);
-        cctx.restore();
-      } else {
-        cctx.drawImage(imgBitmap,0,0,cap.width,cap.height);
-      }
-      cctx.filter='none';
-    } else {
-      // Use pre-rendered capCanvas
-      const capCvs=document.getElementById('cap-canvas');
-      if(capCvs && capCvs.width>0){
-        if(facingMode==='user'){
-          cctx.save();cctx.scale(-1,1);
-          cctx.drawImage(capCvs,-cap.width,0,cap.width,cap.height);
-          cctx.restore();
-        } else {
-          cctx.drawImage(capCvs,0,0,cap.width,cap.height);
-        }
-      }
-    }
-
-    // Add grain overlay
-    if(selectedFilter.grain>0){
-      const id=cctx.createImageData(cap.width,cap.height);
-      const d=id.data;
-      for(let i=0;i<d.length;i+=4){
-        const n=(Math.random()-0.5)*selectedFilter.grain*200;
-        d[i]=d[i+1]=d[i+2]=128+n;
-        d[i+3]=Math.floor(selectedFilter.grain*50);
-      }
-      cctx.putImageData(id,0,0);
-    }
-    // Add vignette
-    if(selectedFilter.vignette>0){
-      const vg=cctx.createRadialGradient(cap.width/2,cap.height/2,cap.height*0.2,cap.width/2,cap.height/2,cap.height*0.8);
-      vg.addColorStop(0,'rgba(0,0,0,0)');
-      vg.addColorStop(1,`rgba(0,0,0,${selectedFilter.vignette*0.75})`);
-      cctx.fillStyle=vg;
-      cctx.fillRect(0,0,cap.width,cap.height);
-    }
-    // Stamp
-    cctx.font=`bold ${Math.floor(cap.width*0.028)}px 'Courier New'`;
-    cctx.fillStyle='rgba(255,255,255,0.6)';
-    cctx.textAlign='left';
-    cctx.fillText('📷 '+selectedFilter.name+' — fab.games',cap.width*0.025,cap.height*0.97);
-
-    capturedDataURL=cap.toDataURL('image/jpeg',0.92);
     document.getElementById('capturedImg').src=capturedDataURL;
     document.getElementById('photoLabel').textContent='📷 '+selectedFilter.name;
     document.getElementById('photoModal').classList.add('show');
     playShutter();
   }catch(err){
     console.error('Capture error:',err);
-    alert('Could not capture photo. Please try again! 📷');
+    alert('Capture failed: '+err.message);
   }
 }
 
