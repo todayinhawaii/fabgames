@@ -476,9 +476,9 @@
 </div>
 
 <!-- Text modal -->
-<div id="txtModal">
-  <div class="tcard" style="max-width:360px;width:94vw;max-height:90vh;overflow-y:auto;">
-    <h3>✍️ Add Text to Slime</h3>
+<div id="txtModal" style="align-items:flex-start;justify-content:flex-end;padding:8px;">
+  <div class="tcard" id="txtCard" style="max-width:360px;width:94vw;max-height:90vh;overflow-y:auto;cursor:default;position:relative;">
+    <div id="dragHandle" style="cursor:grab;background:rgba(255,255,255,0.05);border-radius:6px;padding:6px 10px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;user-select:none;"><span style="font-size:13px;font-weight:700;color:#fff;">✍️ Add Text to Slime</span><span style="font-size:10px;color:#aaa;">⠿ drag</span></div>
 
     <!-- Live preview -->
     <div id="txtPreview" style="width:100%;min-height:52px;display:flex;align-items:center;
@@ -846,27 +846,7 @@ function renderStroke(stroke){
       }
       break;}
 
-    case 'text':
-      if(stroke.text){
-        const wp=warpPoint(stroke.pts[0].x,stroke.pts[0].y);
-        ctx.filter      ='none';
-        ctx.shadowBlur  =0;
-        ctx.globalAlpha = stroke.opacity!==undefined ? stroke.opacity : op;
-        ctx.font        = stroke.font||`bold ${sz}px Anton,Impact,sans-serif`;
-        ctx.fillStyle   = stroke.color;
-        ctx.textAlign   = stroke.align||'center';
-        ctx.textBaseline='middle';
-        ctx.shadowColor ='rgba(0,0,0,0.4)';
-        ctx.shadowBlur  =3;
-        // Multi-line support
-        const txtLines=(stroke.text||'').split('\n');
-        const lineH=sz*1.2;
-        const totalH=lineH*(txtLines.length-1);
-        txtLines.forEach((line,li)=>{
-          ctx.fillText(line, wp.x, wp.y - totalH/2 + li*lineH);
-        });
-      }
-      break;
+    case 'text': break; // handled by renderLiveText()
   }
   ctx.restore();
 }
@@ -1208,28 +1188,17 @@ function addText(){
   }
   const fontStr2=fontStr; // alias for catch block
 
-  // Make absolutely sure font is loaded before adding stroke
-  document.fonts.load(fontStr).then(()=>{
-    strokes.push({
-      tool:'text',color:drawColor,
-      size:sz*PR*0.6,
-      text:txt,
-      font:fontStr,
-      pts:[{x:CX,y:CY}]
-    });
-    showToast('✍️ Now squish it around!');
-  }).catch(()=>{
-    // Fallback even if promise fails
-    strokes.push({
-      tool:'text',color:drawColor,
-      size:sz*PR*0.6,
-      text:txt,
-      font:fontStr,
-      pts:[{x:CX,y:CY}]
-    });
-    showToast('✍️ Now squish it around!');
+  // Add as live text object - never burned into canvas
+  const msgId = Date.now();
+  textMessages.push({
+    id:msgId, text:txt, size:sz, opacity:op,
+    font:fontStr, align:selectedAlign,
+    color:drawColor, x:CX, y:CY
   });
-  closeTxt();
+  renderTextSlots();
+  document.getElementById('tInput').value='';
+  updateTxtPreview();
+  showToast('✍️ Added! Edit anytime in the list below.');
 }
 
 // ── SLIME PATH BUILDER ─────────────────────────
@@ -1608,6 +1577,56 @@ function doShareFacebook(){
   const txt=encodeURIComponent('Check out this amazing slime art I made on fab.games! 🧪🌺');
   window.open('https://www.facebook.com/sharer/sharer.php?u='+url+'&quote='+txt,'_blank');
 }
+
+// ── DRAGGABLE TEXT MODAL ───────────────────────
+(function(){
+  let dragging=false,dx=0,dy=0,modalX=0,modalY=0;
+  document.addEventListener('DOMContentLoaded',()=>{
+    const modal=document.getElementById('txtModal');
+    const handle=document.getElementById('dragHandle');
+    if(!modal||!handle)return;
+    handle.addEventListener('mousedown',e=>{
+      dragging=true;
+      const r=modal.getBoundingClientRect();
+      dx=e.clientX-r.left; dy=e.clientY-r.top;
+      handle.style.cursor='grabbing';
+      e.preventDefault();
+    });
+    handle.addEventListener('touchstart',e=>{
+      dragging=true;
+      const t=e.touches[0];
+      const r=modal.getBoundingClientRect();
+      dx=t.clientX-r.left; dy=t.clientY-r.top;
+      e.preventDefault();
+    },{passive:false});
+    document.addEventListener('mousemove',e=>{
+      if(!dragging)return;
+      modal.style.justifyContent='flex-start';
+      modal.style.alignItems='flex-start';
+      const card=document.getElementById('txtCard');
+      if(card){
+        card.style.position='fixed';
+        card.style.left=Math.max(0,Math.min(window.innerWidth-300,e.clientX-dx))+'px';
+        card.style.top=Math.max(0,Math.min(window.innerHeight-200,e.clientY-dy))+'px';
+        card.style.margin='0';
+      }
+    });
+    document.addEventListener('touchmove',e=>{
+      if(!dragging)return;
+      const t=e.touches[0];
+      const card=document.getElementById('txtCard');
+      if(card){
+        card.style.position='fixed';
+        card.style.left=Math.max(0,Math.min(window.innerWidth-300,t.clientX-dx))+'px';
+        card.style.top=Math.max(0,Math.min(window.innerHeight-200,t.clientY-dy))+'px';
+        card.style.margin='0';
+      }
+      e.preventDefault();
+    },{passive:false});
+    document.addEventListener('mouseup',()=>{dragging=false;if(handle)handle.style.cursor='grab';});
+    document.addEventListener('touchend',()=>{dragging=false;});
+  });
+})();
 </script>
 
 <!-- Mobile side tab — glowing wall-attached pull tab -->
