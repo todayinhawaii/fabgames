@@ -306,6 +306,13 @@
   font-weight:700;color:#fff;border:1.5px solid rgba(255,255,255,0.12);
   background:rgba(255,255,255,0.05);transition:all .15s;}
 .tf:hover{background:rgba(255,255,255,0.1);}
+
+@keyframes inputFlash{
+  0%,100%{border-color:rgba(255,255,255,0.2);box-shadow:none;}
+  25%,75%{border-color:#ffd700;box-shadow:0 0 12px rgba(255,215,0,0.6);}
+  50%{border-color:#ffaa00;box-shadow:0 0 20px rgba(255,170,0,0.8);}
+}
+.input-flash{animation:inputFlash 0.7s ease 2;}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Dancing+Script:wght@700&family=Space+Mono:wght@700&family=Abril+Fatface&family=Permanent+Marker&display=block" rel="stylesheet">
 </head>
@@ -989,6 +996,13 @@ let tFontFamily='Anton,Impact,sans-serif', tFontWeight='700', tFontStyle='normal
 
 function showTxt(){
   document.getElementById('txtModal').style.display='block';
+  const btn=document.getElementById('addBtn');
+  if(btn && textMsgs.length===0){
+    btn.textContent='🔤 ADD TYPE';
+    btn.style.background='linear-gradient(135deg,#ff69b4,#a855f7)';
+  }
+  // Focus the input right away
+  setTimeout(()=>{const inp=document.getElementById('tInput');if(inp)inp.focus();},200);
   // Preload fonts
   ['700 42px Anton','700 42px Dancing Script','700 38px Space Mono',
    '400 44px Abril Fatface','400 38px Permanent Marker'].forEach(f=>document.fonts.load(f).catch(()=>{}));
@@ -1018,8 +1032,23 @@ function pickFont(el){
 }
 function updateAlignBtns(){} // alignment removed
 function addText(){
-  const txt=(document.getElementById('tInput')||{}).value||'';
-  if(!txt.trim()) return;
+  const inp=document.getElementById('tInput');
+  const txt=(inp||{}).value||'';
+  if(!txt.trim()){
+    // Flash yellow and focus the input - tell them to type first!
+    if(inp){
+      inp.classList.remove('input-flash');
+      void inp.offsetWidth; // force reflow
+      inp.classList.add('input-flash');
+      inp.placeholder='✍️ Type your message here first!';
+      inp.focus();
+      setTimeout(()=>{
+        inp.placeholder='Type here... Enter for new line';
+        inp.classList.remove('input-flash');
+      }, 1500);
+    }
+    return;
+  }
   const sz=parseInt(document.getElementById('tSize').value)||60;
   const op=parseInt(document.getElementById('tOp').value)/100;
   const col=document.getElementById('tColor').value||'#ffffff';
@@ -1042,9 +1071,34 @@ function addText(){
       fontFamily:tFontFamily,fontWeight:tFontWeight,fontStyle:tFontStyle,
       align:'center', x:CX, y:CY+yo});
   }
-  document.getElementById('tInput').value='';
+  const inpEl=document.getElementById('tInput');
+  if(inpEl) inpEl.value='';
   renderMsgList();
-  showToast(editIdx>=0 ? '✅ Updated!' : '✅ Added! Drag it on the slime!');
+  if(editIdx<0){
+    // First/subsequent add - change button + flash input ready for more
+    const btn=document.getElementById('addBtn');
+    if(btn && textMsgs.length>0){
+      btn.textContent='🔤 ADD MORE TYPE';
+      btn.style.background='linear-gradient(135deg,#ff69b4,#a855f7)';
+    }
+    showToast('✅ Added! Drag it on the slime!');
+    // Flash input ready for next message
+    if(inpEl){
+      setTimeout(()=>{
+        inpEl.classList.remove('input-flash');
+        void inpEl.offsetWidth;
+        inpEl.classList.add('input-flash');
+        inpEl.placeholder='✍️ Add another message...';
+        inpEl.focus();
+        setTimeout(()=>{
+          inpEl.placeholder='Type here... Enter for new line';
+          inpEl.classList.remove('input-flash');
+        },1500);
+      },100);
+    }
+  } else {
+    showToast('✅ Saved!');
+  }
 }
 function renderMsgList(){
   const wrap=document.getElementById('msgList');if(!wrap)return;
