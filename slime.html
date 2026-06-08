@@ -435,7 +435,25 @@
   <div class="arow">
     <button class="abtn bsq" onclick="doSquish()">💦 SQUISH</button>
     <button class="abtn bmx" onclick="doMix()">🌀 MIX</button>
-    <button class="abtn bsv" onclick="doSave()">📸 SAVE</button>
+    <div style="position:relative;display:inline-block;">
+  <button class="abtn bsv" onclick="toggleSaveMenu()" id="saveMenuBtn">📸 SAVE ▾</button>
+  <div id="saveMenu" style="display:none;position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
+    background:rgba(13,17,23,0.97);border:1px solid rgba(255,215,0,0.3);border-radius:10px;
+    min-width:160px;z-index:300;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+    <div onclick="doSave();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;
+      color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.08);"
+      onmouseover="this.style.background='rgba(255,215,0,0.1)'"
+      onmouseout="this.style.background=''">📸 Save to Gallery</div>
+    <div onclick="doShareNative();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;
+      color:#fff;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.08);"
+      onmouseover="this.style.background='rgba(255,215,0,0.1)'"
+      onmouseout="this.style.background=''">↗ Share to Social</div>
+    <div onclick="doShareFacebook();closeSaveMenu()" style="padding:11px 16px;font-size:12px;font-weight:700;
+      color:#4267B2;cursor:pointer;"
+      onmouseover="this.style.background='rgba(255,215,0,0.1)'"
+      onmouseout="this.style.background=''">📘 Share on Facebook</div>
+  </div>
+</div>
     <button class="abtn brs" onclick="doReset()">🔄 RESET</button>
   </div>
 </div>
@@ -446,7 +464,7 @@
     <h3>✍️ Write in your slime!</h3>
     <input type="text" id="tInput" placeholder="I ❤️ Slime! 🌺" maxlength="30">
     <select id="fSel">
-      <option value="900 42px 'Arial Black', Arial, sans-serif">Bold Modern</option>
+      <option value="bold 46px Impact, 'Arial Black', sans-serif">Bold Modern</option>
       <option value="900 42px Georgia">Bold Serif</option>
       <option value="900 38px 'Courier New'">Typewriter</option>
       <option value="italic 900 42px Georgia">Fancy Italic</option>
@@ -1294,7 +1312,7 @@ loop();
   const div=document.createElement('div');
   div.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0.001;font-size:42px;pointer-events:none;';
   div.innerHTML=
-    '<span style="font:900 42px \'Arial Black\', Arial">Aa</span>'+
+    '<span style="font:bold 46px Impact, Arial Black">Aa</span>'+
     '<span style="font:900 42px Georgia">Aa</span>'+
     '<span style="font:900 38px Courier New">Aa</span>'+
     '<span style="font:italic 900 42px Georgia">Aa</span>'+
@@ -1304,7 +1322,7 @@ loop();
   // Also draw each onto canvas to warm GPU texture cache
   function warmCanvas(){
     const fonts=[
-      '900 '+Math.round(42*PR)+'px system-ui',
+      'bold '+Math.round(46*PR)+'px Impact',
       '900 '+Math.round(42*PR)+'px Georgia',
       '900 '+Math.round(38*PR)+'px Courier New',
       'italic 900 '+Math.round(42*PR)+'px Georgia',
@@ -1340,6 +1358,37 @@ function toggleMobTools(){
   // Move tab flush against the panel
   tab.style.left = open ? '155px' : '0';
   document.getElementById('mobTabArrow').style.transform = open ? 'rotate(180deg)' : 'rotate(0)';
+}
+
+function toggleSaveMenu(){
+  const m=document.getElementById('saveMenu');
+  m.style.display=m.style.display==='none'?'block':'none';
+}
+function closeSaveMenu(){
+  document.getElementById('saveMenu').style.display='none';
+}
+// Close menu if tapping outside
+document.addEventListener('touchstart',e=>{
+  const btn=document.getElementById('saveMenuBtn');
+  const menu=document.getElementById('saveMenu');
+  if(menu&&btn&&!btn.contains(e.target)&&!menu.contains(e.target)){
+    menu.style.display='none';
+  }
+});
+function doShareNative(){
+  const canvas=document.getElementById('mainCanvas');
+  canvas.toBlob(async blob=>{
+    const file=new File([blob],'my-slime-art.png',{type:'image/png'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      try{ await navigator.share({title:'My Slime Art!',text:'Made with Slime Artists on fab.games 🧪✨',files:[file]}); }
+      catch(e){ if(e.name!=='AbortError') doSave(); }
+    } else { doSave(); }
+  },'image/png');
+}
+function doShareFacebook(){
+  const url=encodeURIComponent('https://www.fab.games/slime');
+  const txt=encodeURIComponent('Check out this amazing slime art I made on fab.games! 🧪🌺');
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+url+'&quote='+txt,'_blank');
 }
 </script>
 
