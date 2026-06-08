@@ -86,11 +86,12 @@ video,canvas{
   object-fit:cover;
 }
 #preview{
-  display:none !important; /* hidden - canvas is the viewfinder */
+  z-index:1;
+  background:#000;
 }
 #overlay-canvas{
   z-index:2;
-  background:#000;
+  pointer-events:none;
 }
 #overlay-canvas{
   z-index:2;
@@ -786,10 +787,22 @@ async function startCamera(){
     video.style.transform = facingMode==='user' ? 'scaleX(-1)' : 'scaleX(1)';
     // Explicitly play - required on mobile browsers!
     try{ await video.play(); }catch(e){}
+
+    // Android Chrome fix: force repaint after play
+    // Without this, video stays black until page loses/gains focus
+    video.style.opacity='0.99';
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        video.style.opacity='1';
+      });
+    });
+
     video.onloadedmetadata=()=>{
       document.getElementById('noCamera').style.display='none';
       video.style.display='block';
       canvas.style.display='block';
+      // Force another repaint when metadata loads
+      video.style.transform=facingMode==='user'?'scaleX(-1)':'scaleX(1)';
       resizeCanvas();
       startRender();
     };
@@ -814,30 +827,20 @@ async function flipCamera(){
 function startRender(){
   if(rafId) cancelAnimationFrame(rafId);
   function render(){
-    if(video.readyState>=2 && video.videoWidth>0){
-      // Sync canvas size to video
-      if(canvas.width!==video.videoWidth){
-        canvas.width=video.videoWidth;
-        canvas.height=video.videoHeight;
-      }
-      // Draw video WITH filter to the main canvas (this IS the viewfinder)
-      ctx.filter = selectedFilter.css||'none';
-      if(facingMode==='user'){
-        ctx.save();
-        ctx.scale(-1,1);
-        ctx.drawImage(video,-canvas.width,0,canvas.width,canvas.height);
-        ctx.restore();
-      } else {
-        ctx.drawImage(video,0,0,canvas.width,canvas.height);
-      }
-      ctx.filter='none';
-      // Apply overlays on top
+    if(video.readyState>=2){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
       applyGrain(selectedFilter.grain);
       applyVignette(selectedFilter.vignette);
       if(selectedFilter.warm!==0) applyWarmTint(selectedFilter.warm);
     }
     rafId=requestAnimationFrame(render);
   }
+  // Fire when first real video frame arrives
+  video.addEventListener('loadeddata', ()=>{
+    video.style.opacity='0.99';
+    setTimeout(()=>{ video.style.opacity='1'; },50);
+  }, {once:true});
+
   render();
   // Apply CSS filter to video element
   applyVideoFilter();
@@ -896,23 +899,76 @@ async function capturePhoto(){
   setTimeout(()=>flash.classList.remove('flash'),150);
 
   try{
-    // Canvas already has video+filter+overlays rendered every frame
-    // Just grab it directly!
-    capturedDataURL=canvas.toDataURL('image/jpeg',0.92);
+    const w=video.videoWidth||1280;
+    const h=video.videoHeight||720;
+    const cap=document.createElement('canvas');
+    cap.width=w; cap.height=h;
+    const cctx=cap.getContext('2d');
 
-    // If canvas returned blank, try one more frame
-    if(!capturedDataURL || capturedDataURL.length < 1000){
-      await new Promise(r=>setTimeout(r,200));
-      capturedDataURL=canvas.toDataURL('image/jpeg',0.92);
+    // Black background for JPEG
+    cctx.fillStyle='#000';
+    cctx.fillRect(0,0,w,h);
+
+    // Draw frame - use requestVideoFrameCallback if available for sync
+    await new Promise(resolve=>{
+      if('requestVideoFrameCallback' in video){
+        video.requestVideoFrameCallback(()=>{
+          cctx.filter=selectedFilter.css||'none';
+          if(facingMode==='user'){
+            cctx.save();cctx.scale(-1,1);
+            cctx.drawImage(video,-w,0,w,h);
+            cctx.restore();
+          } else {
+            cctx.drawImage(video,0,0,w,h);
+          }
+          cctx.filter='none';
+          resolve();
+        });
+      } else {
+        // Fallback: draw immediately
+        cctx.filter=selectedFilter.css||'none';
+        if(facingMode==='user'){
+          cctx.save();cctx.scale(-1,1);
+          cctx.drawImage(video,-w,0,w,h);
+          cctx.restore();
+        } else {
+          cctx.drawImage(video,0,0,w,h);
+        }
+        cctx.filter='none';
+        resolve();
+      }
+    });
+
+    // Grain overlay
+    if(selectedFilter.grain>0){
+      const id=cctx.createImageData(w,h);const d=id.data;
+      for(let i=0;i<d.length;i+=4){
+        const n=(Math.random()-0.5)*selectedFilter.grain*200;
+        d[i]=d[i+1]=d[i+2]=128+n;d[i+3]=Math.floor(selectedFilter.grain*50);
+      }
+      cctx.putImageData(id,0,0);
     }
+    // Vignette
+    if(selectedFilter.vignette>0){
+      const vg=cctx.createRadialGradient(w/2,h/2,h*0.2,w/2,h/2,h*0.8);
+      vg.addColorStop(0,'rgba(0,0,0,0)');
+      vg.addColorStop(1,`rgba(0,0,0,${selectedFilter.vignette*0.75})`);
+      cctx.fillStyle=vg;cctx.fillRect(0,0,w,h);
+    }
+    // Stamp
+    cctx.font=`bold ${Math.floor(w*0.028)}px Courier New`;
+    cctx.fillStyle='rgba(255,255,255,0.6)';
+    cctx.textAlign='left';
+    cctx.fillText('📷 '+selectedFilter.name+' — fab.games',w*0.025,h*0.97);
 
+    capturedDataURL=cap.toDataURL('image/jpeg',0.92);
     document.getElementById('capturedImg').src=capturedDataURL;
     document.getElementById('photoLabel').textContent='📷 '+selectedFilter.name;
     document.getElementById('photoModal').classList.add('show');
     playShutter();
   }catch(err){
-    console.error('Capture error:',err);
-    alert('Capture failed: '+err.message);
+    console.error('Capture:',err);
+    alert('Could not capture. Try again! '+err.message);
   }
 }
 
@@ -940,8 +996,12 @@ document.addEventListener('visibilitychange', async ()=>{
     if(!stream || !stream.active){
       try{ await initCamera(); }catch(e){}
     } else {
-      // Re-play video in case it paused
-      try{ await video.play(); }catch(e){}
+      try{
+        await video.play();
+        // Force repaint
+        video.style.opacity='0.99';
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{video.style.opacity='1';}));
+      }catch(e){}
     }
   }
 });
@@ -955,9 +1015,23 @@ window.addEventListener('focus', async ()=>{
   if(!stream || !stream.active){
     try{ await initCamera(); }catch(e){}
   } else {
-    try{ await video.play(); }catch(e){}
+    try{
+      await video.play();
+      video.style.opacity='0.99';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{video.style.opacity='1';}));
+    }catch(e){}
   }
 });
+
+// Periodic repaint check - if video is playing but not painting, nudge it
+let repaintCheck=setInterval(()=>{
+  if(video && !video.paused && video.readyState>=2){
+    video.style.opacity='0.99';
+    requestAnimationFrame(()=>{ video.style.opacity='1'; });
+    clearInterval(repaintCheck);
+  }
+},500);
+
 </script>
 </body>
 </html>
