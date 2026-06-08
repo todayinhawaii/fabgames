@@ -909,9 +909,32 @@ async function capturePhoto(){
     cctx.fillStyle='#000';
     cctx.fillRect(0,0,w,h);
 
-    // Draw frame - use requestVideoFrameCallback if available for sync
-    await new Promise(resolve=>{
-      if('requestVideoFrameCallback' in video){
+    // Draw frame - try multiple methods for Android Chrome compatibility
+    let drawn = false;
+
+    // Method 1: createImageBitmap - best for Android GPU compositing
+    if(!drawn && window.createImageBitmap){
+      try{
+        const bitmap = await createImageBitmap(video);
+        cctx.filter = selectedFilter.css||'none';
+        if(facingMode==='user'){
+          cctx.save();cctx.scale(-1,1);
+          cctx.drawImage(bitmap,-w,0,w,h);
+          cctx.restore();
+        } else {
+          cctx.drawImage(bitmap,0,0,w,h);
+        }
+        cctx.filter='none';
+        bitmap.close && bitmap.close();
+        // Check if we actually got pixels (not black)
+        const px=cctx.getImageData(w/2,h/2,1,1).data;
+        if(px[0]>5||px[1]>5||px[2]>5) drawn=true;
+      }catch(e){ console.log('createImageBitmap failed:',e); }
+    }
+
+    // Method 2: requestVideoFrameCallback sync draw
+    if(!drawn && 'requestVideoFrameCallback' in video){
+      await new Promise(resolve=>{
         video.requestVideoFrameCallback(()=>{
           cctx.filter=selectedFilter.css||'none';
           if(facingMode==='user'){
@@ -924,20 +947,23 @@ async function capturePhoto(){
           cctx.filter='none';
           resolve();
         });
+      });
+      const px=cctx.getImageData(w/2,h/2,1,1).data;
+      if(px[0]>5||px[1]>5||px[2]>5) drawn=true;
+    }
+
+    // Method 3: direct drawImage fallback
+    if(!drawn){
+      cctx.filter=selectedFilter.css||'none';
+      if(facingMode==='user'){
+        cctx.save();cctx.scale(-1,1);
+        cctx.drawImage(video,-w,0,w,h);
+        cctx.restore();
       } else {
-        // Fallback: draw immediately
-        cctx.filter=selectedFilter.css||'none';
-        if(facingMode==='user'){
-          cctx.save();cctx.scale(-1,1);
-          cctx.drawImage(video,-w,0,w,h);
-          cctx.restore();
-        } else {
-          cctx.drawImage(video,0,0,w,h);
-        }
-        cctx.filter='none';
-        resolve();
+        cctx.drawImage(video,0,0,w,h);
       }
-    });
+      cctx.filter='none';
+    }
 
     // Grain overlay
     if(selectedFilter.grain>0){
