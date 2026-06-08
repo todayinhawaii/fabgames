@@ -370,6 +370,7 @@
   50%{box-shadow:0 0 18px rgba(255,215,0,0.9),0 0 28px rgba(255,215,0,0.3);}
 }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -464,7 +465,7 @@
     <h3>✍️ Write in your slime!</h3>
     <input type="text" id="tInput" placeholder="I ❤️ Slime! 🌺" maxlength="30">
     <select id="fSel">
-      <option value="bold 46px Impact, 'Arial Black', sans-serif">Bold Modern</option>
+      <option value="400 46px Anton, Impact, sans-serif">Bold Modern</option>
       <option value="900 42px Georgia">Bold Serif</option>
       <option value="900 38px 'Courier New'">Typewriter</option>
       <option value="italic 900 42px Georgia">Fancy Italic</option>
@@ -1312,7 +1313,7 @@ loop();
   const div=document.createElement('div');
   div.style.cssText='position:fixed;left:-9999px;top:-9999px;opacity:0.001;font-size:42px;pointer-events:none;';
   div.innerHTML=
-    '<span style="font:bold 46px Impact, Arial Black">Aa</span>'+
+    '<span style="font:400 46px Anton, Impact">Aa</span>'+
     '<span style="font:900 42px Georgia">Aa</span>'+
     '<span style="font:900 38px Courier New">Aa</span>'+
     '<span style="font:italic 900 42px Georgia">Aa</span>'+
@@ -1322,7 +1323,7 @@ loop();
   // Also draw each onto canvas to warm GPU texture cache
   function warmCanvas(){
     const fonts=[
-      'bold '+Math.round(46*PR)+'px Impact',
+      '400 '+Math.round(46*PR)+'px Anton',
       '900 '+Math.round(42*PR)+'px Georgia',
       '900 '+Math.round(38*PR)+'px Courier New',
       'italic 900 '+Math.round(42*PR)+'px Georgia',
@@ -1380,7 +1381,7 @@ function doShareNative(){
   canvas.toBlob(async blob=>{
     const file=new File([blob],'my-slime-art.png',{type:'image/png'});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      try{ await navigator.share({title:'My Slime Art!',text:'Made with Slime Artists on fab.games 🧪✨',files:[file]}); }
+      try{ await navigator.share({title:'My Slime Art!',text:'My Slime Art from www.fab.games 🧪🌺',files:[file]}); }
       catch(e){ if(e.name!=='AbortError') doSave(); }
     } else { doSave(); }
   },'image/png');
