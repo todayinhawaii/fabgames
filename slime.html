@@ -270,10 +270,10 @@
 
     /* Text modal */
     #txtModal{display:none;position:fixed;inset:0;z-index:200;
-      background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);
-      align-items:center;justify-content:center;}
+      background:rgba(0,0,0,0.15);
+      align-items:flex-start;justify-content:flex-end;padding:8px;}
     #txtModal.on{display:flex;}
-    .tcard{background:#1a1a2e;border:2px solid rgba(255,255,255,0.12);
+    .tcard{background:rgba(20,15,40,0.97);border:2px solid rgba(255,255,255,0.12);
       border-radius:20px;padding:20px;width:min(320px,90vw);}
     .tcard h3{color:#fff;font-size:15px;margin-bottom:10px;text-align:center;}
     .font-preview-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
@@ -1176,11 +1176,10 @@ function updateTextFont(i,newSize){
 }
 function changeTextFont(i,newFontBase){
   const m=textMessages[i]; if(!m)return;
-  // Extract current size from existing font
-  const sizeMatch=m.font.match(/(\d+)px/);
-  const currentSize=sizeMatch?sizeMatch[1]:m.size||60;
-  m.font=newFontBase.replace(/(\d+)px/,currentSize+'px');
-  renderTextSlots(); // re-render to update highlight
+  const sz=m.size||60;
+  m.font=newFontBase.replace(/(\d+)px/,sz+'px');
+  console.log('Font changed to:',m.font,'color:',m.color);
+  renderTextSlots();
 }
 function removeTextMsg(i){
   textMessages.splice(i,1);
@@ -1348,12 +1347,13 @@ function render(){
   // ★ ART STROKES — warped by slime physics!
   strokes.forEach(s=>renderStroke(s));
 
-  // ★ LIVE TEXT — always editable, never burned in
-  renderLiveText();
   // Active stroke being drawn right now
   if(activeStroke&&activeStroke.pts.length>1) renderStroke(activeStroke);
 
   ctx.restore(); // end clip
+
+  // ★ LIVE TEXT — drawn OUTSIDE clip so always visible
+  renderLiveText();
 
   // 3. Rim highlight
   buildPath();
@@ -1365,23 +1365,25 @@ function render(){
 function renderLiveText(){
   if(!textMessages||!textMessages.length) return;
   textMessages.forEach(m=>{
-    if(!m.text) return;
-    const wp = warpPoint(m.x||CX, m.y||CY);
+    if(!m||!m.text) return;
+    // Warp position with slime
+    const wp = warpPoint(m.x!==undefined?m.x:CX, m.y!==undefined?m.y:CY);
     ctx.save();
-    ctx.filter     = 'none';
-    ctx.shadowBlur = 0;
-    ctx.globalAlpha= m.opacity||0.9;
-    ctx.font       = m.font||`bold ${m.size}px Anton,Impact,sans-serif`;
-    ctx.fillStyle  = m.color||drawColor;
-    ctx.textAlign  = m.align||'center';
-    ctx.textBaseline='middle';
-    ctx.shadowColor='rgba(0,0,0,0.4)';
-    ctx.shadowBlur  =3;
-    const lines=(m.text||'').split('\n');
-    const lh=m.size*1.25;
-    const totalH=lh*(lines.length-1);
-    lines.forEach((line,i)=>{
-      ctx.fillText(line, wp.x, wp.y - totalH/2 + i*lh);
+    ctx.filter       = 'none';
+    ctx.globalAlpha  = m.opacity!==undefined ? m.opacity : 0.9;
+    // Build font — always use current size
+    const fnt = m.font || ('bold '+m.size+'px Anton,Impact,sans-serif');
+    ctx.font         = fnt;
+    ctx.fillStyle    = m.color || '#ffffff';
+    ctx.textAlign    = m.align || 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor  = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur   = 4;
+    const lines = (m.text||'').split('\n');
+    const lh    = (m.size||60) * 1.25;
+    const totalH = lh * (lines.length - 1);
+    lines.forEach((line,li)=>{
+      ctx.fillText(line, wp.x, wp.y - totalH/2 + li*lh);
     });
     ctx.restore();
   });
