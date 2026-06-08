@@ -798,8 +798,8 @@ async function startCamera(){
     if(stream){ stream.getTracks().forEach(t=>t.stop()); }
     // Front camera: avoid strict size constraints that can fail on mobile
     const videoConstraints = facingMode==='user'
-      ? {facingMode:{ideal:'user'}}
-      : {facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080}};
+      ? {facingMode:{ideal:'user'}, width:{ideal:1920}, height:{ideal:1080}}
+      : {facingMode:{ideal:'environment'}, width:{ideal:4096}, height:{ideal:2160}};
     stream = await navigator.mediaDevices.getUserMedia({
       video: videoConstraints,
       audio:false
@@ -952,7 +952,16 @@ async function capturePhoto(){
         const track=stream.getVideoTracks()[0];
         const ic=new ImageCapture(track);
         console.log('📸 Trying takePhoto()...');
-        const blob=await ic.takePhoto();
+        // Request max quality from camera hardware
+        const photoSettings={};
+        try{
+          const caps=ic.getPhotoCapabilities ? await ic.getPhotoCapabilities() : null;
+          if(caps){
+            if(caps.imageWidth?.max) photoSettings.imageWidth=caps.imageWidth.max;
+            if(caps.imageHeight?.max) photoSettings.imageHeight=caps.imageHeight.max;
+          }
+        }catch(e){}
+        const blob=await ic.takePhoto(Object.keys(photoSettings).length ? photoSettings : undefined);
         console.log('✅ takePhoto blob: ');
 
         // Convert blob to data URL
@@ -969,6 +978,8 @@ async function capturePhoto(){
         await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=dataUrl;});
         cap.width=img.width; cap.height=img.height;
         const cctx=cap.getContext('2d',{willReadFrequently:true});
+    cctx.imageSmoothingEnabled=true;
+    cctx.imageSmoothingQuality='high'; // high quality scaling
         cctx.filter=selectedFilter.css||'none';
         if(facingMode==='user'){
           cctx.save();cctx.scale(-1,1);
@@ -991,7 +1002,7 @@ async function capturePhoto(){
         cctx.textAlign='left';
         cctx.fillText('📷 '+selectedFilter.name+' — fab.games',cap.width*0.02,cap.height*0.97);
 
-        capturedDataURL=cap.toDataURL('image/jpeg',0.92);
+        capturedDataURL=cap.toDataURL('image/jpeg',1.0); // max quality!
         dbg('✅ Photo ready! '+Math.round(capturedDataURL.length/1024)+'KB','#0f0');
         showPhoto();
         return;
@@ -1013,7 +1024,7 @@ async function capturePhoto(){
         } else { octx.drawImage(bitmap,0,0,w,h); }
         octx.filter='none';
         bitmap.close&&bitmap.close();
-        const blob=await oc.convertToBlob({type:'image/jpeg',quality:0.92});
+        const blob=await oc.convertToBlob({type:'image/jpeg',quality:1.0});
         const url=URL.createObjectURL(blob);
         capturedDataURL=url;
         console.log('✅ OffscreenCanvas worked!');
@@ -1030,6 +1041,8 @@ async function capturePhoto(){
         const cap=document.createElement('canvas');
         cap.width=w;cap.height=h;
         const cctx=cap.getContext('2d',{willReadFrequently:true});
+    cctx.imageSmoothingEnabled=true;
+    cctx.imageSmoothingQuality='high'; // high quality scaling
         cctx.fillStyle='#000';cctx.fillRect(0,0,w,h);
         cctx.filter=selectedFilter.css||'none';
         if(facingMode==='user'){
@@ -1043,7 +1056,7 @@ async function capturePhoto(){
           vg.addColorStop(1,`rgba(0,0,0,${selectedFilter.vignette*0.75})`);
           cctx.fillStyle=vg;cctx.fillRect(0,0,w,h);
         }
-        capturedDataURL=cap.toDataURL('image/jpeg',0.92);
+        capturedDataURL=cap.toDataURL('image/jpeg',1.0); // max quality!
         console.log('Method C result len:');
         showPhoto();
         return;
