@@ -173,8 +173,8 @@ video,canvas{
 }
 .era-tabs::-webkit-scrollbar{display:none;}
 .era-tab{
-  flex-shrink:0;padding:8px 14px;
-  font-size:10px;font-weight:700;letter-spacing:1px;
+  flex-shrink:0;padding:10px 18px;
+  font-size:13px;font-weight:700;letter-spacing:1px;
   text-transform:uppercase;color:rgba(245,237,214,0.4);
   border-bottom:2px solid transparent;cursor:pointer;
   white-space:nowrap;transition:all 0.2s;
@@ -184,18 +184,18 @@ video,canvas{
 
 .filters-scroll{
   display:flex;gap:10px;overflow-x:auto;
-  padding:12px 12px;height:148px;
+  padding:12px 12px;height:210px;
   scrollbar-width:none;align-items:center;
 }
 .filters-scroll::-webkit-scrollbar{display:none;}
 
 .filter-card{
-  flex-shrink:0;width:96px;
+  flex-shrink:0;width:144px;
   background:rgba(255,255,255,0.04);
   border:1.5px solid rgba(212,168,67,0.15);
   border-radius:10px;overflow:hidden;cursor:pointer;
   transition:all 0.2s;position:relative;
-  height:120px;display:flex;flex-direction:column;
+  height:180px;display:flex;flex-direction:column;
 }
 .filter-card:active{transform:scale(0.96);}
 .filter-card.selected{
@@ -203,14 +203,14 @@ video,canvas{
   box-shadow:0 0 16px rgba(212,168,67,0.5);
 }
 .filter-thumb{
-  height:66px;width:100%;flex-shrink:0;overflow:hidden;position:relative;
+  height:100px;width:100%;flex-shrink:0;overflow:hidden;position:relative;
 }
 .filter-thumb canvas{
   width:100%;height:100%;
   position:static;object-fit:cover;
 }
 .filter-info{
-  padding:4px 6px;flex:1;
+  padding:6px 8px;flex:1;
   display:flex;flex-direction:column;justify-content:center;
 }
 .filter-fname{
@@ -773,14 +773,22 @@ function capturePhoto(){
 
   // Draw video + filter + overlays to a capture canvas
   const cap=document.createElement('canvas');
-  cap.width=video.videoWidth||canvas.width;
-  cap.height=video.videoHeight||canvas.height;
+  const previewCvs=document.getElementById('canvas');
+  cap.width = previewCvs?.width || video.videoWidth || 1280;
+  cap.height = previewCvs?.height || video.videoHeight || 720;
   const cctx=cap.getContext('2d');
 
-  // Draw the video frame
-  cctx.filter=selectedFilter.css;
-  cctx.drawImage(video,0,0,cap.width,cap.height);
-  cctx.filter='none';
+  // Draw from preview canvas (already has filter applied - avoids black screen on mobile!)
+  // The preview canvas correctly shows the current filtered view
+  const previewCanvas = document.getElementById('canvas');
+  if(previewCanvas && previewCanvas.width > 0){
+    cctx.drawImage(previewCanvas, 0, 0, cap.width, cap.height);
+  } else {
+    // Fallback: draw video directly
+    cctx.filter = selectedFilter.css||'none';
+    cctx.drawImage(video, 0, 0, cap.width, cap.height);
+    cctx.filter = 'none';
+  }
 
   // Add grain
   if(selectedFilter.grain>0){
