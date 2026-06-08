@@ -301,6 +301,17 @@ video,canvas{
 </style>
 </head>
 <body>
+<!-- On-screen debug panel -->
+<div id="debugPanel" style="display:none;position:fixed;bottom:80px;left:8px;right:8px;
+  z-index:9999;background:rgba(0,0,0,0.85);color:#0f0;font-size:11px;
+  font-family:monospace;padding:10px;border-radius:8px;border:1px solid #0f0;
+  max-height:200px;overflow-y:auto;">
+  <div style="color:#ff0;font-weight:bold;margin-bottom:4px;">📷 Debug Log:</div>
+  <div id="debugLog"></div>
+</div>
+<button onclick="toggleDebug()" style="position:fixed;bottom:130px;right:8px;
+  z-index:10000;background:rgba(0,0,0,0.6);color:#ff0;border:1px solid #ff0;
+  border-radius:6px;padding:4px 8px;font-size:10px;cursor:pointer;">🐛 Debug</button>
 
 <!-- Film strip -->
 <div class="filmstrip">
@@ -901,6 +912,8 @@ async function capturePhoto(){
   try{
     const w=video.videoWidth||1280;
     const h=video.videoHeight||720;
+    dbg('📐 Video: '+video.videoWidth+'x'+video.videoHeight+' ready:'+video.readyState);
+    dbg('🎬 Filter: '+selectedFilter.name+' | '+selectedFilter.css.substring(0,30));
     const cap=document.createElement('canvas');
     cap.width=w; cap.height=h;
     const cctx=cap.getContext('2d');
@@ -928,8 +941,10 @@ async function capturePhoto(){
         bitmap.close && bitmap.close();
         // Check if we actually got pixels (not black)
         const px=cctx.getImageData(w/2,h/2,1,1).data;
-        if(px[0]>5||px[1]>5||px[2]>5) drawn=true;
-      }catch(e){ console.log('createImageBitmap failed:',e); }
+        const px0=cctx.getImageData(w/2,h/2,1,1).data;
+        dbg('🖼 Method1 pixels: r'+px0[0]+' g'+px0[1]+' b'+px0[2]+(px0[0]>5||px0[1]>5||px0[2]>5?' ✅':'❌ BLACK'),'#0ff');
+        if(px0[0]>5||px0[1]>5||px0[2]>5) drawn=true;
+      }catch(e){ dbg('❌ createImageBitmap: '+e.message,'#f44'); }
     }
 
     // Method 2: requestVideoFrameCallback sync draw
@@ -949,10 +964,12 @@ async function capturePhoto(){
         });
       });
       const px=cctx.getImageData(w/2,h/2,1,1).data;
-      if(px[0]>5||px[1]>5||px[2]>5) drawn=true;
+      const px1=cctx.getImageData(w/2,h/2,1,1).data;
+      dbg('🖼 Method2 pixels: r'+px1[0]+' g'+px1[1]+' b'+px1[2]+(px1[0]>5||px1[1]>5||px1[2]>5?' ✅':'❌ BLACK'),'#fa0');
+      if(px1[0]>5||px1[1]>5||px1[2]>5) drawn=true;
     }
 
-    // Method 3: direct drawImage fallback
+    dbg('Method3 direct drawImage','#ff0');
     if(!drawn){
       cctx.filter=selectedFilter.css||'none';
       if(facingMode==='user'){
@@ -1075,6 +1092,23 @@ function playShutter(){
     src.connect(g);g.connect(ac.destination);
     src.start();
   }catch(e){}
+}
+
+// ── ON-SCREEN DEBUG ───────────────────────────────
+let debugVisible=false;
+function toggleDebug(){
+  debugVisible=!debugVisible;
+  document.getElementById('debugPanel').style.display=debugVisible?'block':'none';
+}
+function dbg(msg,color='#0f0'){
+  const log=document.getElementById('debugLog');
+  if(!log)return;
+  const line=document.createElement('div');
+  line.style.color=color;
+  line.textContent=new Date().toLocaleTimeString()+' '+msg;
+  log.appendChild(line);
+  log.scrollTop=log.scrollHeight;
+  console.log(msg);
 }
 </script>
 </body>
