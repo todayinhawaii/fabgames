@@ -1089,7 +1089,7 @@ function showCard(){
   document.getElementById('cardRegion').textContent=REGION_NAMES[q.r]||q.r;
   // Difficulty stars
   const stars='⭐'.repeat(q.d||3);
-  document.getElementById('cardDiff').textContent=stars;
+  const diffEl=document.getElementById('cardDiff');if(diffEl)diffEl.textContent=stars;
   // Multi-capital badge
   const badge=document.getElementById('cardRegion');
   if(q.caps && q.caps.length>1){
