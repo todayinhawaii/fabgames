@@ -1005,6 +1005,12 @@ function pickFont(el){
   tFontFamily=el.dataset.f;
   tFontWeight=el.dataset.fw||'700';
   tFontStyle=el.dataset.fi||'normal';
+  // If editing a message, update it live
+  if(editIdx>=0 && textMsgs[editIdx]){
+    textMsgs[editIdx].fontFamily=tFontFamily;
+    textMsgs[editIdx].fontWeight=tFontWeight;
+    textMsgs[editIdx].fontStyle=tFontStyle;
+  }
 }
 function updateAlignBtns(){
   ['l','c','r'].forEach(x=>{
@@ -1030,6 +1036,9 @@ function addText(){
     m.align=tAlign;
     editIdx=-1;
     document.getElementById('addBtn').textContent='Add ✓';
+    showToast('✅ Updated!');
+    renderMsgList();
+    return;
   } else {
     if(textMsgs.length>=5){showToast('Max 5 messages!');return;}
     const yo=offsets[textMsgs.length]||0;
@@ -1039,6 +1048,7 @@ function addText(){
   }
   document.getElementById('tInput').value='';
   renderMsgList();
+  showToast(editIdx>=0 ? '✅ Updated!' : '✅ Added! Drag it on the slime!');
 }
 function renderMsgList(){
   const wrap=document.getElementById('msgList');if(!wrap)return;
@@ -1081,6 +1091,12 @@ function editMsg(i){
   tFontStyle=m.fontStyle||'normal';
   tAlign=m.align||'left';
   updateAlignBtns();
+  // Highlight active font button
+  document.querySelectorAll('.tf').forEach(el=>{
+    const match = el.dataset.f===tFontFamily;
+    el.style.background=match?'rgba(255,105,180,0.2)':'rgba(255,255,255,0.05)';
+    el.style.borderColor=match?'rgba(255,105,180,0.6)':'rgba(255,255,255,0.12)';
+  });
   document.getElementById('addBtn').textContent='Update ✓';
 }
 function delMsg(i){textMsgs.splice(i,1);renderMsgList();}
