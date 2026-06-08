@@ -814,29 +814,14 @@ async function startCamera(){
     video.style.opacity='0.99';
     requestAnimationFrame(()=>requestAnimationFrame(()=>{ video.style.opacity='1'; }));
 
-    // Strategy 2: re-assign srcObject after 500ms (most reliable on Samsung)
+    // Strategy 2: nudge once after 800ms if video not yet showing
     setTimeout(async ()=>{
-      if(video.readyState<2){
-        const s=video.srcObject;
-        video.srcObject=null;
-        video.srcObject=s;
+      if(video.videoWidth===0){
         try{ await video.play(); }catch(e){}
         video.style.opacity='0.99';
         requestAnimationFrame(()=>requestAnimationFrame(()=>{ video.style.opacity='1'; }));
       }
-    },500);
-
-    // Strategy 3: keep nudging every 200ms for 3 seconds
-    let nudgeCount=0;
-    const nudge=setInterval(()=>{
-      nudgeCount++;
-      if(video.videoWidth>0){
-        video.style.opacity='0.99';
-        requestAnimationFrame(()=>{ video.style.opacity='1'; });
-        clearInterval(nudge);
-      }
-      if(nudgeCount>15) clearInterval(nudge);
-    },200);
+    },800);
 
     video.onloadedmetadata=()=>{
       document.getElementById('noCamera').style.display='none';
