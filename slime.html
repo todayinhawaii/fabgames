@@ -359,7 +359,7 @@
       </div>
     </div>
   </div>
-  <button id="toolCloseBtn" onclick="toggleMobTools()"
+  <button id="toolCloseBtn" onclick="document.getElementById('toolWrap').classList.remove('mob-open');document.getElementById('mobTabArrow').style.transform='rotate(0deg)';"
     style="margin-top:8px;width:100%;padding:10px 0;background:linear-gradient(135deg,#ffd700,#c9a84c);border:none;border-radius:8px;color:#1a1a1a;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;animation:slimePulse 2s ease-in-out infinite;">✕ Close</button>
 <button id="tbToggle" onclick="toggleToolbar()" title="Hide/show tools">◀</button>
 </div>
@@ -435,7 +435,7 @@
   <!-- Buttons -->
   <div style="display:flex;gap:8px;">
     <button onclick="closeTxt()" style="flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.08);color:#aaa;font-size:13px;font-weight:700;cursor:pointer;">Close</button>
-    <button onclick="addText()" style="flex:1;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#ff69b4,#a855f7);color:#fff;font-size:13px;font-weight:700;cursor:pointer;" id="addBtn">+ Add New Type Layer</button>
+    <button onclick="addText()" style="flex:1;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#ff69b4,#a855f7);color:#fff;font-size:13px;font-weight:700;cursor:pointer;" id="addBtn" style="flex:1;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#ff69b4,#a855f7);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">🔤 ADD TYPE</button>
   </div>
 </div>
 </div>
@@ -1000,7 +1000,7 @@ function showTxt(){
 function closeTxt(){
   document.getElementById('txtModal').style.display='none';
   editIdx=-1;
-  document.getElementById('addBtn').textContent='Add ✓';
+  document.getElementById('addBtn').textContent='🔤 ADD TYPE'; document.getElementById('addBtn').style.background='linear-gradient(135deg,#ff69b4,#a855f7)';
 }
 function pickFont(el){
   document.querySelectorAll('.tf').forEach(e=>{
@@ -1042,7 +1042,7 @@ function addText(){
     m.fontFamily=tFontFamily; m.fontWeight=tFontWeight; m.fontStyle=tFontStyle;
     m.align=tAlign;
     editIdx=-1;
-    document.getElementById('addBtn').textContent='Add ✓';
+    document.getElementById('addBtn').textContent='🔤 ADD TYPE'; document.getElementById('addBtn').style.background='linear-gradient(135deg,#ff69b4,#a855f7)';
     showToast('✅ Saved!');
     renderMsgList();
     return;
@@ -1104,7 +1104,7 @@ function editMsg(i){
     el.style.background=match?'rgba(255,105,180,0.2)':'rgba(255,255,255,0.05)';
     el.style.borderColor=match?'rgba(255,105,180,0.6)':'rgba(255,255,255,0.12)';
   });
-  document.getElementById('addBtn').textContent='Save Changes ✓';
+  document.getElementById('addBtn').textContent='💾 SAVE CHANGES'; document.getElementById('addBtn').style.background='linear-gradient(135deg,#22c55e,#16a34a)';
 }
 function delMsg(i){textMsgs.splice(i,1);renderMsgList();}
 
@@ -1482,8 +1482,11 @@ function toggleMobTools(){
   const w=document.getElementById('toolWrap');
   const tab=document.getElementById('mobToolBtn');
   const open=w.classList.toggle('mob-open');
-  document.getElementById('mobTabArrow').style.transform=open?'rotate(180deg)':'rotate(0)';
-  tab.style.left=open?'155px':'0';
+  const arr=document.getElementById('mobTabArrow');
+  if(arr) arr.style.transform=open?'rotate(180deg)':'rotate(0deg)';
+  // Reset left - CSS handles position, just clear inline style
+  tab.style.left='';
+  tab.style.removeProperty('left');
 }
 function toggleSaveMenu(){const m=document.getElementById('saveMenu');m.style.display=m.style.display==='none'?'block':'none';}
 function closeSaveMenu(){document.getElementById('saveMenu').style.display='none';}
