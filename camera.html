@@ -777,6 +777,8 @@ async function startCamera(){
     video.srcObject=stream;
     // Mirror front camera
     video.style.transform = facingMode==='user' ? 'scaleX(-1)' : 'scaleX(1)';
+    // Explicitly play - required on mobile browsers!
+    try{ await video.play(); }catch(e){}
     video.onloadedmetadata=()=>{
       document.getElementById('noCamera').style.display='none';
       video.style.display='block';
@@ -812,11 +814,13 @@ function startRender(){
         capCanvas.height=video.videoHeight||240;
       }
       // Draw video+filter to capture canvas every frame
-      try{
-        capCtx.filter=selectedFilter.css||'none';
-        capCtx.drawImage(video,0,0,capCanvas.width,capCanvas.height);
-        capCtx.filter='none';
-      }catch(e){}
+      if(capCtx && capCanvas.width>0){
+        try{
+          capCtx.filter=selectedFilter.css||'none';
+          capCtx.drawImage(video,0,0,capCanvas.width,capCanvas.height);
+          capCtx.filter='none';
+        }catch(e){}
+      }
 
       ctx.clearRect(0,0,canvas.width,canvas.height);
       applyGrain(selectedFilter.grain);
@@ -892,6 +896,9 @@ function capturePhoto(){
 
   // Draw from pre-rendered capture canvas (video+filter already applied in render loop!)
   const capCvs=document.getElementById('cap-canvas');
+  // Fill black background first - JPEG converts transparency to black otherwise
+  cctx.fillStyle='#000';
+  cctx.fillRect(0,0,cap.width,cap.height);
   if(capCvs && capCvs.width>0){
     // Mirror for front camera
     if(facingMode==='user'){
@@ -907,10 +914,18 @@ function capturePhoto(){
       cctx.drawImage(overlayEl,0,0,cap.width,cap.height);
     }
   } else {
-    // Fallback
-    cctx.filter=selectedFilter.css||'none';
-    cctx.drawImage(video,0,0,cap.width,cap.height);
-    cctx.filter='none';
+    // capCanvas not ready - draw video directly
+    try{
+      cctx.filter=selectedFilter.css||'none';
+      if(facingMode==='user'){
+        cctx.save();cctx.scale(-1,1);
+        cctx.drawImage(video,-cap.width,0,cap.width,cap.height);
+        cctx.restore();
+      } else {
+        cctx.drawImage(video,0,0,cap.width,cap.height);
+      }
+      cctx.filter='none';
+    }catch(e){}
   }
 
   // Add grain
@@ -974,6 +989,32 @@ function closeModal(){
 buildFilterCards('1920s');
 // Auto-start camera on load
 startCamera();
+
+// ── MOBILE CAMERA RESUME ─────────────────────────────
+// When user goes to home screen and comes back, restart camera
+document.addEventListener('visibilitychange', async ()=>{
+  if(document.visibilityState==='visible'){
+    if(!stream || !stream.active){
+      try{ await initCamera(); }catch(e){}
+    } else {
+      // Re-play video in case it paused
+      try{ await video.play(); }catch(e){}
+    }
+  }
+});
+
+// Also handle page focus
+window.addEventListener('pageshow', async ()=>{
+  try{ await video.play(); }catch(e){}
+});
+
+window.addEventListener('focus', async ()=>{
+  if(!stream || !stream.active){
+    try{ await initCamera(); }catch(e){}
+  } else {
+    try{ await video.play(); }catch(e){}
+  }
+});
 </script>
 </body>
 </html>
