@@ -1044,6 +1044,64 @@ function playShutter(){
     src.start();
   }catch(e){}
 }
+
+// ── PHOTO MODAL FUNCTIONS ─────────────────────────────
+function savePhoto(){
+  if(!capturedDataURL) return;
+  // On mobile - use Web Share API with file if available
+  if(navigator.share && capturedDataURL.startsWith('blob:')){
+    fetch(capturedDataURL)
+      .then(r=>r.blob())
+      .then(async blob=>{
+        const file=new File([blob],'fab-games-'+selectedFilter.name.replace(/\s+/g,'-')+'.jpg',{type:'image/jpeg'});
+        if(navigator.canShare && navigator.canShare({files:[file]})){
+          try{
+            await navigator.share({
+              title:'My '+selectedFilter.name+' Photo',
+              text:'Shot with Film Lab on fab.games 📷',
+              files:[file]
+            });
+            return;
+          }catch(e){ if(e.name==='AbortError') return; }
+        }
+        downloadDataURL(capturedDataURL);
+      }).catch(()=>downloadDataURL(capturedDataURL));
+  } else {
+    // Convert data URL to blob for better mobile saving
+    const a=document.createElement('a');
+    a.href=capturedDataURL;
+    a.download='fab-games-'+selectedFilter.name.replace(/\s+/g,'-')+'.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // Also try Web Share API for mobile
+    if(navigator.share){
+      fetch(capturedDataURL)
+        .then(r=>r.blob())
+        .then(async blob=>{
+          const file=new File([blob],'film-lab.jpg',{type:'image/jpeg'});
+          if(navigator.canShare && navigator.canShare({files:[file]})){
+            try{ await navigator.share({title:'Film Lab Photo',text:'Shot with Film Lab on fab.games 📷',files:[file]}); }
+            catch(e){}
+          }
+        }).catch(()=>{});
+    }
+  }
+}
+
+function downloadDataURL(url){
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='film-lab.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function closeModal(){
+  document.getElementById('photoModal').classList.remove('show');
+  capturedDataURL=null;
+}
 </script>
 </body>
 </html>
