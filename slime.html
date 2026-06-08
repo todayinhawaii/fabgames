@@ -295,11 +295,19 @@
     @keyframes tpop{0%{opacity:0;transform:translate(-50%,-8px);}12%{opacity:1;transform:translate(-50%,0);}78%{opacity:1;}100%{opacity:0;}}
   
 @keyframes tabGlow{0%,100%{box-shadow:3px 0 12px rgba(255,215,0,0.2);}50%{box-shadow:3px 0 22px rgba(255,215,0,0.55);}}
-#mobToolBtn{display:none;position:fixed;left:0;top:calc(50% + 96px);transform:translateY(-50%);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:32px;padding:14px 0;background:linear-gradient(180deg,rgba(20,10,30,0.97),rgba(13,5,20,0.97));border:1px solid rgba(255,215,0,0.5);border-left:none;border-radius:0 14px 14px 0;cursor:pointer;animation:tabGlow 2.5s ease-in-out infinite;}
-#mobTabLabel{font-size:7px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:rgba(255,215,0,0.8);writing-mode:vertical-rl;transform:rotate(180deg);}
-#mobTabArrow{font-size:16px;color:rgba(255,215,0,0.7);transition:transform 0.28s;}
+#mobToolBtn{display:none;position:fixed;left:0;top:calc(50% + 96px);transform:translateY(-50%);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:22px;padding:10px 0;background:rgba(20,10,30,0.95);border:1px solid rgba(255,105,180,0.45);border-left:none;border-radius:0 10px 10px 0;cursor:pointer;animation:tabGlow 2.5s ease-in-out infinite;}
+#mobTabLabel{font-size:6px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,105,180,0.9);writing-mode:vertical-rl;transform:rotate(180deg);}
+#mobTabArrow{font-size:11px;color:rgba(255,105,180,0.8);transition:transform 0.28s;}
 @keyframes slimePulse{0%,100%{box-shadow:0 0 8px rgba(255,215,0,0.4);}50%{box-shadow:0 0 18px rgba(255,215,0,0.9);}}
-@media(max-width:768px){#toolWrap{transform:translateX(-155px)!important;transition:transform 0.28s ease;}#toolWrap.mob-open{transform:translateX(0)!important;}#tbToggle{display:none!important;}#mobToolBtn{display:flex!important;}#toolCloseBtn{display:flex!important;}}
+@media(max-width:768px){
+  #toolWrap{transform:translateX(-100%)!important;transition:transform 0.28s ease;}
+  #toolWrap.mob-open{transform:translateX(0)!important;}
+  #tbToggle{display:none!important;}
+  #mobToolBtn{display:flex!important;}
+  #toolBar{max-width:148px;padding:8px 4px 12px;}
+  .tool-btn{font-size:13px;padding:6px 4px;}
+  .tlbl{font-size:10px;}
+}
 #toolCloseBtn{display:none;}
 
 .tf{padding:7px 4px;border-radius:7px;font-size:13px;text-align:center;cursor:pointer;
@@ -366,8 +374,7 @@
       </div>
     </div>
   </div>
-  <button id="toolCloseBtn" onclick="document.getElementById('toolWrap').classList.remove('mob-open');document.getElementById('mobTabArrow').style.transform='rotate(0deg)';"
-    style="margin-top:8px;width:100%;padding:10px 0;background:linear-gradient(135deg,#ffd700,#c9a84c);border:none;border-radius:8px;color:#1a1a1a;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;animation:slimePulse 2s ease-in-out infinite;">✕ Close</button>
+  
 <button id="tbToggle" onclick="toggleToolbar()" title="Hide/show tools">◀</button>
 </div>
 
@@ -1512,7 +1519,7 @@ loop();
 showToast('🧪 Draw inside the slime — it squishes and moves your art!');
 </script>
 <div id="mobToolBtn" onclick="toggleMobTools()">
-  <div style="font-size:16px;">🎨</div>
+  <div style="font-size:12px;">🎨</div>
   <div id="mobTabLabel">TOOLS</div>
   <div id="mobTabArrow">›</div>
 </div>
@@ -1522,13 +1529,9 @@ showToast('🧪 Draw inside the slime — it squishes and moves your art!');
 <script>
 function toggleMobTools(){
   const w=document.getElementById('toolWrap');
-  const tab=document.getElementById('mobToolBtn');
   const open=w.classList.toggle('mob-open');
   const arr=document.getElementById('mobTabArrow');
   if(arr) arr.style.transform=open?'rotate(180deg)':'rotate(0deg)';
-  // Reset left - CSS handles position, just clear inline style
-  tab.style.left='';
-  tab.style.removeProperty('left');
 }
 function toggleSaveMenu(){const m=document.getElementById('saveMenu');m.style.display=m.style.display==='none'?'block':'none';}
 function closeSaveMenu(){document.getElementById('saveMenu').style.display='none';}
