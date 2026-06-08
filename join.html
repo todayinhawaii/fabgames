@@ -88,7 +88,7 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2)
 
     <div class="tabs">
       <div class="tab active" onclick="showTab('free')">🎁 Free Month</div>
-      <div class="tab" onclick="showTab('paid')">💳 Subscribe $4.99</div>
+      <div class="tab" onclick="showTab('paid')">💳 Subscribe $4.99/mo</div>
     </div>
 
     <div id="msgBox" class="msg"></div>
@@ -112,7 +112,7 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2)
         <label class="form-label">Confirm Password</label>
         <input class="form-input" id="freePassword2" type="password" placeholder="Repeat your password">
       </div>
-      <button class="main-btn" id="freeBtn" onclick="startFreeTrial()">Start Free Month →</button>
+      <button class="main-btn" id="freeBtn" onclick="startFreeTrial()">🎁 Start My Free Month →</button>
       <div class="perks">
         <div class="perk">Every game — all of them</div>
         <div class="perk">No credit card needed</div>
@@ -124,12 +124,27 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2)
 
     <!-- PAID -->
     <div id="paidTab" style="display:none;">
+      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);
+        border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:center;">
+        <div style="font-size:22px;font-weight:900;color:#ffd700;">$4.99<span style="font-size:13px;color:var(--muted);">/month</span></div>
+        <div style="font-size:11px;color:#c9a84c;margin-top:2px;">✦ All 17 games · Ad-free · Cancel anytime ✦</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input class="form-input" id="paidName" type="text" placeholder="What do we call you?">
+      </div>
       <div class="form-group">
         <label class="form-label">Email Address</label>
         <input class="form-input" id="paidEmail" type="email" placeholder="your@email.com">
       </div>
-      <button class="main-btn" onclick="startSubscription()">Subscribe $4.99/month →</button>
-      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.7;">Secure payment via Stripe · Cancel anytime<br>Less than a coffee a month ☕</p>
+      <button class="main-btn" onclick="startSubscription()" style="background:linear-gradient(135deg,#c9a84c,#ffd700);color:#0d0d0f;font-weight:800;">
+        💳 Subscribe Now — $4.99/month →
+      </button>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.7;">
+        🔒 Secure payment via Stripe · Cancel anytime<br>
+        Less than a coffee a month ☕<br>
+        <span style="color:#c9a84c;">First month free — charged after 30 days</span>
+      </p>
     </div>
 
     <div class="already-member">Already have an account? <a href="/login">Sign in →</a></div>
@@ -222,7 +237,7 @@ async function startFreeTrial(){
         const checkRes = await fetch('/api/check-member', {
           method:'POST',
           headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({email})
+          body:JSON.stringify({email, name:document.getElementById('paidName')?.value.trim()||''})
         });
         const checkData = await checkRes.json();
 
@@ -269,7 +284,7 @@ async function startFreeTrial(){
   }
 }
 
-async function startSubscription(){
+async async function startSubscription(){
   const email=document.getElementById('paidEmail').value.trim();
   if(!email||!email.includes('@')){ showMsg('Please enter a valid email address!'); return; }
   showMsg('Redirecting to secure checkout...','info');
@@ -277,7 +292,7 @@ async function startSubscription(){
     const res=await fetch('/api/create-checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email})
+      body:JSON.stringify({email, name:document.getElementById('paidName')?.value.trim()||''})
     });
     const data=await res.json();
     if(data.ok){ window.location.href=data.url; }
