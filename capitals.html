@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🌍 Capital Cities — fab.games</title>
+<link rel="icon" href="/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Inter:wght@400;500;600;700;800&display=block" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --brown:  #1a0a05;
+  --brown2: #2c1208;
+  --brown3: #3d1a0a;
+  --burg:   #6b1a1a;
+  --burg2:  #8b2020;
+  --gold:   #c9a84c;
+  --gold2:  #ffd700;
+  --gold3:  #e8c86a;
+  --cream:  #f5e6c8;
+  --text:   #f0d9a8;
+}
+html,body{height:100%;overflow:hidden;}
+body{
+  background:radial-gradient(ellipse at 30% 20%, #3d1a0a 0%, #1a0a05 50%, #0d0502 100%);
+  font-family:'Cinzel',Georgia,serif;
+  color:var(--text);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+
+/* ── STARS ── */
+.star{position:fixed;background:#ffd700;border-radius:50%;pointer-events:none;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.05;}50%{opacity:0.4;}}
+
+/* ── NAME SCREEN ── */
+#nameScreen{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center, #2c1208 0%, #0d0502 100%);
+}
+.ns-wrap{
+  max-width:400px;width:92%;
+  background:linear-gradient(160deg,#2c1208,#1a0a05);
+  border:2px solid var(--gold);
+  border-radius:20px;
+  padding:30px 24px;
+  text-align:center;
+  box-shadow:0 0 60px rgba(201,168,76,0.2),0 0 120px rgba(107,26,26,0.3);
+}
+.ns-seal{font-size:64px;margin-bottom:4px;filter:drop-shadow(0 0 20px rgba(201,168,76,0.5));}
+.ns-title{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(18px,5vw,26px);font-weight:900;
+  background:linear-gradient(180deg,#ffd700,#c9a84c,#8b6914);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:4px;line-height:1.2;
+}
+.ns-sub{font-size:14px;color:#87ceeb;margin-bottom:18px;line-height:1.6;font-family:'Inter',system-ui,sans-serif;font-weight:500;opacity:0.9;}
+.ns-stats{display:flex;gap:10px;justify-content:center;margin-bottom:20px;}
+.ns-stat{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:8px 14px;}
+.ns-stat-v{font-size:22px;font-weight:800;color:#87ceeb;font-family:'Inter',system-ui,sans-serif;text-shadow:0 0 10px rgba(135,206,235,0.4);}
+.ns-stat-l{font-size:9px;color:rgba(135,206,235,0.6);text-transform:uppercase;letter-spacing:1px;font-family:'Inter',system-ui,sans-serif;font-weight:600;}
+.ns-input{
+  width:100%;padding:14px;background:rgba(255,255,255,0.07);
+  border:1.5px solid rgba(201,168,76,0.3);border-radius:10px;
+  color:#ffffff;font-size:17px;font-family:'Inter',system-ui,sans-serif;font-weight:500;
+  outline:none;margin-bottom:10px;text-align:center;letter-spacing:0.2px;
+}
+.ns-input::placeholder{color:rgba(201,168,76,0.4);font-weight:400;}
+.ns-input:focus{border-color:var(--gold);}
+.ns-btn{
+  width:100%;padding:16px;border:none;border-radius:12px;
+  font-size:15px;font-weight:700;cursor:pointer;
+  font-family:'Inter',system-ui,sans-serif;font-weight:800;letter-spacing:2px;
+  color:#1a0a05;
+  background:linear-gradient(180deg,#ffd700,#c9a84c,#8b6914);
+  box-shadow:0 6px 0 #5c4410, 0 8px 24px rgba(201,168,76,0.4);
+  transition:all 0.1s;
+}
+.ns-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.ns-btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #5c4410;}
+
+/* ── GAME HUD ── */
+#hud{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  padding:8px 16px;
+  background:rgba(13,5,2,0.92);
+  border-bottom:1px solid rgba(201,168,76,0.2);
+  backdrop-filter:blur(8px);
+  display:none;
+  align-items:center;justify-content:space-between;gap:8px;
+}
+.hud-box{
+  background:linear-gradient(180deg,#1a0a05,#0d0502);
+  border:1.5px solid rgba(201,168,76,0.3);
+  border-radius:8px;padding:4px 12px;text-align:center;
+  box-shadow:0 0 8px rgba(201,168,76,0.15);
+}
+.hud-val{
+  font-size:22px;font-weight:900;
+  background:linear-gradient(180deg,#ffd700,#c9a84c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  font-family:'Cinzel Decorative',serif;
+}
+.hud-lbl{font-size:7px;color:#6b5030;text-transform:uppercase;letter-spacing:1px;}
+.hud-q{font-size:12px;color:#87ceeb;font-family:'Inter',system-ui,sans-serif;font-weight:700;letter-spacing:0.3px;}
+
+/* ── CARD STAGE ── */
+#stage{
+  width:100%;height:100%;
+  display:none;
+  align-items:center;justify-content:center;
+  perspective:1200px;
+  padding-top:56px;
+  position:relative;
+}
+
+/* ── THE CARD ── */
+.card-wrap{
+  width:clamp(240px,55vw,300px);
+  aspect-ratio:2/3.2;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform 0.8s cubic-bezier(0.23,1,0.32,1);
+}
+.card-wrap.flip{transform:rotateY(180deg);}
+.card-face{
+  position:absolute;inset:0;
+  border-radius:18px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  overflow:hidden;
+  box-shadow:
+    0 0 0 2px var(--gold),
+    0 0 0 5px #2c1208,
+    0 0 0 7px var(--gold3),
+    0 8px 40px rgba(0,0,0,0.8),
+    0 0 60px rgba(201,168,76,0.15);
+}
+.card-front{
+  background:linear-gradient(160deg,#2c1208 0%,#1a0a05 50%,#3d1a0a 100%);
+  display:flex;flex-direction:column;
+}
+.card-back{
+  background:linear-gradient(160deg,#4a0a0a 0%,#2c0808 50%,#1a0505 100%);
+  transform:rotateY(180deg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px;
+  text-align:center;
+}
+
+/* ORNATE BORDER OVERLAY */
+.card-front::before,.card-back::before{
+  content:'';
+  position:absolute;inset:6px;
+  border:1px solid rgba(201,168,76,0.25);
+  border-radius:14px;
+  pointer-events:none;
+  box-shadow:inset 0 0 20px rgba(201,168,76,0.05);
+}
+
+/* CARD FRONT SECTIONS */
+.card-header{
+  padding:10px 14px 4px;
+  text-align:center;
+  border-bottom:1px solid rgba(201,168,76,0.2);
+  position:relative;
+}
+.card-number{
+  position:absolute;top:8px;left:12px;
+  font-size:10px;color:rgba(201,168,76,0.5);
+  font-family:'Cinzel',serif;
+}
+.card-region-badge{
+  display:inline-block;
+  font-size:8px;color:rgba(201,168,76,0.6);
+  text-transform:uppercase;letter-spacing:2px;
+  font-family:'Cinzel',serif;
+  border:1px solid rgba(201,168,76,0.2);
+  border-radius:20px;padding:2px 10px;
+  margin-bottom:4px;
+}
+.card-country{
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:clamp(20px,5.5vw,28px);
+  font-weight:800;
+  color:#87ceeb;
+  text-shadow:0 0 20px rgba(135,206,235,0.4),0 0 40px rgba(135,206,235,0.15);
+  line-height:1.2;
+  letter-spacing:0.5px;
+}
+.card-pop{font-size:15px;color:#a8ff3e;margin-top:5px;font-family:'Cinzel',serif;font-weight:700;letter-spacing:0.5px;text-shadow:0 0 8px rgba(168,255,62,0.4);}
+
+.card-art{
+  flex:1;
+  display:flex;align-items:center;justify-content:center;
+  padding:8px;
+  position:relative;
+  overflow:hidden;
+}
+
+.card-question{
+  padding:6px 10px;
+  text-align:center;
+  border-top:1px solid rgba(201,168,76,0.2);
+  font-size:9px;
+  color:rgba(201,168,76,0.6);
+  font-family:'IM Fell English',serif;
+  font-style:italic;
+  letter-spacing:1px;
+}
+
+/* CHOICES */
+#choices{
+  display:flex;flex-direction:column;gap:8px;
+  width:clamp(240px,55vw,300px);
+  margin-top:12px;
+}
+.choice-btn{
+  padding:13px 16px;
+  background:linear-gradient(135deg,#2c1208,#1a0a05);
+  border:1.5px solid rgba(201,168,76,0.3);
+  border-radius:10px;
+  color:#87ceeb;
+  font-size:16px;
+  font-family:'Inter',system-ui,sans-serif;
+  font-weight:600;
+  cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  transition:all 0.15s;
+  text-align:left;
+  letter-spacing:0.2px;
+}
+.choice-btn:hover,.choice-btn:active{
+  background:linear-gradient(135deg,#0a1a2c,#0a1220);
+  border-color:#87ceeb;
+  color:#ffffff;
+  box-shadow:0 0 12px rgba(135,206,235,0.25);
+}
+.choice-btn .choice-letter{
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(201,168,76,0.15);
+  border:1px solid rgba(201,168,76,0.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--gold);
+  flex-shrink:0;
+}
+.choice-btn.correct{
+  background:linear-gradient(135deg,#0a3d0a,#062006)!important;
+  border-color:#44ff66!important;
+  color:#44ff66!important;
+  animation:correctFlash 0.5s ease;
+}
+.choice-btn.wrong{
+  background:linear-gradient(135deg,#3d0a0a,#200606)!important;
+  border-color:#ff4444!important;
+  color:#ff4444!important;
+}
+@keyframes correctFlash{0%{transform:scale(1);}50%{transform:scale(1.04);}100%{transform:scale(1);}}
+.choice-btn:disabled{cursor:default;}
+
+/* TIMER ARC */
+#timerWrap{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  z-index:10;
+}
+#timerSvg{width:44px;height:44px;filter:drop-shadow(0 0 8px rgba(201,168,76,0.5));}
+
+/* SCORE POP */
+.score-pop{
+  position:fixed;font-size:28px;font-weight:900;
+  pointer-events:none;z-index:9999;
+  font-family:'Cinzel Decorative',serif;
+  animation:scoreFly 1.2s ease forwards;
+  transform:translate(-50%,-50%);
+}
+@keyframes scoreFly{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(0.5);}
+  30%{opacity:1;transform:translate(-50%,-80%) scale(1.3);}
+  100%{opacity:0;transform:translate(-50%,-160%) scale(1);}
+}
+
+/* SLIDE ANIMATIONS */
+@keyframes slideInRight{from{transform:translateX(120%) rotate(8deg);opacity:0;}to{transform:translateX(0) rotate(0);opacity:1;}}
+@keyframes slideInLeft{from{transform:translateX(-120%) rotate(-8deg);opacity:0;}to{transform:translateX(0) rotate(0);opacity:1;}}
+@keyframes slideOutLeft{from{transform:translateX(0) rotate(0);opacity:1;}to{transform:translateX(-120%) rotate(-8deg);opacity:0;}}
+@keyframes slideOutRight{from{transform:translateX(0) rotate(0);opacity:1;}to{transform:translateX(120%) rotate(8deg);opacity:0;}}
+.slide-in{animation:slideInRight 0.6s cubic-bezier(0.23,1,0.32,1) forwards;}
+.slide-out{animation:slideOutLeft 0.5s cubic-bezier(0.23,1,0.32,1) forwards;}
+
+/* BACK CARD CONTENT */
+.back-ornament{font-size:36px;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(201,168,76,0.6));}
+.back-result{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(14px,4vw,22px);
+  font-weight:900;
+  margin-bottom:8px;
+  line-height:1.2;
+}
+.back-result.correct-res{
+  background:linear-gradient(180deg,#88ff88,#44cc44);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.back-result.wrong-res{
+  background:linear-gradient(180deg,#ff8888,#cc4444);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.back-capital{
+  font-size:clamp(20px,5.5vw,30px);font-weight:800;
+  color:#87ceeb;
+  text-shadow:0 0 20px rgba(135,206,235,0.5);
+  font-family:'Inter',system-ui,sans-serif;
+  margin-bottom:6px;letter-spacing:0.5px;
+}
+.back-label{font-size:9px;color:#9a7a4a;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;}
+.back-pts{font-size:32px;font-weight:900;color:var(--gold2);font-family:'Cinzel Decorative',serif;}
+.back-pts-lbl{font-size:8px;color:#9a7a4a;text-transform:uppercase;letter-spacing:1px;}
+
+/* WIN SCREEN */
+#winScreen{
+  position:fixed;inset:0;z-index:300;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(13,5,2,0.95);backdrop-filter:blur(12px);
+}
+.win-wrap{
+  max-width:360px;width:92%;
+  background:linear-gradient(160deg,#2c1208,#1a0a05);
+  border:2px solid var(--gold);border-radius:20px;
+  padding:28px 22px;text-align:center;
+  box-shadow:0 0 80px rgba(201,168,76,0.3);
+  max-height:90vh;overflow-y:auto;
+}
+.win-title{font-family:'Cinzel Decorative',serif;font-size:22px;font-weight:900;
+  background:linear-gradient(180deg,#ffd700,#c9a84c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:6px;}
+.win-score{font-size:56px;font-weight:900;color:var(--gold2);
+  font-family:'Cinzel Decorative',serif;
+  text-shadow:0 0 30px rgba(255,215,0,0.5);}
+.win-stat{display:flex;justify-content:space-between;padding:8px 0;
+  border-bottom:1px solid rgba(201,168,76,0.1);font-size:13px;
+  color:var(--text);}
+.win-btn{width:100%;padding:14px;border:none;border-radius:12px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Cinzel',serif;margin-bottom:8px;
+  transition:transform 0.1s;}
+.win-btn:active{transform:scale(0.97);}
+.win-btn-play{background:linear-gradient(180deg,#ffd700,#c9a84c);color:#1a0a05;}
+.win-btn-home{background:rgba(255,255,255,0.07);color:var(--text);}
+
+/* MUTE */
+.mute-btn{position:fixed;bottom:16px;right:16px;width:40px;height:40px;
+  border-radius:50%;background:rgba(13,5,2,0.8);
+  border:1px solid rgba(201,168,76,0.2);font-size:16px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100;color:var(--text);}
+@keyframes screenFlash{0%{opacity:1;}100%{opacity:0;}}
+@keyframes nextPulse{
+  0%,100%{box-shadow:0 6px 0 #5c4410,0 8px 16px rgba(201,168,76,0.3);}
+  50%{box-shadow:0 6px 0 #5c4410,0 8px 28px rgba(255,215,0,0.6);}
+}
+</style>
+</head>
+<body>
+
+<script>
+// Stars
+for(let i=0;i<40;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=0.5+Math.random()*2;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*5}s;animation-delay:${Math.random()*5}s;opacity:${0.1+Math.random()*0.3};`;
+  document.body.appendChild(s);
+}
+</script>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-box">
+    <div class="hud-val" id="scoreDisp">0</div>
+    <div class="hud-lbl">✦ Score</div>
+  </div>
+  <div style="text-align:center;flex:1;padding:0 8px;">
+    <div class="hud-q" id="qDisp">1 of 197 Countries</div>
+    <div style="margin-top:4px;height:4px;background:rgba(201,168,76,0.12);border-radius:2px;overflow:hidden;">
+      <div id="progressBar" style="height:100%;background:linear-gradient(90deg,#ffd700,#c9a84c);border-radius:2px;width:0%;transition:width 0.4s ease;"></div>
+    </div>
+    <div style="font-size:8px;color:#6b5030;margin-top:2px;font-family:'IM Fell English',serif;font-style:italic;">Capital City Oracle</div>
+  </div>
+  <div class="hud-box">
+    <div class="hud-val" id="streakDisp">0</div>
+    <div class="hud-lbl">🔥 Streak</div>
+  </div>
+</div>
+
+<!-- STAGE -->
+<div id="stage">
+  <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
+    <!-- Rotating Globe + Question Label above card -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px;">
+      <div id="globeWrap" style="flex-shrink:0;">
+        <svg viewBox="0 0 50 50" width="44" height="44" style="filter:drop-shadow(0 0 8px rgba(201,168,76,0.4));">
+          <defs>
+            <linearGradient id="globeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.3"/>
+              <stop offset="50%" stop-color="#ffd700" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#8b6914" stop-opacity="0.2"/>
+            </linearGradient>
+          </defs>
+          <circle cx="25" cy="25" r="22" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+          <ellipse cx="25" cy="25" rx="22" ry="22" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.3"/>
+          <!-- Latitude lines -->
+          <ellipse cx="25" cy="25" rx="22" ry="8" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+          <ellipse cx="25" cy="25" rx="22" ry="16" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.35"/>
+          <!-- Longitude lines animated -->
+          <ellipse cx="25" cy="25" rx="10" ry="22" fill="none" stroke="#ffd700" stroke-width="0.8" opacity="0.6">
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="4s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="25" cy="25" rx="10" ry="22" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.35" transform="rotate(60 25 25)">
+            <animateTransform attributeName="transform" type="rotate" from="60 25 25" to="420 25 25" dur="4s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="25" cy="25" rx="10" ry="22" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.3" transform="rotate(120 25 25)">
+            <animateTransform attributeName="transform" type="rotate" from="120 25 25" to="480 25 25" dur="4s" repeatCount="indefinite"/>
+          </ellipse>
+          <!-- Center dot -->
+          <circle cx="25" cy="25" r="2" fill="#ffd700" opacity="0.8"/>
+          <!-- Equator -->
+          <line x1="3" y1="25" x2="47" y2="25" stroke="#c9a84c" stroke-width="0.6" opacity="0.4"/>
+        </svg>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(11px,3vw,15px);
+          font-weight:900;background:linear-gradient(180deg,#ffd700,#c9a84c);
+          -webkit-background-clip:text;-webkit-text-fill-color:transparent;" id="questionLabel">
+          What is the Capital City?
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:3px;">
+          <svg id="timerSvg" viewBox="0 0 44 44" width="36" height="36" style="flex-shrink:0;">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="3"/>
+            <circle id="timerArc" cx="22" cy="22" r="18" fill="none"
+              stroke="#ffd700" stroke-width="3" stroke-linecap="round"
+              stroke-dasharray="113" stroke-dashoffset="0"
+              transform="rotate(-90 22 22)"/>
+            <text x="22" y="27" text-anchor="middle" font-size="14" font-weight="900"
+              font-family="Cinzel,serif" fill="#ffd700" id="timerText">10</text>
+          </svg>
+          <span style="font-size:9px;color:#9a7a4a;font-family:'IM Fell English',serif;font-style:italic;">seconds</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Card -->
+    <div class="card-wrap" id="cardWrap">
+      <div class="card-face card-front" id="cardFront">
+        <div class="card-header">
+          <div class="card-number" id="cardNum">I</div>
+          <div class="card-region-badge" id="cardRegion">Region</div>
+          <div class="card-country" id="cardCountry">Country</div>
+          <div class="card-pop" id="cardPop">Population: 0</div>
+        </div>
+        <div class="card-art" id="cardArt"></div>
+        <div class="card-question" id="cardQuestion">✦ Name the Capital City ✦</div>
+      </div>
+      <div class="card-face card-back" id="cardBack">
+        <div class="back-ornament" id="backIcon">✦</div>
+        <div class="back-result" id="backResult">CORRECT!</div>
+        <div class="back-label" id="backCapLabel">THE CAPITAL IS</div>
+        <div class="back-capital" id="backCapital">Paris</div>
+        <div id="backCapNote" style="display:none;font-size:9px;color:#9a7a4a;font-family:'IM Fell English',serif;font-style:italic;margin-bottom:8px;line-height:1.5;padding:0 8px;"></div>
+        <div class="back-pts" id="backPts">+500</div>
+        <div class="back-pts-lbl">points</div>
+      </div>
+    </div>
+
+    <!-- Choices -->
+    <div id="choices">
+      <button class="choice-btn" id="choiceA" onclick="choose(0)">
+        <div class="choice-letter">A</div><span id="choiceATxt"></span>
+      </button>
+      <button class="choice-btn" id="choiceB" onclick="choose(1)">
+        <div class="choice-letter">B</div><span id="choiceBTxt"></span>
+      </button>
+      <button class="choice-btn" id="choiceC" onclick="choose(2)">
+        <div class="choice-letter">C</div><span id="choiceCTxt"></span>
+      </button>
+    </div>
+  <!-- Timer toggle - always visible -->
+  <button onclick="toggleTimer()" id="timerToggleBtn"
+    style="width:clamp(240px,55vw,300px);margin-top:8px;
+    padding:10px 16px;border-radius:10px;
+    border:1.5px solid rgba(201,168,76,0.35);
+    background:rgba(30,144,255,0.12);
+    color:#87ceeb;font-size:12px;font-weight:700;
+    font-family:'Cinzel',serif;cursor:pointer;
+    letter-spacing:1px;transition:all 0.25s;
+    box-shadow:0 0 10px rgba(135,206,235,0.15);">⏱ Turn Off Timer — Go At Your Own Pace</button>
+
+  <!-- NEXT button -->
+  <button id="nextBtn" onclick="nextManual()" style="display:none;
+    width:clamp(240px,55vw,300px);margin-top:10px;
+    padding:14px;border:none;border-radius:12px;
+    font-family:'Cinzel Decorative',serif;font-size:14px;font-weight:900;
+    letter-spacing:2px;cursor:pointer;color:#1a0a05;
+    background:linear-gradient(180deg,#ffd700,#c9a84c,#8b6914);
+    box-shadow:0 6px 0 #5c4410,0 8px 20px rgba(201,168,76,0.4);
+    transition:all 0.1s;animation:nextPulse 1s ease-in-out infinite;">
+    NEXT COUNTRY ›
+  </button>
+</div>
+</div>
+</div>
+
+<!-- NAME SCREEN -->
+<div id="nameScreen">
+  <div class="ns-wrap">
+
+    <!-- Challenge tagline ABOVE globe -->
+    <div style="font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;
+      color:#87ceeb;text-align:center;margin-bottom:14px;line-height:1.7;
+      text-shadow:0 0 12px rgba(135,206,235,0.3);padding:0 4px;">
+      You should already know all the capitals around<br>
+      the world — <span style="color:#ffd700;font-weight:800;">take the challenge and prove it!</span>
+    </div>
+
+    <!-- BIG spinning globe -->
+    <div style="display:flex;justify-content:center;margin-bottom:14px;">
+      <svg viewBox="0 0 120 120" width="110" height="110"
+        style="filter:drop-shadow(0 0 20px rgba(135,206,235,0.5));">
+        <defs>
+          <radialGradient id="ngGrad" cx="38%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#87ceeb" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#0a0a20" stop-opacity="0"/>
+          </radialGradient>
+          <clipPath id="ngClip"><circle cx="60" cy="60" r="52"/></clipPath>
+        </defs>
+        <circle cx="60" cy="60" r="52" fill="rgba(10,20,40,0.7)" stroke="#87ceeb" stroke-width="1.8"/>
+        <circle cx="60" cy="60" r="52" fill="url(#ngGrad)"/>
+        <!-- Latitude lines -->
+        <ellipse cx="60" cy="60" rx="52" ry="18" fill="none" stroke="#87ceeb" stroke-width="0.8" opacity="0.4" clip-path="url(#ngClip)"/>
+        <ellipse cx="60" cy="60" rx="52" ry="36" fill="none" stroke="#87ceeb" stroke-width="0.5" opacity="0.25" clip-path="url(#ngClip)"/>
+        <line x1="8" y1="60" x2="112" y2="60" stroke="#87ceeb" stroke-width="0.8" opacity="0.35"/>
+        <!-- Spinning longitudes -->
+        <ellipse cx="60" cy="60" rx="24" ry="52" fill="none" stroke="#ffd700" stroke-width="1.2" opacity="0.55" clip-path="url(#ngClip)">
+          <animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="3s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="60" cy="60" rx="24" ry="52" fill="none" stroke="#87ceeb" stroke-width="0.8" opacity="0.4" clip-path="url(#ngClip)" transform="rotate(60 60 60)">
+          <animateTransform attributeName="transform" type="rotate" from="60 60 60" to="420 60 60" dur="3s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="60" cy="60" rx="24" ry="52" fill="none" stroke="#c9a84c" stroke-width="0.7" opacity="0.3" clip-path="url(#ngClip)" transform="rotate(120 60 60)">
+          <animateTransform attributeName="transform" type="rotate" from="120 60 60" to="480 60 60" dur="3s" repeatCount="indefinite"/>
+        </ellipse>
+        <!-- Pulsing centre dot -->
+        <circle cx="60" cy="60" r="3.5" fill="#87ceeb" opacity="0.9">
+          <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="r" values="2.5;4;2.5" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Shine highlight -->
+        <ellipse cx="44" cy="40" rx="14" ry="9" fill="white" opacity="0.05"/>
+      </svg>
+    </div>
+
+    <div class="ns-title">Capital City<br>Challenge</div>
+    <div class="ns-sub">195 countries · 195 capitals · Can you name them all?</div>
+    <div class="ns-stats">
+      <div class="ns-stat"><div class="ns-stat-v">195</div><div class="ns-stat-l">Countries</div></div>
+      <div class="ns-stat"><div class="ns-stat-v">195</div><div class="ns-stat-l">Capitals</div></div>
+      <div class="ns-stat"><div class="ns-stat-v">10s</div><div class="ns-stat-l">Per Card</div></div>
+    </div>
+    <input class="ns-input" id="playerName" placeholder="Your Name" maxlength="25" oninput="checkReady()">
+    <input class="ns-input" id="playerLoc" placeholder="City, Country 🌺" maxlength="30" oninput="checkReady()" onkeydown="if(event.key==='Enter')startGame()">
+    <button class="ns-btn" id="startBtn" onclick="startGame()" disabled>✦ Reveal the Cards ✦</button>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div id="winScreen">
+  <div class="win-wrap">
+    <div style="font-size:56px;margin-bottom:8px;">🌍🏆🌍</div>
+    <div class="win-title">All 195 Countries Mastered!</div>
+    <div class="win-score" id="winScore">0</div>
+    <div style="font-size:10px;color:#9a7a4a;margin-bottom:16px;font-family:'IM Fell English',serif;font-style:italic;">points of mystic knowledge</div>
+    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:12px;padding:12px;margin-bottom:16px;">
+      <div class="win-stat"><span>✅ Correct</span><span id="winCorrect" style="color:#44ff66;font-weight:700;">0</span></div>
+      <div class="win-stat"><span>❌ Wrong</span><span id="winWrong" style="color:#ff4444;font-weight:700;">0</span></div>
+      <div class="win-stat" style="border:none;"><span>🔥 Best Streak</span><span id="winStreak" style="color:var(--gold2);font-weight:700;">0</span></div>
+    </div>
+    <button class="win-btn win-btn-play" onclick="restartGame()">✦ Play Again ✦</button>
+    <button class="win-btn win-btn-home" onclick="window.location='/play'">← Play Room</button>
+  </div>
+</div>
+
+<button class="mute-btn" onclick="toggleMute()">🔊</button>
+
+<script>
+// ══════════════════════════════════════════════════
+// CAPITAL CITY ORACLE — fab.games
+// 195 countries · Vegas card flip · 5 sec timer
+// ══════════════════════════════════════════════════
+
+// ── DATA: 195 Countries ───────────────────────────
+const COUNTRIES=[
+{n:"Afghanistan",c:"Kabul",p:"41M",r:"asia"},
+{n:"Albania",c:"Tirana",p:"2.8M",r:"europe"},
+{n:"Algeria",c:"Algiers",p:"45M",r:"africa"},
+{n:"Andorra",c:"Andorra la Vella",p:"77K",r:"europe"},
+{n:"Angola",c:"Luanda",p:"35M",r:"africa"},
+{n:"Antigua & Barbuda",c:"Saint John's",p:"100K",r:"caribbean"},
+{n:"Argentina",c:"Buenos Aires",p:"46M",r:"americas"},
+{n:"Armenia",c:"Yerevan",p:"3M",r:"asia"},
+{n:"Australia",c:"Canberra",p:"26M",r:"oceania"},
+{n:"Austria",c:"Vienna",p:"9M",r:"europe"},
+{n:"Azerbaijan",c:"Baku",p:"10M",r:"asia"},
+{n:"Bahamas",c:"Nassau",p:"400K",r:"caribbean"},
+{n:"Bahrain",c:"Manama",p:"1.5M",r:"asia"},
+{n:"Bangladesh",c:"Dhaka",p:"170M",r:"asia"},
+{n:"Barbados",c:"Bridgetown",p:"280K",r:"caribbean"},
+{n:"Belarus",c:"Minsk",p:"9.4M",r:"europe"},
+{n:"Belgium",c:"Brussels",p:"11.6M",r:"europe"},
+{n:"Belize",c:"Belmopan",p:"410K",r:"americas"},
+{n:"Benin",c:"Porto-Novo",p:"13M",r:"africa"},
+{n:"Bhutan",c:"Thimphu",p:"780K",r:"asia"},
+{n:"Bolivia",c:"Sucre",p:"12M",r:"americas"},
+{n:"Bosnia & Herzegovina",c:"Sarajevo",p:"3.2M",r:"europe"},
+{n:"Botswana",c:"Gaborone",p:"2.6M",r:"africa"},
+{n:"Brazil",c:"Brasília",p:"215M",r:"americas"},
+{n:"Brunei",c:"Bandar Seri Begawan",p:"440K",r:"asia"},
+{n:"Bulgaria",c:"Sofia",p:"6.5M",r:"europe"},
+{n:"Burkina Faso",c:"Ouagadougou",p:"22M",r:"africa"},
+{n:"Burundi",c:"Gitega",p:"12M",r:"africa"},
+{n:"Cambodia",c:"Phnom Penh",p:"17M",r:"asia"},
+{n:"Cameroon",c:"Yaoundé",p:"27M",r:"africa"},
+{n:"Canada",c:"Ottawa",p:"38M",r:"americas"},
+{n:"Cape Verde",c:"Praia",p:"560K",r:"africa"},
+{n:"Central African Republic",c:"Bangui",p:"5M",r:"africa"},
+{n:"Chad",c:"N'Djamena",p:"18M",r:"africa"},
+{n:"Chile",c:"Santiago",p:"19M",r:"americas"},
+{n:"China",c:"Beijing",p:"1.4B",r:"asia"},
+{n:"Colombia",c:"Bogotá",p:"51M",r:"americas"},
+{n:"Comoros",c:"Moroni",p:"900K",r:"africa"},
+{n:"Congo (Brazzaville)",c:"Brazzaville",p:"5.8M",r:"africa"},
+{n:"Congo (Kinshasa)",c:"Kinshasa",p:"100M",r:"africa"},
+{n:"Costa Rica",c:"San José",p:"5.2M",r:"americas"},
+{n:"Croatia",c:"Zagreb",p:"3.9M",r:"europe"},
+{n:"Cuba",c:"Havana",p:"11M",r:"caribbean"},
+{n:"Cyprus",c:"Nicosia",p:"1.2M",r:"europe"},
+{n:"Czech Republic",c:"Prague",p:"10.9M",r:"europe"},
+{n:"Denmark",c:"Copenhagen",p:"5.9M",r:"europe"},
+{n:"Djibouti",c:"Djibouti City",p:"1M",r:"africa"},
+{n:"Dominica",c:"Roseau",p:"72K",r:"caribbean"},
+{n:"Dominican Republic",c:"Santo Domingo",p:"11M",r:"caribbean"},
+{n:"Ecuador",c:"Quito",p:"18M",r:"americas"},
+{n:"Egypt",c:"Cairo",p:"104M",r:"africa"},
+{n:"El Salvador",c:"San Salvador",p:"6.5M",r:"americas"},
+{n:"Equatorial Guinea",c:"Malabo",p:"1.5M",r:"africa"},
+{n:"Eritrea",c:"Asmara",p:"3.5M",r:"africa"},
+{n:"Estonia",c:"Tallinn",p:"1.3M",r:"europe"},
+{n:"Eswatini",c:"Mbabane",p:"1.2M",r:"africa"},
+{n:"Ethiopia",c:"Addis Ababa",p:"123M",r:"africa"},
+{n:"Fiji",c:"Suva",p:"930K",r:"oceania"},
+{n:"Finland",c:"Helsinki",p:"5.5M",r:"europe"},
+{n:"France",c:"Paris",p:"68M",r:"europe"},
+{n:"Gabon",c:"Libreville",p:"2.3M",r:"africa"},
+{n:"Gambia",c:"Banjul",p:"2.6M",r:"africa"},
+{n:"Georgia",c:"Tbilisi",p:"3.7M",r:"asia"},
+{n:"Germany",c:"Berlin",p:"84M",r:"europe"},
+{n:"Ghana",c:"Accra",p:"33M",r:"africa"},
+{n:"Greece",c:"Athens",p:"10.4M",r:"europe"},
+{n:"Grenada",c:"Saint George's",p:"124K",r:"caribbean"},
+{n:"Guatemala",c:"Guatemala City",p:"18M",r:"americas"},
+{n:"Guinea",c:"Conakry",p:"13M",r:"africa"},
+{n:"Guinea-Bissau",c:"Bissau",p:"2M",r:"africa"},
+{n:"Guyana",c:"Georgetown",p:"790K",r:"americas"},
+{n:"Haiti",c:"Port-au-Prince",p:"11.5M",r:"caribbean"},
+{n:"Honduras",c:"Tegucigalpa",p:"10M",r:"americas"},
+{n:"Hungary",c:"Budapest",p:"9.7M",r:"europe"},
+{n:"Iceland",c:"Reykjavik",p:"370K",r:"europe"},
+{n:"India",c:"New Delhi",p:"1.43B",r:"asia"},
+{n:"Indonesia",c:"Jakarta",p:"277M",r:"asia"},
+{n:"Iran",c:"Tehran",p:"87M",r:"asia"},
+{n:"Iraq",c:"Baghdad",p:"42M",r:"asia"},
+{n:"Ireland",c:"Dublin",p:"5.1M",r:"europe"},
+{n:"Israel",c:"Jerusalem",p:"9.4M",r:"asia"},
+{n:"Italy",c:"Rome",p:"59M",r:"europe"},
+{n:"Ivory Coast",c:"Yamoussoukro",p:"27M",r:"africa"},
+{n:"Jamaica",c:"Kingston",p:"2.8M",r:"caribbean"},
+{n:"Japan",c:"Tokyo",p:"125M",r:"asia"},
+{n:"Jordan",c:"Amman",p:"10.3M",r:"asia"},
+{n:"Kazakhstan",c:"Astana",p:"19M",r:"asia"},
+{n:"Kenya",c:"Nairobi",p:"55M",r:"africa"},
+{n:"Kiribati",c:"South Tarawa",p:"120K",r:"oceania"},
+{n:"Kosovo",c:"Pristina",p:"1.8M",r:"europe"},
+{n:"Kuwait",c:"Kuwait City",p:"4.3M",r:"asia"},
+{n:"Kyrgyzstan",c:"Bishkek",p:"6.6M",r:"asia"},
+{n:"Laos",c:"Vientiane",p:"7.4M",r:"asia"},
+{n:"Latvia",c:"Riga",p:"1.8M",r:"europe"},
+{n:"Lebanon",c:"Beirut",p:"5.5M",r:"asia"},
+{n:"Lesotho",c:"Maseru",p:"2.2M",r:"africa"},
+{n:"Liberia",c:"Monrovia",p:"5.3M",r:"africa"},
+{n:"Libya",c:"Tripoli",p:"7M",r:"africa"},
+{n:"Liechtenstein",c:"Vaduz",p:"38K",r:"europe"},
+{n:"Lithuania",c:"Vilnius",p:"2.8M",r:"europe"},
+{n:"Luxembourg",c:"Luxembourg City",p:"660K",r:"europe"},
+{n:"Madagascar",c:"Antananarivo",p:"28M",r:"africa"},
+{n:"Malawi",c:"Lilongwe",p:"20M",r:"africa"},
+{n:"Malaysia",c:"Kuala Lumpur",p:"33M",r:"asia"},
+{n:"Maldives",c:"Malé",p:"520K",r:"asia"},
+{n:"Mali",c:"Bamako",p:"22M",r:"africa"},
+{n:"Malta",c:"Valletta",p:"520K",r:"europe"},
+{n:"Marshall Islands",c:"Majuro",p:"41K",r:"oceania"},
+{n:"Mauritania",c:"Nouakchott",p:"4.6M",r:"africa"},
+{n:"Mauritius",c:"Port Louis",p:"1.3M",r:"africa"},
+{n:"Mexico",c:"Mexico City",p:"130M",r:"americas"},
+{n:"Micronesia",c:"Palikir",p:"115K",r:"oceania"},
+{n:"Moldova",c:"Chișinău",p:"2.6M",r:"europe"},
+{n:"Monaco",c:"Monaco",p:"36K",r:"europe"},
+{n:"Mongolia",c:"Ulaanbaatar",p:"3.4M",r:"asia"},
+{n:"Montenegro",c:"Podgorica",p:"620K",r:"europe"},
+{n:"Morocco",c:"Rabat",p:"37M",r:"africa"},
+{n:"Mozambique",c:"Maputo",p:"32M",r:"africa"},
+{n:"Myanmar",c:"Naypyidaw",p:"54M",r:"asia"},
+{n:"Namibia",c:"Windhoek",p:"2.6M",r:"africa"},
+{n:"Nauru",c:"Yaren",p:"10K",r:"oceania"},
+{n:"Nepal",c:"Kathmandu",p:"30M",r:"asia"},
+{n:"Netherlands",c:"Amsterdam",p:"17.7M",r:"europe"},
+{n:"New Zealand",c:"Wellington",p:"5.1M",r:"oceania"},
+{n:"Nicaragua",c:"Managua",p:"6.8M",r:"americas"},
+{n:"Niger",c:"Niamey",p:"25M",r:"africa"},
+{n:"Nigeria",c:"Abuja",p:"220M",r:"africa"},
+{n:"North Korea",c:"Pyongyang",p:"26M",r:"asia"},
+{n:"North Macedonia",c:"Skopje",p:"2M",r:"europe"},
+{n:"Norway",c:"Oslo",p:"5.4M",r:"europe"},
+{n:"Oman",c:"Muscat",p:"4.5M",r:"asia"},
+{n:"Pakistan",c:"Islamabad",p:"230M",r:"asia"},
+{n:"Palau",c:"Ngerulmud",p:"18K",r:"oceania"},
+{n:"Palestine",c:"Ramallah",p:"5.4M",r:"asia"},
+{n:"Panama",c:"Panama City",p:"4.4M",r:"americas"},
+{n:"Papua New Guinea",c:"Port Moresby",p:"10M",r:"oceania"},
+{n:"Paraguay",c:"Asunción",p:"7.4M",r:"americas"},
+{n:"Peru",c:"Lima",p:"33M",r:"americas"},
+{n:"Philippines",c:"Manila",p:"115M",r:"asia"},
+{n:"Poland",c:"Warsaw",p:"38M",r:"europe"},
+{n:"Portugal",c:"Lisbon",p:"10.2M",r:"europe"},
+{n:"Qatar",c:"Doha",p:"2.9M",r:"asia"},
+{n:"Romania",c:"Bucharest",p:"19M",r:"europe"},
+{n:"Russia",c:"Moscow",p:"145M",r:"europe"},
+{n:"Rwanda",c:"Kigali",p:"13.5M",r:"africa"},
+{n:"Saint Kitts & Nevis",c:"Basseterre",p:"53K",r:"caribbean"},
+{n:"Saint Lucia",c:"Castries",p:"184K",r:"caribbean"},
+{n:"Saint Vincent & Grenadines",c:"Kingstown",p:"110K",r:"caribbean"},
+{n:"Samoa",c:"Apia",p:"220K",r:"oceania"},
+{n:"San Marino",c:"San Marino",p:"34K",r:"europe"},
+{n:"São Tomé & Príncipe",c:"São Tomé",p:"220K",r:"africa"},
+{n:"Saudi Arabia",c:"Riyadh",p:"36M",r:"asia"},
+{n:"Senegal",c:"Dakar",p:"17M",r:"africa"},
+{n:"Serbia",c:"Belgrade",p:"7M",r:"europe"},
+{n:"Seychelles",c:"Victoria",p:"98K",r:"africa"},
+{n:"Sierra Leone",c:"Freetown",p:"8.4M",r:"africa"},
+{n:"Singapore",c:"Singapore",p:"5.9M",r:"asia"},
+{n:"Slovakia",c:"Bratislava",p:"5.5M",r:"europe"},
+{n:"Slovenia",c:"Ljubljana",p:"2.1M",r:"europe"},
+{n:"Solomon Islands",c:"Honiara",p:"720K",r:"oceania"},
+{n:"Somalia",c:"Mogadishu",p:"17M",r:"africa"},
+{n:"South Africa",c:"Pretoria",p:"60M",r:"africa"},
+{n:"South Korea",c:"Seoul",p:"52M",r:"asia"},
+{n:"South Sudan",c:"Juba",p:"11M",r:"africa"},
+{n:"Spain",c:"Madrid",p:"47M",r:"europe"},
+{n:"Sri Lanka",c:"Sri Jayawardenepura Kotte",p:"22M",r:"asia"},
+{n:"Sudan",c:"Khartoum",p:"46M",r:"africa"},
+{n:"Suriname",c:"Paramaribo",p:"610K",r:"americas"},
+{n:"Sweden",c:"Stockholm",p:"10.5M",r:"europe"},
+{n:"Switzerland",c:"Bern",p:"8.7M",r:"europe"},
+{n:"Syria",c:"Damascus",p:"22M",r:"asia"},
+{n:"Taiwan",c:"Taipei",p:"23.5M",r:"asia"},
+{n:"Tajikistan",c:"Dushanbe",p:"10M",r:"asia"},
+{n:"Tanzania",c:"Dodoma",p:"63M",r:"africa"},
+{n:"Thailand",c:"Bangkok",p:"72M",r:"asia"},
+{n:"Timor-Leste",c:"Dili",p:"1.3M",r:"asia"},
+{n:"Togo",c:"Lomé",p:"8.7M",r:"africa"},
+{n:"Tonga",c:"Nukualofa",p:"100K",r:"oceania"},
+{n:"Trinidad & Tobago",c:"Port of Spain",p:"1.4M",r:"caribbean"},
+{n:"Tunisia",c:"Tunis",p:"12M",r:"africa"},
+{n:"Turkey",c:"Ankara",p:"85M",r:"asia"},
+{n:"Turkmenistan",c:"Ashgabat",p:"6.1M",r:"asia"},
+{n:"Tuvalu",c:"Funafuti",p:"11K",r:"oceania"},
+{n:"Uganda",c:"Kampala",p:"48M",r:"africa"},
+{n:"Ukraine",c:"Kyiv",p:"44M",r:"europe"},
+{n:"United Arab Emirates",c:"Abu Dhabi",p:"10M",r:"asia"},
+{n:"United Kingdom",c:"London",p:"68M",r:"europe"},
+{n:"United States",c:"Washington D.C.",p:"335M",r:"americas"},
+{n:"Uruguay",c:"Montevideo",p:"3.5M",r:"americas"},
+{n:"Uzbekistan",c:"Tashkent",p:"36M",r:"asia"},
+{n:"Vanuatu",c:"Port Vila",p:"330K",r:"oceania"},
+{n:"Vatican City",c:"Vatican City",p:"800",r:"europe"},
+{n:"Venezuela",c:"Caracas",p:"28M",r:"americas"},
+{n:"Vietnam",c:"Hanoi",p:"98M",r:"asia"},
+{n:"Yemen",c:"Sanaa",p:"33M",r:"asia"},
+{n:"Zambia",c:"Lusaka",p:"19M",r:"africa"},
+{n:"Zimbabwe",c:"Harare",p:"16M",r:"africa"},
+];
+
+// ── SVG ILLUSTRATIONS by region ───────────────────
+function getCardSVG(region,country){
+  const svgs={
+    europe:`<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="eg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#4a1a1a" stop-opacity="0.6"/><stop offset="100%" stop-color="#1a0a05" stop-opacity="0"/></radialGradient></defs>
+      <ellipse cx="100" cy="110" rx="80" ry="90" fill="url(#eg)"/>
+      <!-- Castle towers -->
+      <rect x="30" y="80" width="28" height="70" rx="2" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <rect x="26" y="74" width="10" height="12" rx="1" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <rect x="38" y="74" width="10" height="12" rx="1" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <rect x="50" y="74" width="8" height="12" rx="1" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <rect x="142" y="80" width="28" height="70" rx="2" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <rect x="138" y="74" width="10" height="12" rx="1" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <rect x="150" y="74" width="10" height="12" rx="1" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <rect x="162" y="74" width="8" height="12" rx="1" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <!-- Center spire -->
+      <polygon points="100,20 88,80 112,80" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <rect x="88" y="80" width="24" height="70" rx="2" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <!-- Windows -->
+      <rect x="95" y="95" width="10" height="14" rx="4" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <rect x="95" y="120" width="10" height="14" rx="4" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <!-- Crown -->
+      <polyline points="78,46 84,38 90,46 96,34 100,46 104,34 110,46 116,38 122,46" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <!-- Stars -->
+      <text x="56" y="62" font-size="8" fill="#ffd700" opacity="0.7">★</text>
+      <text x="136" y="62" font-size="8" fill="#ffd700" opacity="0.7">★</text>
+      <text x="96" y="176" font-size="9" fill="#ffd700" opacity="0.7">✦</text>
+      <!-- Bottom ornament -->
+      <path d="M60 190 Q100 200 140 190" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.5"/>
+    </svg>`,
+
+    asia:`<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="ag" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#1a0a2a" stop-opacity="0.7"/><stop offset="100%" stop-color="#1a0a05" stop-opacity="0"/></radialGradient></defs>
+      <ellipse cx="100" cy="120" rx="80" ry="85" fill="url(#ag)"/>
+      <!-- Pagoda -->
+      <polygon points="100,22 72,60 128,60" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <line x1="88" y1="60" x2="88" y2="75" stroke="#c9a84c" stroke-width="1"/>
+      <line x1="112" y1="60" x2="112" y2="75" stroke="#c9a84c" stroke-width="1"/>
+      <polygon points="100,40 75,75 125,75" fill="none" stroke="#ffd700" stroke-width="1.2"/>
+      <line x1="82" y1="75" x2="82" y2="90" stroke="#c9a84c" stroke-width="1"/>
+      <line x1="118" y1="75" x2="118" y2="90" stroke="#c9a84c" stroke-width="1"/>
+      <polygon points="100,58 78,90 122,90" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <rect x="84" y="90" width="32" height="60" rx="1" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <!-- Door arch -->
+      <path d="M92 150 Q100 140 108 150 L108 150 L92 150" fill="none" stroke="#ffd700" stroke-width="1.2"/>
+      <!-- Dragon wings hint -->
+      <path d="M40 100 Q60 80 80 100 Q60 120 40 100" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+      <path d="M160 100 Q140 80 120 100 Q140 120 160 100" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+      <!-- Lanterns -->
+      <ellipse cx="55" cy="140" rx="8" ry="12" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.7"/>
+      <ellipse cx="145" cy="140" rx="8" ry="12" fill="none" stroke="#ffd700" stroke-width="1" opacity="0.7"/>
+      <!-- Lotus -->
+      <path d="M90 190 Q100 178 110 190 Q100 196 90 190" fill="none" stroke="#ffd700" stroke-width="1.2"/>
+      <path d="M82 192 Q100 176 118 192" fill="none" stroke="#c9a84c" stroke-width="1"/>
+    </svg>`,
+
+    africa:`<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="afg" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#2a1a00" stop-opacity="0.7"/><stop offset="100%" stop-color="#1a0a05" stop-opacity="0"/></radialGradient></defs>
+      <ellipse cx="100" cy="120" rx="80" ry="85" fill="url(#afg)"/>
+      <!-- Pyramids -->
+      <polygon points="100,30 55,130 145,130" fill="none" stroke="#ffd700" stroke-width="1.8"/>
+      <polygon points="148,70 122,130 174,130" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <polygon points="52,70 26,130 78,130" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <!-- Sun disk -->
+      <circle cx="100" cy="24" r="8" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <line x1="100" y1="12" x2="100" y2="8" stroke="#ffd700" stroke-width="1.2"/>
+      <line x1="112" y1="16" x2="115" y2="13" stroke="#ffd700" stroke-width="1.2"/>
+      <line x1="114" y1="24" x2="118" y2="24" stroke="#ffd700" stroke-width="1.2"/>
+      <line x1="88" y1="16" x2="85" y2="13" stroke="#ffd700" stroke-width="1.2"/>
+      <line x1="86" y1="24" x2="82" y2="24" stroke="#ffd700" stroke-width="1.2"/>
+      <!-- Eye of Ra -->
+      <ellipse cx="100" cy="24" rx="4" ry="3" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <!-- Horizon line -->
+      <line x1="20" y1="130" x2="180" y2="130" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+      <!-- Ornamental columns -->
+      <line x1="40" y1="130" x2="40" y2="170" stroke="#c9a84c" stroke-width="1.5"/>
+      <line x1="160" y1="130" x2="160" y2="170" stroke="#c9a84c" stroke-width="1.5"/>
+      <!-- Cross ornament -->
+      <path d="M94 155 L94 165 M88 160 L106 160" stroke="#ffd700" stroke-width="1.2"/>
+      <!-- Ankh -->
+      <circle cx="100" cy="155" r="7" fill="none" stroke="#ffd700" stroke-width="1.2"/>
+      <line x1="100" y1="162" x2="100" y2="178" stroke="#ffd700" stroke-width="1.2"/>
+      <line x1="93" y1="168" x2="107" y2="168" stroke="#ffd700" stroke-width="1.2"/>
+      <!-- Stars -->
+      <text x="68" y="50" font-size="7" fill="#ffd700" opacity="0.6">★</text>
+      <text x="122" y="50" font-size="7" fill="#ffd700" opacity="0.6">★</text>
+      <text x="95" y="198" font-size="8" fill="#c9a84c" opacity="0.5">✦</text>
+    </svg>`,
+
+    americas:`<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="amg" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#0a1a2a" stop-opacity="0.7"/><stop offset="100%" stop-color="#1a0a05" stop-opacity="0"/></radialGradient></defs>
+      <ellipse cx="100" cy="110" rx="80" ry="90" fill="url(#amg)"/>
+      <!-- Aztec/Inca sun stone -->
+      <circle cx="100" cy="100" r="55" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <circle cx="100" cy="100" r="44" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <circle cx="100" cy="100" r="30" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <circle cx="100" cy="100" r="16" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <!-- Sun rays -->
+      <line x1="100" y1="44" x2="100" y2="32" stroke="#ffd700" stroke-width="1.5"/>
+      <line x1="100" y1="156" x2="100" y2="168" stroke="#ffd700" stroke-width="1.5"/>
+      <line x1="44" y1="100" x2="32" y2="100" stroke="#ffd700" stroke-width="1.5"/>
+      <line x1="156" y1="100" x2="168" y2="100" stroke="#ffd700" stroke-width="1.5"/>
+      <line x1="61" y1="61" x2="53" y2="53" stroke="#c9a84c" stroke-width="1.2"/>
+      <line x1="139" y1="61" x2="147" y2="53" stroke="#c9a84c" stroke-width="1.2"/>
+      <line x1="61" y1="139" x2="53" y2="147" stroke="#c9a84c" stroke-width="1.2"/>
+      <line x1="139" y1="139" x2="147" y2="147" stroke="#c9a84c" stroke-width="1.2"/>
+      <!-- Eagle wings -->
+      <path d="M40 88 Q60 72 80 88 Q60 104 40 88" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+      <path d="M160 88 Q140 72 120 88 Q140 104 160 88" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+      <!-- Face in center -->
+      <circle cx="100" cy="100" r="10" fill="none" stroke="#ffd700" stroke-width="1"/>
+      <!-- Bottom feathers -->
+      <path d="M70 170 Q85 155 100 170 Q115 155 130 170" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <path d="M80 185 Q100 168 120 185" fill="none" stroke="#c9a84c" stroke-width="1"/>
+    </svg>`,
+
+    oceania:`<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="ocg" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#001a2a" stop-opacity="0.7"/><stop offset="100%" stop-color="#1a0a05" stop-opacity="0"/></radialGradient></defs>
+      <ellipse cx="100" cy="110" rx="80" ry="90" fill="url(#ocg)"/>
+      <!-- Compass rose -->
+      <circle cx="100" cy="100" r="55" fill="none" stroke="#c9a84c" stroke-width="0.8" stroke-dasharray="4,3"/>
+      <circle cx="100" cy="100" r="40" fill="none" stroke="#ffd700" stroke-width="1"/>
+      <circle cx="100" cy="100" r="12" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <!-- North arrow -->
+      <polygon points="100,45 96,100 104,100" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <polygon points="100,155 96,100 104,100" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <polygon points="45,100 100,96 100,104" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <polygon points="155,100 100,96 100,104" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <!-- Diagonal arrows -->
+      <line x1="60" y1="60" x2="70" y2="70" stroke="#c9a84c" stroke-width="1"/>
+      <line x1="140" y1="60" x2="130" y2="70" stroke="#c9a84c" stroke-width="1"/>
+      <line x1="60" y1="140" x2="70" y2="130" stroke="#c9a84c" stroke-width="1"/>
+      <line x1="140" y1="140" x2="130" y2="130" stroke="#c9a84c" stroke-width="1"/>
+      <!-- Stars (Southern Cross) -->
+      <text x="36" y="46" font-size="10" fill="#ffd700">✦</text>
+      <text x="50" y="36" font-size="8" fill="#ffd700" opacity="0.8">★</text>
+      <text x="28" y="58" font-size="7" fill="#c9a84c" opacity="0.7">★</text>
+      <text x="42" y="62" font-size="6" fill="#ffd700" opacity="0.6">★</text>
+      <text x="22" y="46" font-size="6" fill="#c9a84c" opacity="0.5">★</text>
+      <!-- Waves at bottom -->
+      <path d="M30 175 Q45 165 60 175 Q75 185 90 175 Q105 165 120 175 Q135 185 150 175 Q165 165 170 175" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <path d="M30 185 Q50 175 70 185 Q90 195 110 185 Q130 175 150 185" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.6"/>
+      <!-- N label -->
+      <text x="97" y="38" font-size="9" fill="#ffd700" font-family="Cinzel,serif">N</text>
+    </svg>`,
+
+    caribbean:`<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="cg" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#001a1a" stop-opacity="0.7"/><stop offset="100%" stop-color="#1a0a05" stop-opacity="0"/></radialGradient></defs>
+      <ellipse cx="100" cy="120" rx="80" ry="85" fill="url(#cg)"/>
+      <!-- Shell spiral -->
+      <path d="M100 100 Q130 80 130 110 Q130 150 100 160 Q60 160 50 120 Q40 70 80 50 Q130 30 150 80" fill="none" stroke="#ffd700" stroke-width="1.8"/>
+      <path d="M100 100 Q120 90 120 115 Q120 145 100 150 Q72 150 65 120 Q58 84 88 68" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <circle cx="100" cy="100" r="6" fill="none" stroke="#ffd700" stroke-width="1.5"/>
+      <!-- Palm tree -->
+      <line x1="150" y1="190" x2="160" y2="100" stroke="#c9a84c" stroke-width="1.5"/>
+      <path d="M160 100 Q175 90 185 98 Q170 96 165 106" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+      <path d="M160 100 Q172 82 178 88 Q164 90 160 100" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <path d="M160 100 Q148 85 154 78 Q158 90 160 100" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <!-- Stars -->
+      <text x="38" y="60" font-size="9" fill="#ffd700" opacity="0.7">★</text>
+      <text x="25" y="110" font-size="7" fill="#c9a84c" opacity="0.6">✦</text>
+      <!-- Wave lines -->
+      <path d="M25 170 Q40 162 55 170 Q70 178 85 170 Q100 162 115 170" fill="none" stroke="#c9a84c" stroke-width="1"/>
+      <path d="M25 182 Q45 174 65 182 Q85 190 105 182" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+    </svg>`,
+  };
+  return svgs[region]||svgs.europe;
+}
+
+// ── ROMAN NUMERALS ─────────────────────────────────
+function toRoman(n){
+  const v=[1000,900,500,400,100,90,50,40,10,9,5,4,1];
+  const s=['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+  let r='';
+  for(let i=0;i<v.length;i++){while(n>=v[i]){r+=s[i];n-=v[i];}}
+  return r;
+}
+
+// ── REGION NAMES ───────────────────────────────────
+const REGION_NAMES={
+  europe:'The Old World',
+  asia:'The Far East',
+  africa:'The Dark Continent',
+  americas:'The New World',
+  oceania:'The Pacific Realm',
+  caribbean:'The Island Seas',
+};
+
+// ── GAME STATE ─────────────────────────────────────
+let playerName='',playerLoc='';
+let deck=[],qIdx=0,score=0,streak=0,bestStreak=0;
+let correctCount=0,wrongCount=0;
+let timerInterval=null,timerSecs=10;
+let answered=false,muted=false,timerOn=true;
+const Q_COUNT=COUNTRIES.length; // ALL countries!
+
+function checkReady(){
+  const ok=document.getElementById('playerName').value.trim().length>=2&&
+            document.getElementById('playerLoc').value.trim().length>=2;
+  document.getElementById('startBtn').disabled=!ok;
+}
+document.getElementById('playerName').addEventListener('input',checkReady);
+document.getElementById('playerLoc').addEventListener('input',checkReady);
+
+function startGame(){
+  playerName=document.getElementById('playerName').value.trim()||'Seeker';
+  playerLoc=document.getElementById('playerLoc').value.trim()||'Earth';
+  document.getElementById('nameScreen').style.display='none';
+  document.getElementById('hud').style.display='flex';
+  document.getElementById('stage').style.display='flex';
+  // Shuffle deck — pick Q_COUNT random countries
+  deck=[...COUNTRIES].sort(()=>Math.random()-0.5); // ALL countries shuffled!
+  qIdx=0;score=0;streak=0;bestStreak=0;correctCount=0;wrongCount=0;
+  showCard();
+}
+
+function showCard(){
+  if(qIdx>=Q_COUNT){endGame();return;}
+  const q=deck[qIdx];
+  answered=false;
+  // Update HUD
+  document.getElementById('qDisp').textContent=`${qIdx+1} of ${Q_COUNT} Countries`;
+  const pct=Math.round((qIdx/Q_COUNT)*100);
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('scoreDisp').textContent=score.toLocaleString();
+  document.getElementById('streakDisp').textContent=streak;
+  // Update card front
+  document.getElementById('cardNum').textContent=toRoman(qIdx+1);
+  document.getElementById('cardRegion').textContent=REGION_NAMES[q.r]||q.r;
+  // Multi-capital badge
+  const badge=document.getElementById('cardRegion');
+  if(q.caps && q.caps.length>1){
+    badge.style.borderColor='rgba(255,215,0,0.6)';
+    badge.style.color='rgba(255,215,0,0.9)';
+    badge.textContent='★ '+q.caps.length+' Capitals · '+(REGION_NAMES[q.r]||q.r);
+  } else {
+    badge.style.borderColor='rgba(201,168,76,0.2)';
+    badge.style.color='rgba(201,168,76,0.6)';
+    badge.textContent=REGION_NAMES[q.r]||q.r;
+  }
+  document.getElementById('cardCountry').textContent=q.n;
+  document.getElementById('cardPop').textContent='🌍 Pop: '+q.p;
+  document.getElementById('cardArt').innerHTML=getCardSVG(q.r,q.n);
+  // Reset card flip
+  const wrap=document.getElementById('cardWrap');
+  wrap.classList.remove('flip','slide-in','slide-out');
+  void wrap.offsetWidth;
+  wrap.classList.add('slide-in');
+  // Enable choices, hide next
+  document.getElementById('nextBtn').style.display='none';
+  ['choiceA','choiceB','choiceC'].forEach(id=>{
+    const btn=document.getElementById(id);
+    btn.disabled=false;
+    btn.classList.remove('correct','wrong');
+  });
+  // Multi-capital or single capital?
+  const isMulti = q.caps && q.caps.length > 1;
+  let opts;
+  if(isMulti){
+    // All choices ARE the capitals - pad with wrong if < 3
+    if(q.caps.length>=3){
+      opts=q.caps.slice(0,3);
+    } else {
+      const wrong=[...COUNTRIES].filter(c=>c.n!==q.n).sort(()=>Math.random()-0.5)[0].c;
+      opts=shuffle([...q.caps, wrong]).slice(0,3);
+    }
+    wrap.dataset.isMulti='1';
+    wrap.dataset.allCaps=JSON.stringify(q.caps);
+    // Update card question text
+    document.getElementById('cardQuestion').textContent='✦ Name ALL the Capitals ✦';document.getElementById('questionLabel').textContent='What are the Capital Cities?';
+  } else {
+    const wrongs=[...COUNTRIES]
+      .filter(c=>c.n!==q.n)
+      .sort(()=>Math.random()-0.5)
+      .slice(0,2)
+      .map(c=>c.c);
+    opts=shuffle([q.c,...wrongs]);
+    wrap.dataset.isMulti='0';
+    document.getElementById('cardQuestion').textContent='✦ Name the Capital City ✦';document.getElementById('questionLabel').textContent='What is the Capital City?';
+  }
+  document.getElementById('choiceATxt').textContent=opts[0];
+  document.getElementById('choiceBTxt').textContent=opts[1];
+  document.getElementById('choiceCTxt').textContent=opts[2];
+  wrap.dataset.correct=q.c;
+  wrap.dataset.opts=JSON.stringify(opts);
+  // Start timer
+  startTimer();
+}
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  if(!timerOn){
+    // No timer - show infinity
+    document.getElementById('timerText').textContent='∞';
+    document.getElementById('timerArc').style.strokeDashoffset='0';
+    document.getElementById('timerArc').style.stroke='#c9a84c';
+    return;
+  }
+  timerSecs=10;
+  updateTimerArc(10,10);
+  timerInterval=setInterval(()=>{
+    timerSecs--;
+    updateTimerArc(timerSecs,10);
+    if(timerSecs<=0){
+      clearInterval(timerInterval);
+      timeOut();
+    }
+  },1000);
+}
+
+function updateTimerArc(remaining,total){
+  const arc=document.getElementById('timerArc');
+  const txt=document.getElementById('timerText');
+  const pct=remaining/total;
+  const dashoffset=113*(1-pct);
+  arc.style.strokeDashoffset=dashoffset;
+  arc.style.stroke=remaining<=2?'#ff4444':remaining<=4?'#ff8800':'#ffd700';
+  txt.textContent=remaining;
+  txt.style.fill=remaining<=2?'#ff4444':remaining<=4?'#ff8800':'#ffd700';
+}
+
+function timeOut(){
+  if(answered)return;
+  answered=true;
+  streak=0;
+  wrongCount++;
+  document.getElementById('streakDisp').textContent=streak;
+  // Show all correct answers on timeout
+  const wrap=document.getElementById('cardWrap');
+  const opts=JSON.parse(wrap.dataset.opts||'[]');
+  const correct=wrap.dataset.correct;
+  const isMulti=wrap.dataset.isMulti==='1';
+  const allCaps=isMulti?JSON.parse(wrap.dataset.allCaps||'[]'):null;
+  ['choiceA','choiceB','choiceC'].forEach((id,i)=>{
+    document.getElementById(id).disabled=true;
+    const val=opts[i];
+    if(isMulti ? allCaps.includes(val) : val===correct)
+      document.getElementById(id).classList.add('correct');
+  });
+  vibrate([100,50,100,50,200]);
+  revealCard(false,0,'⌛');
+}
+
+function choose(idx){
+  if(answered)return;
+  clearInterval(timerInterval);
+  answered=true;
+  const wrap=document.getElementById('cardWrap');
+  const opts=JSON.parse(wrap.dataset.opts);
+  const correct=wrap.dataset.correct;
+  const chosen=opts[idx];
+  const isMulti=wrap.dataset.isMulti==='1';
+  const allCaps=isMulti?JSON.parse(wrap.dataset.allCaps):null;
+  const isCorrect=isMulti ? allCaps.includes(chosen) : chosen===correct;
+  // Highlight buttons
+  const btns=['choiceA','choiceB','choiceC'];
+  btns.forEach((id,i)=>{
+    document.getElementById(id).disabled=true;
+    const thisVal=opts[i];
+    const thisCorrect=isMulti ? allCaps.includes(thisVal) : thisVal===correct;
+    if(thisCorrect) document.getElementById(id).classList.add('correct');
+    else if(i===idx&&!isCorrect) document.getElementById(id).classList.add('wrong');
+  });
+  // Score
+  let pts=0;
+  if(isCorrect){
+    pts=timerOn
+      ? Math.max(100,100+timerSecs*80+(streak*50))
+      : 100+(streak*50); // flat 100 + streak bonus when timer off
+    score+=pts;streak++;
+    if(streak>bestStreak)bestStreak=streak;
+    correctCount++;
+  } else {
+    streak=0;wrongCount++;
+  }
+  document.getElementById('scoreDisp').textContent=score.toLocaleString();
+  document.getElementById('streakDisp').textContent=streak;
+  playChoice(isCorrect);
+  if(isCorrect){
+    vibrate([30,20,60,20,100]);
+    showScorePop('+'+pts);
+    // BIG celebration bursts!
+    for(let bi=0;bi<5;bi++){
+      setTimeout(()=>{
+        burst(Math.random()*window.innerWidth, Math.random()*window.innerHeight*0.7);
+      },bi*80);
+    }
+    // Screen flash gold
+    const flash=document.createElement('div');
+    flash.style.cssText='position:fixed;inset:0;background:rgba(255,215,0,0.12);pointer-events:none;z-index:9997;animation:screenFlash 0.5s ease forwards;';
+    document.body.appendChild(flash);
+    setTimeout(()=>flash.remove(),500);
+  } else {
+    vibrate([100,50,100,50,200]);
+    // Red flash on wrong
+    const rflash=document.createElement('div');
+    rflash.style.cssText='position:fixed;inset:0;background:rgba(255,40,40,0.12);pointer-events:none;z-index:9997;animation:screenFlash 0.5s ease forwards;';
+    document.body.appendChild(rflash);
+    setTimeout(()=>rflash.remove(),500);
+  }
+  setTimeout(()=>revealCard(isCorrect,pts,isCorrect?'✦':'✕'),600);
+}
+
+function revealCard(isCorrect,pts,icon){
+  const q=deck[qIdx];
+  const isMultiCard=document.getElementById('cardWrap').dataset.isMulti==='1';
+  document.getElementById('backIcon').textContent=isCorrect?'✦':'✕';
+  document.getElementById('backIcon').style.color=isCorrect?'#ffd700':'#ff4444';
+  document.getElementById('backResult').textContent=isCorrect?'CORRECT!':'WRONG!';
+  document.getElementById('backResult').className='back-result '+(isCorrect?'correct-res':'wrong-res');
+  // Show capital(s)
+  if(isMultiCard && q.caps){
+    document.getElementById('backCapital').textContent=q.caps.join(' · ');
+    document.getElementById('backCapLabel').textContent=q.caps.length+' CAPITALS';
+    document.getElementById('backCapNote').textContent=q.capNote||'';
+    document.getElementById('backCapNote').style.display='block';
+  } else {
+    document.getElementById('backCapital').textContent=q.c;
+    document.getElementById('backCapLabel').textContent='THE CAPITAL IS';
+    document.getElementById('backCapNote').style.display='none';
+  }
+  document.getElementById('backPts').textContent=pts>0?'+'+pts:'0';
+  document.getElementById('backPts').style.color=isCorrect?'#ffd700':'#ff6666';
+  // Flip card
+  document.getElementById('cardWrap').classList.add('flip');
+  playFlip();
+  if(timerOn){
+    // Auto-advance after showing result briefly
+    setTimeout(()=>{
+      qIdx++;
+      if(qIdx<Q_COUNT) nextCard();
+      else endGame();
+    },2000);
+  } else {
+    // Manual advance - show NEXT button
+    setTimeout(()=>{
+      document.getElementById('nextBtn').style.display='block';
+    },700);
+  }
+}
+
+function nextCard(){
+  const wrap=document.getElementById('cardWrap');
+  wrap.classList.add('slide-out');
+  setTimeout(()=>{
+    wrap.classList.remove('flip','slide-out');
+    showCard();
+  },500);
+}
+
+function endGame(){
+  document.getElementById('winScore').textContent=score.toLocaleString();
+  document.getElementById('winCorrect').textContent=correctCount;
+  document.getElementById('winWrong').textContent=wrongCount;
+  document.getElementById('winStreak').textContent=bestStreak;
+  document.getElementById('winScreen').style.display='flex';
+  playWin();
+  // Big celebration bursts
+  for(let i=0;i<6;i++) setTimeout(()=>burst(Math.random()*window.innerWidth,Math.random()*window.innerHeight*0.5),i*200);
+}
+
+function restartGame(){
+  document.getElementById('winScreen').style.display='none';
+  deck=[...COUNTRIES].sort(()=>Math.random()-0.5); // ALL countries shuffled!
+  qIdx=0;score=0;streak=0;bestStreak=0;correctCount=0;wrongCount=0;
+  showCard();
+}
+
+// ── SCORE POP ─────────────────────────────────────
+function showScorePop(txt){
+  const pop=document.createElement('div');
+  pop.className='score-pop';
+  pop.style.cssText=`left:50%;top:40%;color:#ffd700;`;
+  pop.textContent=txt;
+  document.body.appendChild(pop);
+  setTimeout(()=>pop.remove(),1200);
+}
+
+// ── TIMER TOGGLE ──────────────────────────────────
+function toggleTimer(){
+  timerOn=!timerOn;
+  const btn=document.getElementById('timerToggleBtn');
+  const svg=document.getElementById('timerSvg');
+  if(timerOn){
+    btn.textContent='⏱ Turn Off Timer';
+    btn.style.borderColor='rgba(135,206,235,0.4)';
+    btn.style.color='#87ceeb';
+    btn.style.background='rgba(30,144,255,0.12)';
+    if(svg) svg.style.opacity='1';
+    // Restart timer for current card
+    if(!answered) startTimer();
+  } else {
+    clearInterval(timerInterval);
+    btn.textContent='🧘 Go At Your Pace';
+    btn.style.borderColor='rgba(100,200,100,0.4)';
+    btn.style.color='#88ff88';
+    // Hide timer arc, show ∞
+    if(svg) svg.style.opacity='0.2';
+    document.getElementById('timerText').textContent='∞';
+    document.getElementById('timerArc').style.strokeDashoffset='0';
+  }
+}
+
+// ── NEXT MANUAL ───────────────────────────────────
+function nextManual(){
+  document.getElementById('nextBtn').style.display='none';
+  qIdx++;
+  if(qIdx<Q_COUNT) nextCard();
+  else endGame();
+}
+
+// ── CONFETTI ──────────────────────────────────────
+function burst(cx,cy){
+  const cols=['#ffd700','#c9a84c','#ff4444','#ff8800','#44ff66','#ff69b4','#88ffff','#ffffff'];
+  for(let i=0;i<28;i++){
+    const p=document.createElement('div');
+    p.style.cssText=`position:fixed;pointer-events:none;z-index:9998;
+      background:${cols[Math.floor(Math.random()*cols.length)]};
+      width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      left:${cx}px;top:${cy}px;`;
+    document.body.appendChild(p);
+    const ang=Math.random()*Math.PI*2,dist=50+Math.random()*100;
+    const tx=Math.cos(ang)*dist,ty=Math.sin(ang)*dist;
+    const dur=500+Math.random()*500,start=Date.now();
+    const animP=()=>{
+      const pr=Math.min(1,(Date.now()-start)/dur);
+      const e=1-Math.pow(1-pr,2);
+      p.style.transform=`translate(${tx*e}px,${ty*e+60*pr*pr}px) rotate(${pr*540}deg)`;
+      p.style.opacity=1-pr;
+      if(pr<1)requestAnimationFrame(animP);else p.remove();
+    };
+    requestAnimationFrame(animP);
+  }
+}
+
+// ── SOUND ─────────────────────────────────────────
+let audioCtx=null;
+function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function tone(f,t,v,d,delay=0){
+  if(muted)return;
+  try{
+    const c=getAudio(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type=t;o.frequency.value=f;
+    g.gain.setValueAtTime(0,c.currentTime+delay);
+    g.gain.linearRampToValueAtTime(v,c.currentTime+delay+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+delay+d);
+    o.start(c.currentTime+delay);o.stop(c.currentTime+delay+d+0.05);
+  }catch(e){}
+}
+function playChoice(correct){
+  if(correct){
+    // FANFARE! ascending chord + high ping
+    [523,659,784,1047,1319].forEach((f,i)=>tone(f,'sine',0.5,0.25,i*0.06));
+    setTimeout(()=>tone(1568,'sine',0.6,0.3),0.35*1000);
+    setTimeout(()=>tone(2093,'sine',0.4,0.4),0.5*1000);
+  } else {
+    // Sad trombone + buzz
+    [330,294,262,220].forEach((f,i)=>tone(f,'sawtooth',0.4,0.25,i*0.1));
+    setTimeout(()=>tone(110,'square',0.3,0.4),0.5*1000);
+  }
+}
+function playFlip(){tone(440,'sine',0.2,0.15);}
+function playWin(){const n=[523,659,784,1047,1319,784,1047,1319,1568];n.forEach((f,i)=>tone(f,'sine',0.5,0.22,i*0.08));}
+function toggleMute(){muted=!muted;document.getElementById('muteBtn').textContent=muted?'🔇':'🔊';}
+function vibrate(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
+</script>
+</body>
+</html>
