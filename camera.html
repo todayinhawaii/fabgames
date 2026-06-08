@@ -927,41 +927,41 @@ async function capturePhoto(){
     if(window.ImageCapture && stream){
       try{
         const track=stream.getVideoTracks()[0];
-        const ic=new ImageCapture(track);
-        console.log('📸 Boosting resolution for capture...');
-
-        // Step 1: Boost stream to max resolution just for capture
+        console.log('📸 Opening hi-res stream for capture...');
+        // Open a separate max-resolution stream just for this shot
+        // Preview stream stays untouched - no flicker!
+        let hiResStream=null;
+        let blob=null;
         try{
-          await track.applyConstraints({
-            width:{ideal:9999}, height:{ideal:9999}
+          hiResStream=await navigator.mediaDevices.getUserMedia({
+            video:{
+              facingMode:{ideal:facingMode==='user'?'user':'environment'},
+              width:{ideal:9999},
+              height:{ideal:9999}
+            },
+            audio:false
           });
-          console.log('Stream boosted to: '+track.getSettings().width+'x'+track.getSettings().height);
-        }catch(e){ console.log('Boost failed:',e.message); }
-
-        // Step 2: Capture at boosted resolution
-        let blob;
-        try{
-          // Try getPhotoCapabilities for absolute max
-          const caps=await ic.getPhotoCapabilities();
-          if(caps.imageWidth?.max){
-            blob=await ic.takePhoto({
-              imageWidth:caps.imageWidth.max,
-              imageHeight:caps.imageHeight.max
-            });
-          } else {
-            blob=await ic.takePhoto();
-          }
+          const hiTrack=hiResStream.getVideoTracks()[0];
+          const settings=hiTrack.getSettings();
+          console.log('Hi-res stream: '+settings.width+'x'+settings.height);
+          const hiIc=new ImageCapture(hiTrack);
+          // Try with max photoCapabilities
+          try{
+            const caps=await hiIc.getPhotoCapabilities();
+            if(caps.imageWidth?.max){
+              blob=await hiIc.takePhoto({imageWidth:caps.imageWidth.max,imageHeight:caps.imageHeight.max});
+            } else { blob=await hiIc.takePhoto(); }
+          }catch(e){ blob=await hiIc.takePhoto(); }
+          console.log('Hi-res captured: '+Math.round(blob.size/1024/1024*10)/10+'MB');
         }catch(e){
-          blob=await ic.takePhoto();
+          console.log('Hi-res stream failed:'+e.message+' - falling back to preview stream');
+          // Fallback: use existing preview stream
+          const ic2=new ImageCapture(track);
+          blob=await ic2.takePhoto();
+        }finally{
+          // Always stop hi-res stream
+          if(hiResStream) hiResStream.getTracks().forEach(t=>t.stop());
         }
-        console.log('Captured: '+Math.round(blob.size/1024/1024*10)/10+'MB');
-
-        // Step 3: Drop stream back to preview resolution
-        try{
-          await track.applyConstraints({
-            width:{ideal:1920}, height:{ideal:1080}
-          });
-        }catch(e){}
         console.log('✅ takePhoto blob: ');
 
         // Convert blob to data URL
