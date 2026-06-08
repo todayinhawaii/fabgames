@@ -909,188 +909,136 @@ function applyWarmTint(warm){
 
 // ── CAPTURE PHOTO ─────────────────────────────────────────
 async function capturePhoto(){
-  dbg('🔴 capturePhoto STARTED','#f0f');
   const flash=document.getElementById('flashOverlay');
   flash.classList.add('flash');
   setTimeout(()=>flash.classList.remove('flash'),150);
+  dbg('🔴 CAPTURE START','#f0f');
 
   try{
-    dbg('✅ try block entered','#0f0');
     const w=video.videoWidth||1280;
     const h=video.videoHeight||720;
+    dbg('📐 '+w+'x'+h+' ready:'+video.readyState,'#0ff');
 
-    // Pre-warm: draw to a small test canvas to check if readback works
-    try{
-      const test=document.createElement('canvas');
-      test.width=4;test.height=4;
-      const tctx=test.getContext('2d',{willReadFrequently:true});
-      tctx.drawImage(video,0,0,4,4);
-      const tpx=tctx.getImageData(1,1,1,1).data;
-      dbg('🔍 Test draw r:'+tpx[0]+' g:'+tpx[1]+' b:'+tpx[2]+(tpx[0]+tpx[1]+tpx[2]>5?' HAS PIXELS ✅':' BLACK ❌'),'#ff0');
-    }catch(e){ dbg('🔍 Test draw error: '+e.message,'#f80'); }
-    dbg('📐 Video: '+video.videoWidth+'x'+video.videoHeight+' ready:'+video.readyState);
-    dbg('🎬 Filter: '+selectedFilter.name+' | '+selectedFilter.css.substring(0,30));
-    const cap=document.createElement('canvas');
-    cap.width=w; cap.height=h;
-    const cctx=cap.getContext('2d',{willReadFrequently:true});
-
-    // Black background for JPEG
-    cctx.fillStyle='#000';
-    cctx.fillRect(0,0,w,h);
-
-    // Draw frame - try multiple methods for Android Chrome compatibility
-    let drawn = false;
-
-    // Method 1: createImageBitmap - best for Android GPU compositing
-    if(!drawn && window.createImageBitmap){
+    // ── METHOD A: ImageCapture.takePhoto() ──────────────
+    // Captures direct from hardware - bypasses canvas taint!
+    if(window.ImageCapture && stream){
       try{
-        const bitmap = await createImageBitmap(video);
-        cctx.filter = selectedFilter.css||'none';
+        const track=stream.getVideoTracks()[0];
+        const ic=new ImageCapture(track);
+        dbg('📸 Trying takePhoto()...','#ff0');
+        const blob=await ic.takePhoto();
+        dbg('✅ takePhoto blob: '+blob.size+' bytes','#0f0');
+
+        // Convert blob to data URL
+        const reader=new FileReader();
+        const dataUrl=await new Promise((res,rej)=>{
+          reader.onload=()=>res(reader.result);
+          reader.onerror=rej;
+          reader.readAsDataURL(blob);
+        });
+
+        // Apply CSS filter effect by drawing to canvas with filter
+        const cap=document.createElement('canvas');
+        const img=new Image();
+        await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=dataUrl;});
+        cap.width=img.width; cap.height=img.height;
+        const cctx=cap.getContext('2d',{willReadFrequently:true});
+        cctx.filter=selectedFilter.css||'none';
         if(facingMode==='user'){
           cctx.save();cctx.scale(-1,1);
-          cctx.drawImage(bitmap,-w,0,w,h);
+          cctx.drawImage(img,-cap.width,0,cap.width,cap.height);
           cctx.restore();
         } else {
-          cctx.drawImage(bitmap,0,0,w,h);
+          cctx.drawImage(img,0,0);
         }
         cctx.filter='none';
-        bitmap.close && bitmap.close();
-        // Check if we actually got pixels (not black)
-        const px=cctx.getImageData(w/2,h/2,1,1).data;
-        let px0=[0,0,0,0]; try{px0=cctx.getImageData(Math.floor(w/2),Math.floor(h/2),1,1).data;}catch(e){} 
-        dbg('🖼 Method1 pixels: r'+px0[0]+' g'+px0[1]+' b'+px0[2]+(px0[0]>5||px0[1]>5||px0[2]>5?' ✅':'❌ BLACK'),'#0ff');
-        if(px0[0]>5||px0[1]>5||px0[2]>5) drawn=true;
-      }catch(e){ dbg('❌ createImageBitmap: '+e.message,'#f44'); }
+        // Vignette
+        if(selectedFilter.vignette>0){
+          const vg=cctx.createRadialGradient(cap.width/2,cap.height/2,cap.height*0.2,cap.width/2,cap.height/2,cap.height*0.8);
+          vg.addColorStop(0,'rgba(0,0,0,0)');
+          vg.addColorStop(1,`rgba(0,0,0,${selectedFilter.vignette*0.75})`);
+          cctx.fillStyle=vg;cctx.fillRect(0,0,cap.width,cap.height);
+        }
+        // Stamp
+        cctx.font=`bold ${Math.floor(cap.width*0.025)}px Courier New`;
+        cctx.fillStyle='rgba(255,255,255,0.65)';
+        cctx.textAlign='left';
+        cctx.fillText('📷 '+selectedFilter.name+' — fab.games',cap.width*0.02,cap.height*0.97);
+
+        capturedDataURL=cap.toDataURL('image/jpeg',0.92);
+        dbg('✅ Photo ready! '+Math.round(capturedDataURL.length/1024)+'KB','#0f0');
+        showPhoto();
+        return;
+      }catch(e){ dbg('❌ takePhoto: '+e.message,'#f44'); }
     }
 
-    // Method 2: requestVideoFrameCallback sync draw
-    if(!drawn && 'requestVideoFrameCallback' in video){
-      await new Promise(resolve=>{
-        video.requestVideoFrameCallback(()=>{
-          cctx.filter=selectedFilter.css||'none';
-          if(facingMode==='user'){
-            cctx.save();cctx.scale(-1,1);
-            cctx.drawImage(video,-w,0,w,h);
-            cctx.restore();
-          } else {
-            cctx.drawImage(video,0,0,w,h);
-          }
-          cctx.filter='none';
-          resolve();
-        });
-      });
-      const px=cctx.getImageData(w/2,h/2,1,1).data;
-      let px1=[0,0,0,0]; try{px1=cctx.getImageData(Math.floor(w/2),Math.floor(h/2),1,1).data;}catch(e){} 
-      dbg('🖼 Method2 pixels: r'+px1[0]+' g'+px1[1]+' b'+px1[2]+(px1[0]>5||px1[1]>5||px1[2]>5?' ✅':'❌ BLACK'),'#fa0');
-      if(px1[0]>5||px1[1]>5||px1[2]>5) drawn=true;
-    }
-
-    dbg('Method3 direct drawImage','#ff0');
-    if(!drawn){
-      cctx.filter=selectedFilter.css||'none';
-      if(facingMode==='user'){
-        cctx.save();cctx.scale(-1,1);
-        cctx.drawImage(video,-w,0,w,h);
-        cctx.restore();
-      } else {
-        cctx.drawImage(video,0,0,w,h);
-      }
-      cctx.filter='none';
-    }
-
-    // Grain overlay
-    if(selectedFilter.grain>0){
-      const id=cctx.createImageData(w,h);const d=id.data;
-      for(let i=0;i<d.length;i+=4){
-        const n=(Math.random()-0.5)*selectedFilter.grain*200;
-        d[i]=d[i+1]=d[i+2]=128+n;d[i+3]=Math.floor(selectedFilter.grain*50);
-      }
-      cctx.putImageData(id,0,0);
-    }
-    // Vignette
-    if(selectedFilter.vignette>0){
-      const vg=cctx.createRadialGradient(w/2,h/2,h*0.2,w/2,h/2,h*0.8);
-      vg.addColorStop(0,'rgba(0,0,0,0)');
-      vg.addColorStop(1,`rgba(0,0,0,${selectedFilter.vignette*0.75})`);
-      cctx.fillStyle=vg;cctx.fillRect(0,0,w,h);
-    }
-    // Stamp
-    cctx.font=`bold ${Math.floor(w*0.028)}px Courier New`;
-    cctx.fillStyle='rgba(255,255,255,0.6)';
-    cctx.textAlign='left';
-    cctx.fillText('📷 '+selectedFilter.name+' — fab.games',w*0.025,h*0.97);
-
-    capturedDataURL=cap.toDataURL('image/jpeg',0.92);
-    document.getElementById('capturedImg').src=capturedDataURL;
-    document.getElementById('photoLabel').textContent='📷 '+selectedFilter.name;
-    document.getElementById('photoModal').classList.add('show');
-    playShutter();
-  }catch(err){
-    dbg('💥 ERROR: '+err.message,'#f44');
-    console.error('Capture:',err);
-    alert('Could not capture. Try again! '+err.message);
-  }
-}
-
-
-function savePhoto(){
-  const a=document.createElement('a');
-  a.href=capturedDataURL;
-  a.download=`hawaii-${selectedFilter.name.replace(/[^a-z0-9]/gi,'-').toLowerCase()}-${Date.now()}.jpg`;
-  a.click();
-}
-
-function closeModal(){
-  document.getElementById('photoModal').classList.remove('show');
-}
-
-// ── INIT ──────────────────────────────────────────────────
-buildFilterCards('1920s');
-// Auto-start camera on load
-startCamera();
-
-// ── MOBILE CAMERA RESUME ─────────────────────────────
-// When user goes to home screen and comes back, restart camera
-document.addEventListener('visibilitychange', async ()=>{
-  if(document.visibilityState==='visible'){
-    if(!stream || !stream.active){
-      try{ await initCamera(); }catch(e){}
-    } else {
+    // ── METHOD B: createImageBitmap → OffscreenCanvas ───
+    // createImageBitmap works (confirmed r105 g98 b87)
+    // Use OffscreenCanvas to avoid taint on main canvas
+    if(window.createImageBitmap && window.OffscreenCanvas){
       try{
-        await video.play();
-        // Force repaint
-        video.style.opacity='0.99';
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{video.style.opacity='1';}));
-      }catch(e){}
+        dbg('🔄 Trying OffscreenCanvas...','#ff0');
+        const bitmap=await createImageBitmap(video);
+        const oc=new OffscreenCanvas(w,h);
+        const octx=oc.getContext('2d');
+        octx.filter=selectedFilter.css||'none';
+        if(facingMode==='user'){
+          octx.save();octx.scale(-1,1);octx.drawImage(bitmap,-w,0,w,h);octx.restore();
+        } else { octx.drawImage(bitmap,0,0,w,h); }
+        octx.filter='none';
+        bitmap.close&&bitmap.close();
+        const blob=await oc.convertToBlob({type:'image/jpeg',quality:0.92});
+        const url=URL.createObjectURL(blob);
+        capturedDataURL=url;
+        dbg('✅ OffscreenCanvas worked!','#0f0');
+        showPhoto();
+        return;
+      }catch(e){ dbg('❌ OffscreenCanvas: '+e.message,'#f44'); }
     }
-  }
-});
 
-// Also handle page focus
-window.addEventListener('pageshow', async ()=>{
-  try{ await video.play(); }catch(e){}
-});
+    // ── METHOD C: createImageBitmap → img → canvas ─────
+    if(window.createImageBitmap){
+      try{
+        dbg('🔄 Trying bitmap→img→canvas...','#ff0');
+        const bitmap=await createImageBitmap(video);
+        const cap=document.createElement('canvas');
+        cap.width=w;cap.height=h;
+        const cctx=cap.getContext('2d',{willReadFrequently:true});
+        cctx.fillStyle='#000';cctx.fillRect(0,0,w,h);
+        cctx.filter=selectedFilter.css||'none';
+        if(facingMode==='user'){
+          cctx.save();cctx.scale(-1,1);cctx.drawImage(bitmap,-w,0,w,h);cctx.restore();
+        } else { cctx.drawImage(bitmap,0,0,w,h); }
+        cctx.filter='none';
+        bitmap.close&&bitmap.close();
+        if(selectedFilter.vignette>0){
+          const vg=cctx.createRadialGradient(w/2,h/2,h*0.2,w/2,h/2,h*0.8);
+          vg.addColorStop(0,'rgba(0,0,0,0)');
+          vg.addColorStop(1,`rgba(0,0,0,${selectedFilter.vignette*0.75})`);
+          cctx.fillStyle=vg;cctx.fillRect(0,0,w,h);
+        }
+        capturedDataURL=cap.toDataURL('image/jpeg',0.92);
+        dbg('Method C result len:'+capturedDataURL.length,'#fa0');
+        showPhoto();
+        return;
+      }catch(e){ dbg('❌ Method C: '+e.message,'#f44'); }
+    }
 
-window.addEventListener('focus', async ()=>{
-  if(!stream || !stream.active){
-    try{ await initCamera(); }catch(e){}
-  } else {
-    try{
-      await video.play();
-      video.style.opacity='0.99';
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{video.style.opacity='1';}));
-    }catch(e){}
-  }
-});
+    dbg('❌ ALL METHODS FAILED','#f00');
+    alert('Camera capture not supported on this browser. Try updating Chrome!');
 
-// Periodic repaint check - if video is playing but not painting, nudge it
-let repaintCheck=setInterval(()=>{
-  if(video && !video.paused && video.readyState>=2){
-    video.style.opacity='0.99';
-    requestAnimationFrame(()=>{ video.style.opacity='1'; });
-    clearInterval(repaintCheck);
+  }catch(err){
+    dbg('💥 OUTER ERROR: '+err.message,'#f44');
+    alert('Error: '+err.message);
   }
-},500);
+}
+
+function showPhoto(){
+  document.getElementById('capturedImg').src=capturedDataURL;
+  document.getElementById('photoLabel').textContent='📷 '+selectedFilter.name;
+  document.getElementById('photoModal').classList.add('show');
+  playShutter();
+}
 
 
 // ── SHUTTER SOUND ─────────────────────────────────
