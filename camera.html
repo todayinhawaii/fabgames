@@ -85,6 +85,11 @@ video,canvas{
   width:100%;height:100%;
   object-fit:cover;
 }
+#preview{
+  background:#000;
+  z-index:1;
+  will-change:transform; /* GPU layer for smooth video */
+}
 #preview{ z-index:1; }
 #overlay-canvas{ z-index:2; pointer-events:none; }
 
@@ -807,11 +812,11 @@ async function flipCamera(){
 function startRender(){
   if(rafId) cancelAnimationFrame(rafId);
   function render(){
-    if(video.readyState>=2){
+    if(video.readyState>=2 && video.videoWidth>0){
       // Sync capture canvas size
-      if(capCanvas.width!==video.videoWidth||capCanvas.height!==video.videoHeight){
-        capCanvas.width=video.videoWidth||320;
-        capCanvas.height=video.videoHeight||240;
+      if(capCanvas.width!==video.videoWidth){
+        capCanvas.width=video.videoWidth;
+        capCanvas.height=video.videoHeight;
       }
       // Draw video+filter to capture canvas every frame
       if(capCtx && capCanvas.width>0){
@@ -881,98 +886,101 @@ function applyWarmTint(warm){
 }
 
 // ── CAPTURE PHOTO ─────────────────────────────────────────
-function capturePhoto(){
-  // Flash effect
+async function capturePhoto(){
+  // Flash
   const flash=document.getElementById('flashOverlay');
   flash.classList.add('flash');
   setTimeout(()=>flash.classList.remove('flash'),150);
 
-  // Draw video + filter + overlays to a capture canvas
-  const cap=document.createElement('canvas');
-  const capCvsEl=document.getElementById('cap-canvas');
-  cap.width = capCvsEl?.width || video.videoWidth || 1280;
-  cap.height = capCvsEl?.height || video.videoHeight || 720;
-  const cctx=cap.getContext('2d');
+  try{
+    const cap=document.createElement('canvas');
+    let imgBitmap=null;
 
-  // Draw from pre-rendered capture canvas (video+filter already applied in render loop!)
-  const capCvs=document.getElementById('cap-canvas');
-  // Fill black background first - JPEG converts transparency to black otherwise
-  cctx.fillStyle='#000';
-  cctx.fillRect(0,0,cap.width,cap.height);
-  if(capCvs && capCvs.width>0){
-    // Mirror for front camera
-    if(facingMode==='user'){
-      cctx.save();cctx.scale(-1,1);
-      cctx.drawImage(capCvs,-cap.width,0,cap.width,cap.height);
-      cctx.restore();
-    } else {
-      cctx.drawImage(capCvs,0,0,cap.width,cap.height);
+    // Try ImageCapture API first (best quality, works on Android Chrome)
+    if(stream && window.ImageCapture){
+      try{
+        const track=stream.getVideoTracks()[0];
+        const ic=new ImageCapture(track);
+        imgBitmap=await ic.grabFrame();
+        cap.width=imgBitmap.width;
+        cap.height=imgBitmap.height;
+      }catch(e){ imgBitmap=null; }
     }
-    // Add overlay (grain/vignette) on top
-    const overlayEl=document.getElementById('overlay-canvas');
-    if(overlayEl && overlayEl.width>0){
-      cctx.drawImage(overlayEl,0,0,cap.width,cap.height);
+
+    // Fallback to capCanvas (pre-rendered each frame)
+    if(!imgBitmap){
+      const capCvs=document.getElementById('cap-canvas');
+      cap.width=capCvs?.width||video.videoWidth||1280;
+      cap.height=capCvs?.height||video.videoHeight||720;
     }
-  } else {
-    // capCanvas not ready - draw video directly
-    try{
+
+    const cctx=cap.getContext('2d');
+
+    // Black background (JPEG needs it)
+    cctx.fillStyle='#000';
+    cctx.fillRect(0,0,cap.width,cap.height);
+
+    if(imgBitmap){
+      // Apply CSS filter via canvas 2D filter
       cctx.filter=selectedFilter.css||'none';
       if(facingMode==='user'){
         cctx.save();cctx.scale(-1,1);
-        cctx.drawImage(video,-cap.width,0,cap.width,cap.height);
+        cctx.drawImage(imgBitmap,-cap.width,0,cap.width,cap.height);
         cctx.restore();
       } else {
-        cctx.drawImage(video,0,0,cap.width,cap.height);
+        cctx.drawImage(imgBitmap,0,0,cap.width,cap.height);
       }
       cctx.filter='none';
-    }catch(e){}
-  }
-
-  // Add grain
-  if(selectedFilter.grain>0){
-    const id=cctx.createImageData(cap.width,cap.height);
-    const d=id.data;
-    for(let i=0;i<d.length;i+=4){
-      const n=(Math.random()-0.5)*selectedFilter.grain*200;
-      d[i]=d[i+1]=d[i+2]=128+n;
-      d[i+3]=Math.floor(selectedFilter.grain*50);
+    } else {
+      // Use pre-rendered capCanvas
+      const capCvs=document.getElementById('cap-canvas');
+      if(capCvs && capCvs.width>0){
+        if(facingMode==='user'){
+          cctx.save();cctx.scale(-1,1);
+          cctx.drawImage(capCvs,-cap.width,0,cap.width,cap.height);
+          cctx.restore();
+        } else {
+          cctx.drawImage(capCvs,0,0,cap.width,cap.height);
+        }
+      }
     }
-    cctx.putImageData(id,0,0);
+
+    // Add grain overlay
+    if(selectedFilter.grain>0){
+      const id=cctx.createImageData(cap.width,cap.height);
+      const d=id.data;
+      for(let i=0;i<d.length;i+=4){
+        const n=(Math.random()-0.5)*selectedFilter.grain*200;
+        d[i]=d[i+1]=d[i+2]=128+n;
+        d[i+3]=Math.floor(selectedFilter.grain*50);
+      }
+      cctx.putImageData(id,0,0);
+    }
+    // Add vignette
+    if(selectedFilter.vignette>0){
+      const vg=cctx.createRadialGradient(cap.width/2,cap.height/2,cap.height*0.2,cap.width/2,cap.height/2,cap.height*0.8);
+      vg.addColorStop(0,'rgba(0,0,0,0)');
+      vg.addColorStop(1,`rgba(0,0,0,${selectedFilter.vignette*0.75})`);
+      cctx.fillStyle=vg;
+      cctx.fillRect(0,0,cap.width,cap.height);
+    }
+    // Stamp
+    cctx.font=`bold ${Math.floor(cap.width*0.028)}px 'Courier New'`;
+    cctx.fillStyle='rgba(255,255,255,0.6)';
+    cctx.textAlign='left';
+    cctx.fillText('📷 '+selectedFilter.name+' — fab.games',cap.width*0.025,cap.height*0.97);
+
+    capturedDataURL=cap.toDataURL('image/jpeg',0.92);
+    document.getElementById('capturedImg').src=capturedDataURL;
+    document.getElementById('photoLabel').textContent='📷 '+selectedFilter.name;
+    document.getElementById('photoModal').classList.add('show');
+    playShutter();
+  }catch(err){
+    console.error('Capture error:',err);
+    alert('Could not capture photo. Please try again! 📷');
   }
-
-  // Add vignette
-  if(selectedFilter.vignette>0){
-    const vg=cctx.createRadialGradient(
-      cap.width/2,cap.height/2,cap.height*0.2,
-      cap.width/2,cap.height/2,cap.height*0.8
-    );
-    vg.addColorStop(0,'rgba(0,0,0,0)');
-    vg.addColorStop(1,`rgba(0,0,0,${selectedFilter.vignette*0.75})`);
-    cctx.fillStyle=vg;
-    cctx.fillRect(0,0,cap.width,cap.height);
-  }
-
-  // Warm tint
-  if(selectedFilter.warm!==0){
-    const w=selectedFilter.warm;
-    cctx.fillStyle=w>0
-      ?`rgba(${w*4},${w*2},0,0.08)`
-      :`rgba(0,${Math.abs(w)*2},${Math.abs(w)*4},0.08)`;
-    cctx.fillRect(0,0,cap.width,cap.height);
-  }
-
-  // Stamp filter name
-  cctx.font=`bold ${Math.floor(cap.width*0.028)}px 'Courier New'`;
-  cctx.fillStyle='rgba(255,255,255,0.6)';
-  cctx.textAlign='left';
-  cctx.fillText('📷 '+selectedFilter.name+' — fab.games',
-    cap.width*0.025, cap.height*0.97);
-
-  capturedDataURL=cap.toDataURL('image/jpeg',0.92);
-  document.getElementById('capturedImg').src=capturedDataURL;
-  document.getElementById('photoLabel').textContent='📷 '+selectedFilter.name;
-  document.getElementById('photoModal').classList.add('show');
 }
+
 
 function savePhoto(){
   const a=document.createElement('a');
