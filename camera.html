@@ -92,10 +92,12 @@ video,canvas{
 #overlay-canvas{
   z-index:2;
   pointer-events:none;
+  background:transparent!important;
 }
 #overlay-canvas{
   z-index:2;
   pointer-events:none;
+  background:transparent!important;
 }
 
 /* Camera overlay decorations */
@@ -1055,7 +1057,10 @@ async function capturePhoto(){
 function showPhoto(){
   document.getElementById('capturedImg').src=capturedDataURL;
   document.getElementById('photoLabel').textContent='📷 '+selectedFilter.name;
-  const pm=document.getElementById('photoModal');pm.style.display='flex';
+  const pm=document.getElementById('photoModal');
+  pm.style.visibility='visible';
+  pm.style.opacity='1';
+  pm.style.display='flex';
   playShutter();
   // Photo ready - user holds down to save to gallery
 }
@@ -1240,8 +1245,13 @@ function downloadDataURL(url){
 }
 
 function closeModal(){
-  document.getElementById('photoModal').style.display='none';
+  const pm=document.getElementById('photoModal');
+  pm.style.display='none';
+  pm.style.opacity='0';
+  pm.style.visibility='hidden';
   capturedDataURL=null;
+  // Re-focus the viewfinder
+  try{ video.play(); }catch(e){}
 }
 </script>
 </body>
