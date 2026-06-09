@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🧩 Jigsaw Puzzle Gallery — fab.games</title>
+<link rel="icon" href="/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&display=block" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+:root{
+  --gold:#c9a84c;--gold2:#ffd700;--gold3:#e8c86a;
+  --dark:#0a0a0d;--dark2:#13131a;--dark3:#1c1c26;
+  --text:#f0ede8;--muted:rgba(240,237,232,0.5);
+}
+html,body{height:100%;background:var(--dark);overflow:hidden;}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--text);}
+
+/* ── GALLERY SCREEN ── */
+#galleryScreen{
+  position:fixed;inset:0;z-index:10;
+  background:radial-gradient(ellipse at 40% 20%,#1c1520 0%,#0a0a0d 70%);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.gallery-header{
+  padding:16px 16px 8px;text-align:center;flex-shrink:0;
+}
+.gallery-title{
+  font-family:'Cinzel Decorative',serif;font-size:clamp(20px,5vw,30px);font-weight:900;
+  background:linear-gradient(180deg,#ffd700,#c9a84c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:2px;
+}
+.gallery-sub{font-size:12px;color:var(--muted);font-style:italic;font-family:'Cinzel',serif;}
+
+/* Difficulty row */
+.diff-row{display:flex;gap:6px;justify-content:center;padding:10px 16px 8px;flex-shrink:0;}
+.diff-btn{
+  padding:7px 14px;border-radius:20px;
+  border:1.5px solid rgba(201,168,76,0.25);
+  background:rgba(201,168,76,0.06);
+  color:rgba(201,168,76,0.7);font-size:11px;font-weight:700;cursor:pointer;
+  transition:all 0.2s;
+}
+.diff-btn.active{
+  background:rgba(201,168,76,0.18);border-color:var(--gold2);color:var(--gold2);
+  box-shadow:0 0 12px rgba(255,215,0,0.2);
+}
+
+/* Art grid */
+.art-grid{
+  flex:1;overflow-y:auto;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;padding:8px 12px 20px;
+}
+.art-grid::-webkit-scrollbar{display:none;}
+
+.art-frame{
+  position:relative;border-radius:10px;overflow:hidden;cursor:pointer;
+  aspect-ratio:3/4;
+  border:2px solid rgba(201,168,76,0.15);
+  background:var(--dark3);
+  transition:all 0.25s;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+}
+.art-frame:hover,.art-frame:active{
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px var(--gold),0 8px 30px rgba(201,168,76,0.3);
+  transform:scale(1.03);
+}
+.art-frame img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform 0.3s;
+}
+.art-frame:hover img{transform:scale(1.06);}
+.art-number{
+  position:absolute;top:6px;left:6px;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
+  border:1px solid rgba(201,168,76,0.3);border-radius:20px;
+  padding:2px 8px;font-size:9px;font-weight:700;color:var(--gold);
+  font-family:'Cinzel',serif;
+}
+.art-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:20px 8px 8px;
+  background:linear-gradient(0deg,rgba(0,0,0,0.9) 0%,transparent 100%);
+  font-size:10px;font-weight:700;color:#fff;text-align:center;
+  line-height:1.3;
+}
+
+/* ── PREVIEW SCREEN ── */
+#previewScreen{
+  position:fixed;inset:0;z-index:20;
+  background:#000;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#previewImg{
+  max-width:92vw;max-height:68vh;
+  object-fit:contain;display:block;
+  border-radius:12px;
+  box-shadow:0 0 0 2px var(--gold),0 0 0 4px #111,0 0 0 6px var(--gold3),
+             0 20px 60px rgba(0,0,0,0.9);
+  animation:imgReveal 0.6s cubic-bezier(0.23,1,0.32,1) forwards;
+}
+@keyframes imgReveal{
+  from{opacity:0;transform:scale(0.85);}
+  to{opacity:1;transform:scale(1);}
+}
+.prev-bottom{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:20px 20px 36px;
+  background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.7) 60%,transparent 100%);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.prev-art-title{
+  font-family:'Cinzel Decorative',serif;font-size:clamp(14px,4vw,20px);
+  color:var(--gold2);text-align:center;
+}
+.prev-art-num{font-size:11px;color:var(--muted);font-family:'Cinzel',serif;}
+.prev-diff-label{font-size:12px;color:var(--gold);font-family:'Cinzel',serif;}
+.scramble-btn{
+  padding:16px 36px;border:none;border-radius:14px;
+  font-family:'Cinzel Decorative',serif;font-size:clamp(14px,4vw,18px);font-weight:900;
+  color:#0a0a0d;cursor:pointer;
+  background:linear-gradient(135deg,#ffd700,#c9a84c,#ffd700);
+  background-size:200% 100%;
+  box-shadow:0 6px 0 #7a5c14,0 8px 28px rgba(201,168,76,0.5);
+  animation:goldShine 2s ease infinite;
+  transition:transform 0.1s;
+}
+.scramble-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #7a5c14;}
+@keyframes goldShine{
+  0%,100%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+}
+.back-small{
+  position:absolute;top:16px;left:16px;
+  padding:8px 14px;border-radius:20px;
+  border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.6);
+  color:rgba(255,255,255,0.7);font-size:12px;cursor:pointer;
+}
+
+/* ── GAME SCREEN ── */
+#gameScreen{
+  position:fixed;inset:0;z-index:30;
+  display:none;flex-direction:column;
+  background:var(--dark);
+}
+#gameHud{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;flex-shrink:0;
+  background:rgba(0,0,0,0.7);
+  border-bottom:1px solid rgba(201,168,76,0.12);
+}
+.hud-left{display:flex;flex-direction:column;gap:1px;}
+.hud-pieces{font-size:13px;font-weight:700;color:var(--gold);}
+.hud-pct{font-size:9px;color:var(--muted);}
+/* progress bar */
+.hud-bar{height:3px;background:rgba(201,168,76,0.15);border-radius:2px;margin-top:3px;width:100px;overflow:hidden;}
+.hud-bar-fill{height:100%;background:linear-gradient(90deg,#ffd700,#c9a84c);border-radius:2px;transition:width 0.3s;}
+.hud-timer{font-size:20px;font-weight:900;color:var(--gold2);font-variant-numeric:tabular-nums;font-family:'Cinzel',serif;}
+.hud-right{display:flex;gap:6px;}
+.hud-btn{
+  padding:6px 10px;border-radius:8px;
+  border:1px solid rgba(201,168,76,0.25);background:rgba(201,168,76,0.07);
+  color:var(--gold);font-size:10px;font-weight:700;cursor:pointer;
+  white-space:nowrap;
+}
+#gameCanvas{display:block;touch-action:none;flex:1;width:100%;}
+
+/* ── WIN SCREEN ── */
+#winScreen{
+  position:fixed;inset:0;z-index:40;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;
+  background:rgba(0,0,0,0.92);backdrop-filter:blur(16px);
+}
+.win-art{
+  max-width:min(80vw,260px);max-height:35vh;
+  border-radius:12px;object-fit:contain;
+  box-shadow:0 0 0 2px var(--gold),0 0 30px rgba(201,168,76,0.4);
+}
+.win-title{
+  font-family:'Cinzel Decorative',serif;font-size:clamp(20px,5vw,28px);font-weight:900;
+  background:linear-gradient(180deg,#ffd700,#c9a84c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.win-stats{display:flex;gap:14px;}
+.win-stat{text-align:center;}
+.win-stat-v{font-size:22px;font-weight:900;color:var(--gold2);display:block;}
+.win-stat-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.win-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.win-btn{padding:13px 20px;border-radius:12px;border:none;font-size:13px;font-weight:700;cursor:pointer;}
+.win-btn.gold{background:linear-gradient(135deg,#ffd700,#c9a84c);color:#0a0a0d;}
+.win-btn.ghost{background:rgba(255,255,255,0.07);color:var(--text);border:1.5px solid rgba(255,255,255,0.12);}
+
+/* Peek overlay */
+#peekOverlay{
+  position:fixed;inset:0;z-index:35;pointer-events:none;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.5);
+}
+#peekOverlay img{
+  max-width:min(88vw,340px);max-height:72vh;
+  border-radius:14px;object-fit:contain;
+  box-shadow:0 0 0 3px var(--gold),0 0 40px rgba(201,168,76,0.4);
+}
+/* snap-pop defined in explosion CSS above */
+
+/* ── SNAP EXPLOSION ── */
+.snap-pop{position:fixed;pointer-events:none;z-index:9999;
+  font-size:28px;font-weight:900;color:var(--gold2);
+  font-family:'Cinzel',serif;
+  animation:popFly 1s ease forwards;transform:translate(-50%,-50%);}
+@keyframes popFly{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(0.3);}
+  35%{opacity:1;transform:translate(-50%,-60%) scale(1.6);}
+  100%{opacity:0;transform:translate(-50%,-160%) scale(1);}}
+
+.sparkle{position:fixed;pointer-events:none;z-index:9998;
+  font-size:18px;animation:sparkleFly ease forwards;
+  transform:translate(-50%,-50%);}
+@keyframes sparkleFly{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(0) rotate(0deg);}
+  50%{opacity:1;transform:translate(var(--tx),var(--ty)) scale(1.2) rotate(180deg);}
+  100%{opacity:0;transform:translate(var(--tx2),var(--ty2)) scale(0.5) rotate(360deg);}}
+
+.snap-ring{position:fixed;pointer-events:none;z-index:9997;
+  border-radius:50%;border:3px solid var(--gold2);
+  transform:translate(-50%,-50%) scale(0);
+  animation:ringExpand 0.6s ease forwards;}
+@keyframes ringExpand{
+  0%{opacity:0.9;transform:translate(-50%,-50%) scale(0);}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(3);}}
+
+.snap-flash{position:fixed;inset:0;pointer-events:none;z-index:9996;
+  background:rgba(255,215,0,0.08);
+  animation:flashFade 0.4s ease forwards;}
+@keyframes flashFade{0%{opacity:1;}100%{opacity:0;}}
+
+@keyframes hudBtnPulse{
+  0%,100%{box-shadow:0 0 6px rgba(255,215,0,0.2);border-color:rgba(60,160,60,0.5);background:linear-gradient(135deg,#0f2a0f,#0a1a0a);}
+  50%{box-shadow:0 0 12px rgba(255,215,0,0.3);border-color:rgba(201,168,76,0.6);background:linear-gradient(135deg,#142814,#0d1f0d);}
+}
+.hud-btn-pulse{
+  padding:12px 18px;border-radius:12px;
+  border:1.5px solid rgba(60,160,60,0.5);
+  background:linear-gradient(135deg,#0f2a0f,#0a1a0a);
+  color:#7db87d;font-size:13px;font-weight:800;cursor:pointer;
+  white-space:nowrap;letter-spacing:0.5px;text-transform:uppercase;
+  font-family:'Inter',system-ui,sans-serif;
+  animation:hudBtnPulse 2.5s ease-in-out infinite;transition:transform 0.1s;
+}
+.hud-btn-pulse:active{transform:scale(0.94);}
+</style>
+</head>
+<body>
+
+<!-- GALLERY SCREEN -->
+<div id="galleryScreen">
+  <div class="gallery-header">
+    <div class="gallery-title">🧩 Puzzle Gallery</div>
+    <div class="gallery-sub">Choose your masterpiece · Solve the puzzle</div>
+  </div>
+  <div class="diff-row">
+    <button class="diff-btn active" data-d="12" onclick="setDiff(this)">Easy · 12</button>
+    <button class="diff-btn" data-d="24" onclick="setDiff(this)">Medium · 24</button>
+    <button class="diff-btn" data-d="48" onclick="setDiff(this)">Hard · 48</button>
+    <button class="diff-btn" data-d="70" onclick="setDiff(this)">Expert · 70</button>
+  </div>
+  <div class="art-grid" id="artGrid"></div>
+</div>
+
+<!-- PREVIEW SCREEN -->
+<div id="previewScreen">
+  <button class="back-small" onclick="showGallery()">← Gallery</button>
+  <img id="previewImg" src="" alt="">
+  <div class="prev-bottom">
+    <div class="prev-art-title" id="prevTitle"></div>
+    <div class="prev-art-num" id="prevNum"></div>
+    <div class="prev-diff-label" id="prevDiff"></div>
+    <button class="scramble-btn" onclick="startGame()">✦ Scramble It! ✦</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen">
+  <div id="gameHud">
+    <div class="hud-left">
+      <div class="hud-pieces" id="hudPieces">0 / 0 placed</div>
+      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar" style="width:0%"></div></div>
+    </div>
+    <div class="hud-timer" id="hudTimer">0:00</div>
+    <div class="hud-right">
+      <button class="hud-btn" onclick="peekImage()">👁 Peek</button>
+      <button class="hud-btn" onclick="quitGame()">🎨 Gallery</button>
+    </div>
+  </div>
+  <canvas id="gameCanvas" style="margin-bottom:70px;"></canvas>
+  <div id="gameBtnBar" style="position:fixed;bottom:0;left:0;right:0;display:none;gap:10px;padding:10px 12px 14px;background:rgba(0,0,0,0.92);border-top:1px solid rgba(60,160,60,0.2);z-index:31;">
+    <button class="hud-btn-pulse" style="flex:1;" onclick="peekImage()">👁 TAKE A PEEK</button>
+    <button class="hud-btn-pulse" style="flex:1;" onclick="quitGame()">🎨 BACK TO GALLERY</button>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div id="winScreen">
+  <img class="win-art" id="winArt" src="" alt="">
+  <div class="win-title">Puzzle Complete! 🎉</div>
+  <div class="win-stats">
+    <div class="win-stat"><span class="win-stat-v" id="winTime">0:00</span><span class="win-stat-l">Time</span></div>
+    <div class="win-stat"><span class="win-stat-v" id="winPieces">0</span><span class="win-stat-l">Pieces</span></div>
+  </div>
+  <div class="win-btns">
+    <button class="win-btn gold" onclick="restartSame()">🔄 Play Again</button>
+    <button class="win-btn ghost" onclick="showGallery()">🎨 Gallery</button>
+    <button class="win-btn ghost" onclick="location='/play'">← Play Room</button>
+  </div>
+</div>
+
+<!-- PEEK OVERLAY -->
+<div id="peekOverlay"><img id="peekImg" src="" alt=""></div>
+
+<script>
+// ════════════════════════════════════════════════
+// JIGSAW PUZZLE GALLERY — fab.games
+// 9 art pieces · drag & drop · snap to place
+// ════════════════════════════════════════════════
+
+// ── ART GALLERY ─────────────────────────────────
+// Replace these with your actual art files on the server!
+// Just upload puzzle1.jpg → puzzle9.jpg to the same folder
+// ── AUTO-DETECT ORIENTATION ─────────────────────
+function isPortrait(){ return window.innerHeight > window.innerWidth; }
+
+// Upload 18 images to your server:
+// puzzle1-portrait.jpg → puzzle9-portrait.jpg  (9×16 phones)
+// puzzle1-landscape.jpg → puzzle9-landscape.jpg (16×9 desktop)
+const ART = [
+  { portrait:'/puzzle1-portrait.jpg', landscape:'/puzzle1-landscape.jpg', title:"The Mermaid's Hawaiian Cove", num:'I' },
+  { portrait:'/puzzle2-portrait.jpg', landscape:'/puzzle2-landscape.jpg', title:'Christmas in the Cotswolds', num:'II' },
+  { portrait:'/puzzle3-portrait.jpg', landscape:'/puzzle3-landscape.jpg', title:'Summer at Daisy Cottage', num:'III' },
+  { portrait:'/puzzle4-portrait.jpg', landscape:'/puzzle4-landscape.jpg', title:'Secret Garden of Magic', num:'IV' },
+  { portrait:'/puzzle5-portrait.jpg', landscape:'/puzzle5-landscape.jpg', title:'The Old Steam Train Station', num:'V' },
+  { portrait:'/puzzle6-portrait.jpg', landscape:'/puzzle6-landscape.jpg', title:"Grandpa's Country Store", num:'VI' },
+  { portrait:'/puzzle7-portrait.jpg', landscape:'/puzzle7-landscape.jpg', title:'The Butterfly Garden', num:'VII' },
+  { portrait:'/puzzle8-portrait.jpg', landscape:'/puzzle8-landscape.jpg', title:'Dolphins of Paradise Bay', num:'VIII' },
+  { portrait:'/puzzle9-portrait.jpg', landscape:'/puzzle9-landscape.jpg', title:'London in the Snow', num:'IX' },
+];
+
+function getArtSrc(art){ return isPortrait() ? art.portrait : art.landscape; }
+
+// Build gallery
+const grid = document.getElementById('artGrid');
+ART.forEach((art, i) => {
+  const frame = document.createElement('div');
+  frame.className = 'art-frame';
+  frame.innerHTML = `
+    <img src="${getArtSrc(art)}" loading="lazy" alt="${art.title}">
+    <div class="art-number">${art.num}</div>
+    <div class="art-label">${art.title}</div>`;
+  frame.onclick = () => openPreview(i);
+  grid.appendChild(frame);
+});
+
+// ── STATE ────────────────────────────────────────
+let difficulty = 12;
+let selIdx = 0;
+let pieces = [], dragging = null, dragOffX = 0, dragOffY = 0;
+let timerInt = null, elapsed = 0, running = false;
+let placed = 0, total = 0, maxZ = 100;
+let puzzleImg = null;
+
+const DIFFS = {
+  12:{cols:3,rows:4},
+  24:{cols:4,rows:6},
+  48:{cols:6,rows:8},
+  70:{cols:7,rows:10}
+};
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// ── DIFFICULTY ───────────────────────────────────
+function setDiff(btn){
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  difficulty = parseInt(btn.dataset.d);
+}
+
+// ── GALLERY → PREVIEW ────────────────────────────
+function openPreview(idx){
+  selIdx = idx;
+  const art = ART[idx];
+  document.getElementById('previewImg').src = getArtSrc(art);
+  document.getElementById('prevTitle').textContent = art.title;
+  document.getElementById('prevNum').textContent = 'Artwork ' + art.num + ' of IX';
+  const cfg = DIFFS[difficulty];
+  document.getElementById('prevDiff').textContent =
+    difficulty + ' pieces · ' + cfg.cols + '×' + cfg.rows;
+  document.getElementById('previewScreen').style.display = 'flex';
+  document.getElementById('galleryScreen').style.display = 'none';
+}
+
+function showGallery(){
+  const bb=document.getElementById('gameBtnBar');if(bb)bb.style.display='none';
+  document.getElementById('previewScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('winScreen').style.display = 'none';
+  document.getElementById('galleryScreen').style.display = 'flex';
+  stopTimer();
+  running = false;
+}
+
+// ── START GAME ───────────────────────────────────
+function startGame(){
+  document.getElementById('previewScreen').style.display = 'none';
+  document.getElementById('winScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'flex';
+  document.getElementById('gameBtnBar').style.display = 'flex';
+
+  canvas.width = canvas.offsetWidth || window.innerWidth;
+  canvas.height = canvas.offsetHeight || (window.innerHeight - 52);
+
+  const art = ART[selIdx];
+  puzzleImg = new Image();
+  puzzleImg.crossOrigin = 'anonymous';
+  puzzleImg.onload = initPuzzle;
+  puzzleImg.onerror = () => {
+    puzzleImg = new Image();
+    puzzleImg.onload = initPuzzle;
+    puzzleImg.src = getArtSrc(art);
+  };
+  puzzleImg.src = getArtSrc(art);
+  document.getElementById('peekImg').src = getArtSrc(art);
+  document.getElementById('winArt').src = getArtSrc(art);
+}
+
+function restartSame(){
+  document.getElementById('winScreen').style.display = 'none';
+  startGame();
+}
+
+function quitGame(){
+  stopTimer(); running = false;
+  showGallery();
+}
+
+// ── INIT PUZZLE ──────────────────────────────────
+function initPuzzle(){
+  const cfg = DIFFS[difficulty];
+  const cols = cfg.cols, rows = cfg.rows;
+  total = cols * rows; placed = 0; maxZ = 100;
+  pieces = [];
+
+  const cw = canvas.width, ch = canvas.height;
+
+  // Board: maintain image aspect ratio, centered
+  const imgAR = puzzleImg.naturalWidth / puzzleImg.naturalHeight;
+  let bw = cw * 0.72, bh = bw / imgAR;
+  if(bh > ch * 0.84){ bh = ch * 0.84; bw = bh * imgAR; }
+  const bx = (cw - bw) / 2, by = (ch - bh) / 2;
+
+  const pw = bw / cols, ph = bh / rows;
+  const TAB = Math.min(pw, ph) * 0.24;
+
+  // Generate edge connections
+  const hTab = Array.from({length:rows-1}, ()=>
+    Array.from({length:cols}, ()=> Math.random()>0.5?1:-1));
+  const vTab = Array.from({length:rows}, ()=>
+    Array.from({length:cols-1}, ()=> Math.random()>0.5?1:-1));
+
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      pieces.push({
+        id: r*cols+c, r, c, cols, rows,
+        cx: bx+c*pw, cy: by+r*ph,
+        x: bx+c*pw, y: by+r*ph,
+        w: pw, h: ph, tab: TAB,
+        sides:{
+          top:    r>0      ? -hTab[r-1][c] : 0,
+          bottom: r<rows-1 ?  hTab[r][c]   : 0,
+          left:   c>0      ? -vTab[r][c-1] : 0,
+          right:  c<cols-1 ?  vTab[r][c]   : 0,
+        },
+        placed: false, z: r*cols+c,
+      });
+    }
+  }
+
+  scramble(bx, by, bw, bh);
+  updateHud();
+  startTimer();
+  running = true;
+  requestAnimationFrame(renderLoop);
+}
+
+// ── SCRAMBLE ─────────────────────────────────────
+function scramble(bx, by, bw, bh){
+  const cw = canvas.width, ch = canvas.height;
+  pieces.forEach((p, i) => {
+    let x, y, tries = 0;
+    do {
+      x = p.tab + Math.random() * (cw - p.w - p.tab*2);
+      y = p.tab + Math.random() * (ch - p.h - p.tab*2);
+      tries++;
+    } while(tries < 30 && overlapsBoard(x, y, p.w, p.h, bx, by, bw, bh));
+    p.x = x; p.y = y; p.placed = false; p.z = i;
+  });
+}
+
+function overlapsBoard(x,y,w,h,bx,by,bw,bh){
+  return x < bx+bw+10 && x+w > bx-10 &&
+         y < by+bh+10 && y+h > by-10;
+}
+
+// ── PIECE PATH ───────────────────────────────────
+function buildPath(p){
+  const {x,y,w,h,tab:t,sides:s} = p;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+
+  // TOP
+  if(s.top===0){ ctx.lineTo(x+w,y); }
+  else{
+    ctx.lineTo(x+w*0.37,y);
+    ctx.bezierCurveTo(x+w*0.37,y+s.top*t*0.6, x+w*0.18,y+s.top*t, x+w*0.5,y+s.top*t);
+    ctx.bezierCurveTo(x+w*0.82,y+s.top*t, x+w*0.63,y+s.top*t*0.6, x+w*0.63,y);
+    ctx.lineTo(x+w,y);
+  }
+  // RIGHT
+  if(s.right===0){ ctx.lineTo(x+w,y+h); }
+  else{
+    ctx.lineTo(x+w,y+h*0.37);
+    ctx.bezierCurveTo(x+w-s.right*t*0.6,y+h*0.37, x+w-s.right*t,y+h*0.18, x+w-s.right*t,y+h*0.5);
+    ctx.bezierCurveTo(x+w-s.right*t,y+h*0.82, x+w-s.right*t*0.6,y+h*0.63, x+w,y+h*0.63);
+    ctx.lineTo(x+w,y+h);
+  }
+  // BOTTOM
+  if(s.bottom===0){ ctx.lineTo(x,y+h); }
+  else{
+    ctx.lineTo(x+w*0.63,y+h);
+    ctx.bezierCurveTo(x+w*0.63,y+h-s.bottom*t*0.6, x+w*0.82,y+h-s.bottom*t, x+w*0.5,y+h-s.bottom*t);
+    ctx.bezierCurveTo(x+w*0.18,y+h-s.bottom*t, x+w*0.37,y+h-s.bottom*t*0.6, x+w*0.37,y+h);
+    ctx.lineTo(x,y+h);
+  }
+  // LEFT
+  if(s.left===0){ ctx.lineTo(x,y); }
+  else{
+    ctx.lineTo(x,y+h*0.63);
+    ctx.bezierCurveTo(x+s.left*t*0.6,y+h*0.63, x+s.left*t,y+h*0.82, x+s.left*t,y+h*0.5);
+    ctx.bezierCurveTo(x+s.left*t,y+h*0.18, x+s.left*t*0.6,y+h*0.37, x,y+h*0.37);
+    ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+}
+
+// ── RENDER LOOP ──────────────────────────────────
+function renderLoop(){
+  if(!running) return;
+  const cw=canvas.width, ch=canvas.height;
+  ctx.clearRect(0,0,cw,ch);
+
+  // Background
+  ctx.fillStyle='#0a0a0d';
+  ctx.fillRect(0,0,cw,ch);
+
+  // Ghost image on board
+  if(pieces.length){
+    const p0=pieces[0];
+    const bx=p0.cx, by=p0.cy;
+    const bw=p0.cols*p0.w, bh=p0.rows*p0.h;
+    // Board glow border
+    ctx.strokeStyle='rgba(201,168,76,0.18)';
+    ctx.lineWidth=2;
+    ctx.strokeRect(bx-1,by-1,bw+2,bh+2);
+    // Ghost
+    ctx.save();
+    ctx.globalAlpha=0.1;
+    ctx.drawImage(puzzleImg,bx,by,bw,bh);
+    ctx.restore();
+  }
+
+  // Draw pieces z-sorted
+  // Draw placed pieces first (seamless background)
+// then unplaced pieces on top (with borders/shadows)
+const placedP = pieces.filter(p=>p.placed);
+const unplacedP = [...pieces].filter(p=>!p.placed).sort((a,b)=>a.z-b.z);
+placedP.forEach(drawPiece);
+unplacedP.forEach(drawPiece);
+  requestAnimationFrame(renderLoop);
+}
+
+function drawPiece(p){
+  ctx.save();
+  buildPath(p);
+  ctx.clip();
+
+  // Draw FULL image mapped to entire board area
+  // This correctly fills tab areas (which extend outside piece rectangle)
+  const boardX = p.cx - p.c * p.w;
+  const boardY = p.cy - p.r * p.h;
+  const boardW = p.cols * p.w;
+  const boardH = p.rows * p.h;
+  // Offset by how much the piece has moved from correct position
+  const offX = p.x - p.cx;
+  const offY = p.y - p.cy;
+  ctx.drawImage(puzzleImg,
+    0, 0, puzzleImg.naturalWidth, puzzleImg.naturalHeight,
+    boardX + offX, boardY + offY, boardW, boardH
+  );
+  ctx.restore();
+
+  // Only draw border on unplaced/dragging pieces
+  // Placed pieces show NO border so they merge seamlessly!
+  if(p===dragging){
+    buildPath(p);
+    ctx.shadowColor='rgba(0,0,0,0.7)';
+    ctx.shadowBlur=16;ctx.shadowOffsetY=6;
+    ctx.strokeStyle='rgba(255,215,0,0.8)';
+    ctx.lineWidth=2.5;
+    ctx.stroke();
+    ctx.shadowColor='transparent';
+  } else if(!p.placed){
+    buildPath(p);
+    ctx.strokeStyle='rgba(255,255,255,0.18)';
+    ctx.lineWidth=1.2;
+    ctx.stroke();
+  }
+  // placed pieces: no stroke — seamless masterpiece!
+}
+
+// ── SNAP ─────────────────────────────────────────
+function trySnap(p){
+  const threshold = Math.min(p.w,p.h)*0.32;
+  if(Math.abs(p.x-p.cx)<threshold && Math.abs(p.y-p.cy)<threshold){
+    p.x=p.cx; p.y=p.cy; p.placed=true;
+    placed++;
+    updateHud();
+    snapFx(p.cx+p.w/2, p.cy+p.h/2);
+    if(placed>=total) setTimeout(winGame,500);
+    return true;
+  }
+  return false;
+}
+
+// ── INPUT ────────────────────────────────────────
+function getXY(e){
+  const r=canvas.getBoundingClientRect();
+  const src=e.touches?e.touches[0]:e;
+  return{x:src.clientX-r.left, y:src.clientY-r.top};
+}
+
+function hitTest(x,y){
+  const sorted=[...pieces].sort((a,b)=>b.z-a.z);
+  for(const p of sorted){
+    if(p.placed) continue;
+    const T=p.tab;
+    if(x>=p.x-T&&x<=p.x+p.w+T&&y>=p.y-T&&y<=p.y+p.h+T){
+      ctx.save(); buildPath(p);
+      const hit=ctx.isPointInPath(x,y);
+      ctx.restore();
+      if(hit||(x>=p.x&&x<=p.x+p.w&&y>=p.y&&y<=p.y+p.h)) return p;
+    }
+  }
+  return null;
+}
+
+canvas.addEventListener('mousedown',  onDown);
+canvas.addEventListener('mousemove',  onMove);
+canvas.addEventListener('mouseup',    onUp);
+canvas.addEventListener('touchstart', onDown,{passive:false});
+canvas.addEventListener('touchmove',  onMove,{passive:false});
+canvas.addEventListener('touchend',   onUp, {passive:false});
+
+function onDown(e){
+  e.preventDefault();
+  const {x,y}=getXY(e);
+  const p=hitTest(x,y);
+  if(p){ dragging=p; dragOffX=x-p.x; dragOffY=y-p.y; maxZ++; p.z=maxZ; }
+}
+function onMove(e){
+  if(!dragging) return;
+  e.preventDefault();
+  const {x,y}=getXY(e);
+  dragging.x=x-dragOffX;
+  dragging.y=y-dragOffY;
+}
+function onUp(e){
+  if(!dragging) return;
+  trySnap(dragging);
+  dragging=null;
+}
+
+// ── PEEK ────────────────────────────────────────
+let peekTO=null;
+function peekImage(){
+  const ov=document.getElementById('peekOverlay');
+  ov.style.display='flex';
+  clearTimeout(peekTO);
+  peekTO=setTimeout(()=>ov.style.display='none',2500);
+}
+
+// ── HUD ──────────────────────────────────────────
+function updateHud(){
+  document.getElementById('hudPieces').textContent=placed+' / '+total+' placed';
+  document.getElementById('hudBar').style.width=Math.round(placed/total*100)+'%';
+}
+
+// ── TIMER ────────────────────────────────────────
+function startTimer(){
+  stopTimer(); elapsed=0;
+  timerInt=setInterval(()=>{
+    elapsed++;
+    const m=Math.floor(elapsed/60),s=elapsed%60;
+    document.getElementById('hudTimer').textContent=m+':'+(s<10?'0':'')+s;
+  },1000);
+}
+function stopTimer(){ clearInterval(timerInt); }
+
+// ── WIN ──────────────────────────────────────────
+function winGame(){
+  document.getElementById('gameBtnBar').style.display='none';
+  stopTimer(); running=false;
+  const m=Math.floor(elapsed/60),s=elapsed%60;
+  document.getElementById('winTime').textContent=m+':'+(s<10?'0':'')+s;
+  document.getElementById('winPieces').textContent=total;
+  document.getElementById('winScreen').style.display='flex';
+  document.getElementById('gameScreen').style.display='none';
+  for(let i=0;i<10;i++) setTimeout(()=>burst(Math.random()*innerWidth,Math.random()*innerHeight*0.6),i*120);
+  winSound();
+}
+
+// ── FX ───────────────────────────────────────────
+function snapFx(x,y){
+  // 1. Big gold star pop
+  const pop=document.createElement('div');
+  pop.className='snap-pop';
+  pop.style.cssText=`left:${x}px;top:${y}px;`;
+  pop.textContent='✦';
+  document.body.appendChild(pop);
+  setTimeout(()=>pop.remove(),1000);
+
+  // 2. Expanding gold ring
+  const ring=document.createElement('div');
+  ring.className='snap-ring';
+  ring.style.cssText=`left:${x}px;top:${y}px;width:60px;height:60px;`;
+  document.body.appendChild(ring);
+  setTimeout(()=>ring.remove(),600);
+
+  // 3. Gold screen flash
+  const flash=document.createElement('div');
+  flash.className='snap-flash';
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),400);
+
+  // 4. Burst of sparkles around snap point
+  const stars=['✦','★','✨','◆','✸'];
+  for(let i=0;i<10;i++){
+    const s=document.createElement('div');
+    s.className='sparkle';
+    const angle=(i/10)*Math.PI*2;
+    const dist=40+Math.random()*60;
+    const dist2=dist+30+Math.random()*40;
+    const dur=0.5+Math.random()*0.4;
+    const tx=`${Math.cos(angle)*dist-50}%`;
+    const ty=`${Math.sin(angle)*dist-50}%`;
+    const tx2=`${Math.cos(angle)*dist2-50}%`;
+    const ty2=`${Math.sin(angle)*dist2-50}%`;
+    s.style.cssText=`
+      left:${x}px;top:${y}px;
+      --tx:${tx};--ty:${ty};
+      --tx2:${tx2};--ty2:${ty2};
+      animation-duration:${dur}s;
+      color:${['#ffd700','#ffaa00','#ffffff','#c9a84c'][i%4]};
+      font-size:${12+Math.random()*10}px;`;
+    s.textContent=stars[i%stars.length];
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),dur*1000+100);
+  }
+
+  // 5. Particle burst
+  snapBurst(x,y);
+
+  // 6. Sound + vibrate
+  snapSound();
+  try{if(navigator.vibrate)navigator.vibrate([20,10,40]);}catch(e){}
+}
+
+function snapBurst(cx,cy){
+  const cols=['#ffd700','#ffaa00','#ffffff','#c9a84c','#ffe066'];
+  for(let i=0;i<16;i++){
+    const p=document.createElement('div');
+    const sz=3+Math.random()*5;
+    p.style.cssText=`position:fixed;pointer-events:none;z-index:9995;
+      background:${cols[i%cols.length]};
+      width:${sz}px;height:${sz}px;border-radius:50%;
+      left:${cx}px;top:${cy}px;`;
+    document.body.appendChild(p);
+    const ang=Math.random()*Math.PI*2;
+    const dist=30+Math.random()*70;
+    const tx=Math.cos(ang)*dist,ty=Math.sin(ang)*dist;
+    const dur=300+Math.random()*400,t0=Date.now();
+    const anim=()=>{
+      const pr=Math.min(1,(Date.now()-t0)/dur);
+      const e=1-Math.pow(1-pr,3);
+      p.style.transform=`translate(${tx*e}px,${ty*e+30*pr*pr}px)`;
+      p.style.opacity=1-pr;
+      if(pr<1)requestAnimationFrame(anim);else p.remove();
+    };
+    requestAnimationFrame(anim);
+  }
+}
+
+function burst(cx,cy){
+  const cols=['#ffd700','#c9a84c','#ff4444','#44ff88','#87ceeb','#ff69b4','#ffffff'];
+  for(let i=0;i<22;i++){
+    const p=document.createElement('div');
+    p.style.cssText=`position:fixed;pointer-events:none;z-index:9998;
+      background:${cols[i%cols.length]};
+      width:${4+Math.random()*7}px;height:${4+Math.random()*7}px;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      left:${cx}px;top:${cy}px;`;
+    document.body.appendChild(p);
+    const ang=Math.random()*Math.PI*2,dist=50+Math.random()*110;
+    const tx=Math.cos(ang)*dist,ty=Math.sin(ang)*dist;
+    const dur=600+Math.random()*600,t0=Date.now();
+    const anim=()=>{
+      const pr=Math.min(1,(Date.now()-t0)/dur);
+      const e=1-Math.pow(1-pr,2);
+      p.style.transform=`translate(${tx*e}px,${ty*e+70*pr*pr}px) rotate(${pr*540}deg)`;
+      p.style.opacity=1-pr;
+      if(pr<1)requestAnimationFrame(anim);else p.remove();
+    };
+    requestAnimationFrame(anim);
+  }
+}
+
+let _ac=null;
+function _audio(){if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();return _ac;}
+function _tone(f,t,v,d,delay=0){
+  try{const c=_audio(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);o.type=t;o.frequency.value=f;
+    g.gain.setValueAtTime(0,c.currentTime+delay);
+    g.gain.linearRampToValueAtTime(v,c.currentTime+delay+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+delay+d);
+    o.start(c.currentTime+delay);o.stop(c.currentTime+delay+d+0.05);
+  }catch(e){}
+}
+function snapSound(){
+  // Satisfying click + chime chord
+  _tone(880,'sine',0.3,0.06);
+  _tone(1046,'sine',0.35,0.1,0.03);
+  _tone(1318,'sine',0.25,0.12,0.07);
+  _tone(1568,'sine',0.15,0.14,0.12);
+}
+function winSound(){
+  [523,659,784,1047,1319,1568].forEach((f,i)=>_tone(f,'sine',0.4,0.2,i*0.07));
+  setTimeout(()=>[784,1047,1318,1568,2093].forEach((f,i)=>_tone(f,'sine',0.3,0.22,i*0.06)),700);
+}
+
+// ── RESIZE ───────────────────────────────────────
+window.addEventListener('resize',()=>{
+  if(!running) return;
+  canvas.width=canvas.offsetWidth||innerWidth;
+  canvas.height=canvas.offsetHeight||(innerHeight-52);
+  initPuzzle();
+});
+</script>
+</body>
+</html>
