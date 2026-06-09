@@ -321,6 +321,11 @@ def wordsearch_scores():
 def capitals():
     return send_from_directory('.', 'capitals.html')
 
+# ── JIGSAW PUZZLE GALLERY ────────────────────────
+@app.route('/jigsaw')
+def jigsaw():
+    return send_from_directory('.', 'jigsaw.html')
+
 @app.route('/<path:filename>')
 def static_files(filename):
     return send_from_directory('.', filename)
