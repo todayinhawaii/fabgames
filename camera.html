@@ -855,29 +855,18 @@ function startRender(){
     rafId=requestAnimationFrame(render);
   }
   // Fire when first real video frame arrives
-  video.addEventListener('loadeddata', async ()=>{
-    // Pause→play trick forces Samsung Chrome to re-init video rendering
-    try{
-      video.pause();
-      await new Promise(r=>setTimeout(r,80));
-      await video.play();
-    }catch(e){}
-  }, {once:true});
-
-  // Second attempt after 1.5s in case loadeddata was too early
-  setTimeout(async ()=>{
-    if(video.paused || video.videoWidth===0){
-      try{ await video.play(); }catch(e){}
-    }
-    // Pause→play a second time
-    if(video.videoWidth>0 && !video.paused){
-      try{
-        video.pause();
-        await new Promise(r=>setTimeout(r,80));
-        await video.play();
-      }catch(e){}
-    }
-  },1500);
+  // One-time viewfinder nudge after stream starts
+  let nudgeDone=false;
+  video.addEventListener('playing', async ()=>{
+    if(nudgeDone) return;
+    nudgeDone=true;
+    // Small delay then single repaint nudge
+    await new Promise(r=>setTimeout(r,300));
+    video.style.willChange='transform';
+    requestAnimationFrame(()=>{
+      video.style.willChange='auto';
+    });
+  }, {once:false});
 
   render();
   // Apply CSS filter to video element
