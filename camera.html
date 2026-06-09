@@ -1158,8 +1158,8 @@ function getPinchDist(e){
 async function applyZoom(z){
   currentZoom=Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
   video.style.transform = facingMode==='user'
-    ? `scale(${-currentZoom}, ${currentZoom})`
-    : currentZoom===1 ? 'none' : `scale(${currentZoom})`;
+    ? `scale(${-currentZoom}, ${currentZoom}) translateZ(0)`
+    : `scale(${currentZoom}) translateZ(0)`;
   // Try hardware zoom first
   if(stream){
     try{
