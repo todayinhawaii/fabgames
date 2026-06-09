@@ -855,10 +855,29 @@ function startRender(){
     rafId=requestAnimationFrame(render);
   }
   // Fire when first real video frame arrives
-  video.addEventListener('loadeddata', ()=>{
-    video.style.opacity='0.99';
-    setTimeout(()=>{ video.style.opacity='1'; },50);
+  video.addEventListener('loadeddata', async ()=>{
+    // Pause→play trick forces Samsung Chrome to re-init video rendering
+    try{
+      video.pause();
+      await new Promise(r=>setTimeout(r,80));
+      await video.play();
+    }catch(e){}
   }, {once:true});
+
+  // Second attempt after 1.5s in case loadeddata was too early
+  setTimeout(async ()=>{
+    if(video.paused || video.videoWidth===0){
+      try{ await video.play(); }catch(e){}
+    }
+    // Pause→play a second time
+    if(video.videoWidth>0 && !video.paused){
+      try{
+        video.pause();
+        await new Promise(r=>setTimeout(r,80));
+        await video.play();
+      }catch(e){}
+    }
+  },1500);
 
   render();
   // Apply CSS filter to video element
