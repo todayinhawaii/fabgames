@@ -25,11 +25,8 @@
   --muted:rgba(240,239,232,0.45);
   --accent:#c9a84c;
 }
-
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-
 html{scroll-behavior:smooth;}
-
 body{
   background:var(--black);
   color:var(--white);
@@ -38,7 +35,6 @@ body{
   overflow-x:hidden;
   cursor:default;
 }
-
 /* ── GRAIN OVERLAY ── */
 body::before{
   content:'';
@@ -46,7 +42,6 @@ body::before{
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
   pointer-events:none;z-index:1000;opacity:0.4;
 }
-
 /* ── CUSTOM CURSOR ── */
 *{cursor:none !important;}
 .cursor{
@@ -64,7 +59,6 @@ body::before{
   transform:translate(-50%,-50%);
   transition:all 0.15s ease;
 }
-
 /* ── NAV ── */
 nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
@@ -110,7 +104,6 @@ nav.scrolled{
   color:var(--gold2) !important;
 }
 .nav-mobile-btn{display:none;background:none;border:none;color:var(--white);font-size:22px;}
-
 /* ── HERO ── */
 .hero{
   min-height:100vh;
@@ -135,7 +128,6 @@ nav.scrolled{
   animation:lineGrow 1.5s ease forwards;
 }
 @keyframes lineGrow{0%{height:0;opacity:0;}100%{height:80px;opacity:1;}}
-
 .hero-badge{
   font-size:10px;letter-spacing:4px;text-transform:uppercase;
   color:var(--gold);margin-bottom:24px;
@@ -201,13 +193,10 @@ nav.scrolled{
   border-color:rgba(255,255,255,0.5);
   background:rgba(255,255,255,0.04);
 }
-
-
 @keyframes fadeUp{
   0%{opacity:0;transform:translateY(24px);}
   100%{opacity:1;transform:translateY(0);}
 }
-
 /* ── SECTION COMMON ── */
 section{padding:100px 48px;max-width:1400px;margin:0 auto;}
 .section-badge{
@@ -226,8 +215,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   max-width:560px;line-height:1.8;
   margin-bottom:60px;
 }
-
-
 /* ── GAMES GRID ── */
 .games-grid{
   display:grid;
@@ -238,7 +225,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
 @media(max-width:600px){
   .games-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
 }
-
 /* ── GLASS CARD 9×16 ── */
 .game-card{
   position:relative;overflow:hidden;
@@ -280,7 +266,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
     0 0 50px rgba(201,168,76,0.13),
     inset 0 1px 0 rgba(255,255,255,0.22);
 }
-
 /* Background emoji */
 .game-card-bg{
   position:absolute;inset:0;z-index:1;
@@ -291,7 +276,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   filter:blur(1px);
 }
 .game-card:hover .game-card-bg{opacity:0.25;transform:scale(1.08);filter:blur(0);}
-
 /* Gradient overlay */
 .game-card-overlay{
   position:absolute;inset:0;z-index:2;
@@ -304,7 +288,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   display:flex;flex-direction:column;justify-content:flex-end;
   padding:16px 14px 14px;
 }
-
 .game-card-cat{
   font-size:8px;letter-spacing:2.5px;text-transform:uppercase;
   color:rgba(201,168,76,0.7);margin-bottom:5px;font-weight:600;
@@ -320,7 +303,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   display:-webkit-box;-webkit-line-clamp:2;
   -webkit-box-orient:vertical;overflow:hidden;
 }
-
 /* PLAY button — muted green, gold font, gold rim */
 .play-btn{
   display:flex;align-items:center;justify-content:center;gap:6px;
@@ -343,7 +325,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   box-shadow:0 3px 14px rgba(0,0,0,0.3),0 0 10px rgba(201,168,76,0.15);
   transform:translateY(-1px);
 }
-
 /* Add to Home Screen */
 .game-dl-btn{
   display:flex;align-items:center;justify-content:center;gap:5px;
@@ -364,7 +345,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   color:#ffd700;
   box-shadow:0 2px 10px rgba(201,168,76,0.15);
 }
-
 /* Live badge */
 .live-badge{
   position:absolute;top:10px;right:10px;z-index:3;
@@ -375,7 +355,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   border-radius:20px;color:rgba(201,168,76,0.8);
   font-weight:600;
 }
-
 /* ── PRICING ── */
 .pricing-wrap{
   display:flex;gap:20px;justify-content:center;flex-wrap:wrap;
@@ -427,7 +406,6 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
 }
 .price-features li::before{content:'✦';position:absolute;left:0;color:#c9a84c;font-size:8px;top:2px;}
 .price-features li.active{color:rgba(255,255,255,0.8);}
-
 /* ── FOOTER ── */
 footer{
   text-align:center;
@@ -464,11 +442,9 @@ footer{
 </style>
 </head>
 <body>
-
 <!-- Custom cursor -->
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
-
 <!-- NAV -->
 <nav id="mainNav">
   <div class="nav-logo">fab.games</div>
@@ -476,12 +452,12 @@ footer{
     <li><a href="#games">Games</a></li>
     <li><a href="#world">World</a></li>
     <li><a href="/about">About</a></li>
-    <li><a href="/login">Sign In</a></li>
+    <li id="signInLi"><a href="/login">Sign In</a></li>
+    <li id="accountLi" style="display:none;"><a href="/account">My Account</a></li>
     <li><a href="/join?tab=paid" class="nav-cta">Join · $4.99</a></li>
   </ul>
   <button class="nav-mobile-btn">☰</button>
 </nav>
-
 <!-- HERO -->
 <div class="hero">
   <div class="hero-bg"></div>
@@ -509,7 +485,6 @@ footer{
     </div>
   </div>
 </div>
-
 <!-- FAMILY SAFE SECTION -->
 <section style="text-align:center;padding:80px 48px;max-width:1000px;margin:0 auto;">
   <div class="section-badge">— Safe for Everyone</div>
@@ -539,15 +514,12 @@ footer{
     </div>
   </div>
 </section>
-
 <div style="display:none;">
-
   <div class="scroll-indicator">
     <span>Scroll</span>
     <div class="scroll-line"></div>
   </div>
 </div>
-
 <!-- GAMES SECTION -->
 <section id="games">
   <div class="section-badge">— Games Collection</div>
@@ -556,11 +528,6 @@ footer{
   <div class="divider"></div>
   <div class="games-grid" id="gamesGrid"></div>
 </section>
-
-
-
-
-
 <!-- PRICING -->
 <section id="pricing" style="text-align:center;">
   <div class="section-badge">— Simple Pricing</div>
@@ -601,7 +568,6 @@ footer{
     </div>
   </div>
 </section>
-
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">fab.games</div>
@@ -616,7 +582,6 @@ footer{
   </div>
   <div class="footer-copy">© 2026 fab.games — All rights reserved</div>
 </footer>
-
 <script>
 // ── CURSOR ────────────────────────────────────────
 const cursor=document.getElementById('cursor');
@@ -642,12 +607,10 @@ document.querySelectorAll('a,button').forEach(el=>{
     ring.style.width='36px';ring.style.height='36px';
   });
 });
-
 // ── NAV SCROLL ────────────────────────────────────
 window.addEventListener('scroll',()=>{
   document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>60);
 });
-
 // ── GAMES DATA ────────────────────────────────────
 const GAMES=[
   {emoji:'🎨',cat:'Art & Creativity',title:'Art Lab',desc:'Professional drawing app. Pencils, watercolour, oil paint, layers and more. Create and share your art.',href:'/artlab',color:'rgba(155,89,182,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
@@ -683,8 +646,6 @@ const GAMES=[
     href:'/jigsaw'
   },
 ];
-
-
 const grid=document.getElementById('gamesGrid');
 GAMES.forEach(function(g,i){
   const card=document.createElement('a');
@@ -744,9 +705,6 @@ GAMES.forEach(function(g,i){
   card.appendChild(overlay);
   grid.appendChild(card);
 });
-
-
-
 // ── SMOOTH SCROLL ─────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
@@ -764,6 +722,22 @@ if('serviceWorker' in navigator){
       .catch(e=>console.log('[fab.games] SW error',e));
   });
 }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Show "My Account" link if logged in
+(async function(){
+  try{
+    const res = await fetch('/api/config');
+    const cfg = await res.json();
+    const sb = window.supabase.createClient(cfg.supabase_url, cfg.supabase_anon_key);
+    const{data:{session}}=await sb.auth.getSession();
+    if(session){
+      document.getElementById('signInLi').style.display='none';
+      document.getElementById('accountLi').style.display='';
+    }
+  }catch(e){console.log('Account check:',e);}
+})();
 </script>
 </body>
 </html>
