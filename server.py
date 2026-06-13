@@ -363,3 +363,7 @@ def aloha_letters():
 @app.route('/who-are-you')
 def who_are_you():
     return send_from_directory('.', 'humor.html')
+
+@app.route('/trash')
+def trash():
+    return send_from_directory('.', 'trash.html')
