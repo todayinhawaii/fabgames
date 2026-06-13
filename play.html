@@ -295,7 +295,7 @@ const GAMES=[
   {emoji:'🔮',cat:'Fun · Social',title:'Fortune Roulette',desc:'Spin the wheel, discover your Hawaiian fortune. Share with friends!',href:'/fortune',color:'rgba(99,102,241,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
   {emoji:'🎭',cat:'Fun · Personality',title:'Who Are You?',desc:'Find out which Hawaiian spirit animal you are. Fun for everyone!',href:'/who-are-you',color:'rgba(236,72,153,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
   {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists',desc:'Mix colours, create slime art. A messy, beautiful creative experience.',href:'/slime',color:'rgba(16,185,129,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
-  {emoji:'🎞️',cat:'Creative · Photo',title:'Film Lab',desc:'Apply gorgeous film filters to your photos. Analogue vibes, digital ease.',href:'/film-lab',color:'rgba(251,146,60,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+  // {emoji:'🎞️',cat:'Creative · Photo',title:'Film Lab',desc:'Apply gorgeous film filters to your photos. Analogue vibes, digital ease.',href:'/film-lab',color:'rgba(251,146,60,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'}, // HIDDEN - not ready yet
   {
     id:'capitals',
     title:'Capital City Challenge',
@@ -311,6 +311,15 @@ const GAMES=[
     desc:'9 beautiful artworks · drag & drop pieces · snap to place · 4 difficulty levels!',
     color:'#0d0d0f',
     href:'/jigsaw'
+  },
+  {
+    id:'trash',
+    emoji:'🧹',
+    cat:'Arcade · Fun',
+    title:'Pick Up The Trash!',
+    desc:'Choose your hero and clean up the park or beach!! Pick up litter, dump it in the bins. Fun for all ages!!',
+    color:'rgba(34,197,94,0.12)',
+    href:'/trash'
   },
 ];
 
@@ -375,52 +384,11 @@ GAMES.forEach(function(g,i){
   grid.appendChild(card);
 });
 
-  // Download / install button on each card
-  const dlBtn = document.createElement('button');
-  dlBtn.className='game-dl-btn';
-  dlBtn.id='dlBtn_'+i;
-  dlBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Add to Home Screen';
-  dlBtn.onclick=function(e){
-    e.preventDefault(); e.stopPropagation();
-    if(deferredPrompt){
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function(r){
-        if(r.outcome==='accepted'){
-          dlBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Added!!';
-          dlBtn.style.color='rgba(34,197,94,0.7)';
-        }
-        deferredPrompt=null;
-      });
-    } else {
-      // Already installed or iOS
-      dlBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> On Home Screen';
-      dlBtn.style.color='rgba(34,197,94,0.7)';
-      setTimeout(()=>{ pwaBar.classList.add('show'); },200);
-    }
-  };
-  title.style.color=g.neon;
-  title.style.borderColor=g.neon;
-  title.style.background=g.neonbg;
-  title.style.textShadow='0 0 8px '+g.neon+',0 0 16px '+g.neon;
-  title.style.boxShadow='inset 0 0 8px '+g.neonbg;
-  title.style.animationDelay=(Math.random()*3)+'s';
-  const btn=document.createElement('div');
-  btn.className='play-btn';
-  btn.innerHTML='<span>Play Now</span><span>→</span>';
-  overlay.appendChild(cat);
-  overlay.appendChild(title);
-  overlay.appendChild(dlBtn);
-  overlay.appendChild(btn);
-  card.appendChild(bg);
-  card.appendChild(badge);
-  card.appendChild(overlay);
-  grid.appendChild(card);
-});
-
 // Auth check AFTER games are rendered
-// Instant auth check
+// Accept either key - login.html sets fabEmail, success.html sets fabPremium
 const email=localStorage.getItem('fabEmail');
-if(!email) window.location.href='/login';
+const premium=localStorage.getItem('fabPremium');
+if(!email && !premium){ window.location.href='/login'; }
 </script>
 
 <!-- PWA Install Bar -->
