@@ -1,6 +1,6 @@
 // ── MASTER GAMES LIST ─────────────────────────────────────────
-// Edit this file to add/remove games from BOTH home page and play page
-// Home page cards → /join  |  Play page cards → game href
+// Edit this ONE file to add/remove games from BOTH the home page and play page!!
+// Both index.html and play.html load this file via <script src="/games.js"></script>
 
 const GAMES=[
   {emoji:'🎨',cat:'Art & Creativity',title:'Art Lab',
@@ -17,53 +17,65 @@ const GAMES=[
 
   {emoji:'🐬',cat:'Memory · Cards',title:'Dolphin Card Game',
    desc:'Flip the full 52-card deck across 2 rounds. Find every pair to win.',
-   href:'https://todayinhawaii.com/dolphins',color:'rgba(34,211,238,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/dolphins',color:'rgba(34,211,238,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",
    desc:"Stack the lava rocks, trigger eruptions. Hawaii's most explosive game.",
-   href:'https://todayinhawaii.com/peles-fury',color:'rgba(239,68,68,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/peles-fury',color:'rgba(239,68,68,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🐢',cat:'Board · Strategy',title:'Turtle Checkers',
    desc:'Classic checkers with a Hawaiian twist. Challenge a friend or the AI.',
-   href:'https://todayinhawaii.com/turtle-checkers',color:'rgba(34,197,94,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/turtle-checkers',color:'rgba(34,197,94,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'♛',cat:'Board · Strategy',title:'Mermaid Chess',
    desc:'Full chess with stunning mermaid pieces. Classic strategy, ocean style.',
-   href:'https://todayinhawaii.com/mermaid-chess',color:'rgba(139,92,246,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/mermaid-chess',color:'rgba(139,92,246,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🌺',cat:'Trivia · Hawaii',title:'Hawaii Trivia',
    desc:'Test your knowledge of the islands. History, culture, nature and more.',
-   href:'https://todayinhawaii.com/trivia',color:'rgba(244,114,182,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/trivia',color:'rgba(244,114,182,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🧠',cat:'Memory · Puzzle',title:'Aloha Memory',
    desc:'Match beautiful Hawaiian image pairs. Train your memory island style.',
-   href:'https://todayinhawaii.com/memory',color:'rgba(59,130,246,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/memory',color:'rgba(59,130,246,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🔤',cat:'Word · Puzzle',title:'Hawaii Word Search',
    desc:'Find hidden Hawaiian words in this beautiful island word puzzle.',
-   href:'https://todayinhawaii.com/word-search',color:'rgba(245,158,11,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/word-search',color:'rgba(245,158,11,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🎰',cat:'Arcade · Letters',title:'Aloha Letters',
    desc:'Fast-paced letter matching arcade game with Hawaiian words.',
-   href:'https://todayinhawaii.com/aloha-letters',color:'rgba(168,85,247,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/aloha-letters',color:'rgba(168,85,247,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🎈',cat:'Arcade · Fun',title:'Pop That Balloon!',
    desc:'Pop as many balloons as you can before time runs out!',
-   href:'https://todayinhawaii.com/balloons',color:'rgba(234,179,8,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/balloons',color:'rgba(234,179,8,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🔮',cat:'Fun · Social',title:'Fortune Roulette',
    desc:'Spin the wheel, discover your Hawaiian fortune. Share with friends!',
-   href:'https://todayinhawaii.com/fortune',color:'rgba(99,102,241,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/fortune',color:'rgba(99,102,241,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🎭',cat:'Fun · Personality',title:'Who Are You?',
    desc:'Find out which Hawaiian spirit animal you are. Fun for everyone!',
-   href:'https://todayinhawaii.com/who-are-you',color:'rgba(236,72,153,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/who-are-you',color:'rgba(236,72,153,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists',
    desc:'Mix colours, create slime art. A messy, beautiful creative experience.',
-   href:'https://todayinhawaii.com/slime',color:'rgba(16,185,129,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+   href:'/slime',color:'rgba(16,185,129,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
-  {emoji:'🎞️',cat:'Creative · Photo',title:'Film Lab',
-   desc:'Apply gorgeous film filters to your photos. Analogue vibes, digital ease.',
-   href:'https://todayinhawaii.com/film-lab',color:'rgba(251,146,60,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+  // {emoji:'🎞️',cat:'Creative · Photo',title:'Film Lab',
+  //  desc:'Apply gorgeous film filters to your photos. Analogue vibes, digital ease.',
+  //  href:'/film-lab',color:'rgba(251,146,60,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'}, // HIDDEN - not ready yet
+
+  {id:'capitals',title:'Capital City Challenge',emoji:'🌍',
+   desc:'195 countries · 195 capitals · Can you name them all? Take the ultimate geography challenge!',
+   color:'#0a0a20',href:'/capitals'},
+
+  {id:'jigsaw',title:'Jigsaw Puzzle Gallery',emoji:'🧩',
+   desc:'9 beautiful artworks · drag & drop pieces · snap to place · 4 difficulty levels!',
+   color:'#0d0d0f',href:'/jigsaw'},
+
+  {id:'trash',emoji:'🧹',cat:'Arcade · Fun',title:'Pick Up The Trash!',
+   desc:'Choose your hero and clean up the park or beach!! Pick up litter, dump it in the bins. Fun for all ages!!',
+   color:'rgba(34,197,94,0.12)',href:'/trash'},
 ];
