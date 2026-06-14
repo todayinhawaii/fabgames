@@ -944,14 +944,26 @@ function makeCursor(emoji, hotX, hotY){
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
     <text x="2" y="32" font-size="30">${emoji}</text>
   </svg>`;
-  // encodeURIComponent handles emoji/unicode safely for data URIs (no btoa needed)
   const url = 'data:image/svg+xml,'+encodeURIComponent(svg);
   return `url("${url}") ${hotX} ${hotY}, auto`;
 }
+
+// Custom vector pencil cursor - tip pixel is exactly known (no emoji-glyph guesswork)
+function makePencilCursor(){
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
+    <polygon points="3,37 8,32 33,7 37,3 39,5 35,9 10,34 5,39" fill="#ffd34d" stroke="#1a1a1a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="3,37 8,32 10,34 5,39" fill="#5a3825"/>
+    <circle cx="3.5" cy="37.5" r="1" fill="#1a1a1a"/>
+  </svg>`;
+  const url = 'data:image/svg+xml,'+encodeURIComponent(svg);
+  // hotspot = the exact graphite tip pixel
+  return `url("${url}") 3 37, crosshair`;
+}
+
 function updateCursor(){
   let cur;
   switch(currentTool){
-    case 'pencil':     cur=makeCursor('✏️',4,32); break;
+    case 'pencil':     cur=makePencilCursor(); break;
     case 'crayon':     cur=makeCursor('🖍️',4,32); break;
     case 'watercolor': cur=makeCursor('🖌️',4,32); break;
     case 'eraser':     cur=makeCursor('🧽',16,32); break;
