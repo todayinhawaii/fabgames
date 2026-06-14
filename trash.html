@@ -407,7 +407,7 @@ function setupScene(scene){
   const types = scene==='park'?TRASH_TYPES_PARK:TRASH_TYPES_BEACH;
   const layout = SCENE_LAYOUT[scene];
 
-  layout.cans.forEach(p=>cans.push({x:p.x*W,y:p.y*H,r:86,color:p.color}));
+  layout.cans.forEach(p=>cans.push({x:p.x*W,y:p.y*H,r:scaleR(86),color:p.color}));
 
   // Dense random scatter across the open ground, avoiding cans + overlap
   const yMin = scene==='park' ? H*0.30 : H*0.32;
@@ -420,12 +420,12 @@ function setupScene(scene){
     const y=rand(yMin,yMax);
     let ok=true;
     for(const c of cans){ if(Math.hypot(x-c.x,y-c.y)<c.r*1.5){ok=false;break;} }
-    for(const t of trashItems){ if(Math.hypot(x-t.x,y-t.y)<38){ok=false;break;} }
+    for(const t of trashItems){ if(Math.hypot(x-t.x,y-t.y)<scaleR(38)){ok=false;break;} }
     if(!ok) continue;
     trashItems.push({
       x,y,
       emoji:types[Math.floor(Math.random()*types.length)],
-      r:38, bob:Math.random()*Math.PI*2,
+      r:scaleR(38), bob:Math.random()*Math.PI*2,
       rot: rand(-0.5,0.5)
     });
   }
@@ -650,7 +650,7 @@ function drawPlayer(){
   ctx.beginPath();ctx.ellipse(0,46,38*shadowScale,11*shadowScale,0,0,Math.PI*2);ctx.fill();
 
   const parts = charImgEls[selectedChar.img];
-  const totalH = 189; // 50% bigger overall
+  const totalH = scaleR(189); // 50% bigger overall, scaled to screen
   const ratio = totalH / parts.h;
   const bodyDrawH = parts.bodyH * ratio;
   const legsDrawH = (parts.h - parts.bodyH + parts.overlap) * ratio;
@@ -769,8 +769,10 @@ function getEmojiSprite(emoji,size){
 
 // ── GAME LOOP ─────────────────────────────────────
 const SPEED=4.4;
-const PICKUP_R=46;
-const DUMP_R=118;
+// Scale interaction radii relative to screen size so mobile feels right
+function scaleR(base){ return base * (Math.min(W,H) / 700); }
+function PICKUP_R(){ return scaleR(46); }
+function DUMP_R(){ return scaleR(118); }
 
 function update(){
   player.bob+=0.12;
@@ -796,7 +798,7 @@ function update(){
   for(let i=trashItems.length-1;i>=0;i--){
     const t=trashItems[i];
     t.bob+=0.08;
-    if(player.carrying.length===0 && player.pickupCooldown===0 && Math.hypot(player.x-t.x,player.y-t.y)<PICKUP_R){
+    if(player.carrying.length===0 && player.pickupCooldown===0 && Math.hypot(player.x-t.x,player.y-t.y)<PICKUP_R()){
       player.carrying.push(t.emoji);
       burst(t.x,t.y,['✨','⭐','💥','🌟'],16);
       sndPickup();
@@ -808,7 +810,7 @@ function update(){
   // auto dump
   if(player.carrying.length>0){
     for(const c of cans){
-      if(Math.hypot(player.x-c.x,player.y-c.y)<DUMP_R){
+      if(Math.hypot(player.x-c.x,player.y-c.y)<DUMP_R()){
         const n=player.carrying.length;
         const pts=n*10;
         score+=pts;
