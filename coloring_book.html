@@ -481,6 +481,9 @@ const lineCanvas=document.getElementById('lineCanvas');
 const pctx=paintCanvas.getContext('2d');
 const tempCanvas=document.getElementById('tempCanvas');
 const tctxLive=tempCanvas.getContext('2d');
+const rawCanvas=document.createElement('canvas');
+rawCanvas.width=1280; rawCanvas.height=720;
+const rctx=rawCanvas.getContext('2d');
 let strokePoints=[]; // points for current line-based stroke (pencil/eraser)
 const lctx=lineCanvas.getContext('2d');
 const canvasWrap=document.getElementById('canvasWrap');
@@ -775,10 +778,6 @@ document.getElementById('clearBtn').onclick=()=>{
 // The raw canvas is then composited onto the real canvas ONCE per stroke
 // at globalAlpha = brushOpacity. This gives the opacity slider real,
 // uniform control over every brush (no per-stamp compounding issues).
-const rawCanvas=document.createElement('canvas');
-rawCanvas.width=NATIVE_W; rawCanvas.height=NATIVE_H;
-const rctx=rawCanvas.getContext('2d');
-
 let watercolorBrush=null;
 function getWatercolorBrush(hardness){
   const size=200;
