@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Fab Coloring Book 🎨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#070708;
+  --panel:#0d0d0f;
+  --border:rgba(255,255,255,0.08);
+  --gold:#c9a84c;
+  --gold2:#e8c96a;
+  --white:#f0efe8;
+  --muted:rgba(240,239,232,0.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:var(--white);font-family:'Inter',sans-serif;touch-action:none;}
+
+/* ───────── TOP BAR ───────── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:58px;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;
+  background:linear-gradient(180deg,rgba(7,7,8,0.96),rgba(7,7,8,0.7));
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(10px);
+}
+.logo{
+  font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:flex;align-items:center;gap:6px;
+}
+.top-actions{display:flex;align-items:center;gap:8px;}
+.icon-btn{
+  width:40px;height:40px;border-radius:10px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);color:var(--white);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.15s;font-size:18px;
+}
+.icon-btn:active{transform:scale(0.92);background:rgba(201,168,76,0.15);}
+.icon-btn.active{background:rgba(201,168,76,0.18);border-color:var(--gold);color:var(--gold2);}
+
+/* ───────── STAGE ───────── */
+#stage{
+  position:fixed;inset:0;top:58px;bottom:74px;
+  height:calc(100vh - 132px);
+  width:100vw;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    repeating-conic-gradient(rgba(255,255,255,0.025) 0% 25%, transparent 0% 50%) 50% / 26px 26px,
+    #16161a;
+}
+#canvasWrap{
+  position:relative;
+  min-width:200px;min-height:112px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+  background:#fff;
+  border-radius:4px;
+  overflow:hidden;
+  touch-action:none;
+}
+#paintCanvas,#lineCanvas,#tempCanvas{
+  position:absolute;top:0;left:0;
+  display:block;
+  width:100%;height:100%;
+  image-rendering:auto;
+}
+#lineCanvas,#tempCanvas{pointer-events:none;}
+
+#loadingMsg{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;color:#888;font-size:14px;text-align:center;padding:20px;
+}
+#loadingMsg .big{font-size:40px;}
+
+/* ───────── BOTTOM BAR ───────── */
+#bottombar{
+  position:fixed;bottom:0;left:0;right:0;height:74px;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;gap:10px;
+  background:linear-gradient(0deg,rgba(7,7,8,0.97),rgba(7,7,8,0.75));
+  border-top:1px solid var(--border);
+  backdrop-filter:blur(10px);
+}
+.tool-group{display:flex;gap:8px;align-items:center;}
+.tool-btn{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  width:58px;height:54px;border-radius:12px;
+  border:1.5px solid var(--border);background:rgba(255,255,255,0.04);
+  color:var(--muted);cursor:pointer;transition:all 0.15s;font-size:10px;font-weight:700;
+  letter-spacing:0.5px;text-transform:uppercase;
+}
+.tool-btn .ti{font-size:20px;}
+.tool-btn.active{
+  border-color:var(--gold);background:rgba(201,168,76,0.15);color:var(--gold2);
+  box-shadow:0 0 0 2px rgba(201,168,76,0.15);
+}
+.tool-btn:active{transform:scale(0.94);}
+
+.page-nav{display:flex;align-items:center;gap:8px;}
+#pageLabel{
+  font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--gold2);
+  min-width:64px;text-align:center;font-weight:600;
+}
+.nav-btn{
+  width:44px;height:44px;border-radius:50%;
+  border:1.5px solid var(--gold);background:rgba(201,168,76,0.1);
+  color:var(--gold2);font-size:18px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.15s;
+}
+.nav-btn:active{transform:scale(0.9);background:rgba(201,168,76,0.25);}
+
+/* ───────── SIDE PALETTE DRAWER ───────── */
+#paletteDrawer{
+  position:fixed;top:58px;right:0;bottom:74px;z-index:45;
+  width:88px;
+  background:rgba(13,13,15,0.97);
+  border-left:1px solid var(--border);
+  backdrop-filter:blur(10px);
+  display:flex;flex-direction:column;align-items:center;
+  padding:14px 0;gap:10px;
+  overflow-y:auto;
+  transition:transform 0.28s cubic-bezier(.4,0,.2,1);
+  transform:translateX(0);
+}
+#paletteDrawer.hidden{transform:translateX(100%);}
+#paletteTab{
+  position:fixed;top:50%;right:0;z-index:46;
+  transform:translateY(-50%);
+  width:26px;height:64px;
+  background:rgba(201,168,76,0.92);
+  border-radius:10px 0 0 10px;
+  display:flex;align-items:center;justify-content:center;
+  color:#1a1a1a;font-size:16px;font-weight:900;
+  cursor:pointer;transition:right 0.28s cubic-bezier(.4,0,.2,1);
+  box-shadow:-2px 0 10px rgba(0,0,0,0.3);
+}
+#paletteTab.shifted{right:88px;}
+
+.swatch{
+  width:42px;height:42px;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,0.15);
+  cursor:pointer;transition:all 0.15s;flex-shrink:0;
+  position:relative;
+}
+.swatch.active{
+  border-color:var(--gold2);
+  box-shadow:0 0 0 3px rgba(201,168,76,0.35),0 0 12px rgba(255,215,0,0.4);
+  transform:scale(1.08);
+}
+.swatch:active{transform:scale(0.92);}
+.swatch-divider{width:60%;height:1px;background:var(--border);margin:4px 0;}
+
+#sizeSlider{
+  -webkit-appearance:none;appearance:none;
+  width:64px;height:64px;
+  writing-mode:vertical-lr;direction:rtl;
+  background:transparent;
+}
+#sizeSlider::-webkit-slider-runnable-track{width:4px;background:var(--border);border-radius:4px;}
+#sizeSlider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:var(--gold2);border:2px solid #1a1a1a;cursor:pointer;
+}
+.size-label{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:center;}
+.brush-preview{
+  width:30px;height:30px;border-radius:50%;
+  border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ───────── SHARE MENU ───────── */
+#shareMenu{
+  position:fixed;inset:0;z-index:80;
+  display:none;align-items:flex-end;justify-content:center;
+  background:rgba(0,0,0,0.55);
+}
+#shareMenu.show{display:flex;}
+#shareSheet{
+  width:100%;max-width:480px;
+  background:var(--panel);border-radius:20px 20px 0 0;
+  border:1px solid var(--border);border-bottom:none;
+  padding:22px 20px 28px;
+  animation:slideUp 0.25s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+#shareSheet h3{
+  font-family:'Cormorant Garamond',serif;font-weight:700;font-size:20px;
+  color:var(--gold2);margin-bottom:16px;text-align:center;
+}
+.share-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}
+.share-opt{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:84px;padding:12px 8px;border-radius:14px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  cursor:pointer;transition:all 0.15s;font-size:11px;color:var(--muted);
+}
+.share-opt:active{transform:scale(0.95);background:rgba(201,168,76,0.12);}
+.share-opt .si{font-size:26px;}
+#closeShare{
+  width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);color:var(--white);font-size:13px;cursor:pointer;
+}
+
+/* ───────── ROTATE BUTTON (jigsaw-style) ───────── */
+#landscapeBtn{
+  position:fixed;top:68px;right:14px;z-index:48;
+  width:42px;height:42px;border-radius:10px;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.2);
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.2s;color:var(--gold2);font-size:20px;
+}
+#landscapeBtn:active{transform:scale(0.9);background:rgba(201,168,76,0.2);}
+
+/* toast */
+#toast{
+  position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);
+  background:rgba(201,168,76,0.95);color:#1a1a1a;
+  padding:10px 22px;border-radius:30px;font-size:13px;font-weight:700;
+  z-index:90;opacity:0;transition:all 0.3s;pointer-events:none;
+  white-space:nowrap;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+
+
+/* VEGAS STYLE BUTTONS */
+.icon-btn{
+  border:1.5px solid rgba(201,168,76,0.35);
+  box-shadow:0 0 0 0 rgba(255,215,0,0);
+  transition:all 0.18s;
+}
+.icon-btn:not(.disabled):hover,.icon-btn:not(.disabled):active{
+  border-color:var(--gold2);
+  box-shadow:0 0 12px rgba(255,215,0,0.35);
+}
+.pill-btn{
+  display:flex;align-items:center;gap:6px;
+  height:40px;padding:0 16px;border-radius:24px;
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:900;
+  letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;transition:all 0.15s;border:2px solid;
+  text-decoration:none;white-space:nowrap;
+}
+.pill-btn:active{transform:scale(0.95);}
+.pill-save{
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  color:#1a1a1a;border-color:#ffe98a;
+  box-shadow:0 4px 0 #8a6a1f,0 0 16px rgba(255,215,0,0.35);
+}
+.pill-save:active{box-shadow:0 1px 0 #8a6a1f;}
+.pill-clear{
+  background:linear-gradient(135deg,#6a0dad,#a020f0);
+  color:#fff;border-color:#d8a8ff;
+  box-shadow:0 4px 0 #4a0880,0 0 16px rgba(160,32,240,0.35);
+}
+.pill-clear:active{box-shadow:0 1px 0 #4a0880;}
+@media(max-width:600px){
+  .pill-btn{height:38px;padding:0 12px;font-size:10px;letter-spacing:1px;}
+  .pill-btn .pill-text{display:none;}
+}
+
+/* extra controls */
+.tool-btn[data-tool="eraser"] .ti{font-size:18px;}
+.swatch.custom{
+  background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+#sliderGroup{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
+.mini-slider{width:64px;}
+.mini-slider input[type=range]{width:64px;height:4px;-webkit-appearance:none;background:var(--border);border-radius:4px;}
+.mini-slider input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--gold2);border:2px solid #1a1a1a;cursor:pointer;
+}
+#zoomPopover{
+  position:absolute;top:48px;left:0;
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:8px;display:none;flex-direction:column;gap:6px;z-index:60;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+#zoomPopover.show{display:flex;}
+#zoomPopover .icon-btn{width:42px;height:42px;}
+.topbar-rel{position:relative;}
+
+/* shortcuts modal */
+#shortcutsModal{
+  position:fixed;inset:0;z-index:90;display:none;
+  align-items:center;justify-content:center;background:rgba(0,0,0,0.6);
+}
+#shortcutsModal.show{display:flex;}
+#shortcutsCard{
+  background:var(--panel);border:1px solid var(--border);border-radius:18px;
+  padding:24px;max-width:380px;width:90%;max-height:80vh;overflow-y:auto;
+}
+#shortcutsCard h3{
+  font-family:'Cormorant Garamond',serif;color:var(--gold2);font-size:20px;
+  margin-bottom:14px;text-align:center;
+}
+.sc-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.sc-row:last-child{border-bottom:none;}
+.sc-key{
+  font-family:monospace;background:rgba(255,255,255,0.08);border:1px solid var(--border);
+  border-radius:6px;padding:3px 8px;font-size:12px;color:var(--gold2);
+}
+#closeShortcuts{
+  width:100%;margin-top:16px;padding:12px;border-radius:10px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);color:var(--white);cursor:pointer;font-size:13px;
+}
+#redoBtn{opacity:1;}
+#redoBtn.disabled,#undoBtn.disabled{opacity:0.3;pointer-events:none;}
+
+
+#shareSheet h3{
+  text-shadow:0 0 12px rgba(255,215,0,0.5);
+}
+.share-opt:active{
+  box-shadow:0 0 16px rgba(255,215,0,0.3);
+}
+.tool-btn.active{
+  box-shadow:0 0 0 2px rgba(201,168,76,0.15),0 0 12px rgba(255,215,0,0.25);
+}
+.nav-btn:active{
+  box-shadow:0 0 16px rgba(255,215,0,0.4);
+}
+
+@media(min-width:768px){
+  #paletteDrawer{width:104px;}
+  #paletteTab.shifted{right:104px;}
+  .swatch{width:48px;height:48px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo">🎨 Fab Coloring Book</div>
+  <div class="top-actions">
+    <div class="icon-btn disabled" id="undoBtn" title="Undo (Cmd+Z)">↩️</div>
+    <div class="icon-btn disabled" id="redoBtn" title="Redo (Cmd+Shift+Z)">↪️</div>
+    <div class="topbar-rel">
+      <div class="icon-btn" id="zoomBtn" title="Zoom">🔍</div>
+      <div id="zoomPopover">
+        <div class="icon-btn" id="zoomInBtn" title="Zoom In (Cmd+=)">➕</div>
+        <div class="icon-btn" id="resetViewBtn" title="Reset View (Fit)">⤢</div>
+        <div class="icon-btn" id="zoomOutBtn" title="Zoom Out (Cmd+-)">➖</div>
+      </div>
+    </div>
+    <div class="pill-btn pill-clear" id="clearBtn" title="Clear Page">🗑️<span class="pill-text">Clear</span></div>
+    <div class="pill-btn pill-save" id="saveBtn" title="Save / Share">🎰<span class="pill-text">Save</span></div>
+    <div class="icon-btn" id="helpBtn" title="Keyboard Shortcuts">❓</div>
+    <a href="/" class="icon-btn" title="Back to fab.games" style="text-decoration:none;">🏠</a>
+  </div>
+</div>
+
+<!-- ROTATE TO LANDSCAPE -->
+<div id="landscapeBtn" title="Rotate">🔄</div>
+
+<!-- STAGE -->
+<div id="stage">
+  <div id="canvasWrap">
+    <canvas id="paintCanvas" width="1280" height="720"></canvas>
+    <canvas id="tempCanvas" width="1280" height="720"></canvas>
+    <canvas id="lineCanvas" width="1280" height="720"></canvas>
+    <div id="loadingMsg"><div class="big">🎨</div><div>Loading page 1...</div></div>
+  </div>
+</div>
+
+<!-- PALETTE TAB -->
+<div id="paletteTab">◀</div>
+
+<!-- SIDE PALETTE -->
+<div id="paletteDrawer">
+  <div class="size-label">Brush</div>
+  <div class="brush-preview" id="brushPreview"><div id="brushDot" style="border-radius:50%;background:#333;"></div></div>
+  <input type="range" id="sizeSlider" min="4" max="60" value="18">
+  <div class="swatch-divider"></div>
+  <div id="sliderGroup">
+    <div class="size-label">Opacity</div>
+    <div class="mini-slider"><input type="range" id="opacitySlider" min="5" max="100" value="100"></div>
+    <div class="size-label">Soft ↔ Hard</div>
+    <div class="mini-slider"><input type="range" id="hardnessSlider" min="0" max="100" value="70"></div>
+  </div>
+  <div class="swatch-divider"></div>
+  <div class="size-label">Colors</div>
+  <div class="swatch custom" id="colorPickerSwatch" title="Custom color">🎨</div>
+  <input type="color" id="colorPickerInput" style="position:absolute;opacity:0;width:1px;height:1px;">
+  <!-- swatches injected by JS -->
+</div>
+
+<!-- BOTTOM TOOLBAR -->
+<div id="bottombar">
+  <div class="tool-group">
+    <div class="tool-btn active" data-tool="pencil"><span class="ti">✏️</span>Pencil</div>
+    <div class="tool-btn" data-tool="crayon"><span class="ti">🖍️</span>Crayon</div>
+    <div class="tool-btn" data-tool="watercolor"><span class="ti">🖌️</span>Water</div>
+    <div class="tool-btn" data-tool="eraser"><span class="ti">🧽</span>Erase</div>
+    <div class="tool-btn" data-tool="pan"><span class="ti">✋</span>Move</div>
+  </div>
+  <div class="page-nav">
+    <div class="nav-btn" id="prevPage">‹</div>
+    <div id="pageLabel">Page 1/20</div>
+    <div class="nav-btn" id="nextPage">›</div>
+  </div>
+</div>
+
+<!-- SHARE MENU -->
+<div id="shareMenu">
+  <div id="shareSheet">
+    <h3>Save &amp; Share Your Art</h3>
+    <div class="share-row">
+      <div class="share-opt" id="optSavePhone"><div class="si">🏆</div>Save to Device</div>
+      <div class="share-opt" id="optShare"><div class="si">🎉</div>Share</div>
+      <div class="share-opt" id="optCopy"><div class="si">✨</div>Copy Image</div>
+    </div>
+    <button id="closeShare">Close</button>
+  </div>
+</div>
+
+
+<!-- SHORTCUTS MODAL -->
+<div id="shortcutsModal">
+  <div id="shortcutsCard">
+    <h3>⌨️ Keyboard Shortcuts</h3>
+    <div class="sc-row"><span>Undo</span><span class="sc-key">Cmd/Ctrl + Z</span></div>
+    <div class="sc-row"><span>Redo</span><span class="sc-key">Cmd/Ctrl + Shift + Z</span></div>
+    <div class="sc-row"><span>Zoom In</span><span class="sc-key">Cmd/Ctrl + =</span></div>
+    <div class="sc-row"><span>Zoom Out</span><span class="sc-key">Cmd/Ctrl + -</span></div>
+    <div class="sc-row"><span>Brush Bigger</span><span class="sc-key">]</span></div>
+    <div class="sc-row"><span>Brush Smaller</span><span class="sc-key">[</span></div>
+    <div class="sc-row"><span>Pan / Move (hold)</span><span class="sc-key">Space</span></div>
+    <div class="sc-row"><span>Pinch (touch)</span><span class="sc-key">Zoom in/out</span></div>
+    <button id="closeShortcuts">Close</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   FAB COLORING BOOK
+   ============================================================ */
+
+const TOTAL_PAGES = 20;
+let currentPage = 1;
+
+// ── COLOR PALETTE ──────────────────────────────────
+const COLORS = [
+  '#000000','#5a3825','#ed1c24','#ff7f27','#ffc20e','#fff200',
+  '#22b14c','#00a651','#00aeef','#3f48cc','#a349a4','#ff66cc',
+  '#ffffff','#b97a56','#ffaec9','#c8bfe7','#99d9ea','#b5e61d',
+];
+
+// ── STATE ──────────────────────────────────────────
+let currentTool='pencil';
+let currentColor=COLORS[2];
+let brushSize=18;
+let brushOpacity=1.0;   // 0.1 - 1.0
+let brushHardness=0.7;  // 0 (soft) - 1 (hard)
+let lastPoint=null;
+let isDrawing=false;
+let undoStack=[];
+let redoStack=[];
+let toolBeforeSpace=null; // for spacebar-hold pan
+
+// pan/zoom state
+let zoom=1, panX=0, panY=0;
+let pinchStartDist=0, pinchStartZoom=1;
+let pinchStartMid=null;
+let panStart=null;
+
+// ── DOM ─────────────────────────────────────────────
+const paintCanvas=document.getElementById('paintCanvas');
+const lineCanvas=document.getElementById('lineCanvas');
+const pctx=paintCanvas.getContext('2d');
+const tempCanvas=document.getElementById('tempCanvas');
+const tctxLive=tempCanvas.getContext('2d');
+let strokePoints=[]; // points for current line-based stroke (pencil/eraser)
+const lctx=lineCanvas.getContext('2d');
+const canvasWrap=document.getElementById('canvasWrap');
+const stage=document.getElementById('stage');
+const loadingMsg=document.getElementById('loadingMsg');
+
+const NATIVE_W=1280, NATIVE_H=720;
+
+// ── BUILD COLOR SWATCHES ─────────────────────────────
+function buildSwatches(){
+  const drawer=document.getElementById('paletteDrawer');
+  COLORS.forEach((c,i)=>{
+    const sw=document.createElement('div');
+    sw.className='swatch'+(c===currentColor?' active':'');
+    sw.style.background=c;
+    if(c==='#ffffff') sw.style.border='2.5px solid rgba(255,255,255,0.4)';
+    sw.dataset.color=c;
+    sw.onclick=()=>{
+      currentColor=c;
+      document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+      sw.classList.add('active');
+      updateBrushPreview();
+    };
+    drawer.appendChild(sw);
+  });
+}
+buildSwatches();
+updateCursor();
+
+// Custom color picker
+const colorPickerSwatch=document.getElementById('colorPickerSwatch');
+const colorPickerInput=document.getElementById('colorPickerInput');
+colorPickerSwatch.onclick=()=>colorPickerInput.click();
+colorPickerInput.addEventListener('input',e=>{
+  currentColor=e.target.value;
+  colorPickerSwatch.style.background=currentColor;
+  colorPickerSwatch.textContent='';
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+  colorPickerSwatch.classList.add('active');
+  updateBrushPreview();
+});
+
+function updateBrushPreview(){
+  const dot=document.getElementById('brushDot');
+  const sz=Math.max(6,Math.min(26,brushSize*0.7));
+  dot.style.width=sz+'px';
+  dot.style.height=sz+'px';
+  dot.style.background=currentTool==='eraser' ? '#ffffff' : currentColor;
+  dot.style.border=currentTool==='eraser' ? '1.5px solid #999' : 'none';
+  let baseOp = currentTool==='watercolor'?0.45 : currentTool==='crayon'?0.7 : 1;
+  dot.style.opacity=String(baseOp*brushOpacity);
+  dot.style.filter = brushHardness<0.5 ? `blur(${(0.5-brushHardness)*4}px)` : 'none';
+}
+updateBrushPreview();
+
+// ── TOOL SELECTION ────────────────────────────────────
+document.querySelectorAll('.tool-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTool=btn.dataset.tool;
+    updateBrushPreview();
+    updateCursor();
+  };
+});
+
+// ── SIZE SLIDER ───────────────────────────────────────
+document.getElementById('sizeSlider').addEventListener('input',e=>{
+  brushSize=parseInt(e.target.value);
+  updateBrushPreview();
+});
+document.getElementById('opacitySlider').addEventListener('input',e=>{
+  brushOpacity=parseInt(e.target.value)/100;
+  updateBrushPreview();
+});
+document.getElementById('hardnessSlider').addEventListener('input',e=>{
+  brushHardness=parseInt(e.target.value)/100;
+  updateBrushPreview();
+});
+
+// ── PALETTE DRAWER TOGGLE ─────────────────────────────
+const paletteDrawer=document.getElementById('paletteDrawer');
+const paletteTab=document.getElementById('paletteTab');
+let drawerOpen=true;
+paletteTab.onclick=()=>{
+  drawerOpen=!drawerOpen;
+  paletteDrawer.classList.toggle('hidden',!drawerOpen);
+  paletteTab.classList.toggle('shifted',drawerOpen);
+  paletteTab.textContent=drawerOpen?'▶':'◀';
+};
+paletteTab.classList.add('shifted');
+paletteTab.textContent='▶';
+
+// ── LOAD PAGE (line art + background) ────────────────
+function loadPage(n){
+  loadingMsg.style.display='flex';
+  loadingMsg.querySelector('div:last-child').textContent='Loading page '+n+'...';
+
+  pctx.fillStyle='#ffffff';
+  pctx.fillRect(0,0,NATIVE_W,NATIVE_H);
+  lctx.clearRect(0,0,NATIVE_W,NATIVE_H);
+  tctxLive.clearRect(0,0,NATIVE_W,NATIVE_H);
+  rctx.clearRect(0,0,NATIVE_W,NATIVE_H);
+  strokePoints=[];
+  undoStack=[];
+  redoStack=[];
+  updateUndoRedoButtons();
+
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=()=>{
+    // Draw image to an offscreen canvas to read pixels
+    const off=document.createElement('canvas');
+    off.width=NATIVE_W; off.height=NATIVE_H;
+    const octx=off.getContext('2d');
+    octx.fillStyle='#fff';
+    octx.fillRect(0,0,NATIVE_W,NATIVE_H);
+    // fit image (cover for 16:9 source onto 16:9 canvas - should match exactly)
+    octx.drawImage(img,0,0,NATIVE_W,NATIVE_H);
+
+    const data=octx.getImageData(0,0,NATIVE_W,NATIVE_H);
+    const d=data.data;
+    for(let i=0;i<d.length;i+=4){
+      const r=d[i],g=d[i+1],b=d[i+2];
+      const brightness=(r+g+b)/3;
+      // near-white -> transparent so painted colors show through
+      if(brightness>235){
+        d[i+3]=0;
+      } else {
+        // darken lines slightly for crisp linework
+        d[i]=Math.min(r,40); d[i+1]=Math.min(g,40); d[i+2]=Math.min(b,40);
+        d[i+3]=Math.min(255, (255-brightness)*1.4);
+      }
+    }
+    octx.putImageData(data,0,0);
+    lctx.clearRect(0,0,NATIVE_W,NATIVE_H);
+    lctx.drawImage(off,0,0);
+    loadingMsg.style.display='none';
+  };
+  img.onerror=()=>{
+    // Placeholder line-art demo (so the app works before images are uploaded)
+    drawPlaceholderArt(n);
+    loadingMsg.style.display='none';
+  };
+  img.src='/colorbook'+n+'.jpg';
+}
+
+function drawPlaceholderArt(n){
+  lctx.clearRect(0,0,NATIVE_W,NATIVE_H);
+  lctx.save();
+  lctx.strokeStyle='rgba(30,30,30,0.85)';
+  lctx.lineWidth=4;
+  lctx.lineJoin='round';lctx.lineCap='round';
+
+  // Simple sun
+  lctx.beginPath();lctx.arc(1080,140,70,0,Math.PI*2);lctx.stroke();
+  for(let a=0;a<12;a++){
+    const ang=a/12*Math.PI*2;
+    lctx.beginPath();
+    lctx.moveTo(1080+Math.cos(ang)*85,140+Math.sin(ang)*85);
+    lctx.lineTo(1080+Math.cos(ang)*110,140+Math.sin(ang)*110);
+    lctx.stroke();
+  }
+  // Waves
+  for(let row=0;row<3;row++){
+    lctx.beginPath();
+    for(let x=0;x<=NATIVE_W;x+=40){
+      const y=560+row*40+Math.sin(x/80)*14;
+      x===0?lctx.moveTo(x,y):lctx.lineTo(x,y);
+    }
+    lctx.stroke();
+  }
+  // Palm tree
+  lctx.beginPath();lctx.moveTo(180,650);lctx.quadraticCurveTo(220,450,260,300);lctx.stroke();
+  for(let i=0;i<6;i++){
+    const ang=-Math.PI/2+(i-2.5)*0.5;
+    lctx.beginPath();
+    lctx.moveTo(260,300);
+    lctx.quadraticCurveTo(260+Math.cos(ang)*70,300+Math.sin(ang)*40,260+Math.cos(ang)*140,300+Math.sin(ang)*90);
+    lctx.stroke();
+  }
+  // Turtle
+  lctx.beginPath();lctx.ellipse(620,420,140,90,0,0,Math.PI*2);lctx.stroke();
+  for(let i=0;i<6;i++){
+    const ang=i/6*Math.PI*2;
+    lctx.beginPath();
+    lctx.moveTo(620+Math.cos(ang)*70,420+Math.sin(ang)*45);
+    lctx.lineTo(620+Math.cos(ang)*135,420+Math.sin(ang)*85);
+    lctx.stroke();
+  }
+  lctx.beginPath();lctx.ellipse(480,400,38,28,0.4,0,Math.PI*2);lctx.stroke();
+  // Title text
+  lctx.font='700 28px Inter, sans-serif';
+  lctx.fillStyle='rgba(30,30,30,0.4)';
+  lctx.textAlign='center';
+  lctx.fillText('Upload colorbook'+n+'.jpg to replace this placeholder',NATIVE_W/2,NATIVE_H-30);
+  lctx.restore();
+}
+
+loadPage(currentPage);
+
+// ── PAGE NAVIGATION ───────────────────────────────────
+function goToPage(n){
+  if(n<1) n=TOTAL_PAGES;
+  if(n>TOTAL_PAGES) n=1;
+  currentPage=n;
+  document.getElementById('pageLabel').textContent='Page '+currentPage+'/'+TOTAL_PAGES;
+  loadPage(currentPage);
+  resetView();
+}
+document.getElementById('prevPage').onclick=()=>goToPage(currentPage-1);
+document.getElementById('nextPage').onclick=()=>goToPage(currentPage+1);
+
+// ── PAN / ZOOM ────────────────────────────────────────
+function applyTransform(){
+  canvasWrap.style.width=(NATIVE_W*zoom)+'px';
+  canvasWrap.style.height=(NATIVE_H*zoom)+'px';
+  canvasWrap.style.transform=`translate(${panX}px,${panY}px)`;
+}
+
+function resetView(){
+  let sw=stage.clientWidth, sh=stage.clientHeight;
+  if(sw<10||sh<10){ sw=window.innerWidth; sh=window.innerHeight-132; }
+  if(sw<10||sh<10){ sw=NATIVE_W; sh=NATIVE_H; }
+  const scale=Math.min(sw/NATIVE_W, sh/NATIVE_H)*0.96;
+  zoom=scale;
+  canvasWrap.style.width=(NATIVE_W*zoom)+'px';
+  canvasWrap.style.height=(NATIVE_H*zoom)+'px';
+  panX=(sw-NATIVE_W*zoom)/2;
+  panY=(sh-NATIVE_H*zoom)/2;
+  applyTransform();
+}
+window.addEventListener('resize',resetView);
+window.addEventListener('load',resetView);
+setTimeout(resetView,50);
+setTimeout(resetView,300);
+document.getElementById('resetViewBtn').onclick=resetView;
+resetView();
+
+function clampPan(){
+  const sw=stage.clientWidth, sh=stage.clientHeight;
+  const w=NATIVE_W*zoom, h=NATIVE_H*zoom;
+  if(w<=sw) panX=(sw-w)/2; else panX=Math.min(0,Math.max(sw-w,panX));
+  if(h<=sh) panY=(sh-h)/2; else panY=Math.min(0,Math.max(sh-h,panY));
+}
+
+// ── DRAWING HELPERS ────────────────────────────────────
+function getCanvasPoint(clientX,clientY){
+  const rect=paintCanvas.getBoundingClientRect();
+  return {
+    x:(clientX-rect.left)/rect.width*NATIVE_W,
+    y:(clientY-rect.top)/rect.height*NATIVE_H
+  };
+}
+
+function updateUndoRedoButtons(){
+  document.getElementById('undoBtn').classList.toggle('disabled',undoStack.length===0);
+  document.getElementById('redoBtn').classList.toggle('disabled',redoStack.length===0);
+}
+function saveUndoState(){
+  if(undoStack.length>=20) undoStack.shift();
+  undoStack.push(pctx.getImageData(0,0,NATIVE_W,NATIVE_H));
+  redoStack=[]; // new action clears redo history
+  updateUndoRedoButtons();
+}
+function doUndo(){
+  if(undoStack.length){
+    redoStack.push(pctx.getImageData(0,0,NATIVE_W,NATIVE_H));
+    pctx.putImageData(undoStack.pop(),0,0);
+    updateUndoRedoButtons();
+  }
+}
+function doRedo(){
+  if(redoStack.length){
+    undoStack.push(pctx.getImageData(0,0,NATIVE_W,NATIVE_H));
+    pctx.putImageData(redoStack.pop(),0,0);
+    updateUndoRedoButtons();
+  }
+}
+document.getElementById('undoBtn').onclick=doUndo;
+document.getElementById('redoBtn').onclick=doRedo;
+document.getElementById('clearBtn').onclick=()=>{
+  if(confirm('Clear all coloring on this page?')){
+    saveUndoState();
+    pctx.fillStyle='#ffffff';
+    pctx.fillRect(0,0,NATIVE_W,NATIVE_H);
+  }
+};
+
+// ── BRUSH ENGINE ──────────────────────────────────────
+// All brushes draw to an offscreen "raw" canvas at full intrinsic strength.
+// The raw canvas is then composited onto the real canvas ONCE per stroke
+// at globalAlpha = brushOpacity. This gives the opacity slider real,
+// uniform control over every brush (no per-stamp compounding issues).
+const rawCanvas=document.createElement('canvas');
+rawCanvas.width=NATIVE_W; rawCanvas.height=NATIVE_H;
+const rctx=rawCanvas.getContext('2d');
+
+let watercolorBrush=null;
+function getWatercolorBrush(hardness){
+  const size=200;
+  const c=document.createElement('canvas');
+  c.width=size;c.height=size;
+  const cx=c.getContext('2d');
+  const grad=cx.createRadialGradient(size/2,size/2,0,size/2,size/2,size/2);
+  const solidStop=0.15+hardness*0.55;
+  grad.addColorStop(0,'rgba(255,255,255,1)');
+  grad.addColorStop(solidStop,'rgba(255,255,255,0.6)');
+  grad.addColorStop(1,'rgba(255,255,255,0)');
+  cx.fillStyle=grad;
+  cx.fillRect(0,0,size,size);
+  return c;
+}
+
+// Crayon/Watercolor: stamp a segment onto rawCanvas (accumulates within the stroke)
+function stampCrayon(x,y,px,py){
+  rctx.save();
+  rctx.lineCap='round';rctx.lineJoin='round';
+  rctx.strokeStyle=currentColor;
+  rctx.shadowColor=currentColor;
+  rctx.shadowBlur=(1-brushHardness)*brushSize*0.6;
+  for(let i=0;i<3;i++){
+    rctx.globalAlpha=0.18+Math.random()*0.12;
+    rctx.lineWidth=brushSize*(0.7+Math.random()*0.4);
+    const jx=(Math.random()-0.5)*brushSize*0.25;
+    const jy=(Math.random()-0.5)*brushSize*0.25;
+    rctx.beginPath();
+    rctx.moveTo(px+jx,py+jy);
+    rctx.lineTo(x+jx,y+jy);
+    rctx.stroke();
+  }
+  rctx.shadowBlur=0;
+  rctx.globalAlpha=0.10;
+  rctx.fillStyle='#000';
+  for(let i=0;i<3;i++){
+    const ox=(Math.random()-0.5)*brushSize;
+    const oy=(Math.random()-0.5)*brushSize;
+    if(Math.hypot(ox,oy)<brushSize/2) rctx.fillRect(x+ox,y+oy,1,1);
+  }
+  rctx.restore();
+}
+
+function stampWatercolor(x,y,px,py){
+  rctx.save();
+  rctx.globalCompositeOperation='multiply';
+  rctx.globalAlpha=0.16;
+  const brush=getWatercolorBrush(brushHardness);
+  const sz=brushSize*2.4;
+
+  const tinted=document.createElement('canvas');
+  tinted.width=brush.width;tinted.height=brush.height;
+  const ttx=tinted.getContext('2d');
+  ttx.fillStyle=currentColor;
+  ttx.fillRect(0,0,tinted.width,tinted.height);
+  ttx.globalCompositeOperation='destination-in';
+  ttx.drawImage(brush,0,0);
+
+  const dist=Math.hypot(x-px,y-py);
+  const steps=Math.max(1,Math.floor(dist/(sz*0.18)));
+  for(let i=0;i<=steps;i++){
+    const t=i/steps;
+    const ix=px+(x-px)*t + (Math.random()-0.5)*sz*0.08;
+    const iy=py+(y-py)*t + (Math.random()-0.5)*sz*0.08;
+    rctx.drawImage(tinted,ix-sz/2,iy-sz/2,sz,sz);
+  }
+  rctx.restore();
+}
+
+// Pencil/Eraser: redraw the ENTIRE path each move (single composite, no dot buildup)
+function redrawPathBrush(){
+  rctx.clearRect(0,0,NATIVE_W,NATIVE_H);
+  if(strokePoints.length===0) return;
+
+  const isEraser = currentTool==='eraser';
+  const color = isEraser ? '#ffffff' : currentColor;
+  const lw = isEraser ? Math.max(6,brushSize*1.1) : Math.max(2,brushSize*0.32);
+
+  rctx.save();
+  rctx.lineCap='round';rctx.lineJoin='round';
+  rctx.strokeStyle=color;
+  rctx.fillStyle=color;
+  rctx.lineWidth=lw;
+
+  const blurAmt=(1-brushHardness)*lw*0.9;
+  if(blurAmt>0.3){ rctx.shadowColor=color; rctx.shadowBlur=blurAmt; }
+
+  if(strokePoints.length===1){
+    rctx.beginPath();
+    rctx.arc(strokePoints[0].x,strokePoints[0].y,lw/2,0,Math.PI*2);
+    rctx.fill();
+  } else {
+    rctx.beginPath();
+    rctx.moveTo(strokePoints[0].x,strokePoints[0].y);
+    for(let i=1;i<strokePoints.length;i++) rctx.lineTo(strokePoints[i].x,strokePoints[i].y);
+    rctx.stroke();
+  }
+
+  if(!isEraser && currentTool==='pencil'){
+    rctx.shadowBlur=0;
+    rctx.globalAlpha=0.12;
+    for(let i=0;i<strokePoints.length;i+=2){
+      const p=strokePoints[i];
+      const ox=(Math.random()-0.5)*brushSize*0.5;
+      const oy=(Math.random()-0.5)*brushSize*0.5;
+      rctx.beginPath();
+      rctx.arc(p.x+ox,p.y+oy,Math.random()*1.5+0.5,0,Math.PI*2);
+      rctx.fill();
+    }
+  }
+  rctx.restore();
+}
+
+// Update the visible live-preview canvas from rawCanvas at the chosen opacity
+function updateLivePreview(){
+  tctxLive.clearRect(0,0,NATIVE_W,NATIVE_H);
+  tctxLive.save();
+  tctxLive.globalAlpha=brushOpacity;
+  tctxLive.drawImage(rawCanvas,0,0);
+  tctxLive.restore();
+}
+
+function startStroke(p){
+  rctx.clearRect(0,0,NATIVE_W,NATIVE_H);
+  tctxLive.clearRect(0,0,NATIVE_W,NATIVE_H);
+  strokePoints=[p];
+  if(currentTool==='pencil'||currentTool==='eraser'){
+    redrawPathBrush();
+  } else if(currentTool==='crayon'){
+    stampCrayon(p.x,p.y,p.x,p.y);
+  } else if(currentTool==='watercolor'){
+    stampWatercolor(p.x,p.y,p.x,p.y);
+  }
+  updateLivePreview();
+}
+
+function continueStroke(p,prev){
+  if(currentTool==='pencil'||currentTool==='eraser'){
+    strokePoints.push(p);
+    redrawPathBrush();
+  } else if(currentTool==='crayon'){
+    stampCrayon(p.x,p.y,prev.x,prev.y);
+  } else if(currentTool==='watercolor'){
+    stampWatercolor(p.x,p.y,prev.x,prev.y);
+  }
+  updateLivePreview();
+}
+
+function commitStroke(){
+  pctx.save();
+  pctx.globalAlpha=brushOpacity;
+  pctx.drawImage(rawCanvas,0,0);
+  pctx.restore();
+  rctx.clearRect(0,0,NATIVE_W,NATIVE_H);
+  tctxLive.clearRect(0,0,NATIVE_W,NATIVE_H);
+  rctx.clearRect(0,0,NATIVE_W,NATIVE_H);
+  strokePoints=[];
+}
+
+
+// ── TOOL CURSORS ──────────────────────────────────────
+function makeCursor(emoji, hotX, hotY){
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
+    <text x="2" y="32" font-size="30">${emoji}</text>
+  </svg>`;
+  // encodeURIComponent handles emoji/unicode safely for data URIs (no btoa needed)
+  const url = 'data:image/svg+xml,'+encodeURIComponent(svg);
+  return `url("${url}") ${hotX} ${hotY}, auto`;
+}
+function updateCursor(){
+  let cur;
+  switch(currentTool){
+    case 'pencil':     cur=makeCursor('✏️',4,32); break;
+    case 'crayon':     cur=makeCursor('🖍️',4,32); break;
+    case 'watercolor': cur=makeCursor('🖌️',4,32); break;
+    case 'eraser':     cur=makeCursor('🧽',16,32); break;
+    case 'pan':        cur='grab'; break;
+    default: cur='crosshair';
+  }
+  canvasWrap.style.cursor=cur;
+}
+
+// ── POINTER HANDLING (draw + pan + pinch zoom) ─────────
+const activePointers=new Map();
+
+canvasWrap.addEventListener('pointerdown',e=>{
+  canvasWrap.setPointerCapture(e.pointerId);
+  activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+
+  if(activePointers.size===1){
+    if(currentTool==='pan'){
+      panStart={x:e.clientX,y:e.clientY,panX,panY};
+    } else {
+      isDrawing=true;
+      saveUndoState();
+      const p=getCanvasPoint(e.clientX,e.clientY);
+      lastPoint=p;
+      startStroke(p);
+    }
+  } else if(activePointers.size===2){
+    isDrawing=false;
+    const pts=[...activePointers.values()];
+    pinchStartDist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+    pinchStartZoom=zoom;
+    pinchStartMid={x:(pts[0].x+pts[1].x)/2,y:(pts[0].y+pts[1].y)/2};
+    panStart={x:pinchStartMid.x,y:pinchStartMid.y,panX,panY};
+  }
+});
+
+canvasWrap.addEventListener('pointermove',e=>{
+  if(!activePointers.has(e.pointerId)) return;
+  activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+
+  if(activePointers.size===1){
+    if(currentTool==='pan' && panStart){
+      canvasWrap.style.cursor='grabbing';
+      panX=panStart.panX+(e.clientX-panStart.x);
+      panY=panStart.panY+(e.clientY-panStart.y);
+      clampPan();
+      applyTransform();
+    } else if(isDrawing){
+      const p=getCanvasPoint(e.clientX,e.clientY);
+      continueStroke(p,lastPoint||p);
+      lastPoint=p;
+    }
+  } else if(activePointers.size===2){
+    const pts=[...activePointers.values()];
+    const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+    const mid={x:(pts[0].x+pts[1].x)/2,y:(pts[0].y+pts[1].y)/2};
+    const newZoom=Math.min(5,Math.max(0.5,pinchStartZoom*(dist/Math.max(1,pinchStartDist))));
+
+    // keep midpoint stable
+    const stageRect=stage.getBoundingClientRect();
+    const localMidX=pinchStartMid.x-stageRect.left;
+    const localMidY=pinchStartMid.y-stageRect.top;
+    const ratio=newZoom/zoom;
+    panX = localMidX - (localMidX-panX)*ratio + (mid.x-pinchStartMid.x);
+    panY = localMidY - (localMidY-panY)*ratio + (mid.y-pinchStartMid.y);
+    zoom=newZoom;
+    clampPan();
+    applyTransform();
+  }
+});
+
+function endPointer(e){
+  activePointers.delete(e.pointerId);
+  if(activePointers.size===0){
+    if(isDrawing) commitStroke();
+    isDrawing=false;lastPoint=null;panStart=null;
+    if(currentTool==='pan') canvasWrap.style.cursor='grab';
+  } else if(activePointers.size===1){
+    // switch remaining pointer to pan-continue smoothly
+    const [pid,pt]=[...activePointers.entries()][0];
+    panStart={x:pt.x,y:pt.y,panX,panY};
+    isDrawing=false;
+  }
+}
+canvasWrap.addEventListener('pointerup',endPointer);
+canvasWrap.addEventListener('pointercancel',endPointer);
+canvasWrap.addEventListener('pointerleave',e=>{ if(e.buttons===0) endPointer(e); });
+
+// Mouse wheel zoom (desktop)
+stage.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const stageRect=stage.getBoundingClientRect();
+  const localX=e.clientX-stageRect.left;
+  const localY=e.clientY-stageRect.top;
+  const factor=e.deltaY<0?1.1:0.9;
+  const newZoom=Math.min(5,Math.max(0.5,zoom*factor));
+  const ratio=newZoom/zoom;
+  panX = localX - (localX-panX)*ratio;
+  panY = localY - (localY-panY)*ratio;
+  zoom=newZoom;
+  clampPan();
+  applyTransform();
+},{passive:false});
+
+// ── LANDSCAPE TOGGLE (jigsaw-style) ─────────────────────
+let landscapeLocked=false;
+function toggleLandscape(){
+  try{
+    if(!landscapeLocked){
+      const el=document.documentElement;
+      if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      if(screen.orientation&&screen.orientation.lock){
+        screen.orientation.lock('landscape').then(()=>{landscapeLocked=true;}).catch(()=>{landscapeLocked=true;});
+      } else { landscapeLocked=true; }
+    } else {
+      if(screen.orientation&&screen.orientation.unlock) screen.orientation.unlock();
+      if(document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+      landscapeLocked=false;
+    }
+    setTimeout(resetView,400);
+  }catch(e){ landscapeLocked=!landscapeLocked; }
+}
+document.getElementById('landscapeBtn').onclick=toggleLandscape;
+if('ontouchstart' in window){
+  document.getElementById('landscapeBtn').style.display='flex';
+}
+
+// Zoom buttons - zoom toward center of stage
+function zoomBy(factor){
+  const sw=stage.clientWidth, sh=stage.clientHeight;
+  const localX=sw/2, localY=sh/2;
+  const newZoom=Math.min(5,Math.max(0.5,zoom*factor));
+  const ratio=newZoom/zoom;
+  panX = localX - (localX-panX)*ratio;
+  panY = localY - (localY-panY)*ratio;
+  zoom=newZoom;
+  clampPan();
+  applyTransform();
+}
+document.getElementById('zoomInBtn').onclick=()=>zoomBy(1.25);
+document.getElementById('zoomOutBtn').onclick=()=>zoomBy(0.8);
+
+// ── SAVE / SHARE ─────────────────────────────────────────
+function compositeCanvas(){
+  const out=document.createElement('canvas');
+  out.width=NATIVE_W;out.height=NATIVE_H;
+  const octx=out.getContext('2d');
+  octx.drawImage(paintCanvas,0,0);
+  octx.drawImage(lineCanvas,0,0);
+  return out;
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+const shareMenu=document.getElementById('shareMenu');
+document.getElementById('saveBtn').onclick=()=>shareMenu.classList.add('show');
+document.getElementById('closeShare').onclick=()=>shareMenu.classList.remove('show');
+shareMenu.addEventListener('click',e=>{ if(e.target===shareMenu) shareMenu.classList.remove('show'); });
+
+document.getElementById('optSavePhone').onclick=()=>{
+  const out=compositeCanvas();
+  out.toBlob(blob=>{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='fab-coloring-page'+currentPage+'.png';
+    document.body.appendChild(a);a.click();a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Saved to your device!! 🎉');
+    shareMenu.classList.remove('show');
+  },'image/png');
+};
+
+document.getElementById('optShare').onclick=async()=>{
+  const out=compositeCanvas();
+  out.toBlob(async blob=>{
+    const file=new File([blob],'fab-coloring-page'+currentPage+'.png',{type:'image/png'});
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({files:[file],title:'My Fab Coloring Page!!',text:'Check out my coloring page from fab.games 🎨'});
+      }catch(e){}
+    } else {
+      showToast('Sharing not supported - try Save instead!!');
+    }
+    shareMenu.classList.remove('show');
+  },'image/png');
+};
+
+document.getElementById('optCopy').onclick=()=>{
+  const out=compositeCanvas();
+  out.toBlob(async blob=>{
+    try{
+      await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+      showToast('Copied to clipboard!! 📋');
+    }catch(e){
+      showToast('Copy not supported on this browser');
+    }
+    shareMenu.classList.remove('show');
+  },'image/png');
+};
+
+
+
+
+// Zoom popover toggle
+const zoomBtn=document.getElementById('zoomBtn');
+const zoomPopover=document.getElementById('zoomPopover');
+zoomBtn.onclick=(e)=>{
+  e.stopPropagation();
+  zoomPopover.classList.toggle('show');
+};
+document.addEventListener('click',e=>{
+  if(!zoomPopover.contains(e.target) && e.target!==zoomBtn){
+    zoomPopover.classList.remove('show');
+  }
+});
+
+// Shortcuts modal
+const shortcutsModal=document.getElementById('shortcutsModal');
+document.getElementById('helpBtn').onclick=()=>shortcutsModal.classList.add('show');
+document.getElementById('closeShortcuts').onclick=()=>shortcutsModal.classList.remove('show');
+shortcutsModal.addEventListener('click',e=>{ if(e.target===shortcutsModal) shortcutsModal.classList.remove('show'); });
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────
+document.addEventListener('keydown',e=>{
+  const cmd=e.metaKey||e.ctrlKey;
+  if(cmd && e.key.toLowerCase()==='z'){
+    e.preventDefault();
+    if(e.shiftKey) doRedo(); else doUndo();
+  } else if(cmd && (e.key==='y')){
+    e.preventDefault(); doRedo();
+  } else if(cmd && (e.key==='='||e.key==='+')){
+    e.preventDefault(); zoomBy(1.25);
+  } else if(cmd && e.key==='-'){
+    e.preventDefault(); zoomBy(0.8);
+  } else if(e.key===']'){
+    e.preventDefault();
+    brushSize=Math.min(60,brushSize+2);
+    document.getElementById('sizeSlider').value=brushSize;
+    updateBrushPreview();
+  } else if(e.key==='['){
+    e.preventDefault();
+    brushSize=Math.max(4,brushSize-2);
+    document.getElementById('sizeSlider').value=brushSize;
+    updateBrushPreview();
+  } else if(e.code==='Space' && !isDrawing && toolBeforeSpace===null){
+    e.preventDefault();
+    toolBeforeSpace=currentTool;
+    currentTool='pan';
+    document.querySelectorAll('.tool-btn').forEach(b=>b.classList.toggle('active',b.dataset.tool==='pan'));
+    updateCursor();
+  }
+});
+document.addEventListener('keyup',e=>{
+  if(e.code==='Space' && toolBeforeSpace!==null){
+    currentTool=toolBeforeSpace;
+    toolBeforeSpace=null;
+    document.querySelectorAll('.tool-btn').forEach(b=>b.classList.toggle('active',b.dataset.tool===currentTool));
+    updateCursor();
+  }
+});
+
+</script>
+</body>
+</html>
