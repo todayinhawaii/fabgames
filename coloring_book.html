@@ -506,6 +506,7 @@ function buildSwatches(){
       document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
       sw.classList.add('active');
       updateBrushPreview();
+      updateCursor();
     };
     drawer.appendChild(sw);
   });
@@ -524,6 +525,7 @@ colorPickerInput.addEventListener('input',e=>{
   document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
   colorPickerSwatch.classList.add('active');
   updateBrushPreview();
+  updateCursor();
 });
 
 function updateBrushPreview(){
@@ -948,16 +950,19 @@ function makeCursor(emoji, hotX, hotY){
   return `url("${url}") ${hotX} ${hotY}, auto`;
 }
 
-// Custom vector pencil cursor - tip pixel is exactly known (no emoji-glyph guesswork)
+// Custom vector COLORED PENCIL cursor - body matches currentColor, tip pixel is exact
 function makePencilCursor(){
+  const body = currentColor;
+  const tipColor = currentColor==='#ffffff' ? '#cccccc' : currentColor;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
-    <polygon points="3,37 8,32 33,7 37,3 39,5 35,9 10,34 5,39" fill="#ffd34d" stroke="#1a1a1a" stroke-width="1.2" stroke-linejoin="round"/>
-    <polygon points="3,37 8,32 10,34 5,39" fill="#5a3825"/>
-    <circle cx="3.5" cy="37.5" r="1" fill="#1a1a1a"/>
+    <polygon points="6,37 11,32 36,7 40,3 40,5 38,9 13,34 8,39" fill="${body}" stroke="#1a1a1a" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="6,37 11,32 13,34 8,39" fill="${tipColor}" stroke="#1a1a1a" stroke-width="1"/>
+    <polygon points="6,37 8,39 4,38" fill="#3a2410"/>
+    <circle cx="5" cy="38" r="1" fill="#1a1a1a"/>
   </svg>`;
   const url = 'data:image/svg+xml,'+encodeURIComponent(svg);
-  // hotspot = the exact graphite tip pixel
-  return `url("${url}") 3 37, crosshair`;
+  // hotspot = the exact pencil-point pixel
+  return `url("${url}") 5 38, crosshair`;
 }
 
 function updateCursor(){
@@ -1053,12 +1058,15 @@ canvasWrap.addEventListener('pointercancel',endPointer);
 canvasWrap.addEventListener('pointerleave',e=>{ if(e.buttons===0) endPointer(e); });
 
 // Mouse wheel zoom (desktop)
+// Paper stays STATIC for plain trackpad/scroll gestures.
+// Zoom via wheel only when Cmd/Ctrl is held (trackpad pinch auto-sends ctrlKey=true).
 stage.addEventListener('wheel',e=>{
   e.preventDefault();
+  if(!(e.ctrlKey||e.metaKey)) return; // ignore plain scroll/pan gestures entirely
   const stageRect=stage.getBoundingClientRect();
   const localX=e.clientX-stageRect.left;
   const localY=e.clientY-stageRect.top;
-  const factor=e.deltaY<0?1.1:0.9;
+  const factor=e.deltaY<0?1.08:0.93;
   const newZoom=Math.min(5,Math.max(0.5,zoom*factor));
   const ratio=newZoom/zoom;
   panX = localX - (localX-panX)*ratio;
