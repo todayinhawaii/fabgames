@@ -368,7 +368,7 @@ window.addEventListener('resize',resize);
 resize();
 
 // ── GAME STATE ────────────────────────────────────
-let player={x:0,y:0,vx:0,vy:0,target:null,facing:1,bob:0,carrying:[]};
+let player={x:0,y:0,vx:0,vy:0,target:null,facing:1,bob:0,carrying:[],pickupCooldown:0};
 // Kite (park) and sailboat (beach) state
 let kite={t:0,x:0,y:0}; // t = time counter for path
 let sailboat={x:-200,y:0,speed:0.7};
@@ -774,6 +774,7 @@ const DUMP_R=118;
 
 function update(){
   player.bob+=0.12;
+  if(player.pickupCooldown>0) player.pickupCooldown--;
 
   // move toward target
   if(player.target){
@@ -795,7 +796,7 @@ function update(){
   for(let i=trashItems.length-1;i>=0;i--){
     const t=trashItems[i];
     t.bob+=0.08;
-    if(player.carrying.length===0 && Math.hypot(player.x-t.x,player.y-t.y)<PICKUP_R){
+    if(player.carrying.length===0 && player.pickupCooldown===0 && Math.hypot(player.x-t.x,player.y-t.y)<PICKUP_R){
       player.carrying.push(t.emoji);
       burst(t.x,t.y,['✨','⭐','💥','🌟'],16);
       sndPickup();
@@ -817,6 +818,7 @@ function update(){
         sndDump();
         if(n>=3) sndCelebrate();
         player.carrying=[];
+        player.pickupCooldown=24;
         document.getElementById('scoreCount').textContent=score;
         document.getElementById('trashCount').textContent=trashItems.length;
         pulsePill('scoreCount');
