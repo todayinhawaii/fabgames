@@ -78,4 +78,8 @@ const GAMES=[
   {id:'trash',emoji:'🧹',cat:'Arcade · Fun',title:'Pick Up The Trash!',
    desc:'Choose your hero and clean up the park or beach!! Pick up litter, dump it in the bins. Fun for all ages!!',
    color:'rgba(34,197,94,0.12)',href:'/trash'},
+
+  {id:'coloring',emoji:'🎨',cat:'Creative · Art',title:'Fab Coloring Book',
+   desc:'20 beautiful pages! Pencil, crayon and watercolor brushes, zoom in to color the details, then save or share your masterpiece!!',
+   color:'rgba(255,215,0,0.10)',href:'/coloring'},
 ];
