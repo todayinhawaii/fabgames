@@ -367,3 +367,7 @@ def who_are_you():
 @app.route('/trash')
 def trash():
     return send_from_directory('.', 'trash.html')
+
+@app.route('/coloring')
+def coloring():
+    return send_from_directory('.', 'coloring_book.html')
