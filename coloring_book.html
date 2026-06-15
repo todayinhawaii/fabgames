@@ -1164,6 +1164,17 @@ function updateCursor(){
 const touchToolIcon=document.getElementById('touchToolIcon');
 const touchToolImg=document.getElementById('touchToolImg');
 const TOUCH_ICON_W=42, TOUCH_ICON_H=63;
+const TOUCH_OFFSET_Y=64; // px - on touch, the tool tip (and the ink point!) sit this far ABOVE the finger
+
+function getInputPoint(e){
+  // For drawing tools on touch, offset the effective point above the finger
+  // so both the tool icon AND the actual ink land where the user can see them.
+  if(e.pointerType==='touch' && currentTool!=='pan'){
+    return {x:e.clientX, y:e.clientY-TOUCH_OFFSET_Y};
+  }
+  return {x:e.clientX, y:e.clientY};
+}
+
 function showTouchIcon(clientX,clientY){
   if(currentTool==='pan') { touchToolIcon.style.display='none'; return; }
   const iconKey = currentTool==='watercolor' ? 'brush' : currentTool;
@@ -1193,10 +1204,11 @@ canvasWrap.addEventListener('pointerdown',e=>{
     } else {
       isDrawing=true;
       saveUndoState();
-      const p=getCanvasPoint(e.clientX,e.clientY);
+      const ip=getInputPoint(e);
+      const p=getCanvasPoint(ip.x,ip.y);
       lastPoint=p;
       startStroke(p);
-      if(e.pointerType==='touch') showTouchIcon(e.clientX,e.clientY);
+      if(e.pointerType==='touch') showTouchIcon(ip.x,ip.y);
     }
   } else if(activePointers.size===2){
     isDrawing=false;
@@ -1220,10 +1232,11 @@ canvasWrap.addEventListener('pointermove',e=>{
       clampPan();
       applyTransform();
     } else if(isDrawing){
-      const p=getCanvasPoint(e.clientX,e.clientY);
+      const ip=getInputPoint(e);
+      const p=getCanvasPoint(ip.x,ip.y);
       continueStroke(p,lastPoint||p);
       lastPoint=p;
-      if(e.pointerType==='touch') showTouchIcon(e.clientX,e.clientY);
+      if(e.pointerType==='touch') showTouchIcon(ip.x,ip.y);
     }
   } else if(activePointers.size===2){
     const pts=[...activePointers.values()];
