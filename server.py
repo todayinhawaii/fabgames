@@ -371,3 +371,7 @@ def trash():
 @app.route('/coloring')
 def coloring():
     return send_from_directory('.', 'coloring_book.html')
+
+@app.route('/airhockey')
+def airhockey():
+    return send_from_directory('.', 'airhockey.html')
