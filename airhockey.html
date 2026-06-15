@@ -84,6 +84,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
   padding:18px 12px;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;gap:4px;
 }
 .diff-card:active{transform:scale(0.96);}
+.diff-card.selected{
+  transform:scale(1.04);
+  box-shadow:0 0 0 3px rgba(255,215,0,0.7), 0 0 22px rgba(255,215,0,0.35);
+  border-color:var(--gold) !important;
+}
 .diff-card .dname{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold2);}
 .diff-card .ddesc{font-size:11px;color:var(--muted);line-height:1.4;}
 .diff-card.easy{border-color:rgba(76,217,100,0.4);}
@@ -331,6 +336,7 @@ a.linklike{color:var(--gold2);text-decoration:underline;cursor:pointer;}
       <div class="ddesc">Near-perfect AI. Lightning reflexes. Good luck!!</div>
     </div>
   </div>
+  <div class="btn btn-gold" id="playBtn" style="max-width:420px;font-size:18px;letter-spacing:3px;display:none;">🏒 LET'S PLAY!!</div>
   <div class="btn btn-ghost" id="leaderboardBtn" style="max-width:420px;">🏆 Leaderboard</div>
   <div class="fineprint">First to 7 goals wins the match!!</div>
 </div>
@@ -457,15 +463,28 @@ const DIFFICULTIES={
 };
 let currentDifficulty='medium';
 
+// Tap card = select; PLAY button = start
+function selectDifficulty(diff){
+  currentDifficulty=diff;
+  document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelector(`.diff-card[data-diff="${diff}"]`).classList.add('selected');
+  document.getElementById('playBtn').style.display='flex';
+}
 document.querySelectorAll('.diff-card').forEach(card=>{
-  function chooseLevel(){
-    currentDifficulty=card.dataset.diff;
-    document.getElementById('aiNameLabel').textContent=DIFFICULTIES[currentDifficulty].label.toUpperCase();
-    startMatch();
-  }
-  card.addEventListener('click', chooseLevel);
-  card.addEventListener('touchend', e=>{ e.preventDefault(); chooseLevel(); });
+  function pickCard(){ selectDifficulty(card.dataset.diff); }
+  card.addEventListener('click', pickCard);
+  card.addEventListener('touchend', e=>{ e.preventDefault(); pickCard(); });
 });
+// default select easy so there's always something selected
+selectDifficulty('easy');
+
+function startSelectedMatch(){
+  document.getElementById('aiNameLabel').textContent=DIFFICULTIES[currentDifficulty].label.toUpperCase();
+  startMatch();
+}
+const playBtn=document.getElementById('playBtn');
+playBtn.addEventListener('click', startSelectedMatch);
+playBtn.addEventListener('touchend', e=>{ e.preventDefault(); startSelectedMatch(); });
 
 document.getElementById('leaderboardBtn').addEventListener('click',()=>{renderLeaderboard();showScreen(leaderboardScreen);});
 document.getElementById('lbBackBtn').addEventListener('click',()=>showScreen(menuScreen));
