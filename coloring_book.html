@@ -50,7 +50,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
   height:calc(100vh - 132px);
   width:100vw;
   overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
   background:
     repeating-conic-gradient(rgba(255,255,255,0.025) 0% 25%, transparent 0% 50%) 50% / 26px 26px,
     #16161a;
@@ -316,6 +315,31 @@ body.immersive #stage{
   top:0;bottom:0;height:100vh;
 }
 
+
+#touchToolIcon{
+  position:fixed;pointer-events:none;z-index:97;
+  width:42px;height:63px;display:none;
+}
+#touchToolIcon img{
+  width:100%;height:100%;object-fit:contain;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,0.45));
+}
+
+
+@keyframes tabFlash{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.6);}
+  50%{box-shadow:0 0 0 10px rgba(255,215,0,0);}
+}
+#paletteTab.flash{animation:tabFlash 0.9s ease-out 3;}
+#paletteTab .tab-label{
+  position:absolute;top:50%;right:36px;transform:translateY(-50%);
+  white-space:nowrap;font-size:11px;font-weight:800;letter-spacing:0.5px;
+  background:rgba(0,0,0,0.78);color:var(--gold2);
+  padding:5px 10px;border-radius:8px;
+  opacity:0;transition:opacity 0.25s;pointer-events:none;
+}
+#paletteTab.show-label .tab-label{opacity:1;}
+
 /* extra controls */
 .tool-btn[data-tool="eraser"] .ti{font-size:18px;}
 .swatch.custom{
@@ -424,7 +448,7 @@ body.immersive #stage{
 </div>
 
 <!-- PALETTE TAB -->
-<div id="paletteTab">◀</div>
+<div id="paletteTab">◀<span class="tab-label" id="paletteTabLabel">Hide toolbars</span></div>
 
 <!-- SIDE PALETTE -->
 <div id="paletteDrawer">
@@ -501,6 +525,7 @@ body.immersive #stage{
   <p>Fab Coloring Book is best in landscape - rotate your device or tap below to lock landscape mode and color in full size!!</p>
   <div class="rot-btn" id="rotatePromptBtn">🔄 Rotate to Landscape</div>
 </div>
+<div id="touchToolIcon"><img id="touchToolImg" alt=""></div>
 <div id="toast"></div>
 
 <script>
@@ -671,6 +696,7 @@ const paletteDrawer=document.getElementById('paletteDrawer');
 const paletteTab=document.getElementById('paletteTab');
 let drawerOpen=true;
 let immersiveOn=false;
+const paletteTabLabel=document.getElementById('paletteTabLabel');
 function setImmersive(on){
   immersiveOn=on;
   drawerOpen=!on;
@@ -678,6 +704,8 @@ function setImmersive(on){
   paletteDrawer.classList.toggle('hidden',on);
   paletteTab.classList.toggle('shifted',!on);
   paletteTab.textContent = on ? '▶' : '◀';
+  paletteTabLabel.textContent = on ? 'Show toolbars' : 'Hide toolbars';
+  paletteTab.classList.remove('flash');
   setTimeout(resetView,60);
   setTimeout(resetView,300);
 }
@@ -685,6 +713,14 @@ paletteTab.onclick=()=>setImmersive(!immersiveOn);
 // initial state: drawer visible, tab attached to its left edge
 paletteTab.classList.add('shifted');
 paletteTab.textContent='◀';
+
+// Mobile: flash the toggle a few times on load + briefly show its label
+if('ontouchstart' in window){
+  setTimeout(()=>{
+    paletteTab.classList.add('flash','show-label');
+    setTimeout(()=>paletteTab.classList.remove('flash','show-label'),3200);
+  },700);
+}
 
 // ── LOAD PAGE (line art + background) ────────────────
 function loadPage(n){
@@ -1123,6 +1159,27 @@ function updateCursor(){
   canvasWrap.style.cursor=cur;
 }
 
+
+// ── TOUCH TOOL ICON (mobile: shows tool image at finger while drawing) ──
+const touchToolIcon=document.getElementById('touchToolIcon');
+const touchToolImg=document.getElementById('touchToolImg');
+const TOUCH_ICON_W=42, TOUCH_ICON_H=63;
+function showTouchIcon(clientX,clientY){
+  if(currentTool==='pan') { touchToolIcon.style.display='none'; return; }
+  const iconKey = currentTool==='watercolor' ? 'brush' : currentTool;
+  const tip=TOOL_TIP[iconKey];
+  if(!tip){ touchToolIcon.style.display='none'; return; }
+  const flipped=!!toolFlip[iconKey];
+  touchToolImg.src=TOOL_ICONS_CURSOR[iconKey];
+  touchToolImg.style.transform = flipped ? 'scaleX(-1)' : 'none';
+  const tipX = flipped ? (1-tip.x)*TOUCH_ICON_W : tip.x*TOUCH_ICON_W;
+  const tipY = tip.y*TOUCH_ICON_H;
+  touchToolIcon.style.left=(clientX-tipX)+'px';
+  touchToolIcon.style.top=(clientY-tipY)+'px';
+  touchToolIcon.style.display='block';
+}
+function hideTouchIcon(){ touchToolIcon.style.display='none'; }
+
 // ── POINTER HANDLING (draw + pan + pinch zoom) ─────────
 const activePointers=new Map();
 
@@ -1139,6 +1196,7 @@ canvasWrap.addEventListener('pointerdown',e=>{
       const p=getCanvasPoint(e.clientX,e.clientY);
       lastPoint=p;
       startStroke(p);
+      if(e.pointerType==='touch') showTouchIcon(e.clientX,e.clientY);
     }
   } else if(activePointers.size===2){
     isDrawing=false;
@@ -1165,6 +1223,7 @@ canvasWrap.addEventListener('pointermove',e=>{
       const p=getCanvasPoint(e.clientX,e.clientY);
       continueStroke(p,lastPoint||p);
       lastPoint=p;
+      if(e.pointerType==='touch') showTouchIcon(e.clientX,e.clientY);
     }
   } else if(activePointers.size===2){
     const pts=[...activePointers.values()];
@@ -1191,6 +1250,7 @@ function endPointer(e){
     if(isDrawing) commitStroke();
     isDrawing=false;lastPoint=null;panStart=null;
     if(currentTool==='pan') canvasWrap.style.cursor='grab';
+    hideTouchIcon();
   } else if(activePointers.size===1){
     // switch remaining pointer to pan-continue smoothly
     const [pid,pt]=[...activePointers.entries()][0];
