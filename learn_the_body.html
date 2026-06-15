@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Learn The Body 🧠</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Cormorant+Garamond:ital,wght@0,600;1,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#c9a84c; --gold2:#e8c96a;
+  --cream:#fffaf2; --ink:#3a3a3a;
+  --boy:#4ea8de; --girl:#ff8fab;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+html,body{width:100%;min-height:100%;background:var(--cream);color:var(--ink);font-family:'Baloo 2',sans-serif;}
+body{padding-bottom:140px;}
+
+/* ── TOP BAR ── */
+#topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;
+  background:#0d0d0f;border-bottom:3px solid var(--gold);
+}
+.logo{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,4.5vw,26px);letter-spacing:2px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.home-link{
+  width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(201,168,76,0.4);
+  color:#e8c96a;text-decoration:none;font-size:17px;
+}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:18px 16px 10px;}
+.hero h1{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,7vw,44px);letter-spacing:3px;
+  background:linear-gradient(135deg,#ff8fab,#4ea8de);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(13px,3vw,17px);
+  color:#7a6a55;margin-top:4px;
+}
+
+/* ── MODE TOGGLE ── */
+.mode-row{display:flex;justify-content:center;gap:10px;padding:12px 16px;}
+.mode-btn{
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:14px;letter-spacing:0.5px;
+  padding:11px 22px;border-radius:30px;border:2.5px solid;cursor:pointer;transition:all 0.15s;
+}
+.mode-btn:active{transform:scale(0.96);}
+.mode-btn.explore{background:#fff;border-color:var(--gold);color:#8a6a1f;}
+.mode-btn.explore.active{background:linear-gradient(135deg,#ffd700,#c9a84c);color:#1a1a1a;
+  box-shadow:0 4px 0 #8a6a1f;}
+.mode-btn.quiz{background:#fff;border-color:#9b5de5;color:#6a3aa8;}
+.mode-btn.quiz.active{background:linear-gradient(135deg,#c77dff,#9b5de5);color:#fff;
+  box-shadow:0 4px 0 #5a2a8a;}
+
+/* ── QUIZ BANNER ── */
+#quizBanner{
+  display:none;max-width:680px;margin:0 auto 8px;padding:14px 20px;border-radius:18px;
+  background:linear-gradient(135deg,#c77dff,#9b5de5);color:#fff;text-align:center;
+}
+#quizBanner.show{display:block;}
+#quizBanner .qtitle{font-size:13px;letter-spacing:2px;opacity:0.85;font-weight:700;}
+#quizBanner .qtext{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,5.5vw,32px);letter-spacing:2px;margin:2px 0;}
+#quizBanner .qscore{font-size:13px;font-weight:700;opacity:0.9;}
+#quizFeedback{margin-top:6px;font-weight:800;font-size:15px;min-height:22px;}
+
+/* ── BODIES ── */
+.bodies-wrap{
+  display:flex;justify-content:center;align-items:flex-start;gap:18px;
+  flex-wrap:wrap;padding:6px 16px 10px;
+}
+.body-col{display:flex;flex-direction:column;align-items:center;width:min(46vw,300px);}
+.body-label{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(16px,4vw,22px);letter-spacing:3px;
+  padding:5px 22px;border-radius:20px;margin-bottom:8px;color:#fff;
+}
+.body-label.boy{background:var(--boy);}
+.body-label.girl{background:var(--girl);}
+
+.body-wrap{position:relative;width:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.10));}
+.body-wrap img{display:block;width:100%;height:auto;border-radius:8px;}
+
+.hotspot{
+  position:absolute;cursor:pointer;border-radius:50%;
+  background:transparent;border:3px solid transparent;
+  transition:all 0.18s ease;
+}
+.hotspot:hover{background:rgba(255,255,255,0.18);border-color:rgba(255,215,0,0.5);}
+.hotspot.dim{opacity:0.15;}
+.hotspot.highlight{
+  background:rgba(255,235,59,0.32);
+  border-color:#ffd700;
+  box-shadow:0 0 0 4px rgba(255,215,0,0.35), 0 0 18px rgba(255,215,0,0.6);
+  animation:hsPulse 1s ease-in-out infinite;
+}
+.hotspot.correct{
+  background:rgba(76,217,100,0.35);border-color:#4cd964;
+  animation:correctPulse 0.6s ease;
+}
+.hotspot.wrong{ animation:wrongShake 0.4s ease; border-color:#ff5b6e; background:rgba(255,91,110,0.25);}
+@keyframes hsPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+@keyframes correctPulse{0%{transform:scale(1);}40%{transform:scale(1.18);}100%{transform:scale(1);}}
+@keyframes wrongShake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-5px);} 75%{transform:translateX(5px);}
+}
+
+/* ── INFO CARD ── */
+#infoCard{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  background:#fff;border-top:4px solid var(--gold);
+  border-radius:24px 24px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,0.12);
+  padding:16px 20px 22px;
+  display:flex;align-items:center;gap:16px;
+  transform:translateY(100%);transition:transform 0.28s cubic-bezier(.4,0,.2,1);
+  max-width:680px;margin:0 auto;
+}
+#infoCard.show{transform:translateY(0);}
+#infoCard .icon-dot{
+  width:54px;height:54px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  border:3px solid #fff;box-shadow:0 0 0 3px var(--gold2);
+}
+#infoCard .info-text{flex:1;}
+#infoCard .info-label{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,5vw,26px);letter-spacing:2px;color:#1a1a1a;
+}
+#infoCard .info-desc{font-size:14px;line-height:1.4;color:#555;margin-top:2px;}
+#closeInfo{
+  flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;
+  background:#f1f1f1;color:#888;font-size:16px;cursor:pointer;
+}
+
+@media(min-width:700px){
+  .bodies-wrap{gap:50px;}
+  .body-col{width:300px;}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">🧠 Learn The Body</div>
+  <a href="/" class="home-link" title="Back to fab.games">🏠</a>
+</div>
+
+<div class="hero">
+  <h1>Learn The Body!!</h1>
+  <p>Tap any part to discover what it does - then test yourself in Quiz mode!!</p>
+</div>
+
+<div class="mode-row">
+  <div class="mode-btn explore active" id="exploreBtn">🔍 Explore</div>
+  <div class="mode-btn quiz" id="quizBtn">🎯 Quiz Me!!</div>
+</div>
+
+<div id="quizBanner">
+  <div class="qtitle">FIND THE...</div>
+  <div class="qtext" id="quizTarget">HEART</div>
+  <div class="qscore" id="quizScore">Score: 0 / 0</div>
+  <div id="quizFeedback"></div>
+</div>
+
+<div class="bodies-wrap">
+  <div class="body-col">
+    <div class="body-label boy">BOY BODY</div>
+    <div class="body-wrap">
+      <img src="/male.png" alt="Boy body diagram">
+      <div class="hotspot" data-id="male_brain" data-concept="brain" style="left:29%;top:0%;width:34%;height:9.6%;"></div>
+      <div class="hotspot" data-id="male_eyes" data-concept="eyes" style="left:28%;top:13%;width:39%;height:4.5%;"></div>
+      <div class="hotspot" data-id="male_nose" data-concept="nose" style="left:45%;top:16%;width:11%;height:4.0%;"></div>
+      <div class="hotspot" data-id="male_mouth" data-concept="mouth" style="left:40%;top:20%;width:20%;height:4.5%;"></div>
+      <div class="hotspot" data-id="male_trachea" data-concept="trachea" style="left:40%;top:24%;width:10%;height:11.5%;"></div>
+      <div class="hotspot" data-id="male_lung_l" data-concept="lungs" style="left:18%;top:31.2%;width:27%;height:16.8%;"></div>
+      <div class="hotspot" data-id="male_lung_r" data-concept="lungs" style="left:50%;top:31.2%;width:28%;height:16.8%;"></div>
+      <div class="hotspot" data-id="male_heart" data-concept="heart" style="left:42%;top:36%;width:20%;height:11.2%;"></div>
+      <div class="hotspot" data-id="male_liver" data-concept="liver" style="left:20%;top:48%;width:27%;height:8.8%;"></div>
+      <div class="hotspot" data-id="male_gallbladder" data-concept="gallbladder" style="left:30%;top:53%;width:12%;height:4.0%;"></div>
+      <div class="hotspot" data-id="male_stomach" data-concept="stomach" style="left:48%;top:48%;width:28%;height:11.2%;"></div>
+      <div class="hotspot" data-id="male_large_intestine" data-concept="large_intestine" style="left:18%;top:58%;width:60%;height:4%;"></div>
+      <div class="hotspot" data-id="male_small_intestine" data-concept="small_intestine" style="left:18%;top:61%;width:60%;height:14%;"></div>
+    </div>
+  </div>
+  <div class="body-col">
+    <div class="body-label girl">GIRL BODY</div>
+    <div class="body-wrap">
+      <img src="/female.png" alt="Girl body diagram">
+      <div class="hotspot" data-id="female_brain" data-concept="brain" style="left:29%;top:0%;width:34%;height:9.6%;"></div>
+      <div class="hotspot" data-id="female_eyes" data-concept="eyes" style="left:28%;top:13%;width:39%;height:4.5%;"></div>
+      <div class="hotspot" data-id="female_nose" data-concept="nose" style="left:45%;top:16%;width:11%;height:4.0%;"></div>
+      <div class="hotspot" data-id="female_mouth" data-concept="mouth" style="left:40%;top:20%;width:20%;height:4.5%;"></div>
+      <div class="hotspot" data-id="female_trachea" data-concept="trachea" style="left:40%;top:24%;width:10%;height:11.5%;"></div>
+      <div class="hotspot" data-id="female_lung_l" data-concept="lungs" style="left:18%;top:31.2%;width:27%;height:16.8%;"></div>
+      <div class="hotspot" data-id="female_lung_r" data-concept="lungs" style="left:50%;top:31.2%;width:28%;height:16.8%;"></div>
+      <div class="hotspot" data-id="female_heart" data-concept="heart" style="left:42%;top:36%;width:20%;height:11.2%;"></div>
+      <div class="hotspot" data-id="female_liver" data-concept="liver" style="left:20%;top:48%;width:27%;height:8.8%;"></div>
+      <div class="hotspot" data-id="female_gallbladder" data-concept="gallbladder" style="left:30%;top:53%;width:12%;height:4.0%;"></div>
+      <div class="hotspot" data-id="female_stomach" data-concept="stomach" style="left:48%;top:48%;width:28%;height:11.2%;"></div>
+      <div class="hotspot" data-id="female_large_intestine" data-concept="large_intestine" style="left:18%;top:58%;width:60%;height:4%;"></div>
+      <div class="hotspot" data-id="female_small_intestine" data-concept="small_intestine" style="left:18%;top:61%;width:60%;height:4%;"></div>
+      <div class="hotspot" data-id="female_ovary_l" data-concept="ovary" style="left:27%;top:59%;width:15%;height:6%;"></div>
+      <div class="hotspot" data-id="female_ovary_r" data-concept="ovary" style="left:58%;top:60%;width:15%;height:6%;"></div>
+      <div class="hotspot" data-id="female_uterus" data-concept="uterus" style="left:32%;top:65%;width:33%;height:6%;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="infoCard">
+  <div class="icon-dot" id="infoIcon">❤️</div>
+  <div class="info-text">
+    <div class="info-label" id="infoLabel">HEART</div>
+    <div class="info-desc" id="infoDesc">Your heart pumps blood all around your body!!</div>
+  </div>
+  <button id="closeInfo">✕</button>
+</div>
+
+<script>
+const ORGANS = {"brain": {"label": "BRAIN", "emoji": "\ud83e\udde0", "fill": "#f7b6c2", "desc": "Your brain controls your whole body and helps you think, learn and remember!!"}, "eyes": {"label": "EYES", "emoji": "\ud83d\udc40", "fill": "#ffffff", "desc": "Your eyes let you see the wonderful world around you!!"}, "nose": {"label": "NOSE", "emoji": "\ud83d\udc43", "fill": "#f4a18a", "desc": "Your nose helps you smell yummy food and fresh flowers!!"}, "mouth": {"label": "MOUTH", "emoji": "\ud83d\udc44", "fill": "#e8607a", "desc": "Your mouth helps you eat, talk, sing and smile!!"}, "trachea": {"label": "WINDPIPE", "emoji": "\ud83c\udf99\ufe0f", "fill": "#5fb6e8", "desc": "Your windpipe is a tube that carries air down to your lungs when you breathe!!"}, "lungs": {"label": "LUNGS", "emoji": "\ud83e\udec1", "fill": "#ffb6c1", "desc": "Your lungs breathe in fresh air and send oxygen to your whole body!!"}, "heart": {"label": "HEART", "emoji": "\u2764\ufe0f", "fill": "#e63946", "desc": "Your heart pumps blood all around your body, every single second!!"}, "liver": {"label": "LIVER", "emoji": "\ud83d\udfe4", "fill": "#a0522d", "desc": "Your liver cleans your blood and helps you digest your food!!"}, "gallbladder": {"label": "GALLBLADDER", "emoji": "\ud83d\udfe2", "fill": "#9acd32", "desc": "Your gallbladder stores a juice called bile that helps you digest fatty foods!!"}, "stomach": {"label": "STOMACH", "emoji": "\ud83c\udf7d\ufe0f", "fill": "#ffb347", "desc": "Your stomach mixes and mashes your food to start digesting it!!"}, "large_intestine": {"label": "LARGE INTESTINE", "emoji": "\ud83c\udf00", "fill": "#9acd32", "desc": "Your large intestine soaks up water from leftover food before it becomes waste!!"}, "small_intestine": {"label": "SMALL INTESTINE", "emoji": "\ud83c\udf5c", "fill": "#ff9a9e", "desc": "Your small intestine absorbs nutrients and vitamins from food into your blood!!"}, "ovary": {"label": "OVARY", "emoji": "\ud83d\udfe3", "fill": "#b56cd6", "desc": "Ovaries are special - only girls and women have them!! They make egg cells."}, "uterus": {"label": "UTERUS", "emoji": "\ud83c\udf38", "fill": "#ff9bb3", "desc": "The uterus is found only in girls and women - it is where a baby can grow!!"}};
+const QUESTIONS = [{"label": "BRAIN", "concept": "brain"}, {"label": "EYES", "concept": "eyes"}, {"label": "NOSE", "concept": "nose"}, {"label": "MOUTH", "concept": "mouth"}, {"label": "WINDPIPE", "concept": "trachea"}, {"label": "LUNGS", "concept": "lungs"}, {"label": "HEART", "concept": "heart"}, {"label": "LIVER", "concept": "liver"}, {"label": "GALLBLADDER", "concept": "gallbladder"}, {"label": "STOMACH", "concept": "stomach"}, {"label": "LARGE INTESTINE", "concept": "large_intestine"}, {"label": "SMALL INTESTINE", "concept": "small_intestine"}, {"label": "OVARY", "concept": "ovary", "hint": "Only girls and women have these - look at the GIRL body!!"}, {"label": "UTERUS", "concept": "uterus", "hint": "Only girls and women have this - look at the GIRL body!!"}];
+
+const infoCard=document.getElementById('infoCard');
+const exploreBtn=document.getElementById('exploreBtn');
+const quizBtn=document.getElementById('quizBtn');
+const quizBanner=document.getElementById('quizBanner');
+
+let mode='explore';
+let quizScore=0, quizTotal=0;
+let currentQuestion=null;
+let lockInput=false;
+
+function allHotspots(){ return document.querySelectorAll('.hotspot'); }
+
+function clearHighlights(){
+  allHotspots().forEach(el=>el.classList.remove('highlight','dim','correct','wrong'));
+}
+
+function showInfo(concept){
+  const m=ORGANS[concept];
+  document.getElementById('infoIcon').textContent = m.emoji;
+  document.getElementById('infoIcon').style.background = m.fill;
+  document.getElementById('infoLabel').textContent = m.label;
+  document.getElementById('infoDesc').textContent = m.desc;
+  infoCard.classList.add('show');
+}
+document.getElementById('closeInfo').onclick=()=>infoCard.classList.remove('show');
+
+function highlightConcept(concept){
+  clearHighlights();
+  allHotspots().forEach(el=>{
+    if(el.dataset.concept===concept){
+      el.classList.add('highlight');
+    } else {
+      el.classList.add('dim');
+    }
+  });
+}
+
+// ── EXPLORE MODE ──
+function onHotspotClickExplore(el){
+  const concept=el.dataset.concept;
+  highlightConcept(concept);
+  showInfo(concept);
+}
+
+// ── QUIZ MODE ──
+function nextQuestion(){
+  clearHighlights();
+  infoCard.classList.remove('show');
+  document.getElementById('quizFeedback').textContent='';
+  currentQuestion=QUESTIONS[Math.floor(Math.random()*QUESTIONS.length)];
+  document.getElementById('quizTarget').textContent=currentQuestion.label;
+  document.getElementById('quizScore').textContent=`Score: ${quizScore} / ${quizTotal}`;
+  lockInput=false;
+}
+
+function onHotspotClickQuiz(el){
+  if(lockInput) return;
+  const concept=el.dataset.concept;
+  const isCorrect = concept===currentQuestion.concept;
+
+  quizTotal++;
+  const fb=document.getElementById('quizFeedback');
+
+  if(isCorrect){
+    quizScore++;
+    // highlight ALL matching hotspots (e.g. both lungs, both ovaries) on both bodies
+    allHotspots().forEach(h=>{
+      if(h.dataset.concept===concept) h.classList.add('correct');
+    });
+    fb.textContent='✅ Yes!! Great job!!';
+    fb.style.color='#2a9d4a';
+    lockInput=true;
+    setTimeout(nextQuestion, 1400);
+  } else {
+    el.classList.add('wrong');
+    setTimeout(()=>el.classList.remove('wrong'),400);
+    fb.textContent = currentQuestion.hint ? ('🤔 Not quite!! '+currentQuestion.hint) : '🤔 Not quite - try again!!';
+    fb.style.color='#c0392b';
+  }
+  document.getElementById('quizScore').textContent=`Score: ${quizScore} / ${quizTotal}`;
+}
+
+// ── WIRE UP CLICKS ──
+allHotspots().forEach(el=>{
+  el.addEventListener('click',()=>{
+    if(mode==='explore') onHotspotClickExplore(el);
+    else onHotspotClickQuiz(el);
+  });
+});
+
+// ── MODE SWITCHING ──
+exploreBtn.onclick=()=>{
+  mode='explore';
+  exploreBtn.classList.add('active');
+  quizBtn.classList.remove('active');
+  quizBanner.classList.remove('show');
+  clearHighlights();
+  infoCard.classList.remove('show');
+};
+quizBtn.onclick=()=>{
+  mode='quiz';
+  quizBtn.classList.add('active');
+  exploreBtn.classList.remove('active');
+  quizBanner.classList.add('show');
+  infoCard.classList.remove('show');
+  quizScore=0; quizTotal=0;
+  nextQuestion();
+};
+</script>
+</body>
+</html>
