@@ -520,6 +520,23 @@ function onHotspotClickExplore(el){
 }
 
 // ── QUIZ MODE ──
+// ── SHUFFLE DECK: cycle through all questions before repeating ──
+let clickDeck=[], mcDeck=[], lastType=null;
+function shuffled(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function pickNext(){
+  // alternate between click and MC types
+  const preferMC = lastType==='click' || (lastType===null && Math.random()<0.5);
+  if(preferMC){
+    if(mcDeck.length===0) mcDeck=shuffled(MC_QUESTIONS);
+    lastType='mc';
+    return {type:'mc', ...mcDeck.pop()};
+  } else {
+    if(clickDeck.length===0) clickDeck=shuffled(QUESTIONS);
+    lastType='click';
+    return {type:'click', ...clickDeck.pop()};
+  }
+}
+
 function nextQuestion(){
   clearHighlights();
   infoCard.classList.remove('show');
@@ -527,9 +544,10 @@ function nextQuestion(){
   const mcChoices=document.getElementById('mcChoices');
   const qTitle=document.getElementById('qTitle');
 
-  const useMC = Math.random()<0.5;
+  const next=pickNext();
+  const useMC = next.type==='mc';
   if(useMC){
-    const q = MC_QUESTIONS[Math.floor(Math.random()*MC_QUESTIONS.length)];
+    const q = next;
     currentQuestion = {type:'mc', ...q};
     qTitle.textContent='🤔 QUESTION';
     document.getElementById('quizTarget').textContent=currentQuestion.q;
@@ -544,7 +562,7 @@ function nextQuestion(){
       mcChoices.appendChild(btn);
     });
   } else {
-    currentQuestion = {type:'click', ...QUESTIONS[Math.floor(Math.random()*QUESTIONS.length)]};
+    currentQuestion = {type:'click', ...next};
     qTitle.textContent='✨ FIND THE... ✨';
     document.getElementById('quizTarget').textContent=currentQuestion.label;
     mcChoices.style.display='none';
