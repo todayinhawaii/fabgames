@@ -233,17 +233,48 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 .result-lose{color:#ff6b6b;text-shadow:0 0 30px rgba(255,107,107,0.5);}
 .final-score{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);}
 
-/* ── ROTATE PROMPT ── */
-#rotatePrompt{
-  position:fixed;inset:0;z-index:95;display:none;
-  flex-direction:column;align-items:center;justify-content:center;gap:18px;
-  background:rgba(7,7,8,0.97);text-align:center;padding:30px;
+
+
+/* ── MOBILE TRACKPAD ── */
+#mobileControls{
+  display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  width:100%;background:#0d0d0f;border-top:2px solid var(--gold);
+  flex:1;min-height:160px;max-height:240px;position:relative;
+  touch-action:none;user-select:none;
 }
-#rotatePrompt.show{display:flex;}
-#rotatePrompt .rot-icon{font-size:64px;animation:rotPulse 1.6s ease-in-out infinite;}
-@keyframes rotPulse{0%,100%{transform:rotate(0deg);}50%{transform:rotate(90deg);}}
-#rotatePrompt h2{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px;color:var(--gold2);}
-#rotatePrompt p{color:var(--muted);font-size:14px;max-width:280px;line-height:1.5;}
+#trackpad{
+  width:92%;height:78%;border-radius:18px;
+  background:radial-gradient(ellipse at center,rgba(201,168,76,0.08),rgba(0,0,0,0.3));
+  border:2px solid rgba(201,168,76,0.35);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;touch-action:none;
+  box-shadow:inset 0 2px 12px rgba(0,0,0,0.4);
+}
+#trackpadLabel{
+  position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(201,168,76,0.55);font-weight:700;pointer-events:none;
+}
+#trackpadDot{
+  width:44px;height:44px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 35% 35%,#ffd700,#c9a84c);
+  box-shadow:0 0 18px rgba(255,215,0,0.55),0 4px 8px rgba(0,0,0,0.4);
+  border:2px solid rgba(255,255,255,0.35);
+  position:absolute;transition:transform 0.05s;
+}
+#trackpadHint{
+  font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:1px;
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;pointer-events:none;
+}
+
+/* mobile portrait layout */
+@media (max-width:700px){
+  #gameScreen{flex-direction:column;justify-content:flex-start;}
+  #mobileControls{display:flex;}
+  #tableWrap{flex:none;}
+}
 
 .fineprint{font-size:11px;color:var(--muted);max-width:340px;line-height:1.5;}
 a.linklike{color:var(--gold2);text-decoration:underline;cursor:pointer;}
@@ -354,13 +385,6 @@ a.linklike{color:var(--gold2);text-decoration:underline;cursor:pointer;}
   <div class="btn btn-ghost" id="goMenuBtn" style="max-width:340px;">🏠 Main Menu</div>
 </div>
 
-<!-- ═══ ROTATE PROMPT (mobile) ═══ -->
-<div id="rotatePrompt">
-  <div class="rot-icon">📱</div>
-  <h2>Turn your phone sideways!!</h2>
-  <p>Fab Air Hockey is best in landscape - rotate your device or tap below to lock landscape mode!!</p>
-  <div class="btn btn-gold" id="rotatePromptBtn" style="max-width:280px;">🔄 Rotate to Landscape</div>
-</div>
 
 <script>
 /* ============================================================
@@ -540,10 +564,10 @@ function resizeCanvas(){
   canvas.height=Math.round(TABLE_H*dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
 }
-window.addEventListener('resize',()=>{resizeCanvas();checkOrientation();});
-window.addEventListener('orientationchange',()=>setTimeout(()=>{resizeCanvas();checkOrientation();},300));
+window.addEventListener('resize',resizeCanvas);
+window.addEventListener('orientationchange',()=>setTimeout(resizeCanvas,300));
 
-// ── POINTER CONTROL (player mallet, right half) ─────────
+// ── DESKTOP POINTER CONTROL (direct canvas touch - desktop only) ──
 function getTablePoint(clientX,clientY){
   const rect=canvas.getBoundingClientRect();
   return {
@@ -551,19 +575,62 @@ function getTablePoint(clientX,clientY){
     y:(clientY-rect.top)/rect.height*TABLE_H
   };
 }
-function setPlayerTarget(clientX,clientY){
-  const p=getTablePoint(clientX,clientY);
-  playerTarget.x=clamp(p.x, TABLE_W/2+CENTER_MARGIN, TABLE_W-MALLET_MARGIN);
-  playerTarget.y=clamp(p.y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
+function setPlayerTarget(x,y){
+  playerTarget.x=clamp(x, TABLE_W/2+CENTER_MARGIN, TABLE_W-MALLET_MARGIN);
+  playerTarget.y=clamp(y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
 }
-canvas.addEventListener('pointerdown',e=>{
-  canvas.setPointerCapture(e.pointerId);
-  setPlayerTarget(e.clientX,e.clientY);
-  getAC(); // unlock audio on first interaction
-});
-canvas.addEventListener('pointermove',e=>{
-  setPlayerTarget(e.clientX,e.clientY);
-});
+const isMobile='ontouchstart' in window;
+if(!isMobile){
+  canvas.addEventListener('pointerdown',e=>{
+    canvas.setPointerCapture(e.pointerId);
+    const p=getTablePoint(e.clientX,e.clientY);
+    setPlayerTarget(p.x,p.y);
+    getAC();
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=getTablePoint(e.clientX,e.clientY);
+    setPlayerTarget(p.x,p.y);
+  });
+}
+
+// ── MOBILE TRACKPAD ──────────────────────────────────────
+const trackpad=document.getElementById('trackpad');
+const trackpadDot=document.getElementById('trackpadDot');
+let tpActive=false, tpLastX=0, tpLastY=0;
+const TRACKPAD_SENS=2.8; // mallet moves faster than finger for precision
+
+function moveDot(cx,cy){
+  const r=trackpad.getBoundingClientRect();
+  const rx=Math.max(8,Math.min(r.width-8, cx-r.left));
+  const ry=Math.max(8,Math.min(r.height-8, cy-r.top));
+  trackpadDot.style.left=(rx-22)+'px';
+  trackpadDot.style.top=(ry-22)+'px';
+}
+
+trackpad.addEventListener('pointerdown',e=>{
+  trackpad.setPointerCapture(e.pointerId);
+  tpActive=true; tpLastX=e.clientX; tpLastY=e.clientY;
+  moveDot(e.clientX,e.clientY);
+  getAC();
+},{passive:false});
+
+trackpad.addEventListener('pointermove',e=>{
+  if(!tpActive) return;
+  const dx=(e.clientX-tpLastX)*TRACKPAD_SENS;
+  const dy=(e.clientY-tpLastY)*TRACKPAD_SENS;
+  tpLastX=e.clientX; tpLastY=e.clientY;
+  // Convert screen delta to table coords
+  const rect=canvas.getBoundingClientRect();
+  const scaleX=TABLE_W/rect.width, scaleY=TABLE_H/rect.height;
+  setPlayerTarget(
+    playerTarget.x + dx*scaleX,
+    playerTarget.y + dy*scaleY
+  );
+  moveDot(e.clientX,e.clientY);
+},{passive:false});
+
+trackpad.addEventListener('pointerup',()=>{ tpActive=false; },{passive:true});
+trackpad.addEventListener('pointercancel',()=>{ tpActive=false; },{passive:true});
 
 // ── AI ───────────────────────────────────────────────────
 function predictPuckY(targetX){
@@ -576,6 +643,7 @@ function predictPuckY(targetX){
   if(m>range) m=2*range-m;
   return m+MALLET_R;
 }
+let aiStrikeMode=false, aiStrikeTimer=0;
 function updateAI(){
   const d=DIFFICULTIES[currentDifficulty];
   const now=performance.now();
@@ -583,17 +651,42 @@ function updateAI(){
     ai.errorY=(Math.random()-0.5)*2*d.error;
     ai.lastErr=now;
   }
+
+  // Detect AI camping on slow puck — force a back-and-strike manoeuvre
+  const puckSlow=Math.hypot(puck.vx,puck.vy)<0.6;
+  const puckOnAISide=puck.x<TABLE_W/2;
+  const aiNearPuck=Math.hypot(ai.x-puck.x,ai.y-puck.y)<MALLET_R+PUCK_R+8;
+  if(puckSlow && puckOnAISide && aiNearPuck && !aiStrikeMode){
+    aiStrikeMode=true; aiStrikeTimer=0;
+  }
+  if(aiStrikeMode){
+    aiStrikeTimer++;
+    // Phase 1 (frames 0-18): pull back toward own end-wall
+    if(aiStrikeTimer<18){
+      const tx=MALLET_MARGIN+10, ty=clamp(puck.y,MALLET_MARGIN,TABLE_H-MALLET_MARGIN);
+      const dx=tx-ai.x, dy=ty-ai.y, dist=Math.hypot(dx,dy)||1;
+      const spd=d.aiSpeed*1.4;
+      ai.x+=dx/dist*Math.min(spd,dist); ai.y+=dy/dist*Math.min(spd,dist);
+      return;
+    }
+    // Phase 2 (frames 18+): charge hard at puck
+    const tx=clamp(puck.x,MALLET_MARGIN,TABLE_W/2-CENTER_MARGIN);
+    const ty=clamp(puck.y,MALLET_MARGIN,TABLE_H-MALLET_MARGIN);
+    const dx=tx-ai.x, dy=ty-ai.y, dist=Math.hypot(dx,dy)||1;
+    const spd=d.aiSpeed*2.2;
+    ai.x+=dx/dist*Math.min(spd,dist); ai.y+=dy/dist*Math.min(spd,dist);
+    if(aiStrikeTimer>40 || Math.hypot(dx,dy)<4) aiStrikeMode=false;
+    return;
+  }
+
   let targetX,targetY;
   if(puck.x<TABLE_W/2 && puck.visible && puck.vx>-0.2){
-    // offensive - go meet the puck
     targetX=clamp(puck.x, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
     targetY=(d.predictBounces?predictPuckY(ai.x):puck.y)+ai.errorY;
   } else if(puck.x<TABLE_W/2 && puck.visible){
-    // puck coming back toward AI fast - intercept
     targetX=clamp(puck.x+4, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
     targetY=(d.predictBounces?predictPuckY(ai.x):puck.y)+ai.errorY*0.6;
   } else {
-    // defensive - retreat toward home
     targetX=MALLET_MARGIN+20;
     targetY=puck.visible ? (puck.y*0.5+TABLE_H/2*0.5)+ai.errorY*1.4 : TABLE_H/2;
   }
@@ -739,34 +832,34 @@ function unstickFromCorner(){
   }
 }
 
-// Ultimate failsafe: tracks the puck's position over the last ~1 second.
-// If it hasn't roamed outside a small box (whether frozen OR jittering/
-// oscillating in place against a mallet+wall), pop it toward the table
-// center with real velocity. Guarantees no permanent freeze.
+// Ultimate failsafe: if puck hasn't left a small box in ~0.5s, pop it toward centre.
+// Uses 30-frame window and tighter 18px box so it fires sooner.
 let posHistory=[];
 function checkStuck(){
   if(!puck.visible){ posHistory=[]; return; }
   posHistory.push({x:puck.x,y:puck.y});
-  if(posHistory.length>60) posHistory.shift(); // ~1s @60fps
+  if(posHistory.length>30) posHistory.shift(); // ~0.5s @60fps
 
-  if(posHistory.length>=60){
+  if(posHistory.length>=30){
     let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
     for(const p of posHistory){
       if(p.x<minX)minX=p.x; if(p.x>maxX)maxX=p.x;
       if(p.y<minY)minY=p.y; if(p.y>maxY)maxY=p.y;
     }
-    if((maxX-minX)<26 && (maxY-minY)<26){
-      const cx=TABLE_W/2, cy=TABLE_H/2;
+    if((maxX-minX)<18 && (maxY-minY)<18){
+      // aim toward table centre + a little toward the player side so it creates action
+      const cx=TABLE_W*0.65, cy=TABLE_H/2;
       let dx=cx-puck.x, dy=cy-puck.y;
       const d=Math.hypot(dx,dy)||1;
       dx/=d; dy/=d;
-      const jump=MALLET_R+PUCK_R+16; // hop clear of the blocking mallet
+      const jump=MALLET_R+PUCK_R+20;
       puck.x=clamp(puck.x+dx*jump, PUCK_R, TABLE_W-PUCK_R);
       puck.y=clamp(puck.y+dy*jump, PUCK_R, TABLE_H-PUCK_R);
-      puck.vx=dx*3.4; puck.vy=dy*3.4;
+      puck.vx=dx*4.0; puck.vy=dy*4.0;
       puck.trail=[];
       sndWall(3);
       posHistory=[];
+      aiStrikeMode=false; // reset AI strike too
     }
   }
 }
@@ -935,7 +1028,7 @@ function startMatch(){
   resetPositions();
   showScreen(gameScreen);
   resizeCanvas();
-  checkOrientation();
+  resizeCanvas();
   gameRunning=true; paused=false;
   runCountdown(()=>{ resetPuck(0); });
   requestAnimationFrame(loop);
@@ -1025,37 +1118,19 @@ document.getElementById('chooseLevelBtn').onclick=()=>{
   showScreen(menuScreen);
 };
 
-// ── MOBILE ROTATE PROMPT ────────────────────────────────
-const rotatePrompt=document.getElementById('rotatePrompt');
-function checkOrientation(){
-  const isPortrait=window.innerWidth<window.innerHeight;
-  const isTouch='ontouchstart' in window;
-  const inGame=!gameScreen.classList.contains('hidden');
-  if(isTouch && isPortrait && inGame){
-    rotatePrompt.classList.add('show');
-  } else {
-    rotatePrompt.classList.remove('show');
-    resizeCanvas();
-  }
-}
-function toggleLandscape(){
-  try{
-    const el=document.documentElement;
-    if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
-    else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    if(screen.orientation&&screen.orientation.lock){
-      screen.orientation.lock('landscape').catch(()=>{});
-    }
-  }catch(e){}
-}
-document.getElementById('rotatePromptBtn').onclick=()=>{
-  toggleLandscape();
-  setTimeout(checkOrientation,400);
-  setTimeout(checkOrientation,900);
-};
+// (rotate prompt removed — game plays vertical on mobile)
 
 resizeCanvas();
 
 </script>
+
+<!-- ═══ MOBILE TRACKPAD ═══ -->
+<div id="mobileControls">
+  <div id="trackpad">
+    <div id="trackpadLabel">DRAG TO MOVE YOUR MALLET</div>
+    <div id="trackpadDot"></div>
+    <div id="trackpadHint">🏒 Slide to aim &nbsp;|&nbsp; Flick to shoot</div>
+  </div>
+</div>
 </body>
 </html>
