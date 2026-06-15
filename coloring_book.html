@@ -301,28 +301,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 #rotatePrompt .rot-btn:active{transform:scale(0.96);box-shadow:0 1px 0 #8a6a1f;}
 
 
-#immersiveToggle{
-  position:fixed;bottom:84px;right:10px;z-index:96;
-  width:38px;height:38px;border-radius:50%;
-  background:rgba(0,0,0,0.55);border:1.5px solid rgba(201,168,76,0.45);
-  display:none;align-items:center;justify-content:center;
-  color:var(--gold2);font-size:16px;backdrop-filter:blur(6px);
-  cursor:pointer;transition:all 0.2s;
-}
-#immersiveToggle:active{transform:scale(0.9);background:rgba(201,168,76,0.2);}
-
 body.immersive #topbar,
 body.immersive #bottombar,
-body.immersive #paletteTab,
 body.immersive #paletteDrawer,
 body.immersive #landscapeBtn{
   display:none !important;
 }
+body.immersive #paletteTab{
+  right:0 !important;
+  background:rgba(0,0,0,0.55);
+  color:var(--gold2);
+}
 body.immersive #stage{
   top:0;bottom:0;height:100vh;
-}
-body.immersive #immersiveToggle{
-  bottom:10px;
 }
 
 /* extra controls */
@@ -510,7 +501,6 @@ body.immersive #immersiveToggle{
   <p>Fab Coloring Book is best in landscape - rotate your device or tap below to lock landscape mode and color in full size!!</p>
   <div class="rot-btn" id="rotatePromptBtn">🔄 Rotate to Landscape</div>
 </div>
-<div id="immersiveToggle" title="Hide/show toolbars">◂</div>
 <div id="toast"></div>
 
 <script>
@@ -680,16 +670,21 @@ document.getElementById('hardnessSlider').addEventListener('input',e=>{
 const paletteDrawer=document.getElementById('paletteDrawer');
 const paletteTab=document.getElementById('paletteTab');
 let drawerOpen=true;
-paletteTab.onclick=()=>{
-  drawerOpen=!drawerOpen;
-  paletteDrawer.classList.toggle('hidden',!drawerOpen);
-  paletteTab.classList.toggle('shifted',drawerOpen);
-  paletteTab.textContent=drawerOpen?'▶':'◀';
-  setTimeout(resetView,50);
+let immersiveOn=false;
+function setImmersive(on){
+  immersiveOn=on;
+  drawerOpen=!on;
+  document.body.classList.toggle('immersive',on);
+  paletteDrawer.classList.toggle('hidden',on);
+  paletteTab.classList.toggle('shifted',!on);
+  paletteTab.textContent = on ? '▶' : '◀';
+  setTimeout(resetView,60);
   setTimeout(resetView,300);
-};
+}
+paletteTab.onclick=()=>setImmersive(!immersiveOn);
+// initial state: drawer visible, tab attached to its left edge
 paletteTab.classList.add('shifted');
-paletteTab.textContent='▶';
+paletteTab.textContent='◀';
 
 // ── LOAD PAGE (line art + background) ────────────────
 function loadPage(n){
@@ -1392,15 +1387,6 @@ document.addEventListener('keyup',e=>{
 
 
 
-// ── IMMERSIVE MODE (mobile) ───────────────────────────
-const immersiveToggle=document.getElementById('immersiveToggle');
-if('ontouchstart' in window) immersiveToggle.style.display='flex';
-immersiveToggle.onclick=()=>{
-  const on=document.body.classList.toggle('immersive');
-  immersiveToggle.textContent = on ? '▸' : '◂';
-  setTimeout(resetView,60);
-  setTimeout(resetView,300);
-};
 
 // ── MOBILE ROTATE PROMPT ──────────────────────────────
 const rotatePrompt=document.getElementById('rotatePrompt');
