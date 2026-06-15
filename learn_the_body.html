@@ -190,6 +190,28 @@ body{padding-bottom:160px;overflow-x:hidden;}
   100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);opacity:0;}
 }
 
+
+/* ── MULTIPLE CHOICE ── */
+#mcChoices{
+  display:none;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;text-align:left;
+}
+.mc-btn{
+  background:rgba(255,255,255,0.10);border:2px solid #ffd700;border-radius:14px;
+  padding:11px 14px;font-size:13.5px;font-weight:700;color:#fff;
+  cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;
+  line-height:1.25;
+}
+.mc-btn:active{transform:scale(0.97);}
+.mc-letter{
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:26px;height:26px;border-radius:50%;background:#ffd700;color:#1a1a1a;
+  font-family:'Bebas Neue',sans-serif;font-weight:900;font-size:15px;
+}
+.mc-btn.mc-correct{background:rgba(76,217,100,0.45);border-color:#4cd964;
+  box-shadow:0 0 16px rgba(76,217,100,0.5); animation:correctPulse 0.6s ease;}
+.mc-btn.mc-wrong{background:rgba(255,91,110,0.35);border-color:#ff5b6e;animation:wrongShake 0.4s ease;}
+@media(max-width:560px){#mcChoices{grid-template-columns:1fr;}}
+
 /* ── CONFETTI ── */
 .confetti{
   position:fixed;top:0;left:0;width:10px;height:10px;z-index:75;pointer-events:none;
@@ -220,8 +242,9 @@ body{padding-bottom:160px;overflow-x:hidden;}
 </div>
 
 <div id="quizBanner">
-  <div class="qtitle">✨ FIND THE... ✨</div>
+  <div class="qtitle" id="qTitle">✨ FIND THE... ✨</div>
   <div class="qtext" id="quizTarget">HEART</div>
+  <div id="mcChoices"></div>
   <div class="qscore" id="quizScore">⭐ Score: 0 / 0</div>
   <div id="quizFeedback"></div>
 </div>
@@ -231,49 +254,49 @@ body{padding-bottom:160px;overflow-x:hidden;}
     <div class="body-label boy">BOY BODY</div>
     <div class="body-wrap">
       <img src="/male.png" alt="Boy body diagram">
-      <div class="hotspot" data-id="male_brain" data-concept="brain" style="left:33%;top:2.5%;width:30%;height:7.5%;"></div>
-      <div class="hotspot" data-id="male_eyes" data-concept="eyes" style="left:30%;top:13.5%;width:40%;height:5.0%;"></div>
-      <div class="hotspot" data-id="male_ears_l" data-concept="ears" style="left:19%;top:15.5%;width:11%;height:6.5%;"></div>
-      <div class="hotspot" data-id="male_ears_r" data-concept="ears" style="left:70%;top:15.5%;width:11%;height:6.5%;"></div>
-      <div class="hotspot" data-id="male_nose" data-concept="nose" style="left:46%;top:16%;width:9%;height:5.0%;"></div>
-      <div class="hotspot" data-id="male_mouth" data-concept="mouth" style="left:40%;top:21%;width:20%;height:4.0%;"></div>
-      <div class="hotspot" data-id="male_trachea" data-concept="trachea" style="left:45%;top:27%;width:10%;height:8.5%;"></div>
-      <div class="hotspot" data-id="male_lung_l" data-concept="lungs" style="left:20%;top:29%;width:28%;height:16%;"></div>
-      <div class="hotspot" data-id="male_lung_r" data-concept="lungs" style="left:52%;top:29%;width:28%;height:16%;"></div>
-      <div class="hotspot" data-id="male_heart" data-concept="heart" style="left:43%;top:32%;width:19%;height:13.5%;"></div>
-      <div class="hotspot" data-id="male_liver" data-concept="liver" style="left:20%;top:44%;width:30%;height:10.5%;"></div>
-      <div class="hotspot" data-id="male_stomach" data-concept="stomach" style="left:48%;top:42%;width:32%;height:14%;"></div>
-      <div class="hotspot" data-id="male_gallbladder" data-concept="gallbladder" style="left:32%;top:51.5%;width:13%;height:4%;"></div>
-      <div class="hotspot" data-id="male_kidney_l" data-concept="kidney" style="left:13%;top:56.5%;width:17%;height:8.5%;"></div>
-      <div class="hotspot" data-id="male_kidney_r" data-concept="kidney" style="left:70%;top:56.5%;width:17%;height:8.5%;"></div>
-      <div class="hotspot" data-id="male_large_intestine" data-concept="large_intestine" style="left:25%;top:60.5%;width:50%;height:8.5%;"></div>
-      <div class="hotspot" data-id="male_small_intestine" data-concept="small_intestine" style="left:20%;top:66.5%;width:60%;height:11.5%;"></div>
+      <div class="hotspot" data-id="male_brain" data-concept="brain" style="left:32%;top:2%;width:33%;height:8%;"></div>
+      <div class="hotspot" data-id="male_eyes" data-concept="eyes" style="left:30%;top:11%;width:40%;height:8%;"></div>
+      <div class="hotspot" data-id="male_ears_l" data-concept="ears" style="left:18%;top:13%;width:13%;height:8%;"></div>
+      <div class="hotspot" data-id="male_ears_r" data-concept="ears" style="left:69%;top:13%;width:13%;height:8%;"></div>
+      <div class="hotspot" data-id="male_nose" data-concept="nose" style="left:45%;top:14%;width:10%;height:8%;"></div>
+      <div class="hotspot" data-id="male_mouth" data-concept="mouth" style="left:40%;top:19%;width:20%;height:6%;"></div>
+      <div class="hotspot" data-id="male_trachea" data-concept="trachea" style="left:45%;top:23%;width:10%;height:13%;"></div>
+      <div class="hotspot" data-id="male_lung_l" data-concept="lungs" style="left:20%;top:27%;width:28%;height:19%;"></div>
+      <div class="hotspot" data-id="male_lung_r" data-concept="lungs" style="left:52%;top:27%;width:28%;height:19%;"></div>
+      <div class="hotspot" data-id="male_heart" data-concept="heart" style="left:43%;top:30%;width:19%;height:16%;"></div>
+      <div class="hotspot" data-id="male_liver" data-concept="liver" style="left:25%;top:47.5%;width:25%;height:8%;"></div>
+      <div class="hotspot" data-id="male_stomach" data-concept="stomach" style="left:50%;top:46.5%;width:30%;height:12.5%;"></div>
+      <div class="hotspot" data-id="male_gallbladder" data-concept="gallbladder" style="left:35%;top:53%;width:10%;height:3%;"></div>
+      <div class="hotspot" data-id="male_large_intestine" data-concept="large_intestine" style="left:28%;top:62.5%;width:44%;height:6.5%;"></div>
+      <div class="hotspot" data-id="male_small_intestine" data-concept="small_intestine" style="left:20%;top:65%;width:58%;height:13.5%;"></div>
+      <div class="hotspot" data-id="male_kidney_l" data-concept="kidney" style="left:18%;top:55%;width:14%;height:9%;"></div>
+      <div class="hotspot" data-id="male_kidney_r" data-concept="kidney" style="left:68%;top:55%;width:16%;height:9%;"></div>
     </div>
   </div>
   <div class="body-col">
     <div class="body-label girl">GIRL BODY</div>
     <div class="body-wrap">
       <img src="/female.png" alt="Girl body diagram">
-      <div class="hotspot" data-id="female_brain" data-concept="brain" style="left:33%;top:2.5%;width:30%;height:7.5%;"></div>
-      <div class="hotspot" data-id="female_eyes" data-concept="eyes" style="left:30%;top:13.5%;width:40%;height:5.0%;"></div>
-      <div class="hotspot" data-id="female_ears_l" data-concept="ears" style="left:19%;top:15.5%;width:11%;height:6.5%;"></div>
-      <div class="hotspot" data-id="female_ears_r" data-concept="ears" style="left:70%;top:15.5%;width:11%;height:6.5%;"></div>
-      <div class="hotspot" data-id="female_nose" data-concept="nose" style="left:46%;top:16%;width:9%;height:5.0%;"></div>
-      <div class="hotspot" data-id="female_mouth" data-concept="mouth" style="left:40%;top:21%;width:20%;height:4.0%;"></div>
-      <div class="hotspot" data-id="female_trachea" data-concept="trachea" style="left:45%;top:27%;width:10%;height:8.5%;"></div>
-      <div class="hotspot" data-id="female_lung_l" data-concept="lungs" style="left:20%;top:29%;width:28%;height:16%;"></div>
-      <div class="hotspot" data-id="female_lung_r" data-concept="lungs" style="left:52%;top:29%;width:28%;height:16%;"></div>
-      <div class="hotspot" data-id="female_heart" data-concept="heart" style="left:43%;top:32%;width:19%;height:13.5%;"></div>
-      <div class="hotspot" data-id="female_liver" data-concept="liver" style="left:20%;top:44%;width:30%;height:10.5%;"></div>
-      <div class="hotspot" data-id="female_stomach" data-concept="stomach" style="left:48%;top:42%;width:32%;height:14%;"></div>
-      <div class="hotspot" data-id="female_gallbladder" data-concept="gallbladder" style="left:32%;top:51.5%;width:13%;height:4%;"></div>
-      <div class="hotspot" data-id="female_kidney_l" data-concept="kidney" style="left:13%;top:56.5%;width:17%;height:8.5%;"></div>
-      <div class="hotspot" data-id="female_kidney_r" data-concept="kidney" style="left:70%;top:56.5%;width:17%;height:8.5%;"></div>
-      <div class="hotspot" data-id="female_large_intestine" data-concept="large_intestine" style="left:25%;top:60.5%;width:50%;height:8.5%;"></div>
-      <div class="hotspot" data-id="female_small_intestine" data-concept="small_intestine" style="left:20%;top:66.5%;width:60%;height:5%;"></div>
-      <div class="hotspot" data-id="female_ovary_l" data-concept="ovary" style="left:29%;top:69%;width:13%;height:4.5%;"></div>
-      <div class="hotspot" data-id="female_ovary_r" data-concept="ovary" style="left:58%;top:69%;width:13%;height:4.5%;"></div>
-      <div class="hotspot" data-id="female_uterus" data-concept="uterus" style="left:35%;top:64%;width:30%;height:8%;"></div>
+      <div class="hotspot" data-id="female_brain" data-concept="brain" style="left:32%;top:2%;width:33%;height:8%;"></div>
+      <div class="hotspot" data-id="female_eyes" data-concept="eyes" style="left:30%;top:11%;width:40%;height:8%;"></div>
+      <div class="hotspot" data-id="female_ears_l" data-concept="ears" style="left:18%;top:13%;width:13%;height:8%;"></div>
+      <div class="hotspot" data-id="female_ears_r" data-concept="ears" style="left:69%;top:13%;width:13%;height:8%;"></div>
+      <div class="hotspot" data-id="female_nose" data-concept="nose" style="left:45%;top:14%;width:10%;height:8%;"></div>
+      <div class="hotspot" data-id="female_mouth" data-concept="mouth" style="left:40%;top:19%;width:20%;height:6%;"></div>
+      <div class="hotspot" data-id="female_trachea" data-concept="trachea" style="left:45%;top:23%;width:10%;height:13%;"></div>
+      <div class="hotspot" data-id="female_lung_l" data-concept="lungs" style="left:20%;top:27%;width:28%;height:19%;"></div>
+      <div class="hotspot" data-id="female_lung_r" data-concept="lungs" style="left:52%;top:27%;width:28%;height:19%;"></div>
+      <div class="hotspot" data-id="female_heart" data-concept="heart" style="left:43%;top:30%;width:19%;height:16%;"></div>
+      <div class="hotspot" data-id="female_liver" data-concept="liver" style="left:25%;top:42%;width:25%;height:8%;"></div>
+      <div class="hotspot" data-id="female_stomach" data-concept="stomach" style="left:48%;top:40%;width:27%;height:11%;"></div>
+      <div class="hotspot" data-id="female_gallbladder" data-concept="gallbladder" style="left:35%;top:48%;width:10%;height:3%;"></div>
+      <div class="hotspot" data-id="female_large_intestine" data-concept="large_intestine" style="left:25%;top:52%;width:47%;height:5.5%;"></div>
+      <div class="hotspot" data-id="female_small_intestine" data-concept="small_intestine" style="left:22%;top:55%;width:56%;height:7.6%;"></div>
+      <div class="hotspot" data-id="female_kidney_l" data-concept="kidney" style="left:20%;top:55%;width:15%;height:8.5%;"></div>
+      <div class="hotspot" data-id="female_kidney_r" data-concept="kidney" style="left:65%;top:55%;width:15%;height:8.5%;"></div>
+      <div class="hotspot" data-id="female_ovary_l" data-concept="ovary" style="left:28%;top:66.5%;width:12%;height:4%;"></div>
+      <div class="hotspot" data-id="female_ovary_r" data-concept="ovary" style="left:58%;top:66.5%;width:12%;height:4%;"></div>
+      <div class="hotspot" data-id="female_uterus" data-concept="uterus" style="left:32%;top:63%;width:30%;height:8%;"></div>
     </div>
   </div>
 </div>
@@ -292,6 +315,7 @@ body{padding-bottom:160px;overflow-x:hidden;}
 <script>
 const ORGANS = {"brain": {"label": "BRAIN", "emoji": "\ud83e\udde0", "fill": "#f7b6c2", "desc": "Your brain controls your whole body and helps you think, learn and remember!!"}, "eyes": {"label": "EYES", "emoji": "\ud83d\udc40", "fill": "#ffffff", "desc": "Your eyes let you see the wonderful world around you!!"}, "ears": {"label": "EARS", "emoji": "\ud83d\udc42", "fill": "#f4a18a", "desc": "Your ears help you hear sounds and music, and help you keep your balance!!"}, "nose": {"label": "NOSE", "emoji": "\ud83d\udc43", "fill": "#f4a18a", "desc": "Your nose helps you smell yummy food and fresh flowers!!"}, "mouth": {"label": "MOUTH", "emoji": "\ud83d\udc44", "fill": "#e8607a", "desc": "Your mouth helps you eat, talk, sing and smile!!"}, "trachea": {"label": "WINDPIPE", "emoji": "\ud83c\udf99\ufe0f", "fill": "#5fb6e8", "desc": "Your windpipe is a tube that carries air down to your lungs when you breathe!!"}, "lungs": {"label": "LUNGS", "emoji": "\ud83e\udec1", "fill": "#ffb6c1", "desc": "Your lungs breathe in fresh air and send oxygen to your whole body!!"}, "heart": {"label": "HEART", "emoji": "\u2764\ufe0f", "fill": "#e63946", "desc": "Your heart pumps blood all around your body, every single second!!"}, "liver": {"label": "LIVER", "emoji": "\ud83d\udfe4", "fill": "#a0522d", "desc": "Your liver cleans your blood and helps you digest your food!!"}, "gallbladder": {"label": "GALLBLADDER", "emoji": "\ud83d\udfe2", "fill": "#9acd32", "desc": "Your gallbladder stores a juice called bile that helps you digest fatty foods!!"}, "stomach": {"label": "STOMACH", "emoji": "\ud83c\udf7d\ufe0f", "fill": "#ffb347", "desc": "Your stomach mixes and mashes your food to start digesting it!!"}, "kidney": {"label": "KIDNEYS", "emoji": "\ud83e\uded8", "fill": "#8b3a5a", "desc": "Your kidneys filter waste out of your blood and help make pee!!"}, "large_intestine": {"label": "LARGE INTESTINE", "emoji": "\ud83c\udf00", "fill": "#9acd32", "desc": "Your large intestine soaks up water from leftover food before it becomes waste!!"}, "small_intestine": {"label": "SMALL INTESTINE", "emoji": "\ud83c\udf5c", "fill": "#ff9a9e", "desc": "Your small intestine absorbs nutrients and vitamins from food into your blood!!"}, "ovary": {"label": "OVARY", "emoji": "\ud83d\udfe3", "fill": "#b56cd6", "desc": "Ovaries are special - only girls and women have them!! They make egg cells."}, "uterus": {"label": "UTERUS", "emoji": "\ud83c\udf38", "fill": "#ff9bb3", "desc": "The uterus is found only in girls and women - it is where a baby can grow!!"}};
 const QUESTIONS = [{"label": "BRAIN", "concept": "brain"}, {"label": "EYES", "concept": "eyes"}, {"label": "EARS", "concept": "ears"}, {"label": "NOSE", "concept": "nose"}, {"label": "MOUTH", "concept": "mouth"}, {"label": "WINDPIPE", "concept": "trachea"}, {"label": "LUNGS", "concept": "lungs"}, {"label": "HEART", "concept": "heart"}, {"label": "LIVER", "concept": "liver"}, {"label": "GALLBLADDER", "concept": "gallbladder"}, {"label": "STOMACH", "concept": "stomach"}, {"label": "KIDNEYS", "concept": "kidney"}, {"label": "LARGE INTESTINE", "concept": "large_intestine"}, {"label": "SMALL INTESTINE", "concept": "small_intestine"}, {"label": "OVARY", "concept": "ovary", "hint": "Only girls and women have these - look at the GIRL body!!"}, {"label": "UTERUS", "concept": "uterus", "hint": "Only girls and women have this - look at the GIRL body!!"}];
+const MC_QUESTIONS = [{"q": "What does your BRAIN do?", "choices": ["Controls your body and helps you think", "Pumps your blood", "Digests your food", "Helps you breathe"], "correct": 0}, {"q": "What do your EYES do?", "choices": ["Help you hear music", "Let you see the world around you", "Help you smell flowers", "Filter your blood"], "correct": 1}, {"q": "What do your EARS do?", "choices": ["Help you see far away", "Help you hear and keep your balance", "Help you breathe", "Pump your blood"], "correct": 1}, {"q": "What does your NOSE do?", "choices": ["Helps you hear", "Helps you smell things", "Pumps your blood", "Digests your food"], "correct": 1}, {"q": "What does your MOUTH do?", "choices": ["Lets you eat, talk and smile", "Filters your blood", "Helps you see", "Makes egg cells"], "correct": 0}, {"q": "What does your WINDPIPE do?", "choices": ["Pumps your blood", "Carries air down to your lungs", "Digests your food", "Filters waste"], "correct": 1}, {"q": "What do your LUNGS do?", "choices": ["Digest your food", "Breathe in air and send oxygen to your body", "Make pee", "Help you smell"], "correct": 1}, {"q": "What does your HEART do?", "choices": ["Helps you hear", "Stores bile", "Pumps blood all around your body", "Filters waste"], "correct": 2}, {"q": "What does your LIVER do?", "choices": ["Cleans your blood and helps digest food", "Pumps blood around your body", "Helps you see", "Stores air for breathing"], "correct": 0}, {"q": "What does your GALLBLADDER do?", "choices": ["Pumps your blood", "Helps you think", "Stores bile to help digest fatty foods", "Filters waste from blood"], "correct": 2}, {"q": "What does your STOMACH do?", "choices": ["Controls your whole body", "Mixes and mashes your food", "Lets you see", "Filters your blood"], "correct": 1}, {"q": "What do your KIDNEYS do?", "choices": ["Help you smell", "Pump your blood", "Filter waste from blood and help make pee", "Store your food"], "correct": 2}, {"q": "What does your LARGE INTESTINE do?", "choices": ["Pumps your blood", "Soaks up water from leftover food", "Helps you see", "Makes egg cells"], "correct": 1}, {"q": "What does your SMALL INTESTINE do?", "choices": ["Absorbs nutrients from food into your blood", "Helps you hear", "Controls your thinking", "Filters the air you breathe"], "correct": 0}, {"q": "What do OVARIES do?", "choices": ["Pump your blood", "Help you digest food", "Make egg cells - only girls and women have them", "Filter waste"], "correct": 2}, {"q": "What is the UTERUS for?", "choices": ["Pumping blood", "Helping you breathe", "Digesting food", "A baby can grow there - only in girls and women"], "correct": 3}];
 const CELEBRATIONS = ["AMAZING!!","WOOHOO!!","SUPER!!","YOU GOT IT!!","FANTASTIC!!","BRAINY!!","JACKPOT!!"];
 const CONFETTI_COLORS = ["#ffd700","#ff8fab","#4ea8de","#c77dff","#9acd32","#ff9a9e","#ffe066"];
 
@@ -404,10 +428,60 @@ function nextQuestion(){
   clearHighlights();
   infoCard.classList.remove('show');
   document.getElementById('quizFeedback').textContent='';
-  currentQuestion=QUESTIONS[Math.floor(Math.random()*QUESTIONS.length)];
-  document.getElementById('quizTarget').textContent=currentQuestion.label;
+  const mcChoices=document.getElementById('mcChoices');
+  const qTitle=document.getElementById('qTitle');
+
+  const useMC = Math.random()<0.5;
+  if(useMC){
+    const q = MC_QUESTIONS[Math.floor(Math.random()*MC_QUESTIONS.length)];
+    currentQuestion = {type:'mc', ...q};
+    qTitle.textContent='🤔 QUESTION';
+    document.getElementById('quizTarget').textContent=currentQuestion.q;
+    mcChoices.style.display='grid';
+    mcChoices.innerHTML='';
+    const letters=['A','B','C','D'];
+    currentQuestion.choices.forEach((choice,i)=>{
+      const btn=document.createElement('div');
+      btn.className='mc-btn';
+      btn.innerHTML=`<span class="mc-letter">${letters[i]}</span><span>${choice}</span>`;
+      btn.addEventListener('click',()=>{ getAC(); onMCAnswer(i,btn); });
+      mcChoices.appendChild(btn);
+    });
+  } else {
+    currentQuestion = {type:'click', ...QUESTIONS[Math.floor(Math.random()*QUESTIONS.length)]};
+    qTitle.textContent='✨ FIND THE... ✨';
+    document.getElementById('quizTarget').textContent=currentQuestion.label;
+    mcChoices.style.display='none';
+    mcChoices.innerHTML='';
+  }
   document.getElementById('quizScore').textContent=`⭐ Score: ${quizScore} / ${quizTotal}`;
   lockInput=false;
+}
+
+function onMCAnswer(i,btn){
+  if(lockInput) return;
+  quizTotal++;
+  const fb=document.getElementById('quizFeedback');
+  if(i===currentQuestion.correct){
+    quizScore++;
+    btn.classList.add('mc-correct');
+    fb.textContent='✅ Yes!! Great job!!';
+    fb.style.color='#fff3b0';
+    lockInput=true;
+    const r=btn.getBoundingClientRect();
+    burstConfetti(r.left+r.width/2, r.top+r.height/2, 24);
+    burstConfetti(window.innerWidth/2, window.innerHeight*0.3, 24);
+    showCelebration();
+    sndDing();
+    setTimeout(nextQuestion, 1600);
+  } else {
+    btn.classList.add('mc-wrong');
+    setTimeout(()=>btn.classList.remove('mc-wrong'),400);
+    fb.textContent='🤔 Not quite - try again!!';
+    fb.style.color='#ffd9d9';
+    sndBuzz();
+  }
+  document.getElementById('quizScore').textContent=`⭐ Score: ${quizScore} / ${quizTotal}`;
 }
 
 function onHotspotClickQuiz(el){
@@ -449,7 +523,7 @@ allHotspots().forEach(el=>{
   el.addEventListener('click',()=>{
     getAC();
     if(mode==='explore') onHotspotClickExplore(el);
-    else onHotspotClickQuiz(el);
+    else if(currentQuestion && currentQuestion.type==='click') onHotspotClickQuiz(el);
   });
 });
 
