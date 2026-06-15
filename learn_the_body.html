@@ -56,6 +56,29 @@ body{padding-bottom:160px;overflow-x:hidden;}
   position:relative;
 }
 .mode-btn:active{transform:translateY(2px);}
+
+.tap-cta{
+  display:inline-block;margin:8px auto 0;padding:14px 28px;border-radius:40px;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(14px,3.8vw,19px);
+  color:#1a1a1a;letter-spacing:0.3px;line-height:1.35;text-align:center;
+  background:linear-gradient(135deg,#b8ff4d,#7ed957 50%,#5ab832);
+  border:3px solid #ffe566;
+  box-shadow:
+    0 5px 0 #3a7a18,
+    0 0 0 4px rgba(183,255,77,0.25),
+    0 0 22px rgba(126,217,87,0.5);
+  animation:ctaPulse 2s ease-in-out infinite;
+  max-width:680px;width:90%;
+}
+@keyframes ctaPulse{
+  0%,100%{
+    box-shadow:0 5px 0 #3a7a18, 0 0 0 4px rgba(183,255,77,0.25), 0 0 22px rgba(126,217,87,0.5);
+  }
+  50%{
+    box-shadow:0 5px 0 #3a7a18, 0 0 0 8px rgba(183,255,77,0.15), 0 0 40px rgba(126,217,87,0.8), 0 0 60px rgba(255,230,102,0.3);
+  }
+}
+
 .mode-btn.explore{background:#fff;border-color:var(--gold);color:#8a6a1f;box-shadow:0 4px 0 rgba(201,168,76,0.25);}
 .mode-btn.explore.active{
   background:linear-gradient(135deg,#ffe066,#ffd700 50%,#c9a84c);color:#1a1a1a;border-color:#fff3b0;
@@ -270,7 +293,7 @@ body{padding-bottom:160px;overflow-x:hidden;}
 
 <div class="hero">
   <h1>Learn The Body!!</h1>
-  <p>Tap any part to discover what it does - then test yourself in Quiz mode!!</p>
+  <div class="tap-cta">👆 Tap any part to discover what it does — then test yourself in Quiz mode!!</div>
 </div>
 
 <div class="mode-row">
