@@ -375,3 +375,7 @@ def coloring():
 @app.route('/airhockey')
 def airhockey():
     return send_from_directory('.', 'airhockey.html')
+
+@app.route('/learn-the-body')
+def learn_the_body():
+    return send_from_directory('.', 'learn_the_body.html')
