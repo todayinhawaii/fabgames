@@ -330,7 +330,11 @@ body.immersive #stage{
   0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.6);}
   50%{box-shadow:0 0 0 10px rgba(255,215,0,0);}
 }
-#paletteTab.flash{animation:tabFlash 0.9s ease-out 3;}
+@keyframes labelGlow{
+  0%,100%{text-shadow:0 0 4px rgba(255,215,0,0.4);opacity:0.85;}
+  50%{text-shadow:0 0 12px rgba(255,215,0,1),0 0 22px rgba(255,215,0,0.6);opacity:1;}
+}
+#paletteTab.flash{animation:tabFlash 1.4s ease-out infinite;}
 #paletteTab .tab-label{
   position:absolute;top:50%;right:36px;transform:translateY(-50%);
   white-space:nowrap;font-size:11px;font-weight:800;letter-spacing:0.5px;
@@ -338,7 +342,10 @@ body.immersive #stage{
   padding:5px 10px;border-radius:8px;
   opacity:0;transition:opacity 0.25s;pointer-events:none;
 }
-#paletteTab.show-label .tab-label{opacity:1;}
+#paletteTab.show-label .tab-label{
+  opacity:1;
+  animation:labelGlow 1.6s ease-in-out infinite;
+}
 
 /* extra controls */
 .tool-btn[data-tool="eraser"] .ti{font-size:18px;}
@@ -448,7 +455,7 @@ body.immersive #stage{
 </div>
 
 <!-- PALETTE TAB -->
-<div id="paletteTab">◀<span class="tab-label" id="paletteTabLabel">Hide toolbars</span></div>
+<div id="paletteTab">◀<span class="tab-label" id="paletteTabLabel">Hide All</span></div>
 
 <!-- SIDE PALETTE -->
 <div id="paletteDrawer">
@@ -704,8 +711,8 @@ function setImmersive(on){
   paletteDrawer.classList.toggle('hidden',on);
   paletteTab.classList.toggle('shifted',!on);
   paletteTab.textContent = on ? '▶' : '◀';
-  paletteTabLabel.textContent = on ? 'Show toolbars' : 'Hide toolbars';
-  paletteTab.classList.remove('flash');
+  paletteTabLabel.textContent = on ? 'Show All' : 'Hide All';
+  // leave pulsing/label active (mobile) so users can always find the toggle
   setTimeout(resetView,60);
   setTimeout(resetView,300);
 }
@@ -714,11 +721,10 @@ paletteTab.onclick=()=>setImmersive(!immersiveOn);
 paletteTab.classList.add('shifted');
 paletteTab.textContent='◀';
 
-// Mobile: flash the toggle a few times on load + briefly show its label
+// Mobile: persistent pulsing glow + "Hide All" label until first tapped
 if('ontouchstart' in window){
   setTimeout(()=>{
     paletteTab.classList.add('flash','show-label');
-    setTimeout(()=>paletteTab.classList.remove('flash','show-label'),3200);
   },700);
 }
 
