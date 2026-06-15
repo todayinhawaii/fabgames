@@ -266,6 +266,40 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
   .pill-btn .pill-text{display:none;}
 }
 
+
+#rotatePrompt{
+  position:fixed;inset:0;z-index:95;
+  display:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  background:rgba(7,7,8,0.97);
+  text-align:center;padding:30px;
+}
+#rotatePrompt.show{display:flex;}
+#rotatePrompt .rot-icon{
+  font-size:64px;
+  animation:rotPulse 1.6s ease-in-out infinite;
+}
+@keyframes rotPulse{
+  0%,100%{transform:rotate(0deg);}
+  50%{transform:rotate(90deg);}
+}
+#rotatePrompt h2{
+  font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px;
+  color:var(--gold2);
+}
+#rotatePrompt p{
+  color:var(--muted);font-size:14px;max-width:280px;line-height:1.5;
+}
+#rotatePrompt .rot-btn{
+  margin-top:6px;padding:12px 28px;border-radius:30px;
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  color:#1a1a1a;font-weight:900;font-size:13px;letter-spacing:1px;
+  text-transform:uppercase;border:2px solid #ffe98a;
+  box-shadow:0 4px 0 #8a6a1f,0 0 16px rgba(255,215,0,0.35);
+  cursor:pointer;
+}
+#rotatePrompt .rot-btn:active{transform:scale(0.96);box-shadow:0 1px 0 #8a6a1f;}
+
 /* extra controls */
 .tool-btn[data-tool="eraser"] .ti{font-size:18px;}
 .swatch.custom{
@@ -442,6 +476,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
     <div class="sc-row"><span>Pinch (touch)</span><span class="sc-key">Zoom in/out</span></div>
     <button id="closeShortcuts">Close</button>
   </div>
+</div>
+
+<!-- ROTATE PROMPT (mobile portrait) -->
+<div id="rotatePrompt">
+  <div class="rot-icon">📱</div>
+  <h2>Turn your phone sideways!!</h2>
+  <p>Fab Coloring Book is best in landscape - rotate your device or tap below to lock landscape mode and color in full size!!</p>
+  <div class="rot-btn" id="rotatePromptBtn">🔄 Rotate to Landscape</div>
 </div>
 <div id="toast"></div>
 
@@ -1311,6 +1353,28 @@ document.addEventListener('keyup',e=>{
     updateCursor();
   }
 });
+
+
+// ── MOBILE ROTATE PROMPT ──────────────────────────────
+const rotatePrompt=document.getElementById('rotatePrompt');
+function checkOrientation(){
+  const isPortrait = window.innerWidth < window.innerHeight;
+  const isTouch = 'ontouchstart' in window;
+  if(isTouch && isPortrait){
+    rotatePrompt.classList.add('show');
+  } else {
+    rotatePrompt.classList.remove('show');
+    setTimeout(resetView,50);
+  }
+}
+document.getElementById('rotatePromptBtn').onclick=()=>{
+  toggleLandscape();
+  setTimeout(checkOrientation,400);
+  setTimeout(checkOrientation,900);
+};
+window.addEventListener('resize',checkOrientation);
+window.addEventListener('orientationchange',()=>setTimeout(checkOrientation,300));
+checkOrientation();
 
 </script>
 </body>
