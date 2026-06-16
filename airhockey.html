@@ -103,10 +103,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 
 /* ── GAME SCREEN ── */
 #gameScreen{padding:0;justify-content:flex-start;}
-body.is-mobile #gameScreen{flex-direction:column;}
+body.is-mobile #gameScreen{flex-direction:column;height:100vh;height:100dvh;}
 #hud{
   width:100%;display:flex;align-items:center;justify-content:center;gap:20px;
-  padding:10px 14px;position:relative;z-index:5;
+  padding:10px 14px;position:relative;z-index:5;flex-shrink:0;
 }
 .score-pill{
   display:flex;flex-direction:column;align-items:center;gap:0;
@@ -121,7 +121,7 @@ body.is-mobile #gameScreen{flex-direction:column;}
 .vs-label{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted);letter-spacing:2px;}
 
 #tableWrap{
-  position:relative;width:100%;flex:1;display:flex;align-items:center;justify-content:center;
+  position:relative;width:100%;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
   overflow:hidden;
 }
 #hockeyCanvas{
@@ -245,11 +245,11 @@ body.is-mobile #gameScreen{flex-direction:column;}
   display:none;
   flex-direction:column;align-items:center;justify-content:center;
   width:100%;background:#0d0d0f;border-top:2px solid var(--gold);
-  flex:1;min-height:160px;max-height:240px;position:relative;
+  flex-shrink:0;height:200px;position:relative;
   touch-action:none;user-select:none;
 }
 #trackpad{
-  width:92%;height:78%;border-radius:18px;
+  width:92%;height:84%;border-radius:18px;
   background:radial-gradient(ellipse at center,rgba(201,168,76,0.08),rgba(0,0,0,0.3));
   border:2px solid rgba(201,168,76,0.35);
   display:flex;align-items:center;justify-content:center;
@@ -274,12 +274,7 @@ body.is-mobile #gameScreen{flex-direction:column;}
   white-space:nowrap;pointer-events:none;
 }
 
-/* mobile portrait layout */
-@media (max-width:700px){
-  #gameScreen{flex-direction:column;justify-content:flex-start;}
-  #mobileControls{display:flex;}
-  #tableWrap{flex:none;}
-}
+/* mobile: controlled via JS body.is-mobile class */
 
 .fineprint{font-size:11px;color:var(--muted);max-width:340px;line-height:1.5;}
 a.linklike{color:var(--gold2);text-decoration:underline;cursor:pointer;}
