@@ -90,4 +90,8 @@ const GAMES=[
   {id:'learnthebody',emoji:'🧠',cat:'Educational · Kids',title:'Learn The Body',
    desc:'Tap any part of the boy or girl body to learn what it does! Switch to Quiz Mode to test yourself - fun for all ages!!',
    color:'rgba(255,143,171,0.10)',href:'/learn-the-body'},
+
+  {id:'happybuttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
+   desc:'Press the adorable squishy animal buttons for a satisfying ASMR experience!! 10 different sounds - pop, squish, boing and more. Just press and relax!!',
+   color:'rgba(255,183,197,0.15)',href:'/happy-buttons'},
 ];
