@@ -606,7 +606,7 @@ function sndGo(){ tone(880,0.35,'square',0.28); tone(1320,0.3,'sine',0.18,0.05);
 // ── GAME CONSTANTS ─────────────────────────────────────
 const TABLE_W=1000, TABLE_H=520;
 const GOAL_H=170, GOAL_Y0=(TABLE_H-GOAL_H)/2, GOAL_Y1=GOAL_Y0+GOAL_H;
-const PUCK_R=15, MALLET_R=34;
+const PUCK_R=15, MALLET_R=38;
 const FRICTION=0.991;
 const WALL_BOUNCE=0.94;
 const MAX_PUCK_SPEED=24;
@@ -816,31 +816,57 @@ function updateAI(){
 }
 
 // ── PHYSICS ──────────────────────────────────────────────
-function handleMalletCollision(mallet,prevX,prevY,skipCollision){
-  if(skipCollision) return; // AI retreating — let it pass through puck cleanly
+// Per-mallet hit cooldown — prevents re-grabbing the puck immediately after a hit
+const hitCooldown={player:0, ai:0};
+const MIN_EXIT_SPEED=2.5; // puck must leave mallet at this minimum speed
+
+function handleMalletCollision(mallet,prevX,prevY,isAI){
+  const key=isAI?'ai':'player';
+
+  // Countdown cooldown each frame
+  if(hitCooldown[key]>0){ hitCooldown[key]--; return; }
+
+  // Skip AI collision during ghost-retreat phase
+  if(isAI && aiStrikeMode && aiStrikeTimer<14) return;
+
   const dx=puck.x-mallet.x, dy=puck.y-mallet.y;
   const dist=Math.hypot(dx,dy);
   const minDist=PUCK_R+MALLET_R;
-  const COLLISION_TOLERANCE=5;
-  if(dist<minDist+COLLISION_TOLERANCE && dist>0.001){
+  if(dist<minDist+4 && dist>0.001){
     const nx=dx/dist, ny=dy/dist;
-    const overlap=Math.max(0,minDist-dist);
-    puck.x+=nx*overlap; puck.y+=ny*overlap;
 
+    // Push puck fully clear — extra margin so it can't re-collide next frame
+    const sep=minDist+6;
+    puck.x=mallet.x+nx*sep;
+    puck.y=mallet.y+ny*sep;
+
+    // Reflect + add mallet velocity
     const mvx=mallet.x-prevX, mvy=mallet.y-prevY;
     const dot=puck.vx*nx+puck.vy*ny;
-    puck.vx=puck.vx-2*dot*nx + mvx*1.9;
-    puck.vy=puck.vy-2*dot*ny + mvy*1.9;
+    puck.vx=puck.vx-2*dot*nx + mvx*2.0;
+    puck.vy=puck.vy-2*dot*ny + mvy*2.0;
 
+    // Guarantee minimum exit speed away from mallet
+    const exitDot=puck.vx*nx+puck.vy*ny;
+    if(exitDot<MIN_EXIT_SPEED){
+      puck.vx+=(MIN_EXIT_SPEED-exitDot)*nx;
+      puck.vy+=(MIN_EXIT_SPEED-exitDot)*ny;
+    }
+
+    // Cap speed
     const sp=Math.hypot(puck.vx,puck.vy);
     if(sp>MAX_PUCK_SPEED){ puck.vx*=MAX_PUCK_SPEED/sp; puck.vy*=MAX_PUCK_SPEED/sp; }
 
+    // Wall clamp
+    puck.x=clamp(puck.x,PUCK_R,TABLE_W-PUCK_R);
+    puck.y=clamp(puck.y,PUCK_R,TABLE_H-PUCK_R);
+
+    // Sound
     const hitSpeed=Math.hypot(mvx,mvy)*2+sp*0.25;
     if(hitSpeed>0.3) sndMallet(hitSpeed);
 
-    // never let the mallet push the puck through a wall
-    puck.x=clamp(puck.x,PUCK_R,TABLE_W-PUCK_R);
-    puck.y=clamp(puck.y,PUCK_R,TABLE_H-PUCK_R);
+    // Lock out re-collision for 10 frames (~0.16s) — this prevents sticking
+    hitCooldown[key]=10;
   }
 }
 
@@ -971,7 +997,7 @@ function checkStuck(){
       puck.trail=[];
       sndWall(3);
       posHistory=[];
-      aiStrikeMode=false; aiStrikeCooldown=0;
+      aiStrikeMode=false; aiStrikeCooldown=0; hitCooldown.player=0; hitCooldown.ai=0;
     }
   }
 }
@@ -1120,7 +1146,7 @@ function loop(){
   unstickFromCorner();
   checkStuck();
   handleMalletCollision(player,prevPlayerX,prevPlayerY,false);
-  handleMalletCollision(ai,prevAIX,prevAIY, aiStrikeMode && aiStrikeTimer<12);
+  handleMalletCollision(ai,prevAIX,prevAIY,true);
 
   draw();
 }
