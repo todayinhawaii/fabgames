@@ -129,9 +129,10 @@ body.is-mobile .level-btn{font-size:9px;padding:5px 10px;}
 body.is-mobile #hud{padding:5px 8px;gap:8px;}
 body.is-mobile .hud-row{gap:8px;}
 body.is-mobile .scores-row{gap:10px;}
-/* Canvas fills full width on mobile */
-body.is-mobile #tableWrap{width:100vw;}
-body.is-mobile #hockeyCanvas{max-width:100vw;}
+/* Canvas 20% wider + 10% taller on mobile */
+body.is-mobile #tableWrap{width:120vw;margin-left:-10vw;}
+body.is-mobile #hockeyCanvas{max-width:120vw;}
+body.is-mobile #mobileControls{width:120vw;margin-left:-10vw;}
 
 
 body.is-mobile #gameScreen{flex-direction:column;height:100vh;height:100dvh;}
@@ -645,8 +646,8 @@ function resizeCanvas(){
 
   let scale;
   if(isMobile){
-    // Canvas is rotated 90° so fit TABLE_W into height, TABLE_H into width
-    scale=Math.min(wH/TABLE_W, wW/TABLE_H);
+    // Canvas rotated 90°; boost available space by 10% tall + 20% wide
+    scale=Math.min((wH*1.10)/TABLE_W, (wW*1.20)/TABLE_H);
   } else {
     scale=Math.min(wW/TABLE_W, wH/TABLE_H);
   }
