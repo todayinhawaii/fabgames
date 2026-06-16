@@ -107,19 +107,32 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 /* ── HUD COLLAPSE (mobile) ── */
 #hudToggle{
   display:none;
-  position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);z-index:20;
-  width:44px;height:18px;border-radius:0 0 22px 22px;
+  width:36px;height:16px;border-radius:8px;
   background:rgba(201,168,76,0.22);border:1.5px solid rgba(201,168,76,0.45);
-  border-top:none;align-items:center;justify-content:center;
-  font-size:10px;color:var(--gold2);cursor:pointer;
+  align-items:center;justify-content:center;
+  font-size:10px;color:var(--gold2);cursor:pointer;flex-shrink:0;
 }
 body.is-mobile #hudToggle{display:flex;}
 #hud{transition:max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;overflow:visible;}
 body.is-mobile #hud{overflow:visible;position:relative;}
-body.is-mobile.hud-hidden #hud .hud-row{max-height:0;opacity:0;overflow:hidden;padding:0;margin:0;}
-body.is-mobile.hud-hidden #hud{padding-top:0;padding-bottom:0;gap:0;min-height:28px;}
-body.is-mobile.hud-hidden #hudToggle{bottom:-14px;}
+body.is-mobile.hud-hidden .hud-row{max-height:0 !important;opacity:0;overflow:hidden;padding:0 !important;margin:0;}
+body.is-mobile.hud-hidden #hud{padding:3px 8px;gap:0;justify-content:center;}
+body.is-mobile.hud-hidden #hudToggle{display:flex !important;}
 .hud-row{transition:max-height 0.3s ease,opacity 0.3s ease;max-height:120px;}
+/* ── MOBILE: compact HUD, wider canvas ── */
+body.is-mobile .score-pill{padding:3px 12px;border-radius:10px;}
+body.is-mobile .score-pill .sval{font-size:22px;}
+body.is-mobile .score-pill .sname{font-size:9px;letter-spacing:1px;}
+body.is-mobile .vs-label{font-size:13px;}
+body.is-mobile .game-title{font-size:13px;letter-spacing:1px;}
+body.is-mobile .level-btn{font-size:9px;padding:5px 10px;}
+body.is-mobile #hud{padding:5px 8px;gap:8px;}
+body.is-mobile .hud-row{gap:8px;}
+body.is-mobile .scores-row{gap:10px;}
+/* Canvas fills full width on mobile */
+body.is-mobile #tableWrap{width:100vw;}
+body.is-mobile #hockeyCanvas{max-width:100vw;}
+
 
 body.is-mobile #gameScreen{flex-direction:column;height:100vh;height:100dvh;}
 #hud{
@@ -388,12 +401,12 @@ a.linklike{color:var(--gold2);text-decoration:underline;cursor:pointer;}
         <div class="sval" id="scoreAI">0</div>
       </div>
       <div class="vs-label">VS</div>
+      <div id="hudToggle">▲</div>
       <div class="score-pill p1">
         <div class="sname" id="playerNameLabel">YOU</div>
         <div class="sval" id="scorePlayer">0</div>
       </div>
     </div>
-    <div id="hudToggle">▲</div>
   </div>
   <div id="tableWrap">
     <canvas id="hockeyCanvas" width="1000" height="520"></canvas>
@@ -758,22 +771,23 @@ function updateAI(){
 
   if(aiStrikeMode){
     aiStrikeTimer++;
-    if(aiStrikeTimer<12){
-      // Phase 1: pull back fast
-      const tx=MALLET_MARGIN+8;
-      const ty=clamp(puck.y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
+    if(aiStrikeTimer<14){
+      // Phase 1: ghost collision active, retreat to strike position behind puck
+      const tx=Math.max(MALLET_MARGIN+6, puck.x - MALLET_R*2.5);
+      // aim slightly off-centre to create angle on the shot
+      const ty=clamp(puck.y+(puck.y<TABLE_H/2?30:-30), MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
       const dx=tx-ai.x, dy=ty-ai.y, dist=Math.hypot(dx,dy)||1;
-      ai.x+=dx/dist*Math.min(d.aiSpeed*1.8,dist);
-      ai.y+=dy/dist*Math.min(d.aiSpeed*1.8,dist);
+      ai.x+=dx/dist*Math.min(d.aiSpeed*2.2,dist);
+      ai.y+=dy/dist*Math.min(d.aiSpeed*2.2,dist);
       return;
     }
-    // Phase 2: aim at centre of goal and charge
+    // Phase 2: full charge — collision resumes, smash the puck
     const aimX=clamp(puck.x, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
-    const aimY=TABLE_H/2; // aim through centre for best angle
+    const aimY=clamp(puck.y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
     const dx=aimX-ai.x, dy=aimY-ai.y, dist=Math.hypot(dx,dy)||1;
-    ai.x+=dx/dist*Math.min(d.aiSpeed*2.8,dist);
-    ai.y+=dy/dist*Math.min(d.aiSpeed*2.8,dist);
-    if(aiStrikeTimer>35||aiDist<2){ aiStrikeMode=false; aiStrikeCooldown=20; }
+    ai.x+=dx/dist*Math.min(d.aiSpeed*3.0,dist);
+    ai.y+=dy/dist*Math.min(d.aiSpeed*3.0,dist);
+    if(aiStrikeTimer>38){ aiStrikeMode=false; aiStrikeCooldown=25; }
     return;
   }
 
@@ -802,11 +816,12 @@ function updateAI(){
 }
 
 // ── PHYSICS ──────────────────────────────────────────────
-function handleMalletCollision(mallet,prevX,prevY){
+function handleMalletCollision(mallet,prevX,prevY,skipCollision){
+  if(skipCollision) return; // AI retreating — let it pass through puck cleanly
   const dx=puck.x-mallet.x, dy=puck.y-mallet.y;
   const dist=Math.hypot(dx,dy);
   const minDist=PUCK_R+MALLET_R;
-  const COLLISION_TOLERANCE=5; // lets a mallet sitting AT the safety margin still strike the puck
+  const COLLISION_TOLERANCE=5;
   if(dist<minDist+COLLISION_TOLERANCE && dist>0.001){
     const nx=dx/dist, ny=dy/dist;
     const overlap=Math.max(0,minDist-dist);
@@ -1104,8 +1119,8 @@ function loop(){
   updatePuckPhysics();
   unstickFromCorner();
   checkStuck();
-  handleMalletCollision(player,prevPlayerX,prevPlayerY);
-  handleMalletCollision(ai,prevAIX,prevAIY);
+  handleMalletCollision(player,prevPlayerX,prevPlayerY,false);
+  handleMalletCollision(ai,prevAIX,prevAIY, aiStrikeMode && aiStrikeTimer<12);
 
   draw();
 }
