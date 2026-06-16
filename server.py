@@ -379,3 +379,7 @@ def airhockey():
 @app.route('/learn-the-body')
 def learn_the_body():
     return send_from_directory('.', 'learn_the_body.html')
+
+@app.route('/happy-buttons')
+def happy_buttons():
+    return send_from_directory('.', 'happy_buttons.html')
