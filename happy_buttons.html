@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Happy Buttons 🐾</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:#d4c9b8;
+  font-family:'Baloo 2',sans-serif;
+  touch-action:none;
+}
+
+/* ── TOP BAR ── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;
+  background:rgba(30,22,18,0.88);
+  backdrop-filter:blur(6px);
+  border-bottom:2px solid rgba(255,215,0,0.35);
+}
+.logo{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;
+  background:linear-gradient(135deg,#ffd700,#ffb347,#ff8fab);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.home-link{
+  width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,215,0,0.35);
+  color:#e8c96a;text-decoration:none;font-size:16px;
+}
+
+/* ── SOUND PICKER ── */
+#soundBar{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  padding:8px 10px 12px;
+  background:rgba(30,22,18,0.92);
+  backdrop-filter:blur(8px);
+  border-top:2px solid rgba(255,215,0,0.3);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+#soundLabel{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,215,0,0.7);font-weight:800;
+}
+#soundScroll{
+  display:flex;gap:8px;overflow-x:auto;width:100%;
+  padding:2px 4px 2px;scrollbar-width:none;
+}
+#soundScroll::-webkit-scrollbar{display:none;}
+.sound-btn{
+  flex-shrink:0;padding:6px 14px;border-radius:20px;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:12px;
+  background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.7);cursor:pointer;white-space:nowrap;
+  transition:all 0.15s;
+}
+.sound-btn.active{
+  background:linear-gradient(135deg,#ffd700,#ffb347);
+  border-color:#fff3b0;color:#1a1a1a;
+  box-shadow:0 0 12px rgba(255,215,0,0.5);
+}
+
+/* ── BUTTON GRID ── */
+#stage{
+  position:fixed;inset:0;
+  top:50px;bottom:76px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#grid{
+  position:relative;
+  /* sized by JS */
+}
+#bgImg{
+  display:block;width:100%;height:100%;
+  border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.35);
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+/* Each button overlay */
+.btn-hit{
+  position:absolute;cursor:pointer;border-radius:18%;
+  background:transparent;
+  transition:transform 0.08s cubic-bezier(.4,0,.2,1), filter 0.08s;
+  transform-origin:center center;
+}
+.btn-hit:active,.btn-hit.pressed{
+  transform:scale(0.88);
+  filter:brightness(0.82) saturate(1.3);
+}
+
+/* Ripple glow on press */
+.ripple{
+  position:absolute;border-radius:18%;
+  pointer-events:none;z-index:10;
+  animation:rippleOut 0.5s ease-out forwards;
+}
+@keyframes rippleOut{
+  0%{opacity:0.85;transform:scale(0.7);}
+  100%{opacity:0;transform:scale(1.55);}
+}
+
+/* ── PARTICLE BURST ── */
+.particle{
+  position:fixed;pointer-events:none;z-index:60;
+  border-radius:50%;width:8px;height:8px;
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">🐾 Happy Buttons</div>
+  <a href="/" class="home-link">🏠</a>
+</div>
+
+<div id="stage">
+  <div id="grid">
+    <img id="bgImg" src="/buttons1.jpg" alt="Happy Buttons" draggable="false">
+    <!-- hit zones injected by JS -->
+  </div>
+</div>
+
+<div id="soundBar">
+  <div id="soundLabel">🔊 Choose your sound</div>
+  <div id="soundScroll"></div>
+</div>
+
+<script>
+// ── IMAGE LAYOUT ───────────────────────────────────────
+const COLS=4, ROWS=7;
+const IMG_W=1350, IMG_H=2400;
+const PAD_X=28, PAD_Y=28;
+const CELL_W=(IMG_W-PAD_X*2)/COLS; // 323.5
+const CELL_H=(IMG_H-PAD_Y*2)/ROWS; // 334.9
+
+// Button names for fun feedback (row-major order)
+const NAMES=[
+  'Bunny','Panda','Penguin','Bear',
+  'Duck','Frog','Fox','Koala',
+  'Hippo','Giraffe','Elephant','Cat',
+  'Seal','Unicorn','Lion','Pig',
+  'Sloth','Hedgehog','Dino','Otter',
+  'Bee','Sheep','Dolphin','Turtle',
+  'Cloud','Dog','Chick','Octopus',
+];
+
+const COLORS=[
+  '#ffb3ba','#c8e6c9','#bbdefb','#ffe0b2',
+  '#fff9c4','#d1c4e9','#fce4ec','#e8f5e9',
+  '#fff3e0','#e1bee7','#b3e5fc','#f8bbd0',
+  '#e0f2f1','#fef9c3','#fff8e1','#fce4ec',
+  '#ede7f6','#e8eaf6','#dcedc8','#fff3e0',
+  '#fff9c4','#e3f2fd','#b2ebf2','#dcedc8',
+  '#f0f4c3','#ffe0b2','#fce4ec','#e8eaf6',
+];
+
+// ── AUDIO ENGINE ───────────────────────────────────────
+let audioCtx=null;
+function getAC(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(type,freq,dur,vol,detune=0){
+  const ac=getAC();
+  const osc=ac.createOscillator();
+  const gain=ac.createGain();
+  osc.type=type; osc.frequency.value=freq;
+  if(detune) osc.detune.value=detune;
+  gain.gain.setValueAtTime(vol,ac.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+dur);
+  osc.connect(gain); gain.connect(ac.destination);
+  osc.start(); osc.stop(ac.currentTime+dur+0.02);
+}
+
+function playNoise(dur,vol,filterFreq){
+  const ac=getAC();
+  const buf=ac.createBuffer(1,ac.sampleRate*dur,ac.sampleRate);
+  const data=buf.getChannelData(0);
+  for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1);
+  const src=ac.createBufferSource(); src.buffer=buf;
+  const filter=ac.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=filterFreq;
+  const gain=ac.createGain();
+  gain.gain.setValueAtTime(vol,ac.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+dur);
+  src.connect(filter); filter.connect(gain); gain.connect(ac.destination);
+  src.start(); src.stop(ac.currentTime+dur+0.02);
+}
+
+const SOUNDS={
+  'Pop 🫧':()=>{
+    playTone('sine',520,0.08,0.5);
+    playTone('sine',820,0.05,0.3);
+  },
+  'Click 🖱️':()=>{
+    playNoise(0.04,0.6,4000);
+    playTone('square',200,0.03,0.2);
+  },
+  'Squish 🫠':()=>{
+    const ac=getAC();
+    const osc=ac.createOscillator(); osc.type='sine';
+    osc.frequency.setValueAtTime(180,ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80,ac.currentTime+0.15);
+    const g=ac.createGain();
+    g.gain.setValueAtTime(0.55,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.18);
+    osc.connect(g); g.connect(ac.destination);
+    osc.start(); osc.stop(ac.currentTime+0.2);
+  },
+  'Boing 🏀':()=>{
+    const ac=getAC();
+    const osc=ac.createOscillator(); osc.type='sine';
+    osc.frequency.setValueAtTime(120,ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(400,ac.currentTime+0.12);
+    const g=ac.createGain();
+    g.gain.setValueAtTime(0.5,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.25);
+    osc.connect(g); g.connect(ac.destination);
+    osc.start(); osc.stop(ac.currentTime+0.28);
+  },
+  'Bubble 🫧':()=>{
+    playTone('sine',600,0.12,0.35,Math.random()*200-100);
+    setTimeout(()=>playTone('sine',900,0.06,0.2),40);
+  },
+  'Tap 👆':()=>{
+    playNoise(0.025,0.7,2000);
+    playTone('triangle',400,0.025,0.15);
+  },
+  'Plop 💧':()=>{
+    const ac=getAC();
+    const osc=ac.createOscillator(); osc.type='sine';
+    osc.frequency.setValueAtTime(700,ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(200,ac.currentTime+0.1);
+    const g=ac.createGain();
+    g.gain.setValueAtTime(0.4,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.13);
+    osc.connect(g); g.connect(ac.destination);
+    osc.start(); osc.stop(ac.currentTime+0.15);
+  },
+  'Ping ✨':()=>{
+    playTone('sine',1200,0.35,0.28);
+    playTone('sine',1800,0.2,0.15);
+  },
+  'Thud 🥁':()=>{
+    const ac=getAC();
+    const osc=ac.createOscillator(); osc.type='sine';
+    osc.frequency.setValueAtTime(80,ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(30,ac.currentTime+0.12);
+    const g=ac.createGain();
+    g.gain.setValueAtTime(0.7,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);
+    osc.connect(g); g.connect(ac.destination);
+    osc.start(); osc.stop(ac.currentTime+0.18);
+    playNoise(0.06,0.3,800);
+  },
+  'Squeak 🐭':()=>{
+    const ac=getAC();
+    const osc=ac.createOscillator(); osc.type='sawtooth';
+    osc.frequency.setValueAtTime(800,ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1400,ac.currentTime+0.06);
+    osc.frequency.exponentialRampToValueAtTime(900,ac.currentTime+0.12);
+    const g=ac.createGain();
+    g.gain.setValueAtTime(0.18,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.14);
+    osc.connect(g); g.connect(ac.destination);
+    osc.start(); osc.stop(ac.currentTime+0.16);
+  },
+};
+
+let currentSound='Pop 🫧';
+
+// ── SOUND PICKER UI ────────────────────────────────────
+const soundScroll=document.getElementById('soundScroll');
+Object.keys(SOUNDS).forEach(name=>{
+  const btn=document.createElement('div');
+  btn.className='sound-btn'+(name===currentSound?' active':'');
+  btn.textContent=name;
+  btn.addEventListener('click',()=>{
+    currentSound=name;
+    document.querySelectorAll('.sound-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    SOUNDS[name](); // preview the sound
+  });
+  soundScroll.appendChild(btn);
+});
+
+// ── GRID LAYOUT ────────────────────────────────────────
+const stage=document.getElementById('stage');
+const grid=document.getElementById('grid');
+const bgImg=document.getElementById('bgImg');
+
+function layoutGrid(){
+  const sw=stage.clientWidth, sh=stage.clientHeight;
+  const scale=Math.min(sw/IMG_W, sh/IMG_H)*0.97;
+  const gw=IMG_W*scale, gh=IMG_H*scale;
+  grid.style.width=gw+'px'; grid.style.height=gh+'px';
+
+  // Remove old hit zones
+  grid.querySelectorAll('.btn-hit').forEach(e=>e.remove());
+
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const i=r*COLS+c;
+      const bx=(PAD_X + c*CELL_W)*scale;
+      const by=(PAD_Y + r*CELL_H)*scale;
+      const bw=CELL_W*scale, bh=CELL_H*scale;
+      const gap=bw*0.04; // small inset so click zone is button only
+
+      const div=document.createElement('div');
+      div.className='btn-hit';
+      div.style.cssText=`left:${bx+gap}px;top:${by+gap}px;width:${bw-gap*2}px;height:${bh-gap*2}px;`;
+      div.dataset.idx=i;
+      div.dataset.name=NAMES[i]||'';
+      div.dataset.color=COLORS[i]||'#fff';
+      grid.appendChild(div);
+    }
+  }
+}
+
+window.addEventListener('resize',layoutGrid);
+bgImg.onload=layoutGrid;
+if(bgImg.complete) layoutGrid();
+
+// ── PARTICLE BURST ────────────────────────────────────
+function burst(x,y,color){
+  const EMOJIS=['✨','⭐','💫','🌟'];
+  for(let i=0;i<7;i++){
+    const p=document.createElement('div');
+    const useEmoji=Math.random()<0.4;
+    if(useEmoji){
+      p.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${14+Math.random()*12}px;pointer-events:none;z-index:60;`;
+      p.textContent=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    } else {
+      p.className='particle';
+      const size=5+Math.random()*8;
+      p.style.cssText=`position:fixed;left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${color};pointer-events:none;z-index:60;border-radius:50%;`;
+    }
+    document.body.appendChild(p);
+    const angle=Math.random()*Math.PI*2;
+    const dist=30+Math.random()*70;
+    const dx=Math.cos(angle)*dist, dy=Math.sin(angle)*dist;
+    requestAnimationFrame(()=>{
+      p.style.transition='transform 0.55s cubic-bezier(.2,.8,.4,1), opacity 0.55s ease';
+      p.style.transform=`translate(${dx}px,${dy}px) rotate(${Math.random()*360}deg) scale(${0.5+Math.random()})`;
+      p.style.opacity='0';
+    });
+    setTimeout(()=>p.remove(),600);
+  }
+}
+
+// ── RIPPLE GLOW ───────────────────────────────────────
+function ripple(btn,color){
+  const r=document.createElement('div');
+  r.className='ripple';
+  r.style.cssText=`left:0;top:0;right:0;bottom:0;background:${color};border:4px solid ${color};`;
+  btn.appendChild(r);
+  setTimeout(()=>r.remove(),520);
+}
+
+// ── PRESS HANDLER ────────────────────────────────────
+function pressButton(btn,clientX,clientY){
+  getAC();
+  SOUNDS[currentSound]();
+
+  // Visual press
+  btn.classList.add('pressed');
+  setTimeout(()=>btn.classList.remove('pressed'),150);
+
+  // Ripple
+  ripple(btn, btn.dataset.color+'cc');
+
+  // Particle burst from touch point
+  burst(clientX, clientY, btn.dataset.color);
+}
+
+// ── EVENT WIRING ─────────────────────────────────────
+// Support multi-touch (press many buttons at once!!)
+const activePointers=new Set();
+
+document.addEventListener('pointerdown',e=>{
+  const btn=e.target.closest('.btn-hit');
+  if(!btn) return;
+  e.preventDefault();
+  activePointers.add(e.pointerId);
+  pressButton(btn,e.clientX,e.clientY);
+},{passive:false});
+
+document.addEventListener('pointermove',e=>{
+  if(!activePointers.has(e.pointerId)) return;
+  const btn=document.elementFromPoint(e.clientX,e.clientY)?.closest('.btn-hit');
+  if(btn && !btn.classList.contains('pressed')){
+    pressButton(btn,e.clientX,e.clientY);
+  }
+},{passive:true});
+
+document.addEventListener('pointerup',e=>activePointers.delete(e.pointerId),{passive:true});
+document.addEventListener('pointercancel',e=>activePointers.delete(e.pointerId),{passive:true});
+</script>
+</body>
+</html>
