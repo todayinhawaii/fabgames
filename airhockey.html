@@ -26,16 +26,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 
 /* ── SCREENS ── */
 .screen{
-  position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:24px;text-align:center;gap:14px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(201,168,76,0.07), transparent 60%),
-    var(--black);
+  position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:20px 16px;text-align:center;gap:12px;
+  background:radial-gradient(circle at 50% 0%,rgba(201,168,76,0.07),transparent 60%),var(--black);
   overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
-/* vertically centre content when it fits, scroll when keyboard appears */
-.screen::before{content:'';flex:1;min-height:16px;}
-.screen::after{content:'';flex:1;min-height:16px;}
 .screen.hidden{display:none;}
 
 .logo-title{
@@ -463,28 +458,42 @@ const DIFFICULTIES={
 };
 let currentDifficulty='medium';
 
-// Tap card = select; PLAY button = start
-function selectDifficulty(diff){
-  currentDifficulty=diff;
-  document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('selected'));
-  document.querySelector(`.diff-card[data-diff="${diff}"]`).classList.add('selected');
-  document.getElementById('playBtn').style.display='flex';
-}
-document.querySelectorAll('.diff-card').forEach(card=>{
-  function pickCard(){ selectDifficulty(card.dataset.diff); }
-  card.addEventListener('click', pickCard);
-  card.addEventListener('touchend', e=>{ e.preventDefault(); pickCard(); });
-});
-// default select easy so there's always something selected
-selectDifficulty('easy');
+// ── DIFFICULTY SELECT ──
+currentDifficulty='easy'; // default
 
-function startSelectedMatch(){
-  document.getElementById('aiNameLabel').textContent=DIFFICULTIES[currentDifficulty].label.toUpperCase();
-  startMatch();
+function highlightCard(diff){
+  document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('selected'));
+  const card=document.querySelector('.diff-card[data-diff="'+diff+'"]');
+  if(card) card.classList.add('selected');
 }
-const playBtn=document.getElementById('playBtn');
-playBtn.addEventListener('click', startSelectedMatch);
-playBtn.addEventListener('touchend', e=>{ e.preventDefault(); startSelectedMatch(); });
+
+document.querySelectorAll('.diff-card').forEach(card=>{
+  ['click','touchend'].forEach(evt=>{
+    card.addEventListener(evt, function(e){
+      if(evt==='touchend') e.preventDefault();
+      currentDifficulty=this.dataset.diff;
+      highlightCard(currentDifficulty);
+      // show play button
+      const pb=document.getElementById('playBtn');
+      if(pb) pb.style.display='flex';
+    });
+  });
+});
+
+// wire PLAY button
+setTimeout(()=>{
+  const pb=document.getElementById('playBtn');
+  if(!pb) return;
+  function doPlay(){
+    document.getElementById('aiNameLabel').textContent=DIFFICULTIES[currentDifficulty].label.toUpperCase();
+    startMatch();
+  }
+  pb.addEventListener('click', doPlay);
+  pb.addEventListener('touchend', e=>{ e.preventDefault(); doPlay(); });
+  // pre-highlight default
+  highlightCard('easy');
+  pb.style.display='flex';
+},0);
 
 document.getElementById('leaderboardBtn').addEventListener('click',()=>{renderLeaderboard();showScreen(leaderboardScreen);});
 document.getElementById('lbBackBtn').addEventListener('click',()=>showScreen(menuScreen));
@@ -1051,8 +1060,7 @@ function startMatch(){
   document.getElementById('scoreAI').textContent='0';
   resetPositions();
   showScreen(gameScreen);
-  resizeCanvas();
-  resizeCanvas();
+  setTimeout(resizeCanvas,30);
   gameRunning=true; paused=false;
   runCountdown(()=>{ resetPuck(0); });
   requestAnimationFrame(loop);
