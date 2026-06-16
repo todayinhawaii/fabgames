@@ -274,7 +274,23 @@ body.is-mobile #gameScreen{flex-direction:column;height:100vh;height:100dvh;}
   white-space:nowrap;pointer-events:none;
 }
 
-/* mobile: controlled via JS body.is-mobile class */
+/* ── MOBILE PORTRAIT: show trackpad, rotate game to fill screen ── */
+body.is-mobile #mobileControls{display:flex;}
+body.is-mobile #gameScreen{flex-direction:column;height:100dvh;overflow:hidden;}
+
+/* Rotate the table wrap 90° so the landscape game fills portrait height */
+body.is-mobile #tableWrap{
+  flex:1;min-height:0;width:100%;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+body.is-mobile #hockeyCanvas{
+  /* rotate canvas so long axis runs vertically */
+  transform:rotate(90deg);
+  transform-origin:center center;
+  /* after rotation, canvas visual width = original height, visual height = original width */
+  /* We set the CSS size BEFORE rotation to make it fit the portrait layout */
+}
 
 .fineprint{font-size:11px;color:var(--muted);max-width:340px;line-height:1.5;}
 a.linklike{color:var(--gold2);text-decoration:underline;cursor:pointer;}
@@ -591,11 +607,23 @@ let gameRunning=false, paused=false, countdownActive=false, frozen=false;
 
 // ── CANVAS SIZING ──────────────────────────────────────
 function resizeCanvas(){
-  const maxW=tableWrap.clientWidth*0.97, maxH=tableWrap.clientHeight*0.94;
-  let scale=Math.min(maxW/TABLE_W, maxH/TABLE_H);
+  const wrap=tableWrap;
+  const wW=wrap.clientWidth||window.innerWidth;
+  const wH=wrap.clientHeight||(window.innerHeight*0.6);
+
+  let scale;
+  if(isMobile){
+    // Canvas is rotated 90° so fit TABLE_W into height, TABLE_H into width
+    scale=Math.min(wH/TABLE_W, wW/TABLE_H);
+  } else {
+    scale=Math.min(wW/TABLE_W, wH/TABLE_H);
+  }
   if(!isFinite(scale)||scale<=0) scale=1;
+
+  // CSS size before rotation
   canvas.style.width=(TABLE_W*scale)+'px';
   canvas.style.height=(TABLE_H*scale)+'px';
+
   const dpr=window.devicePixelRatio||1;
   canvas.width=Math.round(TABLE_W*dpr);
   canvas.height=Math.round(TABLE_H*dpr);
@@ -657,13 +685,19 @@ trackpad.addEventListener('pointermove',e=>{
   const dx=(e.clientX-tpLastX)*TRACKPAD_SENS;
   const dy=(e.clientY-tpLastY)*TRACKPAD_SENS;
   tpLastX=e.clientX; tpLastY=e.clientY;
-  // Convert screen delta to table coords
   const rect=canvas.getBoundingClientRect();
-  const scaleX=TABLE_W/rect.width, scaleY=TABLE_H/rect.height;
-  setPlayerTarget(
-    playerTarget.x + dx*scaleX,
-    playerTarget.y + dy*scaleY
-  );
+  if(isMobile){
+    // Canvas rotated 90° CW: screen-Y → physics-X, screen-X → physics-Y (inverted)
+    const scaleX=TABLE_W/rect.height; // rotated: height maps to TABLE_W
+    const scaleY=TABLE_H/rect.width;  // rotated: width maps to TABLE_H
+    setPlayerTarget(
+      playerTarget.x + dy*scaleX,   // drag down = move toward own goal
+      playerTarget.y - dx*scaleY    // drag right = move mallet left visually
+    );
+  } else {
+    const scaleX=TABLE_W/rect.width, scaleY=TABLE_H/rect.height;
+    setPlayerTarget(playerTarget.x+dx*scaleX, playerTarget.y+dy*scaleY);
+  }
   moveDot(e.clientX,e.clientY);
 },{passive:false});
 
