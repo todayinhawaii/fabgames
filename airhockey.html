@@ -129,10 +129,10 @@ body.is-mobile .level-btn{font-size:9px;padding:5px 10px;}
 body.is-mobile #hud{padding:5px 8px;gap:8px;}
 body.is-mobile .hud-row{gap:8px;}
 body.is-mobile .scores-row{gap:10px;}
-/* Canvas 20% wider + 10% taller on mobile */
-body.is-mobile #tableWrap{width:120vw;margin-left:-10vw;}
+/* Canvas 20% wider + 10% taller on mobile, centred */
+body.is-mobile #tableWrap{width:120vw;position:relative;left:50%;transform:translateX(-50%);}
 body.is-mobile #hockeyCanvas{max-width:120vw;}
-body.is-mobile #mobileControls{width:120vw;margin-left:-10vw;}
+body.is-mobile #mobileControls{width:120vw;position:relative;left:50%;transform:translateX(-50%);}
 
 
 body.is-mobile #gameScreen{flex-direction:column;height:100vh;height:100dvh;}
