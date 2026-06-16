@@ -27,9 +27,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 /* ── SCREENS ── */
 .screen{
   position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:20px 16px;text-align:center;gap:12px;
+  justify-content:flex-start;padding:28px 16px;text-align:center;gap:12px;
   background:radial-gradient(circle at 50% 0%,rgba(201,168,76,0.07),transparent 60%),var(--black);
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
 }
 .screen.hidden{display:none;}
 
@@ -103,6 +103,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 
 /* ── GAME SCREEN ── */
 #gameScreen{padding:0;justify-content:flex-start;}
+body.is-mobile #gameScreen{flex-direction:column;}
 #hud{
   width:100%;display:flex;align-items:center;justify-content:center;gap:20px;
   padding:10px 14px;position:relative;z-index:5;
@@ -369,6 +370,14 @@ a.linklike{color:var(--gold2);text-decoration:underline;cursor:pointer;}
     <div id="countdownOverlay"><div id="countdownNum">3</div></div>
     <div id="goalFlash"><div class="gtext">GOAL!!</div></div>
   </div>
+  <!-- MOBILE TRACKPAD — inside gameScreen so it hides with it -->
+  <div id="mobileControls">
+    <div id="trackpad">
+      <div id="trackpadLabel">DRAG TO MOVE YOUR MALLET</div>
+      <div id="trackpadDot"></div>
+      <div id="trackpadHint">🏒 Slide to aim &nbsp;|&nbsp; Flick to shoot</div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ PAUSE MENU ═══ -->
@@ -613,6 +622,7 @@ function setPlayerTarget(x,y){
   playerTarget.y=clamp(y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
 }
 const isMobile='ontouchstart' in window;
+if(isMobile) document.body.classList.add('is-mobile');
 if(!isMobile){
   canvas.addEventListener('pointerdown',e=>{
     canvas.setPointerCapture(e.pointerId);
@@ -1156,13 +1166,5 @@ resizeCanvas();
 
 </script>
 
-<!-- ═══ MOBILE TRACKPAD ═══ -->
-<div id="mobileControls">
-  <div id="trackpad">
-    <div id="trackpadLabel">DRAG TO MOVE YOUR MALLET</div>
-    <div id="trackpadDot"></div>
-    <div id="trackpadHint">🏒 Slide to aim &nbsp;|&nbsp; Flick to shoot</div>
-  </div>
-</div>
 </body>
 </html>
