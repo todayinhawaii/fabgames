@@ -103,6 +103,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 
 /* ── GAME SCREEN ── */
 #gameScreen{padding:0;justify-content:flex-start;}
+
+/* ── HUD COLLAPSE (mobile) ── */
+#hudToggle{
+  display:none;
+  position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);z-index:20;
+  width:44px;height:18px;border-radius:0 0 22px 22px;
+  background:rgba(201,168,76,0.22);border:1.5px solid rgba(201,168,76,0.45);
+  border-top:none;align-items:center;justify-content:center;
+  font-size:10px;color:var(--gold2);cursor:pointer;
+}
+body.is-mobile #hudToggle{display:flex;}
+#hud{transition:max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;overflow:visible;}
+body.is-mobile #hud{overflow:visible;position:relative;}
+body.is-mobile.hud-hidden #hud .hud-row{max-height:0;opacity:0;overflow:hidden;padding:0;margin:0;}
+body.is-mobile.hud-hidden #hud{padding-top:0;padding-bottom:0;gap:0;min-height:28px;}
+body.is-mobile.hud-hidden #hudToggle{bottom:-14px;}
+.hud-row{transition:max-height 0.3s ease,opacity 0.3s ease;max-height:120px;}
+
 body.is-mobile #gameScreen{flex-direction:column;height:100vh;height:100dvh;}
 #hud{
   width:100%;display:flex;align-items:center;justify-content:center;gap:20px;
@@ -245,11 +263,11 @@ body.is-mobile #gameScreen{flex-direction:column;height:100vh;height:100dvh;}
   display:none;
   flex-direction:column;align-items:center;justify-content:center;
   width:100%;background:#0d0d0f;border-top:2px solid var(--gold);
-  flex-shrink:0;height:200px;position:relative;
+  flex-shrink:0;height:140px;position:relative;
   touch-action:none;user-select:none;
 }
 #trackpad{
-  width:92%;height:84%;border-radius:18px;
+  width:94%;height:82%;border-radius:18px;
   background:radial-gradient(ellipse at center,rgba(201,168,76,0.08),rgba(0,0,0,0.3));
   border:2px solid rgba(201,168,76,0.35);
   display:flex;align-items:center;justify-content:center;
@@ -375,6 +393,7 @@ a.linklike{color:var(--gold2);text-decoration:underline;cursor:pointer;}
         <div class="sval" id="scorePlayer">0</div>
       </div>
     </div>
+    <div id="hudToggle">▲</div>
   </div>
   <div id="tableWrap">
     <canvas id="hockeyCanvas" width="1000" height="520"></canvas>
@@ -715,7 +734,7 @@ function predictPuckY(targetX){
   if(m>range) m=2*range-m;
   return m+MALLET_R;
 }
-let aiStrikeMode=false, aiStrikeTimer=0;
+let aiStrikeMode=false, aiStrikeTimer=0, aiStrikeCooldown=0;
 function updateAI(){
   const d=DIFFICULTIES[currentDifficulty];
   const now=performance.now();
@@ -723,57 +742,63 @@ function updateAI(){
     ai.errorY=(Math.random()-0.5)*2*d.error;
     ai.lastErr=now;
   }
+  if(aiStrikeCooldown>0){ aiStrikeCooldown--; }
 
-  // Detect AI camping on slow puck — force a back-and-strike manoeuvre
-  const puckSlow=Math.hypot(puck.vx,puck.vy)<0.6;
+  // Detect camping: AI touching slow puck on AI side — go get it properly
+  const puckSpeed=Math.hypot(puck.vx,puck.vy);
   const puckOnAISide=puck.x<TABLE_W/2;
-  const aiNearPuck=Math.hypot(ai.x-puck.x,ai.y-puck.y)<MALLET_R+PUCK_R+8;
-  if(puckSlow && puckOnAISide && aiNearPuck && !aiStrikeMode){
+  const aiDist=Math.hypot(ai.x-puck.x,ai.y-puck.y);
+  const aiTouchingPuck=aiDist<MALLET_R+PUCK_R+12;
+
+  if(!aiStrikeMode && aiStrikeCooldown===0 && puckSpeed<1.2 && puckOnAISide && aiTouchingPuck){
     aiStrikeMode=true; aiStrikeTimer=0;
   }
+  // Also cancel strike if puck moves fast (already hit)
+  if(aiStrikeMode && puckSpeed>3){ aiStrikeMode=false; aiStrikeCooldown=30; }
+
   if(aiStrikeMode){
     aiStrikeTimer++;
-    // Phase 1 (frames 0-18): pull back toward own end-wall
-    if(aiStrikeTimer<18){
-      const tx=MALLET_MARGIN+10, ty=clamp(puck.y,MALLET_MARGIN,TABLE_H-MALLET_MARGIN);
+    if(aiStrikeTimer<12){
+      // Phase 1: pull back fast
+      const tx=MALLET_MARGIN+8;
+      const ty=clamp(puck.y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
       const dx=tx-ai.x, dy=ty-ai.y, dist=Math.hypot(dx,dy)||1;
-      const spd=d.aiSpeed*1.4;
-      ai.x+=dx/dist*Math.min(spd,dist); ai.y+=dy/dist*Math.min(spd,dist);
+      ai.x+=dx/dist*Math.min(d.aiSpeed*1.8,dist);
+      ai.y+=dy/dist*Math.min(d.aiSpeed*1.8,dist);
       return;
     }
-    // Phase 2 (frames 18+): charge hard at puck
-    const tx=clamp(puck.x,MALLET_MARGIN,TABLE_W/2-CENTER_MARGIN);
-    const ty=clamp(puck.y,MALLET_MARGIN,TABLE_H-MALLET_MARGIN);
-    const dx=tx-ai.x, dy=ty-ai.y, dist=Math.hypot(dx,dy)||1;
-    const spd=d.aiSpeed*2.2;
-    ai.x+=dx/dist*Math.min(spd,dist); ai.y+=dy/dist*Math.min(spd,dist);
-    if(aiStrikeTimer>40 || Math.hypot(dx,dy)<4) aiStrikeMode=false;
+    // Phase 2: aim at centre of goal and charge
+    const aimX=clamp(puck.x, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+    const aimY=TABLE_H/2; // aim through centre for best angle
+    const dx=aimX-ai.x, dy=aimY-ai.y, dist=Math.hypot(dx,dy)||1;
+    ai.x+=dx/dist*Math.min(d.aiSpeed*2.8,dist);
+    ai.y+=dy/dist*Math.min(d.aiSpeed*2.8,dist);
+    if(aiStrikeTimer>35||aiDist<2){ aiStrikeMode=false; aiStrikeCooldown=20; }
     return;
   }
 
   let targetX,targetY;
-  if(puck.x<TABLE_W/2 && puck.visible && puck.vx>-0.2){
-    targetX=clamp(puck.x, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+  if(puck.x<TABLE_W/2 && puck.visible && puck.vx>-0.5){
+    // Offensive: position behind puck, aimed toward player goal
+    const leadX=clamp(puck.x-MALLET_R*0.5, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+    targetX=leadX;
     targetY=(d.predictBounces?predictPuckY(ai.x):puck.y)+ai.errorY;
-  } else if(puck.x<TABLE_W/2 && puck.visible){
-    targetX=clamp(puck.x+4, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
-    targetY=(d.predictBounces?predictPuckY(ai.x):puck.y)+ai.errorY*0.6;
+  } else if(puck.x<TABLE_W/2){
+    // Puck moving back — intercept
+    targetX=clamp(puck.x, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+    targetY=(d.predictBounces?predictPuckY(ai.x):puck.y)+ai.errorY*0.5;
   } else {
-    targetX=MALLET_MARGIN+20;
-    targetY=puck.visible ? (puck.y*0.5+TABLE_H/2*0.5)+ai.errorY*1.4 : TABLE_H/2;
+    // Defensive home position
+    targetX=MALLET_MARGIN+24;
+    targetY=puck.visible?(puck.y*0.4+TABLE_H/2*0.6):TABLE_H/2;
   }
   targetX=clamp(targetX, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
   targetY=clamp(targetY, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
 
-  const dx=targetX-ai.x, dy=targetY-ai.y;
-  const dist=Math.hypot(dx,dy);
-  const speed=d.aiSpeed;
-  if(dist>speed && dist>0){
-    ai.x+=dx/dist*speed;
-    ai.y+=dy/dist*speed;
-  } else {
-    ai.x=targetX; ai.y=targetY;
-  }
+  const dx=targetX-ai.x, dy=targetY-ai.y, dist=Math.hypot(dx,dy)||1;
+  const spd=d.aiSpeed;
+  ai.x+=dx/dist*Math.min(spd,dist);
+  ai.y+=dy/dist*Math.min(spd,dist);
 }
 
 // ── PHYSICS ──────────────────────────────────────────────
@@ -931,7 +956,7 @@ function checkStuck(){
       puck.trail=[];
       sndWall(3);
       posHistory=[];
-      aiStrikeMode=false; // reset AI strike too
+      aiStrikeMode=false; aiStrikeCooldown=0;
     }
   }
 }
@@ -1190,6 +1215,26 @@ document.getElementById('chooseLevelBtn').onclick=()=>{
 };
 
 // (rotate prompt removed — game plays vertical on mobile)
+
+// ── HUD COLLAPSE (mobile) ──────────────────────────────
+const hudToggle=document.getElementById('hudToggle');
+let hudHidden=false;
+function setHudHidden(hide){
+  hudHidden=hide;
+  document.body.classList.toggle('hud-hidden',hide);
+  hudToggle.textContent=hide?'▼':'▲';
+  setTimeout(resizeCanvas,320);
+}
+hudToggle.addEventListener('click',()=>setHudHidden(!hudHidden));
+hudToggle.addEventListener('touchend',e=>{e.preventDefault();setHudHidden(!hudHidden);});
+// Touch near top of canvas → restore HUD
+document.getElementById('tableWrap').addEventListener('touchstart',e=>{
+  if(!hudHidden) return;
+  const rect=document.getElementById('tableWrap').getBoundingClientRect();
+  const relY=(e.touches[0].clientY-rect.top)/rect.height;
+  if(relY<0.15) setHudHidden(false);
+},{passive:true});
+
 
 resizeCanvas();
 
