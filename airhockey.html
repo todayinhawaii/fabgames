@@ -748,265 +748,117 @@ function predictPuckY(targetX){
   if(m>range) m=2*range-m;
   return m+MALLET_R;
 }
-let aiStrikeMode=false, aiStrikeTimer=0, aiStrikeCooldown=0;
+let aiErrY=0, aiErrTimer=0;
 function updateAI(){
   const d=DIFFICULTIES[currentDifficulty];
   const now=performance.now();
-  if(now-ai.lastErr>420){
-    ai.errorY=(Math.random()-0.5)*2*d.error;
-    ai.lastErr=now;
+
+  // Refresh aim error periodically
+  if(now-aiErrTimer>380){
+    aiErrY=(Math.random()-0.5)*2*d.error;
+    aiErrTimer=now;
   }
-  if(aiStrikeCooldown>0){ aiStrikeCooldown--; }
 
-  // Detect camping: AI touching slow puck on AI side — go get it properly
-  const puckSpeed=Math.hypot(puck.vx,puck.vy);
-  const puckOnAISide=puck.x<TABLE_W/2;
-  const aiDist=Math.hypot(ai.x-puck.x,ai.y-puck.y);
-  const aiTouchingPuck=aiDist<MALLET_R+PUCK_R+12;
+  let targetX, targetY;
 
-  if(!aiStrikeMode && aiStrikeCooldown===0 && puckSpeed<1.2 && puckOnAISide && aiTouchingPuck){
-    aiStrikeMode=true; aiStrikeTimer=0;
-  }
-  // Also cancel strike if puck moves fast (already hit)
-  if(aiStrikeMode && puckSpeed>3){ aiStrikeMode=false; aiStrikeCooldown=30; }
+  if(puck.visible && puck.x < TABLE_W/2){
+    // ── OFFENSIVE / INTERCEPT ──────────────────────────
+    // ALWAYS position ourselves to the LEFT of the puck (between puck and our own goal).
+    // This guarantees that when we hit, the puck goes RIGHTWARD toward player — no own goals.
 
-  if(aiStrikeMode){
-    aiStrikeTimer++;
-    if(aiStrikeTimer<14){
-      // Phase 1: retreat to LEFT of puck so charge will push it RIGHTWARD toward player
-      const tx=Math.max(MALLET_MARGIN+6, puck.x - MALLET_R*2.8);
-      const ty=clamp(puck.y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
-      const dx=tx-ai.x, dy=ty-ai.y, dist=Math.hypot(dx,dy)||1;
-      ai.x+=dx/dist*Math.min(d.aiSpeed*2.2,dist);
-      ai.y+=dy/dist*Math.min(d.aiSpeed*2.2,dist);
-      return;
+    if(d.predictBounces && puck.vx<0){
+      // Puck coming toward us — predict where to intercept
+      const tx=clamp(ai.x-10, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+      const timeToX=Math.abs((puck.x-tx)/Math.max(Math.abs(puck.vx),0.5));
+      const predictY=puck.y+puck.vy*timeToX;
+      // Bounce-correct Y
+      const range=TABLE_H-2*PUCK_R;
+      let m=((predictY-PUCK_R)%(2*range)+2*range)%(2*range);
+      if(m>range) m=2*range-m;
+      targetY=clamp(m+PUCK_R+aiErrY, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
+      targetX=tx;
+    } else {
+      // Puck moving away or slow — get BEHIND it (to its left) to set up a rightward shot
+      targetX=clamp(puck.x-MALLET_R*1.8, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+      targetY=clamp(puck.y+aiErrY, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
     }
-    // Phase 2: charge from LEFT toward RIGHT — always pushes puck toward player goal
-    // Aim slightly past the puck so collision angle sends it rightward
-    const aimX=clamp(puck.x+MALLET_R, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
-    const aimY=clamp(puck.y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
-    const dx=aimX-ai.x, dy=aimY-ai.y, dist=Math.hypot(dx,dy)||1;
-    ai.x+=dx/dist*Math.min(d.aiSpeed*3.0,dist);
-    ai.y+=dy/dist*Math.min(d.aiSpeed*3.0,dist);
-    if(aiStrikeTimer>38){ aiStrikeMode=false; aiStrikeCooldown=25; }
-    return;
+  } else {
+    // ── DEFENSIVE HOME ──────────────────────────────────
+    targetX=MALLET_MARGIN+28;
+    // Track puck Y loosely so we can deflect shots
+    targetY=puck.visible
+      ? clamp(puck.y*0.45+TABLE_H/2*0.55, MALLET_MARGIN, TABLE_H-MALLET_MARGIN)
+      : TABLE_H/2;
   }
 
-  let targetX,targetY;
-  if(puck.x<TABLE_W/2 && puck.visible && puck.vx>-0.5){
-    // Offensive: position behind puck, aimed toward player goal
-    const leadX=clamp(puck.x-MALLET_R*0.5, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
-    targetX=leadX;
-    targetY=(d.predictBounces?predictPuckY(ai.x):puck.y)+ai.errorY;
-  } else if(puck.x<TABLE_W/2){
-    // Puck moving back — intercept
-    targetX=clamp(puck.x, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
-    targetY=(d.predictBounces?predictPuckY(ai.x):puck.y)+ai.errorY*0.5;
-  } else {
-    // Defensive home position — stay back, don't chase toward own goal
-    targetX=MALLET_MARGIN+24;
-    targetY=puck.visible?(puck.y*0.4+TABLE_H/2*0.6):TABLE_H/2;
-  }
   targetX=clamp(targetX, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
   targetY=clamp(targetY, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
 
-  const dx=targetX-ai.x, dy=targetY-ai.y, dist=Math.hypot(dx,dy)||1;
-  const spd=d.aiSpeed;
-  ai.x+=dx/dist*Math.min(spd,dist);
-  ai.y+=dy/dist*Math.min(spd,dist);
+  const dx=targetX-ai.x, dy=targetY-ai.y;
+  const dist=Math.hypot(dx,dy)||1;
+  const spd=Math.min(d.aiSpeed, dist);
+  ai.x+=dx/dist*spd;
+  ai.y+=dy/dist*spd;
 }
 
 // ── PHYSICS ──────────────────────────────────────────────
-// Per-mallet hit cooldown — prevents re-grabbing the puck immediately after a hit
+// ── PROPER VELOCITY-BASED COLLISION ─────────────────
+// Mallet has mass — collision transfers momentum realistically.
+// No sticking, no vacuuming: uses relative velocity check so only
+// approaching mallets trigger a hit, and puck is separated with
+// guaranteed clearance so re-collision can't happen next frame.
+
+const MALLET_MASS=10; // heavier than puck → most energy stays in puck
+const RESTITUTION=0.82;
 const hitCooldown={player:0, ai:0};
-const MIN_EXIT_SPEED=2.5; // puck must leave mallet at this minimum speed
 
-function handleMalletCollision(mallet,prevX,prevY,isAI){
+function handleMalletCollision(mallet,malletVel,isAI){
   const key=isAI?'ai':'player';
-
-  // Countdown cooldown each frame
   if(hitCooldown[key]>0){ hitCooldown[key]--; return; }
-
-  // Skip AI collision during ghost-retreat phase
-  if(isAI && aiStrikeMode && aiStrikeTimer<14) return;
 
   const dx=puck.x-mallet.x, dy=puck.y-mallet.y;
   const dist=Math.hypot(dx,dy);
   const minDist=PUCK_R+MALLET_R;
-  if(dist<minDist+4 && dist>0.001){
+
+  if(dist<minDist && dist>0.001){
     const nx=dx/dist, ny=dy/dist;
 
-    // Push puck fully clear — extra margin so it can't re-collide next frame
-    const sep=minDist+6;
-    puck.x=mallet.x+nx*sep;
-    puck.y=mallet.y+ny*sep;
+    // Separate fully with extra clearance
+    puck.x=mallet.x+nx*(minDist+4);
+    puck.y=mallet.y+ny*(minDist+4);
 
-    // Reflect + add mallet velocity
-    const mvx=mallet.x-prevX, mvy=mallet.y-prevY;
-    const dot=puck.vx*nx+puck.vy*ny;
-    puck.vx=puck.vx-2*dot*nx + mvx*2.0;
-    puck.vy=puck.vy-2*dot*ny + mvy*2.0;
+    // Relative velocity of puck w.r.t. mallet along collision normal
+    const rvx=puck.vx-malletVel.x, rvy=puck.vy-malletVel.y;
+    const rvn=rvx*nx+rvy*ny;
 
-    // Guarantee minimum exit speed away from mallet
-    const exitDot=puck.vx*nx+puck.vy*ny;
-    if(exitDot<MIN_EXIT_SPEED){
-      puck.vx+=(MIN_EXIT_SPEED-exitDot)*nx;
-      puck.vy+=(MIN_EXIT_SPEED-exitDot)*ny;
-    }
+    // Only resolve if objects are approaching each other
+    if(rvn<0){
+      const impulse=-(1+RESTITUTION)*rvn*(MALLET_MASS/(1+MALLET_MASS));
+      puck.vx+=impulse*nx;
+      puck.vy+=impulse*ny;
 
-    // Cap speed
-    const sp=Math.hypot(puck.vx,puck.vy);
-    if(sp>MAX_PUCK_SPEED){ puck.vx*=MAX_PUCK_SPEED/sp; puck.vy*=MAX_PUCK_SPEED/sp; }
+      // Guarantee minimum exit speed so puck always travels away cleanly
+      const exitV=puck.vx*nx+puck.vy*ny;
+      if(exitV<2.0){ puck.vx+=(2.0-exitV)*nx; puck.vy+=(2.0-exitV)*ny; }
 
-    // Wall clamp
-    puck.x=clamp(puck.x,PUCK_R,TABLE_W-PUCK_R);
-    puck.y=clamp(puck.y,PUCK_R,TABLE_H-PUCK_R);
+      // Cap speed
+      const sp=Math.hypot(puck.vx,puck.vy);
+      if(sp>MAX_PUCK_SPEED){ puck.vx*=MAX_PUCK_SPEED/sp; puck.vy*=MAX_PUCK_SPEED/sp; }
 
-    // Sound
-    const hitSpeed=Math.hypot(mvx,mvy)*2+sp*0.25;
-    if(hitSpeed>0.3) sndMallet(hitSpeed);
+      // Wall clamp
+      puck.x=clamp(puck.x,PUCK_R,TABLE_W-PUCK_R);
+      puck.y=clamp(puck.y,PUCK_R,TABLE_H-PUCK_R);
 
-    // Lock out re-collision for 10 frames (~0.16s) — this prevents sticking
-    hitCooldown[key]=10;
+      // Sound based on actual impact speed
+      const impactSpd=Math.abs(rvn);
+      if(impactSpd>0.3) sndMallet(impactSpd);
 
-    // OWN-GOAL GUARD: only if AI mallet was moving LEFT (toward own goal) when it struck
-    if(isAI && puck.vx < -2 && puck.x < TABLE_W*0.25 && prevX < ai.x){
-      puck.vx = Math.abs(puck.vx)*0.75 + 1.0; // redirect rightward
+      // Cooldown prevents re-grab
+      hitCooldown[key]=8;
     }
   }
 }
 
-function onGoal(scorer){
-  if(!puck.visible) return;
-  puck.visible=false;
-  puck.vx=0;puck.vy=0;
-  if(scorer==='player'){
-    scores.player++; document.getElementById('scorePlayer').textContent=scores.player;
-  } else {
-    scores.ai++; document.getElementById('scoreAI').textContent=scores.ai;
-  }
-  sndGoal();
-  const flash=document.getElementById('goalFlash');
-  flash.classList.add('show');
-  setTimeout(()=>flash.classList.remove('show'),950);
-
-  setTimeout(()=>{
-    if(scores.player>=WIN_SCORE || scores.ai>=WIN_SCORE){
-      endMatch();
-      return;
-    }
-    resetPuck(scorer==='player' ? -1 : 1);
-    puck.visible=true;
-  },1100);
-}
-
-function resetPuck(dir){
-  puck.x=TABLE_W/2; puck.y=TABLE_H/2;
-  puck.trail=[];
-  posHistory=[];
-  const speed=2.5+Math.random()*1.5;
-  const angle=(Math.random()-0.5)*0.9;
-  const d = dir===0 ? (Math.random()<0.5?-1:1) : dir;
-  puck.vx=Math.cos(angle)*speed*d;
-  puck.vy=Math.sin(angle)*speed;
-}
-
-const MIN_BOUNCE_SPEED=0.5; // below this, just rest against the wall (no flip/sound)
-const REST_SPEED=0.18;       // below this total speed, puck comes fully to rest
-
-function updatePuckPhysics(){
-  if(!puck.visible) return;
-  puck.trail.push({x:puck.x,y:puck.y});
-  if(puck.trail.length>8) puck.trail.shift();
-
-  puck.x+=puck.vx; puck.y+=puck.vy;
-  puck.vx*=FRICTION; puck.vy*=FRICTION;
-
-  // top/bottom walls - only bounce+sound on a real hit, else just rest against the wall
-  if(puck.y-PUCK_R<0){
-    puck.y=PUCK_R;
-    if(puck.vy<-MIN_BOUNCE_SPEED){ puck.vy=-puck.vy*WALL_BOUNCE; sndWall(Math.abs(puck.vy)+1); }
-    else if(puck.vy<0) puck.vy=0;
-  } else if(puck.y+PUCK_R>TABLE_H){
-    puck.y=TABLE_H-PUCK_R;
-    if(puck.vy>MIN_BOUNCE_SPEED){ puck.vy=-puck.vy*WALL_BOUNCE; sndWall(Math.abs(puck.vy)+1); }
-    else if(puck.vy>0) puck.vy=0;
-  }
-
-  // left wall / AI goal (player scores)
-  if(puck.x-PUCK_R<0){
-    if(puck.y>GOAL_Y0+2 && puck.y<GOAL_Y1-2){
-      if(puck.x<-PUCK_R*1.3) onGoal('player');
-    } else {
-      puck.x=PUCK_R;
-      if(puck.vx<-MIN_BOUNCE_SPEED){ puck.vx=-puck.vx*WALL_BOUNCE; sndWall(Math.abs(puck.vx)+1); }
-      else if(puck.vx<0) puck.vx=0;
-    }
-  }
-  // right wall / player goal (AI scores)
-  if(puck.x+PUCK_R>TABLE_W){
-    if(puck.y>GOAL_Y0+2 && puck.y<GOAL_Y1-2){
-      if(puck.x>TABLE_W+PUCK_R*1.3) onGoal('ai');
-    } else {
-      puck.x=TABLE_W-PUCK_R;
-      if(puck.vx>MIN_BOUNCE_SPEED){ puck.vx=-puck.vx*WALL_BOUNCE; sndWall(Math.abs(puck.vx)+1); }
-      else if(puck.vx>0) puck.vx=0;
-    }
-  }
-
-  // bring a near-stationary puck fully to rest (prevents endless micro-jitter)
-  if(Math.hypot(puck.vx,puck.vy)<REST_SPEED){ puck.vx=0; puck.vy=0; }
-}
-
-// Safety valve: if the puck is at rest wedged into a corner (mallet camping on it,
-// nowhere to go), give it a gentle diagonal nudge toward the table center.
-function unstickFromCorner(){
-  const speed=Math.hypot(puck.vx,puck.vy);
-  if(speed>0.35) return;
-  const nearLeft=puck.x-PUCK_R<3, nearRight=puck.x+PUCK_R>TABLE_W-3;
-  const nearTop=puck.y-PUCK_R<3, nearBottom=puck.y+PUCK_R>TABLE_H-3;
-  if((nearLeft||nearRight) && (nearTop||nearBottom)){
-    const inGoalY=puck.y>GOAL_Y0 && puck.y<GOAL_Y1;
-    if((nearLeft||nearRight) && inGoalY) return; // let it settle into the goal naturally
-    const dirX = nearLeft? 1 : (nearRight? -1:0);
-    const dirY = nearTop? 1 : (nearBottom? -1:0);
-    const mag=1.7;
-    puck.vx=dirX*mag*0.7071;
-    puck.vy=dirY*mag*0.7071;
-  }
-}
-
-// Ultimate failsafe: if puck hasn't left a small box in ~0.5s, pop it toward centre.
-// Uses 30-frame window and tighter 18px box so it fires sooner.
-let posHistory=[];
-function checkStuck(){
-  if(!puck.visible){ posHistory=[]; return; }
-  posHistory.push({x:puck.x,y:puck.y});
-  if(posHistory.length>30) posHistory.shift(); // ~0.5s @60fps
-
-  if(posHistory.length>=30){
-    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-    for(const p of posHistory){
-      if(p.x<minX)minX=p.x; if(p.x>maxX)maxX=p.x;
-      if(p.y<minY)minY=p.y; if(p.y>maxY)maxY=p.y;
-    }
-    if((maxX-minX)<18 && (maxY-minY)<18){
-      // aim toward table centre + a little toward the player side so it creates action
-      const cx=TABLE_W*0.65, cy=TABLE_H/2;
-      let dx=cx-puck.x, dy=cy-puck.y;
-      const d=Math.hypot(dx,dy)||1;
-      dx/=d; dy/=d;
-      const jump=MALLET_R+PUCK_R+20;
-      puck.x=clamp(puck.x+dx*jump, PUCK_R, TABLE_W-PUCK_R);
-      puck.y=clamp(puck.y+dy*jump, PUCK_R, TABLE_H-PUCK_R);
-      puck.vx=dx*4.0; puck.vy=dy*4.0;
-      puck.trail=[];
-      sndWall(3);
-      posHistory=[];
-      aiStrikeMode=false; aiStrikeCooldown=0; hitCooldown.player=0; hitCooldown.ai=0;
-    }
-  }
-}
 
 // ── DRAWING ──────────────────────────────────────────────
 function drawTable(){
