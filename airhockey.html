@@ -992,19 +992,24 @@ function loop(){
   requestAnimationFrame(loop);
   if(paused || frozen){ draw(); return; }
 
-  const prevPlayerX=player.x, prevPlayerY=player.y;
-  const prevAIX=ai.x, prevAIY=ai.y;
+  // Snapshot positions BEFORE moving
+  const ppx=player.x, ppy=player.y;
+  const apx=ai.x,     apy=ai.y;
 
-  // smooth player toward pointer target
-  player.x += (playerTarget.x-player.x)*0.6;
-  player.y += (playerTarget.y-player.y)*0.6;
-
+  // Move mallets
+  player.x+=(playerTarget.x-player.x)*0.6;
+  player.y+=(playerTarget.y-player.y)*0.6;
   updateAI();
+
+  // Real frame velocity = how far each mallet actually moved this frame
+  const playerVel={x:player.x-ppx, y:player.y-ppy};
+  const aiVel    ={x:ai.x-apx,     y:ai.y-apy};
+
   updatePuckPhysics();
   unstickFromCorner();
   checkStuck();
-  handleMalletCollision(player,prevPlayerX,prevPlayerY,false);
-  handleMalletCollision(ai,prevAIX,prevAIY,true);
+  handleMalletCollision(player, playerVel, false);
+  handleMalletCollision(ai,     aiVel,     true);
 
 
   draw();
