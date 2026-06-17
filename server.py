@@ -372,9 +372,6 @@ def trash():
 def coloring():
     return send_from_directory('.', 'coloring_book.html')
 
-@app.route('/airhockey')
-def airhockey():
-    return send_from_directory('.', 'airhockey.html')
 
 @app.route('/learn-the-body')
 def learn_the_body():
