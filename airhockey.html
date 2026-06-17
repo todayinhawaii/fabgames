@@ -773,17 +773,17 @@ function updateAI(){
   if(aiStrikeMode){
     aiStrikeTimer++;
     if(aiStrikeTimer<14){
-      // Phase 1: ghost collision active, retreat to strike position behind puck
-      const tx=Math.max(MALLET_MARGIN+6, puck.x - MALLET_R*2.5);
-      // aim slightly off-centre to create angle on the shot
-      const ty=clamp(puck.y+(puck.y<TABLE_H/2?30:-30), MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
+      // Phase 1: retreat to LEFT of puck so charge will push it RIGHTWARD toward player
+      const tx=Math.max(MALLET_MARGIN+6, puck.x - MALLET_R*2.8);
+      const ty=clamp(puck.y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
       const dx=tx-ai.x, dy=ty-ai.y, dist=Math.hypot(dx,dy)||1;
       ai.x+=dx/dist*Math.min(d.aiSpeed*2.2,dist);
       ai.y+=dy/dist*Math.min(d.aiSpeed*2.2,dist);
       return;
     }
-    // Phase 2: full charge — collision resumes, smash the puck
-    const aimX=clamp(puck.x, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+    // Phase 2: charge from LEFT toward RIGHT — always pushes puck toward player goal
+    // Aim slightly past the puck so collision angle sends it rightward
+    const aimX=clamp(puck.x+MALLET_R, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
     const aimY=clamp(puck.y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
     const dx=aimX-ai.x, dy=aimY-ai.y, dist=Math.hypot(dx,dy)||1;
     ai.x+=dx/dist*Math.min(d.aiSpeed*3.0,dist);
@@ -803,7 +803,7 @@ function updateAI(){
     targetX=clamp(puck.x, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
     targetY=(d.predictBounces?predictPuckY(ai.x):puck.y)+ai.errorY*0.5;
   } else {
-    // Defensive home position
+    // Defensive home position — stay back, don't chase toward own goal
     targetX=MALLET_MARGIN+24;
     targetY=puck.visible?(puck.y*0.4+TABLE_H/2*0.6):TABLE_H/2;
   }
@@ -868,6 +868,11 @@ function handleMalletCollision(mallet,prevX,prevY,isAI){
 
     // Lock out re-collision for 10 frames (~0.16s) — this prevents sticking
     hitCooldown[key]=10;
+
+    // OWN-GOAL GUARD: if AI just sent puck leftward and it's on AI side, redirect rightward
+    if(isAI && puck.vx < 0 && puck.x < TABLE_W*0.35){
+      puck.vx = Math.abs(puck.vx)*0.85 + 1.5; // flip to rightward
+    }
   }
 }
 
@@ -1148,6 +1153,13 @@ function loop(){
   checkStuck();
   handleMalletCollision(player,prevPlayerX,prevPlayerY,false);
   handleMalletCollision(ai,prevAIX,prevAIY,true);
+
+  // Own-goal prevention: if puck is heading into AI goal mouth with speed, deflect it
+  if(puck.visible && puck.vx<-1 && puck.x < MALLET_MARGIN*2 &&
+     puck.y > GOAL_Y0 && puck.y < GOAL_Y1){
+    puck.vx = Math.abs(puck.vx)*0.7 + 1.0; // bounce rightward
+    puck.vy += (TABLE_H/2-puck.y)*0.04;     // guide toward centre
+  }
 
   draw();
 }
