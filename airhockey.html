@@ -523,7 +523,7 @@ const DIFFICULTIES={
 let currentDifficulty='medium';
 
 // ── DIFFICULTY SELECT ──
-currentDifficulty='easy'; // default
+currentDifficulty='easy';
 
 function highlightCard(diff){
   document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('selected'));
@@ -672,7 +672,7 @@ const DIFFICULTIES={
   hard  :{label:'Champion',speed:11.0,errorPx:10, predict:true},
   pro   :{label:'Legend',  speed:16.0,errorPx:2,  predict:true},
 };
-let currentDifficulty='medium';
+// currentDifficulty declared earlier in menu section
 
 let puck={x:TABLE_W/2,y:TABLE_H/2,vx:0,vy:0,visible:true,trail:[]};
 let player={x:TABLE_W-100,y:TABLE_H/2};
