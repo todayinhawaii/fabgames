@@ -475,16 +475,12 @@ function showScreen(el){
   el.classList.remove('hidden');
 }
 
-document.getElementById('signupBtn').addEventListener('touchend',e=>{e.preventDefault();doSignup();});
-document.getElementById('signupBtn').addEventListener('click',doSignup);
 function doSignup(){
-  const name=document.getElementById('inpName').value.trim();
-  const username=document.getElementById('inpUsername').value.trim();
-  const city=document.getElementById('inpCity').value.trim();
-  if(!name||!username){
-    alert('Please enter at least your name and username!!');
-    return;
-  }
+  const n=(document.getElementById('inpName')||{}).value||'';
+  const u=(document.getElementById('inpUsername')||{}).value||'';
+  const c=(document.getElementById('inpCity')||{}).value||'';
+  const name=n.trim(), username=u.trim(), city=c.trim();
+  if(!name||!username){ return; }
   profile={name,username,city};
   saveProfile(profile);
   enterMenu();
@@ -497,6 +493,19 @@ function enterMenu(){
   if(pl) pl.textContent=profile.username.toUpperCase().slice(0,8);
   showScreen(menuScreen);
 }
+
+// Wire signup button
+(function(){
+  const btn=document.getElementById('signupBtn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){ doSignup(); });
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); doSignup(); });
+  // Also allow Enter key in any field
+  ['inpName','inpUsername','inpCity'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.addEventListener('keydown', function(e){ if(e.key==='Enter') doSignup(); });
+  });
+})();
 
 if(profile && profile.name && profile.username){
   enterMenu();
