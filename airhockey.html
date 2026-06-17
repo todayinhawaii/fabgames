@@ -491,8 +491,10 @@ function doSignup(){
 }
 
 function enterMenu(){
-  document.getElementById('welcomePill').textContent = '👋 Welcome, '+profile.name+'!! ('+ (profile.city||'Unknown') +')';
-  document.getElementById('playerNameLabel').textContent = profile.username.toUpperCase().slice(0,8);
+  const wp=document.getElementById('welcomePill');
+  const pl=document.getElementById('playerNameLabel');
+  if(wp) wp.textContent='👋 Welcome, '+profile.name+'!! ('+(profile.city||'Unknown')+')';
+  if(pl) pl.textContent=profile.username.toUpperCase().slice(0,8);
   showScreen(menuScreen);
 }
 
@@ -534,19 +536,24 @@ document.querySelectorAll('.diff-card').forEach(card=>{
 });
 
 // wire PLAY button
-setTimeout(()=>{
+// Wire up PLAY button once DOM is ready
+(function(){
   const pb=document.getElementById('playBtn');
   if(!pb) return;
-  function doPlay(){
-    document.getElementById('aiNameLabel').textContent=DIFFICULTIES[currentDifficulty].label.toUpperCase();
+  function doPlay(e){
+    if(e&&e.type==='touchend') e.preventDefault();
+    const d=DIFFICULTIES[currentDifficulty];
+    if(!d) return;
+    const lbl=document.getElementById('aiNameLabel');
+    if(lbl) lbl.textContent=d.label.toUpperCase();
     startMatch();
   }
   pb.addEventListener('click', doPlay);
-  pb.addEventListener('touchend', e=>{ e.preventDefault(); doPlay(); });
-  // pre-highlight default
+  pb.addEventListener('touchend', doPlay);
+  // pre-highlight Rookie and show PLAY immediately
   highlightCard('easy');
   pb.style.display='flex';
-},0);
+})();
 
 document.getElementById('leaderboardBtn').addEventListener('click',()=>{renderLeaderboard();showScreen(leaderboardScreen);});
 document.getElementById('lbBackBtn').addEventListener('click',()=>showScreen(menuScreen));
@@ -609,6 +616,17 @@ function sndGo(){ tone(880,0.35,'square',0.28); tone(1320,0.3,'sine',0.18,0.05);
 // ║  FAB AIR HOCKEY — CLEAN PHYSICS ENGINE v3           ║
 // ╚══════════════════════════════════════════════════════╝
 
+// ── MOBILE DETECTION ──────────────────────────────────
+const isMobile='ontouchstart' in window;
+if(isMobile) document.body.classList.add('is-mobile');
+
+// ── MALLET IMAGES (base64 embedded via CSS or plain circles) ──
+// Use coin images if available, else draw coloured circles
+const MALLET_IMG_SRC={
+  you:'/you.png',
+  computer:'/computer.png'
+};
+
 const TABLE_W=1000, TABLE_H=560;
 const GOAL_H=180, GOAL_Y0=(TABLE_H-GOAL_H)/2, GOAL_Y1=GOAL_Y0+GOAL_H;
 const PUCK_R=15, MALLET_R=38;
@@ -635,7 +653,9 @@ window.addEventListener('resize',resizeCanvas);
 window.addEventListener('orientationchange',()=>setTimeout(resizeCanvas,300));
 
 const malletImgs={you:new Image(),computer:new Image()};
-malletImgs.you.src=MALLET_IMG_SRC.you; malletImgs.computer.src=MALLET_IMG_SRC.computer;
+// Load coin images — fall back to drawing plain circles if they don't load
+malletImgs.you.src=MALLET_IMG_SRC.you;
+malletImgs.computer.src=MALLET_IMG_SRC.computer;
 
 const DIFFICULTIES={
   easy  :{label:'Rookie',  speed:3.5, errorPx:52, predict:false},
