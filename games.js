@@ -83,9 +83,6 @@ const GAMES=[
    desc:'20 beautiful pages! Pencil, crayon and watercolor brushes, zoom in to color the details, then save or share your masterpiece!!',
    color:'rgba(255,215,0,0.10)',href:'/coloring'},
 
-  {id:'airhockey',emoji:'🏒',cat:'Arcade · Sports',title:'Fab Air Hockey',
-   desc:'Sign up and take on the computer! 4 difficulty levels from Rookie to Legend. Slap the puck, bank shots off the walls, first to 7 wins!!',
-   color:'rgba(59,227,255,0.10)',href:'/airhockey'},
 
   {id:'learnthebody',emoji:'🧠',cat:'Educational · Kids',title:'Learn The Body',
    desc:'Tap any part of the boy or girl body to learn what it does! Switch to Quiz Mode to test yourself - fun for all ages!!',
