@@ -514,16 +514,7 @@ if(profile && profile.name && profile.username){
 }
 
 // ── DIFFICULTY SELECT ──────────────────────────────────
-const DIFFICULTIES={
-  easy:  {label:'Rookie',    aiSpeed:3.5,  error:55, predictBounces:false},
-  medium:{label:'Pro',       aiSpeed:6.5,  error:28, predictBounces:false},
-  hard:  {label:'Champion',  aiSpeed:10.0, error:12, predictBounces:true},
-  pro:   {label:'Legend',    aiSpeed:14.0, error:3,  predictBounces:true},
-};
-let currentDifficulty='medium';
-
-// ── DIFFICULTY SELECT ──
-currentDifficulty='easy';
+let currentDifficulty='easy';
 
 function highlightCard(diff){
   document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('selected'));
@@ -554,7 +545,7 @@ document.querySelectorAll('.diff-card').forEach(card=>{
     const d=DIFFICULTIES[currentDifficulty];
     if(!d) return;
     const lbl=document.getElementById('aiNameLabel');
-    if(lbl) lbl.textContent=d.label.toUpperCase();
+    if(lbl&&d) lbl.textContent=d.label.toUpperCase();
     startMatch();
   }
   pb.addEventListener('click', doPlay);
@@ -774,7 +765,7 @@ function moveAI(tx,ty,spd){
 }
 function updateAI(){
   const d=DIFFICULTIES[currentDifficulty],now=performance.now();
-  if(now-aiErrT>400){aiErr=(Math.random()-0.5)*2*d.errorPx;aiErrT=now;}
+  if(now-aiErrT>400){aiErr=(Math.random()-0.5)*2*d.errorPxPx;aiErrT=now;}
   const onAISide=puck.visible&&puck.x<TABLE_W/2-CENTER_MARGIN;
   if(!onAISide){
     // defend: hold home, track puck Y loosely
