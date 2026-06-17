@@ -504,10 +504,10 @@ if(profile && profile.name && profile.username){
 
 // ── DIFFICULTY SELECT ──────────────────────────────────
 const DIFFICULTIES={
-  easy:  {label:'Rookie',    aiSpeed:2.5,  reaction:0.05, error:50, predictBounces:false},
-  medium:{label:'Pro',       aiSpeed:5.0,  reaction:0.10, error:26, predictBounces:false},
-  hard:  {label:'Champion',  aiSpeed:8.0,  reaction:0.18, error:12, predictBounces:true},
-  pro:   {label:'Legend',    aiSpeed:10.5, reaction:0.32, error:3,  predictBounces:true},
+  easy:  {label:'Rookie',    aiSpeed:3.5,  error:55, predictBounces:false},
+  medium:{label:'Pro',       aiSpeed:6.5,  error:28, predictBounces:false},
+  hard:  {label:'Champion',  aiSpeed:10.0, error:12, predictBounces:true},
+  pro:   {label:'Legend',    aiSpeed:14.0, error:3,  predictBounces:true},
 };
 let currentDifficulty='medium';
 
@@ -748,57 +748,61 @@ function predictPuckY(targetX){
   if(m>range) m=2*range-m;
   return m+MALLET_R;
 }
-let aiErrY=0, aiErrTimer=0;
+let aiErrY=0, aiErrTimer=0, aiPhase='hunt'; // hunt | lined_up | charge
+
 function updateAI(){
   const d=DIFFICULTIES[currentDifficulty];
   const now=performance.now();
 
-  // Refresh aim error periodically
-  if(now-aiErrTimer>380){
+  // Refresh aim error
+  if(now-aiErrTimer>400){
     aiErrY=(Math.random()-0.5)*2*d.error;
     aiErrTimer=now;
   }
 
+  const puckOnAISide=puck.visible && puck.x < TABLE_W/2-CENTER_MARGIN;
+  const aiToPuck=Math.hypot(ai.x-puck.x, ai.y-puck.y);
   let targetX, targetY;
 
-  if(puck.visible && puck.x < TABLE_W/2){
-    // ── OFFENSIVE / INTERCEPT ──────────────────────────
-    // ALWAYS position ourselves to the LEFT of the puck (between puck and our own goal).
-    // This guarantees that when we hit, the puck goes RIGHTWARD toward player — no own goals.
+  if(puckOnAISide){
+    // ── BEHIND the puck (our left side) so hit sends it RIGHT ──
+    const behindX=clamp(puck.x - MALLET_R*2.2, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+    const puckY  =clamp(puck.y+aiErrY, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
 
-    if(d.predictBounces && puck.vx<0){
-      // Puck coming toward us — predict where to intercept
-      const tx=clamp(ai.x-10, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
-      const timeToX=Math.abs((puck.x-tx)/Math.max(Math.abs(puck.vx),0.5));
-      const predictY=puck.y+puck.vy*timeToX;
-      // Bounce-correct Y
-      const range=TABLE_H-2*PUCK_R;
-      let m=((predictY-PUCK_R)%(2*range)+2*range)%(2*range);
-      if(m>range) m=2*range-m;
-      targetY=clamp(m+PUCK_R+aiErrY, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
-      targetX=tx;
+    // Are we lined up behind puck and close enough to strike?
+    const behindPuck  = ai.x < puck.x - PUCK_R;
+    const yAligned    = Math.abs(ai.y - puck.y) < MALLET_R*1.8;
+    const closeEnough = aiToPuck < MALLET_R*5;
+
+    if(behindPuck && yAligned && closeEnough){
+      // CHARGE: aim well past the puck toward player side — build momentum
+      aiPhase='charge';
+      targetX=clamp(puck.x + MALLET_R*3, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+      targetY=puckY;
     } else {
-      // Puck moving away or slow — get BEHIND it (to its left) to set up a rightward shot
-      targetX=clamp(puck.x-MALLET_R*1.8, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
-      targetY=clamp(puck.y+aiErrY, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
+      // HUNT: get into position behind puck
+      aiPhase='hunt';
+      targetX=behindX;
+      targetY=puckY;
     }
   } else {
-    // ── DEFENSIVE HOME ──────────────────────────────────
-    targetX=MALLET_MARGIN+28;
-    // Track puck Y loosely so we can deflect shots
+    // DEFENSIVE: hold home, loosely track puck Y
+    aiPhase='defend';
+    targetX=MALLET_MARGIN+24;
     targetY=puck.visible
-      ? clamp(puck.y*0.45+TABLE_H/2*0.55, MALLET_MARGIN, TABLE_H-MALLET_MARGIN)
+      ? clamp(puck.y*0.4+TABLE_H/2*0.6, MALLET_MARGIN, TABLE_H-MALLET_MARGIN)
       : TABLE_H/2;
   }
 
-  targetX=clamp(targetX, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
-  targetY=clamp(targetY, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
-
+  // Move at FULL speed when charging — no slowdown near target
   const dx=targetX-ai.x, dy=targetY-ai.y;
   const dist=Math.hypot(dx,dy)||1;
-  const spd=Math.min(d.aiSpeed, dist);
-  ai.x+=dx/dist*spd;
-  ai.y+=dy/dist*spd;
+  const spd = aiPhase==='charge' ? d.aiSpeed*1.5 : d.aiSpeed;
+  ai.x+=dx/dist*Math.min(spd,dist+(aiPhase==='charge'?spd:0));
+  ai.y+=dy/dist*Math.min(spd,dist+(aiPhase==='charge'?spd:0));
+
+  ai.x=clamp(ai.x, MALLET_MARGIN, TABLE_W/2-CENTER_MARGIN);
+  ai.y=clamp(ai.y, MALLET_MARGIN, TABLE_H-MALLET_MARGIN);
 }
 
 // ── PHYSICS ──────────────────────────────────────────────
