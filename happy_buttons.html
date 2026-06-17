@@ -71,9 +71,9 @@ html,body{
 
   transform:translateY(0px);
   transition:
-    transform 0.07s cubic-bezier(.35,0,.2,1),
-    box-shadow 0.07s cubic-bezier(.35,0,.2,1),
-    filter 0.07s;
+    transform 0.13s cubic-bezier(.35,0,.2,1),
+    box-shadow 0.13s cubic-bezier(.35,0,.2,1),
+    filter 0.13s;
   will-change:transform,box-shadow;
 }
 .sqbtn img{
@@ -85,13 +85,13 @@ html,body{
 
 /* ── PRESSED STATE ── */
 .sqbtn.pressed{
-  transform:translateY(6px) scale(0.96);
+  transform:translateY(12px) scale(0.91);
   box-shadow:
-    0 1px 0 rgba(0,0,0,0.28),
-    0 2px 6px rgba(0,0,0,0.20),
-    inset 0 5px 14px rgba(0,0,0,0.32),
-    inset 0 2px 4px rgba(0,0,0,0.18);
-  filter:brightness(0.86) saturate(1.2);
+    0 1px 0 rgba(0,0,0,0.32),
+    0 2px 5px rgba(0,0,0,0.18),
+    inset 0 8px 22px rgba(0,0,0,0.42),
+    inset 0 3px 6px rgba(0,0,0,0.28);
+  filter:brightness(0.80) saturate(1.35);
 }
 
 /* Glow ring on press */
@@ -107,32 +107,89 @@ html,body{
 /* ── SOUND BAR ── */
 #soundBar{
   position:fixed;bottom:0;left:0;right:0;z-index:50;
-  padding:7px 10px 10px;
-  background:rgba(22,16,12,0.94);backdrop-filter:blur(8px);
-  border-top:2px solid rgba(255,215,0,0.28);
-  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:8px 10px 12px;
+  background:rgba(12,22,12,0.96);backdrop-filter:blur(8px);
+  border-top:2px solid rgba(255,215,0,0.4);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
 }
 #soundLabel{
   font-size:10px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,215,0,0.65);font-weight:800;
+  color:rgba(255,215,0,0.75);font-weight:800;
 }
 #soundScroll{
-  display:flex;gap:7px;overflow-x:auto;width:100%;
-  padding:1px 2px;scrollbar-width:none;
+  display:flex;gap:8px;overflow-x:auto;width:100%;
+  padding:2px 4px;scrollbar-width:none;
+  justify-content:flex-start;
 }
 #soundScroll::-webkit-scrollbar{display:none;}
+@media(min-width:600px){
+  #soundScroll{justify-content:center;flex-wrap:wrap;overflow-x:visible;}
+}
+
+@keyframes pillPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(200,255,100,0.0), 0 2px 0 #1a3a0a;}
+  50%{box-shadow:0 0 0 5px rgba(200,255,100,0.18), 0 2px 0 #1a3a0a;}
+}
+@keyframes pillPulseActive{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.0), 0 3px 0 #7a5800, 0 0 12px rgba(255,215,0,0.4);}
+  50%{box-shadow:0 0 0 6px rgba(255,215,0,0.25), 0 3px 0 #7a5800, 0 0 22px rgba(255,215,0,0.65);}
+}
 .snd-btn{
-  flex-shrink:0;padding:5px 13px;border-radius:20px;
+  flex-shrink:0;padding:6px 15px;border-radius:22px;
   font-family:'Baloo 2',sans-serif;font-weight:800;font-size:11px;
-  background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.14);
-  color:rgba(255,255,255,0.65);cursor:pointer;white-space:nowrap;
-  transition:all 0.12s;
+  background:linear-gradient(135deg,#1a3a0a,#2a5a12);
+  border:2px solid rgba(180,230,80,0.35);
+  color:#c8f06a;cursor:pointer;white-space:nowrap;
+  transition:transform 0.12s;
+  box-shadow:0 2px 0 #1a3a0a;
+  animation:pillPulse 2.2s ease-in-out infinite;
 }
+.snd-btn:active{transform:scale(0.95);}
 .snd-btn.active{
-  background:linear-gradient(135deg,#ffd700,#ffb347);
-  border-color:#fff3b0;color:#1a1a1a;
-  box-shadow:0 0 12px rgba(255,215,0,0.45);
+  background:linear-gradient(135deg,#3a6a00,#5a9a00);
+  border:2.5px solid #ffd700;
+  color:#ffd700;
+  box-shadow:0 3px 0 #7a5800, 0 0 14px rgba(255,215,0,0.5);
+  animation:pillPulseActive 1.8s ease-in-out infinite;
 }
+
+
+/* ── IMMERSIVE / COLLAPSE ── */
+#collapseBtn{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:55;
+  width:54px;height:22px;border-radius:12px 12px 0 0;
+  background:rgba(12,28,8,0.85);border:1.5px solid rgba(255,215,0,0.45);
+  border-bottom:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:#c8f06a;cursor:pointer;
+  transition:all 0.25s;
+  box-shadow:0 -3px 12px rgba(0,0,0,0.35);
+}
+#collapseBtn:hover{background:rgba(30,60,12,0.95);color:#ffd700;}
+body.immersive #collapseBtn{
+  bottom:4px;border-radius:14px;border:1.5px solid rgba(255,215,0,0.45);
+  height:26px;width:60px;
+  box-shadow:0 0 14px rgba(255,215,0,0.3);
+  animation:arrowPulse 2s ease-in-out infinite;
+}
+@keyframes arrowPulse{
+  0%,100%{box-shadow:0 0 6px rgba(255,215,0,0.2);}
+  50%{box-shadow:0 0 18px rgba(255,215,0,0.55);}
+}
+
+/* Transitions on bars */
+#topbar{transition:transform 0.3s ease, opacity 0.3s ease;}
+#soundBar{transition:transform 0.3s ease, opacity 0.3s ease;}
+body.immersive #topbar{
+  transform:translateY(-100%);opacity:0;pointer-events:none;
+}
+body.immersive #soundBar{
+  transform:translateY(100%);opacity:0;pointer-events:none;
+}
+body.immersive #stage{
+  top:0 !important;bottom:0 !important;
+}
+body.immersive #collapseBtn{bottom:4px;}
 
 /* Particles */
 .particle{position:fixed;pointer-events:none;z-index:60;border-radius:50%;}
@@ -145,6 +202,7 @@ html,body{
   <a href="/" class="home-link">🏠</a>
 </div>
 
+<div id="collapseBtn" title="Expand / Collapse">▼</div>
 <div id="stage">
   <div id="grid"></div>
 </div>
@@ -217,14 +275,15 @@ function buildGrid(){
     grid.appendChild(div);
   });
 }
-window.addEventListener('resize',()=>{
+function resizeGrid(){
   const sw=stage.clientWidth, sh=stage.clientHeight;
   const maxBW=Math.floor((sw-20-24)/4);
   const maxBH=Math.floor((sh-20-48)/7);
-  const bSize=Math.min(maxBW,maxBH,160);
+  const bSize=Math.min(maxBW,maxBH,180);
   grid.style.gridTemplateColumns=`repeat(4,${bSize}px)`;
   grid.style.gridTemplateRows=`repeat(7,${bSize}px)`;
-});
+}
+window.addEventListener('resize',resizeGrid);
 buildGrid();
 
 // ── AUDIO ─────────────────────────────────────────────
@@ -255,16 +314,52 @@ function noise(dur,vol,fc){
   s.start();s.stop(a.currentTime+dur+0.02);
 }
 const SOUNDS={
-  'Pop 🫧':()=>{osc('sine',500,860,0.09,0.5);},
-  'Click 🖱️':()=>{noise(0.03,0.65,4500);osc('square',200,200,0.025,0.18);},
-  'Squish 🫠':()=>{osc('sine',200,72,0.17,0.55);},
-  'Boing 🏀':()=>{osc('sine',110,430,0.15,0.5);},
-  'Bubble 🫧':()=>{osc('sine',560+Math.random()*80,980,0.14,0.32);},
-  'Tap 👆':()=>{noise(0.022,0.72,2200);osc('triangle',380,380,0.022,0.14);},
-  'Plop 💧':()=>{osc('sine',740,180,0.12,0.42);},
-  'Ping ✨':()=>{osc('sine',1260,1260,0.4,0.24);osc('sine',1900,1900,0.22,0.12);},
-  'Thud 🥁':()=>{osc('sine',80,28,0.14,0.72);noise(0.055,0.28,700);},
-  'Squeak 🐭':()=>{osc('sawtooth',800,1480,0.07,0.16);},
+  'Pop 🫧':()=>{
+    osc('sine',520,920,0.10,0.85);
+    osc('sine',820,1200,0.06,0.4);
+  },
+  'Click 🖱️':()=>{
+    noise(0.04,1.1,5000);
+    osc('square',220,220,0.035,0.4);
+  },
+  'Squish 🫠':()=>{
+    // Slow wet squelch — pitch drops WAY down like squeezing a sponge
+    osc('sine',320,28,0.35,1.1);
+    osc('sine',280,18,0.38,0.7);
+    noise(0.25,0.4,300);
+  },
+  'Boing 🏀':()=>{
+    // Sharp twang — pitch ROCKETS up fast like a spring
+    osc('triangle',60,1400,0.18,1.2);
+    osc('sine',80,1800,0.14,0.8);
+    setTimeout(()=>osc('triangle',900,200,0.22,0.5),80);
+  },
+  'Bubble 🫧':()=>{
+    osc('sine',580+Math.random()*100,1050,0.16,0.75);
+    setTimeout(()=>osc('sine',820,400,0.10,0.4),60);
+  },
+  'Tap 👆':()=>{
+    noise(0.028,1.1,2500);
+    osc('triangle',400,400,0.028,0.35);
+  },
+  'Plop 💧':()=>{
+    osc('sine',780,160,0.15,0.9);
+    noise(0.06,0.35,600);
+  },
+  'Ping ✨':()=>{
+    osc('sine',1320,1320,0.5,0.6);
+    osc('sine',2000,2000,0.3,0.35);
+    osc('sine',660,660,0.4,0.3);
+  },
+  'Thud 🥁':()=>{
+    osc('sine',85,22,0.22,1.3);
+    noise(0.09,0.7,900);
+    osc('sine',140,40,0.15,0.6);
+  },
+  'Squeak 🐭':()=>{
+    osc('sawtooth',820,1600,0.09,0.45);
+    setTimeout(()=>osc('sawtooth',1400,600,0.09,0.3),70);
+  },
 };
 let currentSound='Pop 🫧';
 
@@ -287,11 +382,11 @@ Object.keys(SOUNDS).forEach(name=>{
 // ── PARTICLES ────────────────────────────────────────
 const EMOJIS=['✨','⭐','💫','🌟','🎉','💕','🌈'];
 function burst(x,y,color){
-  for(let i=0;i<9;i++){
+  for(let i=0;i<16;i++){
     const p=document.createElement('div');
     const isEmoji=Math.random()<0.4;
     if(isEmoji){
-      p.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${12+Math.random()*12}px;pointer-events:none;z-index:60;transform:translate(-50%,-50%)`;
+      p.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${16+Math.random()*18}px;pointer-events:none;z-index:60;transform:translate(-50%,-50%)`;
       p.textContent=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
     } else {
       const sz=4+Math.random()*8;
@@ -299,7 +394,7 @@ function burst(x,y,color){
       p.style.cssText=`left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;background:${color};transform:translate(-50%,-50%)`;
     }
     document.body.appendChild(p);
-    const ang=Math.random()*Math.PI*2, dist=28+Math.random()*72;
+    const ang=Math.random()*Math.PI*2, dist=40+Math.random()*110;
     const dx=Math.cos(ang)*dist, dy=Math.sin(ang)*dist;
     requestAnimationFrame(()=>{
       p.style.transition='transform 0.55s cubic-bezier(.2,.8,.4,1),opacity 0.5s ease';
@@ -356,6 +451,42 @@ function end(e){
 }
 document.addEventListener('pointerup',end,{passive:true});
 document.addEventListener('pointercancel',end,{passive:true});
+
+// ── IMMERSIVE TOGGLE ─────────────────────────────────
+const collapseBtn=document.getElementById('collapseBtn');
+let immersive=false;
+let restoreTimer=null;
+
+function setImmersive(on){
+  immersive=on;
+  document.body.classList.toggle('immersive',on);
+  collapseBtn.textContent=on?'▲':'▼';
+  collapseBtn.title=on?'Show menus':'Hide menus';
+  // resize grid after transition
+  setTimeout(resizeGrid,320);
+}
+
+collapseBtn.addEventListener('click',()=>setImmersive(!immersive));
+collapseBtn.addEventListener('touchend',e=>{e.preventDefault();setImmersive(!immersive);});
+
+// Desktop: hover near bottom restores menus
+document.addEventListener('mousemove',e=>{
+  if(!immersive) return;
+  if(e.clientY > window.innerHeight-60){
+    clearTimeout(restoreTimer);
+    setImmersive(false);
+  }
+});
+
+// Mobile: touch near bottom of screen restores
+document.addEventListener('touchstart',e=>{
+  if(!immersive) return;
+  const y=e.touches[0].clientY;
+  if(y > window.innerHeight-70){
+    setImmersive(false);
+  }
+},{passive:true});
+
 </script>
 </body>
 </html>
