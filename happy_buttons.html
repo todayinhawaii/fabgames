@@ -4,15 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Happy Buttons 🐾</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
 html,body{
   width:100%;height:100%;overflow:hidden;
-  background:#d4c9b8;
   font-family:'Baloo 2',sans-serif;
   touch-action:none;
+  background:#c8bfb0;
 }
 
 /* ── TOP BAR ── */
@@ -20,9 +19,8 @@ html,body{
   position:fixed;top:0;left:0;right:0;z-index:50;
   display:flex;align-items:center;justify-content:space-between;
   padding:8px 14px;
-  background:rgba(30,22,18,0.88);
-  backdrop-filter:blur(6px);
-  border-bottom:2px solid rgba(255,215,0,0.35);
+  background:rgba(22,16,12,0.92);backdrop-filter:blur(6px);
+  border-bottom:2px solid rgba(255,215,0,0.3);
 }
 .logo{
   font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;
@@ -30,90 +28,114 @@ html,body{
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
 .home-link{
-  width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
   background:rgba(255,255,255,0.07);border:1px solid rgba(255,215,0,0.35);
   color:#e8c96a;text-decoration:none;font-size:16px;
 }
 
-/* ── SOUND PICKER ── */
-#soundBar{
-  position:fixed;bottom:0;left:0;right:0;z-index:50;
-  padding:8px 10px 12px;
-  background:rgba(30,22,18,0.92);
-  backdrop-filter:blur(8px);
-  border-top:2px solid rgba(255,215,0,0.3);
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-}
-#soundLabel{
-  font-size:11px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,215,0,0.7);font-weight:800;
-}
-#soundScroll{
-  display:flex;gap:8px;overflow-x:auto;width:100%;
-  padding:2px 4px 2px;scrollbar-width:none;
-}
-#soundScroll::-webkit-scrollbar{display:none;}
-.sound-btn{
-  flex-shrink:0;padding:6px 14px;border-radius:20px;
-  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:12px;
-  background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);
-  color:rgba(255,255,255,0.7);cursor:pointer;white-space:nowrap;
-  transition:all 0.15s;
-}
-.sound-btn.active{
-  background:linear-gradient(135deg,#ffd700,#ffb347);
-  border-color:#fff3b0;color:#1a1a1a;
-  box-shadow:0 0 12px rgba(255,215,0,0.5);
-}
-
-/* ── BUTTON GRID ── */
+/* ── STAGE ── */
 #stage{
-  position:fixed;inset:0;
-  top:50px;bottom:76px;
+  position:fixed;top:50px;bottom:80px;left:0;right:0;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
 }
+
+/* ── GRID ── */
 #grid{
-  position:relative;
-  /* sized by JS */
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  padding:10px;
+  background:linear-gradient(145deg,#b0a498,#c8bfb0);
+  border-radius:20px;
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.45),
+    0 0 0 3px rgba(255,255,255,0.15),
+    inset 0 2px 6px rgba(0,0,0,0.2);
 }
-#bgImg{
+
+/* ── EACH BUTTON ── */
+.sqbtn{
+  position:relative;
+  border-radius:16px;
+  cursor:pointer;
+  overflow:hidden;
+
+  /* 3D RAISED */
+  box-shadow:
+    0 7px 0 rgba(0,0,0,0.30),
+    0 10px 18px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.45),
+    inset 0 -2px 4px rgba(0,0,0,0.12);
+
+  transform:translateY(0px);
+  transition:
+    transform 0.07s cubic-bezier(.35,0,.2,1),
+    box-shadow 0.07s cubic-bezier(.35,0,.2,1),
+    filter 0.07s;
+  will-change:transform,box-shadow;
+}
+.sqbtn img{
   display:block;width:100%;height:100%;
-  border-radius:12px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.35);
+  object-fit:cover;border-radius:14px;
   pointer-events:none;
-  user-select:none;
   -webkit-user-drag:none;
 }
 
-/* Each button overlay */
-.btn-hit{
-  position:absolute;cursor:pointer;border-radius:18%;
-  background:transparent;
-  transition:transform 0.08s cubic-bezier(.4,0,.2,1), filter 0.08s;
-  transform-origin:center center;
-}
-.btn-hit:active,.btn-hit.pressed{
-  transform:scale(0.88);
-  filter:brightness(0.82) saturate(1.3);
-}
-
-/* Ripple glow on press */
-.ripple{
-  position:absolute;border-radius:18%;
-  pointer-events:none;z-index:10;
-  animation:rippleOut 0.5s ease-out forwards;
-}
-@keyframes rippleOut{
-  0%{opacity:0.85;transform:scale(0.7);}
-  100%{opacity:0;transform:scale(1.55);}
+/* ── PRESSED STATE ── */
+.sqbtn.pressed{
+  transform:translateY(6px) scale(0.96);
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.28),
+    0 2px 6px rgba(0,0,0,0.20),
+    inset 0 5px 14px rgba(0,0,0,0.32),
+    inset 0 2px 4px rgba(0,0,0,0.18);
+  filter:brightness(0.86) saturate(1.2);
 }
 
-/* ── PARTICLE BURST ── */
-.particle{
-  position:fixed;pointer-events:none;z-index:60;
-  border-radius:50%;width:8px;height:8px;
+/* Glow ring on press */
+.sqbtn::after{
+  content:'';
+  position:absolute;inset:0;border-radius:14px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.1s;
+  box-shadow:0 0 0 3px var(--glow,#ffd700), 0 0 20px var(--glow,#ffd700);
 }
+.sqbtn.pressed::after{ opacity:1; }
+
+/* ── SOUND BAR ── */
+#soundBar{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  padding:7px 10px 10px;
+  background:rgba(22,16,12,0.94);backdrop-filter:blur(8px);
+  border-top:2px solid rgba(255,215,0,0.28);
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+}
+#soundLabel{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,215,0,0.65);font-weight:800;
+}
+#soundScroll{
+  display:flex;gap:7px;overflow-x:auto;width:100%;
+  padding:1px 2px;scrollbar-width:none;
+}
+#soundScroll::-webkit-scrollbar{display:none;}
+.snd-btn{
+  flex-shrink:0;padding:5px 13px;border-radius:20px;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:11px;
+  background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.14);
+  color:rgba(255,255,255,0.65);cursor:pointer;white-space:nowrap;
+  transition:all 0.12s;
+}
+.snd-btn.active{
+  background:linear-gradient(135deg,#ffd700,#ffb347);
+  border-color:#fff3b0;color:#1a1a1a;
+  box-shadow:0 0 12px rgba(255,215,0,0.45);
+}
+
+/* Particles */
+.particle{position:fixed;pointer-events:none;z-index:60;border-radius:50%;}
 </style>
 </head>
 <body>
@@ -124,10 +146,7 @@ html,body{
 </div>
 
 <div id="stage">
-  <div id="grid">
-    <img id="bgImg" src="/buttons1.jpg" alt="Happy Buttons" draggable="false">
-    <!-- hit zones injected by JS -->
-  </div>
+  <div id="grid"></div>
 </div>
 
 <div id="soundBar">
@@ -136,276 +155,207 @@ html,body{
 </div>
 
 <script>
-// ── IMAGE LAYOUT ───────────────────────────────────────
-const COLS=4, ROWS=7;
-const IMG_W=1350, IMG_H=2400;
-const PAD_X=28, PAD_Y=28;
-const CELL_W=(IMG_W-PAD_X*2)/COLS; // 323.5
-const CELL_H=(IMG_H-PAD_Y*2)/ROWS; // 334.9
-
-// Button names for fun feedback (row-major order)
-const NAMES=[
-  'Bunny','Panda','Penguin','Bear',
-  'Duck','Frog','Fox','Koala',
-  'Hippo','Giraffe','Elephant','Cat',
-  'Seal','Unicorn','Lion','Pig',
-  'Sloth','Hedgehog','Dino','Otter',
-  'Bee','Sheep','Dolphin','Turtle',
-  'Cloud','Dog','Chick','Octopus',
+// ── BUTTON DATA ───────────────────────────────────────
+const BUTTONS=[
+  {name:'Bunny',  file:'btn_00_bunny.jpg',    glow:'#ffb3c6'},
+  {name:'Panda',  file:'btn_01_panda.jpg',    glow:'#c8e6c9'},
+  {name:'Penguin',file:'btn_02_penguin.jpg',  glow:'#bbdefb'},
+  {name:'Bear',   file:'btn_03_bear.jpg',     glow:'#ffe0b2'},
+  {name:'Duck',   file:'btn_04_duck.jpg',     glow:'#fff9c4'},
+  {name:'Frog',   file:'btn_05_frog.jpg',     glow:'#c5e1a5'},
+  {name:'Fox',    file:'btn_06_fox.jpg',      glow:'#ffccbc'},
+  {name:'Koala',  file:'btn_07_koala.jpg',    glow:'#d7ccc8'},
+  {name:'Hippo',  file:'btn_08_hippo.jpg',    glow:'#ce93d8'},
+  {name:'Giraffe',file:'btn_09_giraffe.jpg',  glow:'#ffe082'},
+  {name:'Elephant',file:'btn_10_elephant.jpg',glow:'#b3e5fc'},
+  {name:'Cat',    file:'btn_11_cat.jpg',      glow:'#f8bbd0'},
+  {name:'Seal',   file:'btn_12_seal.jpg',     glow:'#e0f7fa'},
+  {name:'Unicorn',file:'btn_13_unicorn.jpg',  glow:'#f3e5f5'},
+  {name:'Lion',   file:'btn_14_lion.jpg',     glow:'#ffe0b2'},
+  {name:'Pig',    file:'btn_15_pig.jpg',      glow:'#fce4ec'},
+  {name:'Sloth',  file:'btn_16_sloth.jpg',    glow:'#d7ccc8'},
+  {name:'Hedgehog',file:'btn_17_hedgehog.jpg',glow:'#dcedc8'},
+  {name:'Dino',   file:'btn_18_dino.jpg',     glow:'#b2dfdb'},
+  {name:'Otter',  file:'btn_19_otter.jpg',    glow:'#ffe0b2'},
+  {name:'Bee',    file:'btn_20_bee.jpg',      glow:'#fff9c4'},
+  {name:'Sheep',  file:'btn_21_sheep.jpg',    glow:'#e3f2fd'},
+  {name:'Dolphin',file:'btn_22_dolphin.jpg',  glow:'#b3e5fc'},
+  {name:'Turtle', file:'btn_23_turtle.jpg',   glow:'#c8e6c9'},
+  {name:'Cloud',  file:'btn_24_cloud.jpg',    glow:'#e8eaf6'},
+  {name:'Dog',    file:'btn_25_dog.jpg',      glow:'#ffe0b2'},
+  {name:'Chick',  file:'btn_26_chick.jpg',    glow:'#fff9c4'},
+  {name:'Octopus',file:'btn_27_octopus.jpg',  glow:'#fce4ec'},
 ];
 
-const COLORS=[
-  '#ffb3ba','#c8e6c9','#bbdefb','#ffe0b2',
-  '#fff9c4','#d1c4e9','#fce4ec','#e8f5e9',
-  '#fff3e0','#e1bee7','#b3e5fc','#f8bbd0',
-  '#e0f2f1','#fef9c3','#fff8e1','#fce4ec',
-  '#ede7f6','#e8eaf6','#dcedc8','#fff3e0',
-  '#fff9c4','#e3f2fd','#b2ebf2','#dcedc8',
-  '#f0f4c3','#ffe0b2','#fce4ec','#e8eaf6',
-];
+// ── BUILD GRID ────────────────────────────────────────
+const grid=document.getElementById('grid');
+const stage=document.getElementById('stage');
 
-// ── AUDIO ENGINE ───────────────────────────────────────
-let audioCtx=null;
-function getAC(){
-  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx.state==='suspended') audioCtx.resume();
-  return audioCtx;
+function buildGrid(){
+  const sw=stage.clientWidth, sh=stage.clientHeight;
+  // 4 cols, 7 rows, 8px gap, 10px padding each side
+  // solve for button size that fits both dimensions
+  const maxBW=Math.floor((sw - 20 - 8*3) / 4);
+  const maxBH=Math.floor((sh - 20 - 8*6) / 7);
+  const bSize=Math.min(maxBW, maxBH, 160); // cap at 160px
+
+  grid.style.gridTemplateColumns=`repeat(4,${bSize}px)`;
+  grid.style.gridTemplateRows=`repeat(7,${bSize}px)`;
+
+  if(grid.children.length===28) return; // already built, just resized
+
+  BUTTONS.forEach((btn,i)=>{
+    const div=document.createElement('div');
+    div.className='sqbtn';
+    div.dataset.idx=i;
+    div.style.setProperty('--glow', btn.glow);
+    const img=document.createElement('img');
+    img.src='/'+btn.file;
+    img.alt=btn.name;
+    img.draggable=false;
+    div.appendChild(img);
+    grid.appendChild(div);
+  });
 }
+window.addEventListener('resize',()=>{
+  const sw=stage.clientWidth, sh=stage.clientHeight;
+  const maxBW=Math.floor((sw-20-24)/4);
+  const maxBH=Math.floor((sh-20-48)/7);
+  const bSize=Math.min(maxBW,maxBH,160);
+  grid.style.gridTemplateColumns=`repeat(4,${bSize}px)`;
+  grid.style.gridTemplateRows=`repeat(7,${bSize}px)`;
+});
+buildGrid();
 
-function playTone(type,freq,dur,vol,detune=0){
-  const ac=getAC();
-  const osc=ac.createOscillator();
-  const gain=ac.createGain();
-  osc.type=type; osc.frequency.value=freq;
-  if(detune) osc.detune.value=detune;
-  gain.gain.setValueAtTime(vol,ac.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+dur);
-  osc.connect(gain); gain.connect(ac.destination);
-  osc.start(); osc.stop(ac.currentTime+dur+0.02);
+// ── AUDIO ─────────────────────────────────────────────
+let AC=null;
+function ac(){
+  if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==='suspended') AC.resume();
+  return AC;
 }
-
-function playNoise(dur,vol,filterFreq){
-  const ac=getAC();
-  const buf=ac.createBuffer(1,ac.sampleRate*dur,ac.sampleRate);
-  const data=buf.getChannelData(0);
-  for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1);
-  const src=ac.createBufferSource(); src.buffer=buf;
-  const filter=ac.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=filterFreq;
-  const gain=ac.createGain();
-  gain.gain.setValueAtTime(vol,ac.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+dur);
-  src.connect(filter); filter.connect(gain); gain.connect(ac.destination);
-  src.start(); src.stop(ac.currentTime+dur+0.02);
+function osc(type,f0,f1,dur,vol){
+  const a=ac(),o=a.createOscillator(),g=a.createGain();
+  o.type=type;
+  o.frequency.setValueAtTime(f0,a.currentTime);
+  if(f1!==f0) o.frequency.exponentialRampToValueAtTime(f1,a.currentTime+dur);
+  g.gain.setValueAtTime(vol,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+  o.connect(g);g.connect(a.destination);
+  o.start();o.stop(a.currentTime+dur+0.02);
 }
-
+function noise(dur,vol,fc){
+  const a=ac(),buf=a.createBuffer(1,a.sampleRate*dur,a.sampleRate);
+  const d=buf.getChannelData(0);for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();
+  s.buffer=buf;f.type='lowpass';f.frequency.value=fc;
+  g.gain.setValueAtTime(vol,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+  s.connect(f);f.connect(g);g.connect(a.destination);
+  s.start();s.stop(a.currentTime+dur+0.02);
+}
 const SOUNDS={
-  'Pop 🫧':()=>{
-    playTone('sine',520,0.08,0.5);
-    playTone('sine',820,0.05,0.3);
-  },
-  'Click 🖱️':()=>{
-    playNoise(0.04,0.6,4000);
-    playTone('square',200,0.03,0.2);
-  },
-  'Squish 🫠':()=>{
-    const ac=getAC();
-    const osc=ac.createOscillator(); osc.type='sine';
-    osc.frequency.setValueAtTime(180,ac.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(80,ac.currentTime+0.15);
-    const g=ac.createGain();
-    g.gain.setValueAtTime(0.55,ac.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.18);
-    osc.connect(g); g.connect(ac.destination);
-    osc.start(); osc.stop(ac.currentTime+0.2);
-  },
-  'Boing 🏀':()=>{
-    const ac=getAC();
-    const osc=ac.createOscillator(); osc.type='sine';
-    osc.frequency.setValueAtTime(120,ac.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(400,ac.currentTime+0.12);
-    const g=ac.createGain();
-    g.gain.setValueAtTime(0.5,ac.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.25);
-    osc.connect(g); g.connect(ac.destination);
-    osc.start(); osc.stop(ac.currentTime+0.28);
-  },
-  'Bubble 🫧':()=>{
-    playTone('sine',600,0.12,0.35,Math.random()*200-100);
-    setTimeout(()=>playTone('sine',900,0.06,0.2),40);
-  },
-  'Tap 👆':()=>{
-    playNoise(0.025,0.7,2000);
-    playTone('triangle',400,0.025,0.15);
-  },
-  'Plop 💧':()=>{
-    const ac=getAC();
-    const osc=ac.createOscillator(); osc.type='sine';
-    osc.frequency.setValueAtTime(700,ac.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(200,ac.currentTime+0.1);
-    const g=ac.createGain();
-    g.gain.setValueAtTime(0.4,ac.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.13);
-    osc.connect(g); g.connect(ac.destination);
-    osc.start(); osc.stop(ac.currentTime+0.15);
-  },
-  'Ping ✨':()=>{
-    playTone('sine',1200,0.35,0.28);
-    playTone('sine',1800,0.2,0.15);
-  },
-  'Thud 🥁':()=>{
-    const ac=getAC();
-    const osc=ac.createOscillator(); osc.type='sine';
-    osc.frequency.setValueAtTime(80,ac.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(30,ac.currentTime+0.12);
-    const g=ac.createGain();
-    g.gain.setValueAtTime(0.7,ac.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);
-    osc.connect(g); g.connect(ac.destination);
-    osc.start(); osc.stop(ac.currentTime+0.18);
-    playNoise(0.06,0.3,800);
-  },
-  'Squeak 🐭':()=>{
-    const ac=getAC();
-    const osc=ac.createOscillator(); osc.type='sawtooth';
-    osc.frequency.setValueAtTime(800,ac.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1400,ac.currentTime+0.06);
-    osc.frequency.exponentialRampToValueAtTime(900,ac.currentTime+0.12);
-    const g=ac.createGain();
-    g.gain.setValueAtTime(0.18,ac.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.14);
-    osc.connect(g); g.connect(ac.destination);
-    osc.start(); osc.stop(ac.currentTime+0.16);
-  },
+  'Pop 🫧':()=>{osc('sine',500,860,0.09,0.5);},
+  'Click 🖱️':()=>{noise(0.03,0.65,4500);osc('square',200,200,0.025,0.18);},
+  'Squish 🫠':()=>{osc('sine',200,72,0.17,0.55);},
+  'Boing 🏀':()=>{osc('sine',110,430,0.15,0.5);},
+  'Bubble 🫧':()=>{osc('sine',560+Math.random()*80,980,0.14,0.32);},
+  'Tap 👆':()=>{noise(0.022,0.72,2200);osc('triangle',380,380,0.022,0.14);},
+  'Plop 💧':()=>{osc('sine',740,180,0.12,0.42);},
+  'Ping ✨':()=>{osc('sine',1260,1260,0.4,0.24);osc('sine',1900,1900,0.22,0.12);},
+  'Thud 🥁':()=>{osc('sine',80,28,0.14,0.72);noise(0.055,0.28,700);},
+  'Squeak 🐭':()=>{osc('sawtooth',800,1480,0.07,0.16);},
 };
-
 let currentSound='Pop 🫧';
 
-// ── SOUND PICKER UI ────────────────────────────────────
+// ── SOUND PICKER ──────────────────────────────────────
 const soundScroll=document.getElementById('soundScroll');
 Object.keys(SOUNDS).forEach(name=>{
-  const btn=document.createElement('div');
-  btn.className='sound-btn'+(name===currentSound?' active':'');
-  btn.textContent=name;
-  btn.addEventListener('click',()=>{
+  const b=document.createElement('div');
+  b.className='snd-btn'+(name===currentSound?' active':'');
+  b.textContent=name;
+  b.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
     currentSound=name;
-    document.querySelectorAll('.sound-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    SOUNDS[name](); // preview the sound
+    document.querySelectorAll('.snd-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    SOUNDS[name]();
   });
-  soundScroll.appendChild(btn);
+  soundScroll.appendChild(b);
 });
 
-// ── GRID LAYOUT ────────────────────────────────────────
-const stage=document.getElementById('stage');
-const grid=document.getElementById('grid');
-const bgImg=document.getElementById('bgImg');
-
-function layoutGrid(){
-  const sw=stage.clientWidth, sh=stage.clientHeight;
-  const scale=Math.min(sw/IMG_W, sh/IMG_H)*0.97;
-  const gw=IMG_W*scale, gh=IMG_H*scale;
-  grid.style.width=gw+'px'; grid.style.height=gh+'px';
-
-  // Remove old hit zones
-  grid.querySelectorAll('.btn-hit').forEach(e=>e.remove());
-
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      const i=r*COLS+c;
-      const bx=(PAD_X + c*CELL_W)*scale;
-      const by=(PAD_Y + r*CELL_H)*scale;
-      const bw=CELL_W*scale, bh=CELL_H*scale;
-      const gap=bw*0.04; // small inset so click zone is button only
-
-      const div=document.createElement('div');
-      div.className='btn-hit';
-      div.style.cssText=`left:${bx+gap}px;top:${by+gap}px;width:${bw-gap*2}px;height:${bh-gap*2}px;`;
-      div.dataset.idx=i;
-      div.dataset.name=NAMES[i]||'';
-      div.dataset.color=COLORS[i]||'#fff';
-      grid.appendChild(div);
-    }
-  }
-}
-
-window.addEventListener('resize',layoutGrid);
-bgImg.onload=layoutGrid;
-if(bgImg.complete) layoutGrid();
-
-// ── PARTICLE BURST ────────────────────────────────────
+// ── PARTICLES ────────────────────────────────────────
+const EMOJIS=['✨','⭐','💫','🌟','🎉','💕','🌈'];
 function burst(x,y,color){
-  const EMOJIS=['✨','⭐','💫','🌟'];
-  for(let i=0;i<7;i++){
+  for(let i=0;i<9;i++){
     const p=document.createElement('div');
-    const useEmoji=Math.random()<0.4;
-    if(useEmoji){
-      p.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${14+Math.random()*12}px;pointer-events:none;z-index:60;`;
+    const isEmoji=Math.random()<0.4;
+    if(isEmoji){
+      p.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:${12+Math.random()*12}px;pointer-events:none;z-index:60;transform:translate(-50%,-50%)`;
       p.textContent=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
     } else {
+      const sz=4+Math.random()*8;
       p.className='particle';
-      const size=5+Math.random()*8;
-      p.style.cssText=`position:fixed;left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${color};pointer-events:none;z-index:60;border-radius:50%;`;
+      p.style.cssText=`left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;background:${color};transform:translate(-50%,-50%)`;
     }
     document.body.appendChild(p);
-    const angle=Math.random()*Math.PI*2;
-    const dist=30+Math.random()*70;
-    const dx=Math.cos(angle)*dist, dy=Math.sin(angle)*dist;
+    const ang=Math.random()*Math.PI*2, dist=28+Math.random()*72;
+    const dx=Math.cos(ang)*dist, dy=Math.sin(ang)*dist;
     requestAnimationFrame(()=>{
-      p.style.transition='transform 0.55s cubic-bezier(.2,.8,.4,1), opacity 0.55s ease';
-      p.style.transform=`translate(${dx}px,${dy}px) rotate(${Math.random()*360}deg) scale(${0.5+Math.random()})`;
+      p.style.transition='transform 0.55s cubic-bezier(.2,.8,.4,1),opacity 0.5s ease';
+      p.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(${0.4+Math.random()*0.9})`;
       p.style.opacity='0';
     });
     setTimeout(()=>p.remove(),600);
   }
 }
 
-// ── RIPPLE GLOW ───────────────────────────────────────
-function ripple(btn,color){
-  const r=document.createElement('div');
-  r.className='ripple';
-  r.style.cssText=`left:0;top:0;right:0;bottom:0;background:${color};border:4px solid ${color};`;
-  btn.appendChild(r);
-  setTimeout(()=>r.remove(),520);
-}
+// ── PRESS / RELEASE ──────────────────────────────────
+const held=new Map();
 
-// ── PRESS HANDLER ────────────────────────────────────
-function pressButton(btn,clientX,clientY){
-  getAC();
-  SOUNDS[currentSound]();
-
-  // Visual press
+function press(btn,cx,cy){
+  if(btn.classList.contains('pressed')) return;
   btn.classList.add('pressed');
-  setTimeout(()=>btn.classList.remove('pressed'),150);
-
-  // Ripple
-  ripple(btn, btn.dataset.color+'cc');
-
-  // Particle burst from touch point
-  burst(clientX, clientY, btn.dataset.color);
+  const idx=+btn.dataset.idx;
+  SOUNDS[currentSound]();
+  burst(cx,cy,BUTTONS[idx].glow);
 }
-
-// ── EVENT WIRING ─────────────────────────────────────
-// Support multi-touch (press many buttons at once!!)
-const activePointers=new Set();
+function release(btn){
+  btn.classList.remove('pressed');
+}
 
 document.addEventListener('pointerdown',e=>{
-  const btn=e.target.closest('.btn-hit');
+  const btn=e.target.closest('.sqbtn');
   if(!btn) return;
   e.preventDefault();
-  activePointers.add(e.pointerId);
-  pressButton(btn,e.clientX,e.clientY);
+  ac();
+  held.set(e.pointerId,btn);
+  press(btn,e.clientX,e.clientY);
 },{passive:false});
 
 document.addEventListener('pointermove',e=>{
-  if(!activePointers.has(e.pointerId)) return;
-  const btn=document.elementFromPoint(e.clientX,e.clientY)?.closest('.btn-hit');
-  if(btn && !btn.classList.contains('pressed')){
-    pressButton(btn,e.clientX,e.clientY);
+  if(!held.has(e.pointerId)) return;
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  const newBtn=el?.closest('.sqbtn');
+  const oldBtn=held.get(e.pointerId);
+  if(newBtn!==oldBtn){
+    if(oldBtn) release(oldBtn);
+    if(newBtn){
+      held.set(e.pointerId,newBtn);
+      press(newBtn,e.clientX,e.clientY);
+    } else {
+      held.delete(e.pointerId);
+    }
   }
 },{passive:true});
 
-document.addEventListener('pointerup',e=>activePointers.delete(e.pointerId),{passive:true});
-document.addEventListener('pointercancel',e=>activePointers.delete(e.pointerId),{passive:true});
+function end(e){
+  const btn=held.get(e.pointerId);
+  if(btn) release(btn);
+  held.delete(e.pointerId);
+}
+document.addEventListener('pointerup',end,{passive:true});
+document.addEventListener('pointercancel',end,{passive:true});
 </script>
 </body>
 </html>
