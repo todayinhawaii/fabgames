@@ -36,7 +36,7 @@ html,body{
 
 /* ── STAGE ── */
 #stage{
-  position:fixed;top:50px;bottom:80px;left:0;right:0;
+  position:fixed;top:50px;bottom:110px;left:0;right:0;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
 }
@@ -107,7 +107,7 @@ html,body{
 /* ── SOUND BAR ── */
 #soundBar{
   position:fixed;bottom:0;left:0;right:0;z-index:50;
-  padding:8px 10px 12px;
+  padding:8px 10px 42px;
   background:rgba(12,22,12,0.96);backdrop-filter:blur(8px);
   border-top:2px solid rgba(255,215,0,0.4);
   display:flex;flex-direction:column;align-items:center;gap:6px;
@@ -156,20 +156,20 @@ html,body{
 
 /* ── IMMERSIVE / COLLAPSE ── */
 #collapseBtn{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:55;
-  width:54px;height:22px;border-radius:12px 12px 0 0;
-  background:rgba(12,28,8,0.85);border:1.5px solid rgba(255,215,0,0.45);
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:56;
+  width:54px;height:22px;border-radius:10px 10px 0 0;
+  background:rgba(12,28,8,0.9);border:1.5px solid rgba(255,215,0,0.5);
   border-bottom:none;
   display:flex;align-items:center;justify-content:center;
   font-size:11px;color:#c8f06a;cursor:pointer;
-  transition:all 0.25s;
-  box-shadow:0 -3px 12px rgba(0,0,0,0.35);
+  transition:bottom 0.3s ease, border-radius 0.3s ease, height 0.3s ease;
+  box-shadow:0 -3px 12px rgba(0,0,0,0.4);
 }
-#collapseBtn:hover{background:rgba(30,60,12,0.95);color:#ffd700;}
+#collapseBtn:hover{background:rgba(30,60,12,0.98);color:#ffd700;}
 body.immersive #collapseBtn{
-  bottom:4px;border-radius:14px;border:1.5px solid rgba(255,215,0,0.45);
+  bottom:6px;border-radius:14px;border:1.5px solid rgba(255,215,0,0.55);
   height:26px;width:60px;
-  box-shadow:0 0 14px rgba(255,215,0,0.3);
+  box-shadow:0 0 16px rgba(255,215,0,0.35);
   animation:arrowPulse 2s ease-in-out infinite;
 }
 @keyframes arrowPulse{
@@ -188,6 +188,16 @@ body.immersive #soundBar{
 }
 body.immersive #stage{
   top:0 !important;bottom:0 !important;
+}
+/* Explicit non-immersive restore */
+body:not(.immersive) #stage{
+  top:50px !important;bottom:110px !important;
+}
+body:not(.immersive) #topbar{
+  transform:translateY(0) !important;opacity:1 !important;pointer-events:auto !important;
+}
+body:not(.immersive) #soundBar{
+  transform:translateY(0) !important;opacity:1 !important;pointer-events:auto !important;
 }
 body.immersive #collapseBtn{bottom:4px;}
 
@@ -466,15 +476,25 @@ function setImmersive(on){
   setTimeout(resizeGrid,320);
 }
 
-collapseBtn.addEventListener('click',()=>setImmersive(!immersive));
-collapseBtn.addEventListener('touchend',e=>{e.preventDefault();setImmersive(!immersive);});
+collapseBtn.addEventListener('click',()=>{
+  if(!immersive && Date.now()-lastRestoreTime<400) return; // skip if just restored by hover
+  setImmersive(!immersive);
+});
+collapseBtn.addEventListener('touchend',e=>{
+  e.preventDefault();
+  if(!immersive && Date.now()-lastRestoreTime<400) return;
+  setImmersive(!immersive);
+});
+
+// Cooldown prevents mousemove-restore from immediately being re-collapsed by the ensuing click
+let lastRestoreTime=0;
 
 // Desktop: hover near bottom restores menus
 document.addEventListener('mousemove',e=>{
   if(!immersive) return;
-  if(e.clientY > window.innerHeight-60){
-    clearTimeout(restoreTimer);
+  if(e.clientY > window.innerHeight-70){
     setImmersive(false);
+    lastRestoreTime=Date.now();
   }
 });
 
@@ -482,8 +502,9 @@ document.addEventListener('mousemove',e=>{
 document.addEventListener('touchstart',e=>{
   if(!immersive) return;
   const y=e.touches[0].clientY;
-  if(y > window.innerHeight-70){
+  if(y > window.innerHeight-80){
     setImmersive(false);
+    lastRestoreTime=Date.now();
   }
 },{passive:true});
 
