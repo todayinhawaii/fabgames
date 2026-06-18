@@ -248,6 +248,7 @@ document.addEventListener('click',initAC,{passive:true});
 
 function ac(){
   if(!AC) initAC();
+  if(AC && AC.state==='suspended') AC.resume();
   return AC;
 }
 function osc(type,f0,f1,dur,vol){
@@ -898,7 +899,7 @@ if(!isMobile){
     malletTarget.x=(e.clientX-r.left)/r.width*GW;
     malletTarget.y=(e.clientY-r.top)/r.height*GH;
   });
-  canvas.addEventListener('mousedown',initAC);
+  canvas.addEventListener('mousedown',()=>{ osc('sine',1,1,0.01,0.00001); });
   canvas.style.cursor='none';
 }
 
@@ -914,7 +915,7 @@ function moveDot(cx,cy){
 trackpad.addEventListener('pointerdown',e=>{
   trackpad.setPointerCapture(e.pointerId);
   tpActive=true; tpLX=e.clientX; tpLY=e.clientY;
-  moveDot(e.clientX,e.clientY); ac();
+  moveDot(e.clientX,e.clientY); osc('sine',1,1,0.01,0.00001);
 },{passive:false});
 trackpad.addEventListener('pointermove',e=>{
   if(!tpActive) return;
