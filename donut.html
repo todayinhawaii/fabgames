@@ -222,11 +222,26 @@ const DONUT_TYPES=[
   {glaze:'#ffffff',ring:'#888888',name:'Classic'},
 ];
 
-// ── AUDIO ─────────────────────────────────────────────
 let AC=null;
+
+// Chrome requires AC created + unlocked SYNCHRONOUSLY in user gesture
+function initAC(){
+  if(AC) return;
+  try{
+    AC=new(window.AudioContext||window.webkitAudioContext)();
+    // Play silent buffer SYNCHRONOUSLY — this is what Chrome needs
+    const b=AC.createBuffer(1,1,AC.sampleRate);
+    const s=AC.createBufferSource();
+    s.buffer=b;s.connect(AC.destination);s.start(0);
+  }catch(e){}
+}
+// Use pointerdown AND touchend — covers Chrome on desktop + mobile
+document.addEventListener('pointerdown',initAC,{passive:true,once:true});
+document.addEventListener('touchend',initAC,{passive:true,once:true});
+
 function ac(){
-  if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
-  if(AC.state==='suspended') AC.resume();
+  if(!AC) initAC();
+  if(AC && AC.state==='suspended') AC.resume();
   return AC;
 }
 function osc(type,f0,f1,dur,vol){
@@ -877,7 +892,7 @@ if(!isMobile){
     malletTarget.x=(e.clientX-r.left)/r.width*GW;
     malletTarget.y=(e.clientY-r.top)/r.height*GH;
   });
-  canvas.addEventListener('mousedown',()=>ac());
+  canvas.addEventListener('mousedown',initAC);
   canvas.style.cursor='none';
 }
 
