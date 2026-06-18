@@ -28,7 +28,7 @@ html,body{width:100%;height:100%;overflow:hidden;touch-action:none;
 #stage{position:fixed;top:52px;bottom:0;left:0;right:0;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;}
 canvas{display:block;touch-action:none;}
-#trackpad{flex-shrink:0;width:100%;height:130px;
+#trackpad{flex-shrink:0;width:100%;height:160px;
   background:rgba(255,220,240,0.3);backdrop-filter:blur(8px);
   border-top:2.5px solid rgba(255,180,220,0.5);
   display:none;align-items:center;justify-content:center;position:relative;touch-action:none;}
@@ -498,11 +498,11 @@ function moveDot(cx,cy){
 tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);osc('sine',1,1,0.01,0.00001);},{passive:false});
 tp.addEventListener('pointermove',e=>{
   if(!tpActive)return;
-  const dx=(e.clientX-tpLX)*2.8,dy=(e.clientY-tpLY)*2.8;
+  const dx=(e.clientX-tpLX)*4.5,dy=(e.clientY-tpLY)*4.5;
   tpLX=e.clientX;tpLY=e.clientY;
   const r=canvas.getBoundingClientRect();
-  blob.tx=clamp(blob.tx+dx*(GW/r.width),blob.r+4,GW-blob.r-4);
-  blob.ty=clamp(blob.ty+dy*(GH/r.height),blob.r+4,GH-blob.r-4);
+  blob.tx=clamp(blob.tx+dx*(GW/r.width),0,GW);
+  blob.ty=clamp(blob.ty+dy*(GH/r.height),0,GH);
   moveDot(e.clientX,e.clientY);
 },{passive:false});
 tp.addEventListener('pointerup',()=>tpActive=false,{passive:true});
