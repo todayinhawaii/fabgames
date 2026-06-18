@@ -91,4 +91,8 @@ const GAMES=[
   {id:'happybuttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
    desc:'Press the adorable squishy animal buttons for a satisfying ASMR experience!! 10 different sounds - pop, squish, boing and more. Just press and relax!!',
    color:'rgba(255,183,197,0.15)',href:'/happy-buttons'},
+
+  {id:'donut',emoji:'🍩',cat:'Arcade · Fun',title:'Donut Dash',
+   desc:'Hit the falling donuts into the goal — but watch out for the mad chef!! He floats around and if he touches you, you lose ALL your points!! How high can you score??',
+   color:'rgba(255,157,226,0.15)',href:'/donut'},
 ];
