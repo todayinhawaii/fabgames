@@ -103,36 +103,28 @@ window.addEventListener('resize',resize);resize();
 
 let AC=null;
 
-function initAC(){
-  // Create AC if needed
+// ── AUDIO ENGINE ─────────────────────────────────────────────────────────
+// ROOT CAUSE FIX: Chrome/Brave require AudioContext to be created AND resumed
+// inside a genuine user gesture (click, touchend, keydown). If new AudioContext()
+// is called from a game loop (outside any gesture), Chrome puts it in "suspended"
+// state and ignores resume() calls — this is why sounds appear after ~30s
+// (Chrome's auto-unblock timer). Safari is more lenient, which is why mobile works.
+//
+// FIX: unlockAudio() creates AC + awaits resume() inside the start button click.
+//      osc() guards AC.state so no sound attempts on a suspended context.
+async function unlockAudio(){
   if(!AC){
-    try{ AC=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+    try{ AC=new(window.AudioContext||window.webkitAudioContext)(); }
+    catch(e){ return; }
   }
-  // ALWAYS resume if suspended — Chrome requires this inside a gesture
   if(AC.state==='suspended'){
-    AC.resume().then(()=>{
-      // Confirm unlock with silent buffer
-      try{
-        const b=AC.createBuffer(1,1,AC.sampleRate),s=AC.createBufferSource();
-        s.buffer=b;s.connect(AC.destination);s.start(0);
-      }catch(e){}
-    });
+    try{ await AC.resume(); }catch(e){}
   }
-}
-
-// PERMANENT listeners — every touch retries unlock until AC is running
-document.addEventListener('pointerdown',initAC,{passive:true});
-document.addEventListener('touchend',initAC,{passive:true});
-document.addEventListener('click',initAC,{passive:true});
-
-function ac(){
-  if(!AC) initAC();
-  if(AC && AC.state==='suspended') AC.resume();
-  return AC;
 }
 
 function osc(type,f0,f1,dur,vol){
-  const a=ac(),o=a.createOscillator(),g=a.createGain();
+  if(!AC||AC.state!=='running') return;        // guard: skip if not yet unlocked
+  const a=AC,o=a.createOscillator(),g=a.createGain();
   o.type=type;
   o.frequency.setValueAtTime(f0,a.currentTime);
   if(f1!==f0) o.frequency.exponentialRampToValueAtTime(f1,a.currentTime+dur);
@@ -141,7 +133,6 @@ function osc(type,f0,f1,dur,vol){
   o.connect(g);g.connect(a.destination);
   o.start();o.stop(a.currentTime+dur+0.02);
 }
-function sndEat(){
   osc('sine',1046,2093,0.12,0.55);
   setTimeout(()=>osc('triangle',1318,2637,0.10,0.38),55);
   setTimeout(()=>osc('sine',1568,3136,0.09,0.28),105);
@@ -183,7 +174,7 @@ function initGame(){
   document.getElementById('scorePill').textContent='0';
   document.getElementById('resultScreen').classList.remove('show');
 }
-initGame();
+// initGame deferred to startBtn
 
 // ── FOOD ─────────────────────────────────────────────────
 function spawnFood(){
@@ -477,7 +468,7 @@ function draw(){
 }
 
 function loop(){update();draw();requestAnimationFrame(loop);}
-requestAnimationFrame(loop);
+// boot deferred to startBtn — see overlay below
 
 // ── INPUT ────────────────────────────────────────────────
 if(!isMobile){
@@ -487,7 +478,6 @@ if(!isMobile){
     blob.tx=(e.clientX-r.left)/r.width*GW;
     blob.ty=(e.clientY-r.top)/r.height*GH;
   });
-  canvas.addEventListener('mousedown',()=>{ osc('sine',1,1,0.01,0.00001); });
 }
 let tpActive=false,tpLX=0,tpLY=0;
 function moveDot(cx,cy){
@@ -495,7 +485,7 @@ function moveDot(cx,cy){
   tpDot.style.left=(Math.max(8,Math.min(r.width-8,cx-r.left))-22)+'px';
   tpDot.style.top=(Math.max(8,Math.min(r.height-8,cy-r.top))-22)+'px';
 }
-tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);osc('sine',1,1,0.01,0.00001);},{passive:false});
+tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);},{passive:false});
 tp.addEventListener('pointermove',e=>{
   if(!tpActive)return;
   const dx=(e.clientX-tpLX)*4.5,dy=(e.clientY-tpLY)*4.5;
@@ -507,6 +497,25 @@ tp.addEventListener('pointermove',e=>{
 },{passive:false});
 tp.addEventListener('pointerup',()=>tpActive=false,{passive:true});
 tp.addEventListener('pointercancel',()=>tpActive=false,{passive:true});
+</script>
+
+<div id="audioOverlay" style="position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.76);backdrop-filter:blur(6px)">
+  <div style="font-size:4rem;margin-bottom:0.4rem">🫧</div>
+  <div style="font-size:1.7rem;font-weight:900;color:#fff;letter-spacing:0.06em;margin-bottom:1.6rem;text-shadow:0 2px 16px rgba(255,77,184,0.8)">🫧 BLOB BOY</div>
+  <button id="startBtn" style="font-size:1.3rem;font-weight:800;padding:0.9rem 2.6rem;border-radius:2rem;border:none;background:linear-gradient(135deg,#ff4db8,#c04dff);color:#fff;cursor:pointer;box-shadow:0 4px 24px rgba(255,77,184,0.65);letter-spacing:0.05em;transition:transform 0.1s" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.95)'" ontouchend="this.style.transform=''">
+    🎵 TAP TO PLAY
+  </button>
+  <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:1.1rem">tap once · unlocks audio on all browsers</div>
+</div>
+<script>
+// Chrome/Brave REQUIRE AudioContext to be created inside a user gesture.
+// This click handler IS the gesture — AC is created here, awaited, then game starts.
+document.getElementById('startBtn').addEventListener('click', async function(){
+  await unlockAudio();   // creates AC within click gesture, awaits resume()
+  document.getElementById('audioOverlay').style.display = 'none';
+  initGame();
+  requestAnimationFrame(loop);
+}, {once:true});
 </script>
 </body>
 </html>
