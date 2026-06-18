@@ -103,24 +103,30 @@ window.addEventListener('resize',resize);resize();
 
 let AC=null;
 
-// Chrome requires AC created + unlocked SYNCHRONOUSLY in user gesture
 function initAC(){
-  if(AC) return;
-  try{
-    AC=new(window.AudioContext||window.webkitAudioContext)();
-    // Play silent buffer SYNCHRONOUSLY — this is what Chrome needs
-    const b=AC.createBuffer(1,1,AC.sampleRate);
-    const s=AC.createBufferSource();
-    s.buffer=b;s.connect(AC.destination);s.start(0);
-  }catch(e){}
+  // Create AC if needed
+  if(!AC){
+    try{ AC=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+  }
+  // ALWAYS resume if suspended — Chrome requires this inside a gesture
+  if(AC.state==='suspended'){
+    AC.resume().then(()=>{
+      // Confirm unlock with silent buffer
+      try{
+        const b=AC.createBuffer(1,1,AC.sampleRate),s=AC.createBufferSource();
+        s.buffer=b;s.connect(AC.destination);s.start(0);
+      }catch(e){}
+    });
+  }
 }
-// Use pointerdown AND touchend — covers Chrome on desktop + mobile
-document.addEventListener('pointerdown',initAC,{passive:true,once:true});
-document.addEventListener('touchend',initAC,{passive:true,once:true});
+
+// PERMANENT listeners — every touch retries unlock until AC is running
+document.addEventListener('pointerdown',initAC,{passive:true});
+document.addEventListener('touchend',initAC,{passive:true});
+document.addEventListener('click',initAC,{passive:true});
 
 function ac(){
   if(!AC) initAC();
-  if(AC && AC.state==='suspended') AC.resume();
   return AC;
 }
 
