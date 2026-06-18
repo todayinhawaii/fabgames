@@ -82,7 +82,7 @@ html,body{
 
 /* ── STAGE ── */
 #stage{
-  position:fixed;top:82px;bottom:0;left:0;right:0;
+  position:fixed;top:52px;bottom:0;left:0;right:0;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
 }
 #gameCanvas{
@@ -93,7 +93,7 @@ html,body{
 
 /* ── TRACKPAD ── */
 #trackpad{
-  flex-shrink:0;width:100%;height:130px;
+  flex-shrink:0;width:100%;height:160px;
   background:rgba(255,255,255,0.2);
   backdrop-filter:blur(8px);
   border-top:3px solid rgba(255,255,255,0.6);
@@ -905,7 +905,7 @@ if(!isMobile){
 
 // ── MOBILE TRACKPAD ───────────────────────────────────
 let tpActive=false, tpLX=0, tpLY=0;
-const TPSENS=2.6;
+const TPSENS=4.5;
 
 function moveDot(cx,cy){
   const r=trackpad.getBoundingClientRect();
@@ -922,8 +922,8 @@ trackpad.addEventListener('pointermove',e=>{
   const dx=(e.clientX-tpLX)*TPSENS, dy=(e.clientY-tpLY)*TPSENS;
   tpLX=e.clientX; tpLY=e.clientY;
   const r=canvas.getBoundingClientRect();
-  malletTarget.x=clamp(malletTarget.x+dx*(GW/r.width), MALLET_R, GW-MALLET_R);
-  malletTarget.y=clamp(malletTarget.y+dy*(GH/r.height), MALLET_R, GH-MALLET_R);
+  malletTarget.x=clamp(malletTarget.x+dx*(GW/r.width), 0, GW);
+  malletTarget.y=clamp(malletTarget.y+dy*(GH/r.height), 0, GH);
   moveDot(e.clientX,e.clientY);
 },{passive:false});
 trackpad.addEventListener('pointerup',()=>tpActive=false,{passive:true});
