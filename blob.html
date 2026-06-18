@@ -110,15 +110,16 @@ function ac(){
 }
 function kickAudio(){
   try{
-    const a=ac();
-    if(a.state==='suspended'){
-      a.resume().then(()=>{
-        const b=a.createBuffer(1,1,a.sampleRate),s=a.createBufferSource();
-        s.buffer=b;s.connect(a.destination);s.start(0);
-      });
+    if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==='running'){
+      // Already running — play test tone to confirm
+      const b=AC.createBuffer(1,1,AC.sampleRate),s=AC.createBufferSource();
+      s.buffer=b;s.connect(AC.destination);s.start(0);
     } else {
-      const b=a.createBuffer(1,1,a.sampleRate),s=a.createBufferSource();
-      s.buffer=b;s.connect(a.destination);s.start(0);
+      AC.resume().then(()=>{
+        const b=AC.createBuffer(1,1,AC.sampleRate),s=AC.createBufferSource();
+        s.buffer=b;s.connect(AC.destination);s.start(0);
+      });
     }
   }catch(e){}
 }
