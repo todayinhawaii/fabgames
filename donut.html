@@ -229,6 +229,14 @@ function ac(){
   if(AC.state==='suspended') AC.resume();
   return AC;
 }
+// Unlock audio on very first interaction ANYWHERE on page
+function unlockAudio(){
+  ac();
+  document.removeEventListener('pointerdown', unlockAudio);
+  document.removeEventListener('keydown', unlockAudio);
+}
+document.addEventListener('pointerdown', unlockAudio, {once:true, passive:true});
+document.addEventListener('keydown', unlockAudio, {once:true, passive:true});
 function osc(type,f0,f1,dur,vol){
   const a=ac(),o=a.createOscillator(),g=a.createGain();
   o.type=type; o.frequency.setValueAtTime(f0,a.currentTime);
