@@ -101,11 +101,26 @@ function resize(){
 }
 window.addEventListener('resize',resize);resize();
 
-// ── AUDIO ───────────────────────────────────────────────
 let AC=null;
+
+// Chrome requires AC created + unlocked SYNCHRONOUSLY in user gesture
+function initAC(){
+  if(AC) return;
+  try{
+    AC=new(window.AudioContext||window.webkitAudioContext)();
+    // Play silent buffer SYNCHRONOUSLY — this is what Chrome needs
+    const b=AC.createBuffer(1,1,AC.sampleRate);
+    const s=AC.createBufferSource();
+    s.buffer=b;s.connect(AC.destination);s.start(0);
+  }catch(e){}
+}
+// Use pointerdown AND touchend — covers Chrome on desktop + mobile
+document.addEventListener('pointerdown',initAC,{passive:true,once:true});
+document.addEventListener('touchend',initAC,{passive:true,once:true});
+
 function ac(){
-  if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
-  if(AC.state==='suspended') AC.resume();
+  if(!AC) initAC();
+  if(AC && AC.state==='suspended') AC.resume();
   return AC;
 }
 
@@ -465,7 +480,7 @@ if(!isMobile){
     blob.tx=(e.clientX-r.left)/r.width*GW;
     blob.ty=(e.clientY-r.top)/r.height*GH;
   });
-  canvas.addEventListener('mousedown',()=>ac());
+  canvas.addEventListener('mousedown',initAC);
 }
 let tpActive=false,tpLX=0,tpLY=0;
 function moveDot(cx,cy){
@@ -473,7 +488,7 @@ function moveDot(cx,cy){
   tpDot.style.left=(Math.max(8,Math.min(r.width-8,cx-r.left))-22)+'px';
   tpDot.style.top=(Math.max(8,Math.min(r.height-8,cy-r.top))-22)+'px';
 }
-tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);ac();},{passive:false});
+tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);initAC();},{passive:false});
 tp.addEventListener('pointermove',e=>{
   if(!tpActive)return;
   const dx=(e.clientX-tpLX)*2.8,dy=(e.clientY-tpLY)*2.8;
