@@ -101,18 +101,19 @@ function resize(){
 }
 window.addEventListener('resize',resize);resize();
 
-// ── AUDIO — same pattern as donut game (known working) ──
-const AC = new(window.AudioContext||window.webkitAudioContext)();
-
+// ── AUDIO ───────────────────────────────────────────────
+let AC=null;
 function ac(){
+  if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
   if(AC.state==='suspended') AC.resume();
   return AC;
 }
 function kickAudio(){
   try{
-    AC.resume().then(()=>{
-      const b=AC.createBuffer(1,1,AC.sampleRate),s=AC.createBufferSource();
-      s.buffer=b;s.connect(AC.destination);s.start(0);
+    const a=ac();
+    a.resume().then(()=>{
+      const b=a.createBuffer(1,1,a.sampleRate),s=a.createBufferSource();
+      s.buffer=b;s.connect(a.destination);s.start(0);
     });
   }catch(e){}
 }
