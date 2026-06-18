@@ -326,6 +326,11 @@ def static_files(filename):
 def donut():
     return send_from_directory('.', 'donut.html')
 
+
+@app.route('/blob')
+def blob():
+    return send_from_directory('.', 'blob.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
 # ── MIGRATED GAMES FROM TODAYINHAWAII ──────────────
