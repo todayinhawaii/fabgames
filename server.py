@@ -321,6 +321,11 @@ def jigsaw():
 @app.route('/<path:filename>')
 def static_files(filename):
     return send_from_directory('.', filename)
+
+@app.route('/donut')
+def donut():
+    return send_from_directory('.', 'donut.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
 # ── MIGRATED GAMES FROM TODAYINHAWAII ──────────────
