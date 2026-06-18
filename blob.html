@@ -127,6 +127,7 @@ document.addEventListener('click',initAC,{passive:true});
 
 function ac(){
   if(!AC) initAC();
+  if(AC && AC.state==='suspended') AC.resume();
   return AC;
 }
 
@@ -486,7 +487,7 @@ if(!isMobile){
     blob.tx=(e.clientX-r.left)/r.width*GW;
     blob.ty=(e.clientY-r.top)/r.height*GH;
   });
-  canvas.addEventListener('mousedown',initAC);
+  canvas.addEventListener('mousedown',()=>{ osc('sine',1,1,0.01,0.00001); });
 }
 let tpActive=false,tpLX=0,tpLY=0;
 function moveDot(cx,cy){
@@ -494,7 +495,7 @@ function moveDot(cx,cy){
   tpDot.style.left=(Math.max(8,Math.min(r.width-8,cx-r.left))-22)+'px';
   tpDot.style.top=(Math.max(8,Math.min(r.height-8,cy-r.top))-22)+'px';
 }
-tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);initAC();},{passive:false});
+tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);osc('sine',1,1,0.01,0.00001);},{passive:false});
 tp.addEventListener('pointermove',e=>{
   if(!tpActive)return;
   const dx=(e.clientX-tpLX)*2.8,dy=(e.clientY-tpLY)*2.8;
