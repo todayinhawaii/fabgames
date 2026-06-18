@@ -223,20 +223,37 @@ const DONUT_TYPES=[
 ];
 
 // ── AUDIO ─────────────────────────────────────────────
-let AC=null;
-function ac(){
-  if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
+// Create AudioContext immediately — will be suspended until user gesture
+const AC = new (window.AudioContext || window.webkitAudioContext)();
+
+function ac(){ 
   if(AC.state==='suspended') AC.resume();
   return AC;
 }
-// Unlock audio on very first interaction ANYWHERE on page
-function unlockAudio(){
-  ac();
-  document.removeEventListener('pointerdown', unlockAudio);
-  document.removeEventListener('keydown', unlockAudio);
+
+// Play a completely silent buffer to fully unlock audio on first touch
+function kickAudio(){
+  try {
+    AC.resume().then(()=>{
+      // Play silent 0.001s buffer — forces full unlock on iOS/Android
+      const buf=AC.createBuffer(1,1,AC.sampleRate);
+      const src=AC.createBufferSource();
+      src.buffer=buf;
+      src.connect(AC.destination);
+      src.start(0);
+    });
+  } catch(e){}
 }
-document.addEventListener('pointerdown', unlockAudio, {once:true, passive:true});
-document.addEventListener('keydown', unlockAudio, {once:true, passive:true});
+
+// Fire on absolutely any first interaction
+['pointerdown','touchstart','mousedown','keydown'].forEach(evt=>{
+  document.addEventListener(evt, function unlock(){
+    kickAudio();
+    ['pointerdown','touchstart','mousedown','keydown'].forEach(e=>
+      document.removeEventListener(e, unlock)
+    );
+  }, {passive:true});
+});
 function osc(type,f0,f1,dur,vol){
   const a=ac(),o=a.createOscillator(),g=a.createGain();
   o.type=type; o.frequency.setValueAtTime(f0,a.currentTime);
