@@ -105,41 +105,19 @@ window.addEventListener('resize',resize);resize();
 let AC=null;
 function ac(){
   if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
-  if(AC.state!=='running') AC.resume();
+  if(AC.state==='suspended') AC.resume();
   return AC;
 }
-function kickAudio(){
-  try{
-    if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
-    if(AC.state==='running'){
-      // Already running — play test tone to confirm
-      const b=AC.createBuffer(1,1,AC.sampleRate),s=AC.createBufferSource();
-      s.buffer=b;s.connect(AC.destination);s.start(0);
-    } else {
-      AC.resume().then(()=>{
-        const b=AC.createBuffer(1,1,AC.sampleRate),s=AC.createBufferSource();
-        s.buffer=b;s.connect(AC.destination);s.start(0);
-      });
-    }
-  }catch(e){}
-}
-// Keep listeners PERMANENT — every touch keeps AC alive
-document.addEventListener('pointerdown',kickAudio,{passive:true});
-document.addEventListener('touchstart',kickAudio,{passive:true});
-document.addEventListener('mousedown',kickAudio,{passive:true});
-document.addEventListener('keydown',kickAudio,{passive:true});
 
 function osc(type,f0,f1,dur,vol){
-  try{
-    const a=ac(),o=a.createOscillator(),g=a.createGain();
-    o.type=type;
-    o.frequency.setValueAtTime(f0,a.currentTime);
-    if(f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,a.currentTime+dur);
-    g.gain.setValueAtTime(vol,a.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
-    o.connect(g);g.connect(a.destination);
-    o.start();o.stop(a.currentTime+dur+0.02);
-  }catch(e){}
+  const a=ac(),o=a.createOscillator(),g=a.createGain();
+  o.type=type;
+  o.frequency.setValueAtTime(f0,a.currentTime);
+  if(f1!==f0) o.frequency.exponentialRampToValueAtTime(f1,a.currentTime+dur);
+  g.gain.setValueAtTime(vol,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+  o.connect(g);g.connect(a.destination);
+  o.start();o.stop(a.currentTime+dur+0.02);
 }
 function sndEat(){
   osc('sine',1046,2093,0.12,0.55);
@@ -487,7 +465,7 @@ if(!isMobile){
     blob.tx=(e.clientX-r.left)/r.width*GW;
     blob.ty=(e.clientY-r.top)/r.height*GH;
   });
-  canvas.addEventListener('mousedown',kickAudio);
+  canvas.addEventListener('mousedown',()=>ac());
 }
 let tpActive=false,tpLX=0,tpLY=0;
 function moveDot(cx,cy){
@@ -495,7 +473,7 @@ function moveDot(cx,cy){
   tpDot.style.left=(Math.max(8,Math.min(r.width-8,cx-r.left))-22)+'px';
   tpDot.style.top=(Math.max(8,Math.min(r.height-8,cy-r.top))-22)+'px';
 }
-tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);kickAudio();},{passive:false});
+tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);ac();},{passive:false});
 tp.addEventListener('pointermove',e=>{
   if(!tpActive)return;
   const dx=(e.clientX-tpLX)*2.8,dy=(e.clientY-tpLY)*2.8;
