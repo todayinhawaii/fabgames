@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Donut Dash 🍩</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+html,body{
+  width:100%;height:100%;overflow:hidden;touch-action:none;
+  background:linear-gradient(135deg,#ff9de2,#ffd6a5,#fffb7d,#a0f4b4,#9de3ff);
+  background-size:400% 400%;
+  animation:bgShift 8s ease-in-out infinite;
+  font-family:'Baloo 2',sans-serif;
+}
+@keyframes bgShift{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* ── CHEF WARNING ── */
+#chefWarning{
+  position:fixed;top:52px;left:0;right:0;z-index:29;
+  text-align:center;font-size:16px;font-weight:800;letter-spacing:1px;
+  padding:6px 10px;
+  background:rgba(255,40,40,0.18);
+  color:rgba(255,60,60,0.95);
+  border-bottom:1.5px solid rgba(255,80,80,0.3);
+  backdrop-filter:blur(4px);
+  animation:warnPulse 2.5s ease-in-out infinite;
+}
+@keyframes warnPulse{0%,100%{opacity:0.7;}50%{opacity:1;}}
+
+/* ── TOP BAR ── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:30;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;
+  background:rgba(255,255,255,0.25);
+  backdrop-filter:blur(10px);
+  border-bottom:3px solid rgba(255,255,255,0.6);
+}
+#vegasLogo{
+  font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;
+  color:#fff;
+  background:linear-gradient(135deg,#cc0055,#ff4400,#cc8800);
+  padding:6px 16px;
+  border-radius:30px;
+  border:2px solid rgba(255,220,0,0.9);
+  box-shadow:0 0 10px rgba(255,100,0,0.6), 0 0 24px rgba(255,50,100,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+  animation:logoPulse 2s ease-in-out infinite;
+  white-space:nowrap;
+}
+@keyframes logoPulse{
+  0%,100%{box-shadow:0 0 10px rgba(255,100,0,0.6),0 0 22px rgba(255,50,100,0.3),inset 0 1px 0 rgba(255,255,255,0.2);}
+  50%{box-shadow:0 0 18px rgba(255,180,0,0.9),0 0 36px rgba(255,80,150,0.5),inset 0 1px 0 rgba(255,255,255,0.2);}
+}
+#scoreDisplay{
+  font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;
+  color:#fff;text-shadow:0 2px 8px rgba(255,100,150,0.8), 0 0 20px rgba(255,200,0,0.6);
+  display:flex;align-items:center;gap:8px;
+}
+#scorePill{
+  background:linear-gradient(135deg,#ff4db8,#ff8c00);
+  border-radius:30px;padding:4px 18px;
+  font-size:22px;letter-spacing:2px;
+  box-shadow:0 4px 12px rgba(255,100,150,0.5);
+  animation:scorePop 0.3s ease;
+}
+@keyframes scorePop{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.35);}
+  100%{transform:scale(1);}
+}
+.home-link{
+  width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.5);border:2px solid rgba(255,255,255,0.8);
+  color:#ff4db8;text-decoration:none;font-size:18px;
+}
+
+/* ── STAGE ── */
+#stage{
+  position:fixed;top:82px;bottom:0;left:0;right:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+}
+#gameCanvas{
+  display:block;
+  border-radius:0;
+  touch-action:none;
+}
+
+/* ── TRACKPAD ── */
+#trackpad{
+  flex-shrink:0;width:100%;height:130px;
+  background:rgba(255,255,255,0.2);
+  backdrop-filter:blur(8px);
+  border-top:3px solid rgba(255,255,255,0.6);
+  display:none;
+  align-items:center;justify-content:center;
+  position:relative;touch-action:none;
+  cursor:none;
+}
+body.is-mobile #trackpad{display:flex;}
+#trackpadLabel{
+  position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,100,180,0.7);font-weight:800;
+}
+#trackpadDot{
+  width:48px;height:48px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 35% 35%,#fff,#ff9de2);
+  box-shadow:0 0 20px rgba(255,100,180,0.6),0 4px 8px rgba(0,0,0,0.2);
+  border:3px solid rgba(255,255,255,0.8);
+  position:absolute;transition:transform 0.04s;
+}
+#trackpadHint{
+  font-size:11px;color:rgba(255,100,180,0.6);letter-spacing:1px;
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;pointer-events:none;
+}
+
+/* ── SCORE BURST ── */
+.burst{
+  position:fixed;pointer-events:none;z-index:60;
+  font-family:'Bebas Neue',sans-serif;font-size:42px;
+  color:#fff;
+  text-shadow:0 0 10px #ff4db8, 0 0 30px #ff8c00;
+  animation:burstUp 1s ease-out forwards;
+  white-space:nowrap;
+}
+@keyframes burstUp{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(0.5);}
+  40%{opacity:1;transform:translate(-50%,-80%) scale(1.3);}
+  100%{opacity:0;transform:translate(-50%,-150%) scale(1);}
+}
+.particle{position:fixed;pointer-events:none;z-index:59;border-radius:50%;}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div id="vegasLogo">🍩 DONUT DASH 🍩</div>
+  <div id="scoreDisplay">🍩 <span id="scorePill">0</span></div>
+  <a href="/" class="home-link">🏠</a>
+</div>
+<div id="chefWarning">⚠️ Avoid the mad chef or lose all your points!!</div>
+
+<div id="stage">
+  <canvas id="gameCanvas"></canvas>
+  <div id="trackpad">
+    <div id="trackpadLabel">🍩 Drag to swing your mallet</div>
+    <div id="trackpadDot"></div>
+    <div id="trackpadHint">Slide left ↔ right to hit the donuts!!</div>
+  </div>
+</div>
+
+<script>
+// ── MOBILE ────────────────────────────────────────────
+const isMobile='ontouchstart' in window;
+if(isMobile) document.body.classList.add('is-mobile');
+
+// ── CANVAS SETUP ──────────────────────────────────────
+const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
+const stage=document.getElementById('stage');
+const trackpad=document.getElementById('trackpad');
+const trackpadDot=document.getElementById('trackpadDot');
+
+// Wider on desktop, portrait on mobile
+const GW = isMobile ? 480 : 860;
+const GH = isMobile ? 780 : 580;
+
+function resize(){
+  const sw=stage.clientWidth;
+  const tph=isMobile?130:0;
+  const sh=stage.clientHeight-tph;
+  const scale=Math.min(sw/GW, sh/GH);
+  canvas.style.width=(GW*scale)+'px';
+  canvas.style.height=(GH*scale)+'px';
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(GW*dpr);
+  canvas.height=Math.round(GH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener('resize',resize);
+resize();
+
+// ── GAME CONSTANTS ────────────────────────────────────
+const GRAVITY=0.09;
+const FRICTION=0.999;
+const DONUT_R=43;
+const MALLET_R=36;
+const BOUNCE=0.58;
+const SPAWN_INTERVAL=3000;
+// Chute on LEFT side (mid height), goal at TOP centre
+// TOP ROW: [LEFT CHUTE ▼]  [GOAL NET]  [RIGHT CHUTE ▼]
+const GOAL_X0=GW*0.28;
+const GOAL_X1=GW*0.72;
+const GOAL_Y=8;
+const GOAL_H=52;
+const CHUTE_L={x:GW*0.12, y:0};  // left of goal, at top
+const CHUTE_R={x:GW*0.88, y:0};  // right of goal, at top
+let lastChute='L';
+const PLAYER_R=38;  // collision radius of player character
+const CHEF_R=36;    // chef collision radius
+const CHEF_SPEED=1.1;
+let chefs=[];
+let nextChefSpawn=Date.now()+5000;
+let gameOver=false;
+
+// ── DONUT TYPES ───────────────────────────────────────
+const DONUT_TYPES=[
+  {glaze:'#ff9de2',ring:'#ff4db8',name:'Strawberry'},
+  {glaze:'#ffd6a5',ring:'#ff8c00',name:'Orange'},
+  {glaze:'#fffb7d',ring:'#e6b800',name:'Lemon'},
+  {glaze:'#a0f4b4',ring:'#00b341',name:'Mint'},
+  {glaze:'#9de3ff',ring:'#0096cc',name:'Blueberry'},
+  {glaze:'#d4a0ff',ring:'#8800cc',name:'Grape'},
+  {glaze:'#ff9fa0',ring:'#cc0000',name:'Cherry'},
+  {glaze:'#ffffff',ring:'#888888',name:'Classic'},
+];
+
+// ── AUDIO ─────────────────────────────────────────────
+let AC=null;
+function ac(){
+  if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==='suspended') AC.resume();
+  return AC;
+}
+function osc(type,f0,f1,dur,vol){
+  const a=ac(),o=a.createOscillator(),g=a.createGain();
+  o.type=type; o.frequency.setValueAtTime(f0,a.currentTime);
+  if(f1!==f0) o.frequency.exponentialRampToValueAtTime(f1,a.currentTime+dur);
+  g.gain.setValueAtTime(vol,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+  o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+dur+0.02);
+}
+function sndHit(){ osc('sine',320,680,0.1,0.5); }
+function sndGoal(){
+  osc('sine',523,1046,0.15,0.6);
+  setTimeout(()=>osc('sine',659,1318,0.15,0.5),100);
+  setTimeout(()=>osc('sine',784,1568,0.2,0.4),200);
+}
+function sndSpawn(){ osc('sine',880,440,0.08,0.2); }
+function sndMiss(){ osc('sine',220,110,0.18,0.3); }
+
+// ── GAME STATE ────────────────────────────────────────
+let score=0;
+let mallet={x:GW*0.5, y:GH*0.65};
+let malletTarget={x:GW*0.5, y:GH*0.65};
+let donuts=[];
+let nextSpawn=Date.now()+1200;
+let combo=0;
+
+function clamp(v,lo,hi){return v<lo?lo:v>hi?hi:v;}
+
+// ── DONUT SPAWN ───────────────────────────────────────
+function spawnChef(){
+  // Spawn from random edge
+  let x,y,vx,vy;
+  const edge=Math.floor(Math.random()*4);
+  const spd=CHEF_SPEED*(0.7+Math.random()*0.6);
+  if(edge===0){x=Math.random()*GW;y=GOAL_H+CHEF_R+10;vx=(Math.random()-0.5)*spd*2;vy=spd;}
+  else if(edge===1){x=GW-CHEF_R;y=GOAL_H+Math.random()*(GH-GOAL_H);vx=-spd;vy=(Math.random()-0.5)*spd;}
+  else if(edge===2){x=Math.random()*GW;y=GH-CHEF_R-10;vx=(Math.random()-0.5)*spd*2;vy=-spd;}
+  else{x=CHEF_R;y=GOAL_H+Math.random()*(GH-GOAL_H);vx=spd;vy=(Math.random()-0.5)*spd;}
+  chefs.push({x,y,vx,vy,wobble:0,hatBob:Math.random()*Math.PI*2});
+}
+
+function triggerGameOver(cx,cy){
+  if(gameOver) return;
+  gameOver=true;
+  showBurst(cx,cy,'😱 CHEF GOT YOU!!');
+  burst(cx,cy,'#ff4444');
+  sndMiss();
+  // Flash red then reset
+  setTimeout(()=>{
+    score=0; updateScore();
+    chefs=[]; donuts=[];
+    combo=0; gameOver=false;
+    nextChefSpawn=Date.now()+4000;
+    nextSpawn=Date.now()+2000;
+    showBurst(GW/2,GH/2,'START AGAIN!! 🍩');
+  },1200);
+}
+
+function spawnDonut(){
+  const type=DONUT_TYPES[Math.floor(Math.random()*DONUT_TYPES.length)];
+  // Surprise — bias away from last side
+  const fromLeft = Math.random() < (lastChute==='R' ? 0.65 : 0.35);
+  lastChute = fromLeft ? 'L' : 'R';
+  const chute = fromLeft ? CHUTE_L : CHUTE_R;
+  const jitter=(Math.random()-0.5)*24;
+  donuts.push({
+    x: chute.x + jitter,
+    y: DONUT_R+8,
+    vx: fromLeft ? (0.4+Math.random()*0.8) : -(0.4+Math.random()*0.8),
+    vy: 1.6+Math.random()*1.0,   // gentle balloon drop
+    r:DONUT_R,
+    type, fromLeft,
+    rotation:0,
+    rotSpeed:(Math.random()-0.5)*0.2,
+    alpha:1, scored:false, missing:false,
+  });
+  sndSpawn();
+}
+
+// ── PHYSICS UPDATE ────────────────────────────────────
+function updateDonuts(){
+  const now=Date.now();
+  if(now>=nextSpawn && donuts.filter(d=>!d.scored&&!d.missing).length<6){
+    spawnDonut();
+    nextSpawn=now+SPAWN_INTERVAL;
+  }
+
+  // ── CHEF UPDATE ──────────────────────────────────
+  if(!gameOver && Date.now()>=nextChefSpawn && chefs.length<4){
+    spawnChef();
+    nextChefSpawn=Date.now()+5000;
+  }
+  chefs.forEach(ch=>{
+    ch.x+=ch.vx; ch.y+=ch.vy;
+    // Bounce off walls
+    if(ch.x-CHEF_R<0){ch.x=CHEF_R;ch.vx=Math.abs(ch.vx);}
+    if(ch.x+CHEF_R>GW){ch.x=GW-CHEF_R;ch.vx=-Math.abs(ch.vx);}
+    if(ch.y-CHEF_R<GOAL_H+20){ch.y=GOAL_H+20+CHEF_R;ch.vy=Math.abs(ch.vy);}
+    if(ch.y+CHEF_R>GH-10){ch.y=GH-10-CHEF_R;ch.vy=-Math.abs(ch.vy);}
+    // Gentle random drift
+    if(Math.random()<0.015){ch.vx+=(Math.random()-0.5)*0.5;ch.vy+=(Math.random()-0.5)*0.5;}
+    // Cap speed
+    const spd=Math.hypot(ch.vx,ch.vy);
+    if(spd>CHEF_SPEED){ch.vx*=CHEF_SPEED/spd;ch.vy*=CHEF_SPEED/spd;}
+    if(spd<0.3){ch.vx+=(Math.random()-0.5)*0.4;ch.vy+=(Math.random()-0.5)*0.4;}
+    ch.wobble=(ch.wobble||0)+0.08;
+    // Check collision with player
+    const dist=Math.hypot(ch.x-mallet.x, ch.y-mallet.y);
+    if(dist<CHEF_R+PLAYER_R){ triggerGameOver(ch.x,ch.y); }
+  });
+
+  // Mallet smoothing
+  mallet.x+=(malletTarget.x-mallet.x)*0.45;
+  mallet.y+=(malletTarget.y-mallet.y)*0.45;
+  mallet.x=clamp(mallet.x, MALLET_R, GW-MALLET_R);
+  mallet.y=clamp(mallet.y, MALLET_R, GH-MALLET_R);
+
+  donuts.forEach(d=>{
+    if(d.scored||d.missing) return;
+
+    d.vx*=FRICTION; d.vy*=FRICTION;
+    d.vy+=GRAVITY;
+    d.x+=d.vx; d.y+=d.vy;
+    d.rotation+=d.rotSpeed;
+
+    // GOAL at TOP
+    if(d.y-d.r<GOAL_Y+GOAL_H && d.x>GOAL_X0 && d.x<GOAL_X1 && d.vy<0){
+      d.scored=true;
+      score++; combo++;
+      updateScore(); sndGoal();
+      showBurst(d.x, GOAL_Y+60, combo>=3?'🔥 COMBO x'+combo+'!!':'SWEET!!');
+      burst(d.x, GOAL_Y+40, d.type.glaze);
+      return;
+    }
+    // Ceiling (missed goal)
+    if(d.y-d.r<10){
+      d.y=10+d.r;
+      d.vy=Math.abs(d.vy)*BOUNCE;
+    }
+    // Floor bounce
+    if(d.y+d.r>GH-10){
+      d.y=GH-10-d.r;
+      d.vy=-Math.abs(d.vy)*BOUNCE;
+      d.vx*=0.88;
+      if(Math.abs(d.vy)<0.8 && Math.abs(d.vx)<0.8){ d.missing=true; combo=0; sndMiss(); }
+    }
+    // Left wall (chute side)
+    if(d.x-d.r<10){
+      d.x=10+d.r;
+      d.vx=Math.abs(d.vx)*BOUNCE;
+    }
+    // Right wall
+    if(d.x+d.r>GW-10){
+      d.x=GW-10-d.r;
+      d.vx=-Math.abs(d.vx)*BOUNCE;
+    }
+
+    // Mallet collision
+    const dx=d.x-mallet.x, dy=d.y-mallet.y;
+    const dist=Math.hypot(dx,dy);
+    const minD=d.r+MALLET_R;
+    if(dist<minD && dist>0.001){
+      const nx=dx/dist, ny=dy/dist;
+      d.x=mallet.x+nx*(minD+2);
+      d.y=mallet.y+ny*(minD+2);
+      const speed=Math.hypot(d.vx-0, d.vy-0);
+      const impulse=Math.max(8, speed*1.8+6);
+      d.vx=nx*impulse;
+      d.vy=ny*impulse-3;
+      d.rotSpeed=(Math.random()-0.5)*0.35;
+      sndHit();
+    }
+  });
+
+  // Clean up old scored/missing after fade
+  donuts=donuts.filter(d=>d.alpha>0.01);
+  donuts.forEach(d=>{
+    if(d.scored||d.missing) d.alpha-=0.06;
+  });
+}
+
+// ── SCORE UPDATE ──────────────────────────────────────
+function updateScore(){
+  const pill=document.getElementById('scorePill');
+  pill.textContent=score;
+  pill.style.animation='none';
+  void pill.offsetWidth;
+  pill.style.animation='scorePop 0.3s ease';
+}
+
+// ── BURST / PARTICLES ─────────────────────────────────
+const WORDS=['SWEET!!','YUMMY!!','SUGAR RUSH!!','TASTY!!','NOM NOM!!','DELISH!!'];
+function showBurst(x,y,text){
+  const el=document.createElement('div');
+  el.className='burst';
+  el.textContent=text||WORDS[Math.floor(Math.random()*WORDS.length)];
+  const r=canvas.getBoundingClientRect();
+  const scale=r.width/GW;
+  el.style.left=(r.left+x*scale)+'px';
+  el.style.top=(r.top+y*scale)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1100);
+}
+const EMOJIS=['🍩','✨','⭐','🎉','💫','🌟','🍬','🍭'];
+function burst(gx,gy,color){
+  const r=canvas.getBoundingClientRect();
+  const scale=r.width/GW;
+  const cx=r.left+gx*scale, cy=r.top+gy*scale;
+  for(let i=0;i<12;i++){
+    const p=document.createElement('div');
+    const isEmoji=Math.random()<0.45;
+    if(isEmoji){
+      p.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;font-size:${16+Math.random()*16}px;pointer-events:none;z-index:60;transform:translate(-50%,-50%)`;
+      p.textContent=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    } else {
+      const sz=5+Math.random()*10;
+      p.className='particle';
+      p.style.cssText=`left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;background:${color};transform:translate(-50%,-50%)`;
+    }
+    document.body.appendChild(p);
+    const ang=Math.random()*Math.PI*2, dist=40+Math.random()*90;
+    const dx=Math.cos(ang)*dist, dy=Math.sin(ang)*dist;
+    requestAnimationFrame(()=>{
+      p.style.transition='transform 0.6s cubic-bezier(.2,.8,.4,1),opacity 0.6s ease';
+      p.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(${0.3+Math.random()})`;
+      p.style.opacity='0';
+    });
+    setTimeout(()=>p.remove(),700);
+  }
+}
+
+// ── DRAWING ───────────────────────────────────────────
+function drawBackground(){
+  // Polka dot candy background
+  ctx.fillStyle='rgba(255,255,255,0.08)';
+  for(let x=0;x<GW;x+=60){
+    for(let y=0;y<GH;y+=60){
+      ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // Floor
+  const floorGrad=ctx.createLinearGradient(0,GH-18,0,GH);
+  floorGrad.addColorStop(0,'rgba(255,255,255,0.3)');
+  floorGrad.addColorStop(1,'rgba(255,180,220,0.5)');
+  ctx.fillStyle=floorGrad;
+  ctx.beginPath();
+  ctx.roundRect(0,GH-18,GW,18,8);
+  ctx.fill();
+}
+
+function drawOneChute(chute){
+  ctx.save();
+  const cx=chute.x;
+  const TW=58, TH=64;
+  const x0=cx-TW/2;
+
+  // Rainbow stripes — horizontal bands
+  const rainbow=['#ff0000','#ff7700','#ffee00','#00cc44','#2299ff','#8833ff','#ff44cc'];
+  const sh=TH/rainbow.length;
+  rainbow.forEach((col,i)=>{
+    ctx.fillStyle=col;
+    ctx.beginPath();
+    if(i===0) ctx.roundRect(x0,i*sh,TW,sh+2,{topLeft:10,topRight:10,bottomLeft:0,bottomRight:0});
+    else if(i===rainbow.length-1) ctx.roundRect(x0,i*sh,TW,sh,{topLeft:0,topRight:0,bottomLeft:10,bottomRight:10});
+    else ctx.rect(x0,i*sh,TW,sh+1);
+    ctx.fill();
+  });
+
+  // Sheen overlay on tube
+  const sheen=ctx.createLinearGradient(x0,0,x0+TW,0);
+  sheen.addColorStop(0,'rgba(255,255,255,0.35)');
+  sheen.addColorStop(0.4,'rgba(255,255,255,0.08)');
+  sheen.addColorStop(1,'rgba(0,0,0,0.12)');
+  ctx.fillStyle=sheen;
+  ctx.beginPath();
+  ctx.roundRect(x0,0,TW,TH,10);
+  ctx.fill();
+
+  // Tube outline
+  ctx.strokeStyle='rgba(255,255,255,0.8)';
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.roundRect(x0,0,TW,TH,10);
+  ctx.stroke();
+
+  // Rainbow opening rings at bottom
+  const ry=TH+4;
+  const radii=[TW/2, TW/2-5, TW/2-10, TW/2-15];
+  rainbow.slice(0,4).forEach((col,i)=>{
+    ctx.strokeStyle=col;
+    ctx.lineWidth=4-i;
+    ctx.beginPath();
+    ctx.ellipse(cx, ry, radii[i], 8-i*1.5, 0, 0, Math.PI*2);
+    ctx.stroke();
+  });
+
+  // Spinning sparkle
+  const t=Date.now()/600;
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  [0,1,2,3].forEach(i=>{
+    const a=t+i*Math.PI/2;
+    ctx.beginPath();
+    ctx.arc(cx+Math.cos(a)*18, TH*0.45+Math.sin(a)*10, 2.5, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  ctx.restore();
+}
+function drawChute(){
+  drawOneChute(CHUTE_L);
+  drawOneChute(CHUTE_R);
+}
+
+function drawGoal(){
+  // Goal net at TOP
+  ctx.save();
+  const gw=GOAL_X1-GOAL_X0;
+  // glow
+  const gg=ctx.createLinearGradient(0,GOAL_Y,0,GOAL_Y+GOAL_H);
+  gg.addColorStop(0,'rgba(255,220,0,0.35)');
+  gg.addColorStop(1,'rgba(255,100,180,0.08)');
+  ctx.fillStyle=gg;
+  ctx.fillRect(GOAL_X0,GOAL_Y,gw,GOAL_H);
+  // net lines
+  ctx.strokeStyle='rgba(255,255,255,0.38)';ctx.lineWidth=1.5;
+  for(let y=GOAL_Y;y<=GOAL_Y+GOAL_H;y+=16){
+    ctx.beginPath();ctx.moveTo(GOAL_X0,y);ctx.lineTo(GOAL_X1,y);ctx.stroke();
+  }
+  for(let x=GOAL_X0;x<=GOAL_X1;x+=20){
+    ctx.beginPath();ctx.moveTo(x,GOAL_Y);ctx.lineTo(x,GOAL_Y+GOAL_H);ctx.stroke();
+  }
+  // posts
+  ctx.strokeStyle='rgba(255,255,255,0.95)';
+  ctx.lineWidth=5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(GOAL_X0,GOAL_Y);ctx.lineTo(GOAL_X0,GOAL_Y+GOAL_H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(GOAL_X1,GOAL_Y);ctx.lineTo(GOAL_X1,GOAL_Y+GOAL_H);ctx.stroke();
+  // bottom bar of goal (opening faces DOWN)
+  ctx.beginPath();ctx.moveTo(GOAL_X0,GOAL_Y+GOAL_H-2);ctx.lineTo(GOAL_X1,GOAL_Y+GOAL_H-2);ctx.stroke();
+  // label
+  ctx.font='bold 13px Bebas Neue';
+  ctx.fillStyle='rgba(255,215,0,0.95)';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('⬆ SHOOT UP HERE ⬆', GW/2, GOAL_Y+GOAL_H+16);
+  ctx.restore();
+}
+
+function drawChef(ch){
+  ctx.save();
+  ctx.translate(ch.x, ch.y);
+  const bob=Math.sin(ch.wobble)*4;
+  const t=Date.now()/800;
+
+  // Shadow
+  ctx.fillStyle='rgba(0,0,0,0.15)';
+  ctx.beginPath();ctx.ellipse(2,CHEF_R+6,CHEF_R*0.7,8,0,0,Math.PI*2);ctx.fill();
+
+  // Belly
+  ctx.fillStyle='#fff8ee';
+  ctx.beginPath();ctx.arc(0,6+bob,CHEF_R,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(200,150,80,0.4)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(0,6+bob,CHEF_R,0,Math.PI*2);ctx.stroke();
+
+  // Apron
+  ctx.fillStyle='#fff';
+  ctx.strokeStyle='rgba(200,180,160,0.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(-14,2+bob,28,26,6);ctx.fill();ctx.stroke();
+  // Apron strings
+  ctx.strokeStyle='rgba(180,160,140,0.6)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(-14,4+bob);ctx.lineTo(-20,-4+bob);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(14,4+bob);ctx.lineTo(20,-4+bob);ctx.stroke();
+
+  // Head
+  const headY=-CHEF_R*0.55+bob;
+  ctx.fillStyle='#ffdbb5';
+  ctx.beginPath();ctx.arc(0,headY,CHEF_R*0.65,0,Math.PI*2);ctx.fill();
+
+  // Chef HAT
+  const hy=headY-CHEF_R*0.55;
+  // hat brim
+  ctx.fillStyle='#ffffff';
+  ctx.beginPath();ctx.roundRect(-20,hy-2,40,10,4);ctx.fill();
+  ctx.strokeStyle='rgba(200,200,200,0.7)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(-20,hy-2,40,10,4);ctx.stroke();
+  // hat body (tall puffy)
+  const hatH=28+Math.sin(ch.hatBob+t)*3;
+  ctx.fillStyle='#fff';
+  ctx.beginPath();
+  ctx.moveTo(-14,hy);
+  ctx.bezierCurveTo(-16,hy-hatH/2,-15,hy-hatH,-8,hy-hatH);
+  ctx.bezierCurveTo(-2,hy-hatH-4, 2,hy-hatH-4, 8,hy-hatH);
+  ctx.bezierCurveTo(15,hy-hatH, 16,hy-hatH/2, 14,hy);
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle='rgba(200,200,200,0.5)';ctx.lineWidth=1.5;ctx.stroke();
+
+  // Eyes (beady villain eyes)
+  ctx.fillStyle='#333';
+  [-8,8].forEach(ex=>{
+    ctx.beginPath();ctx.ellipse(ex,headY-3,4.5,5,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(ex+1.5,headY-4.5,1.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#333';
+  });
+
+  // Eyebrows (villainous)
+  ctx.strokeStyle='#5a3000';ctx.lineWidth=2.5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-13,headY-10);ctx.lineTo(-4,headY-8);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(13,headY-10);ctx.lineTo(4,headY-8);ctx.stroke();
+
+  // Moustache
+  ctx.fillStyle='#5a3000';
+  ctx.beginPath();ctx.ellipse(-6,headY+6,6,4,-0.3,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(6,headY+6,6,4,0.3,0,Math.PI*2);ctx.fill();
+
+  // Arms holding ladle/spoon
+  ctx.strokeStyle='#ffdbb5';ctx.lineWidth=8;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-CHEF_R+2,2+bob);ctx.lineTo(-CHEF_R-10,-8+bob);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(CHEF_R-2,2+bob);ctx.lineTo(CHEF_R+10,-8+bob);ctx.stroke();
+  // Spoon in right hand
+  ctx.strokeStyle='#ccc';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(CHEF_R+10,-8+bob);ctx.lineTo(CHEF_R+22,-20+bob);ctx.stroke();
+  ctx.fillStyle='#ddd';
+  ctx.beginPath();ctx.ellipse(CHEF_R+24,-23+bob,6,5,-0.5,0,Math.PI*2);ctx.fill();
+
+  // Warning glow pulsing red around chef
+  const pulse=0.3+Math.sin(t*4)*0.2;
+  ctx.strokeStyle=`rgba(255,50,50,${pulse})`;
+  ctx.lineWidth=3;
+  ctx.setLineDash([6,4]);
+  ctx.beginPath();ctx.arc(0,bob,CHEF_R+10,0,Math.PI*2);ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.restore();
+}
+
+function drawDonut(d){
+  ctx.save();
+  ctx.globalAlpha=d.alpha;
+  ctx.translate(d.x,d.y);
+  ctx.rotate(d.rotation);
+
+  const outerR=d.r;
+  const innerR=d.r*0.4;
+
+  // Shadow
+  ctx.shadowColor='rgba(0,0,0,0.25)';
+  ctx.shadowBlur=12;
+  ctx.shadowOffsetY=4;
+
+  // Donut body
+  ctx.beginPath();
+  ctx.arc(0,0,outerR,0,Math.PI*2);
+  ctx.arc(0,0,innerR,0,Math.PI*2,true);
+  ctx.fillStyle=d.type.glaze;
+  ctx.fill();
+
+  ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+
+  // Glaze sheen
+  const gl=ctx.createRadialGradient(-outerR*0.3,-outerR*0.3,0,0,0,outerR);
+  gl.addColorStop(0,'rgba(255,255,255,0.55)');
+  gl.addColorStop(0.5,'rgba(255,255,255,0.12)');
+  gl.addColorStop(1,'rgba(0,0,0,0.08)');
+  ctx.beginPath();
+  ctx.arc(0,0,outerR,0,Math.PI*2);
+  ctx.arc(0,0,innerR,0,Math.PI*2,true);
+  ctx.fillStyle=gl;
+  ctx.fill();
+
+  // Ring outline
+  ctx.strokeStyle=d.type.ring;
+  ctx.lineWidth=3;
+  ctx.beginPath();ctx.arc(0,0,outerR,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,innerR,0,Math.PI*2);ctx.stroke();
+
+  // Sprinkles
+  const sprinkleColors=['#ff4db8','#ff8c00','#ffe600','#00cc55','#0099ff','#cc44ff'];
+  for(let i=0;i<6;i++){
+    const ang=(i/6)*Math.PI*2+d.rotation*0.3;
+    const sr=outerR*0.68;
+    const sx=Math.cos(ang)*sr, sy=Math.sin(ang)*sr;
+    ctx.save();
+    ctx.translate(sx,sy);
+    ctx.rotate(ang+Math.PI*0.5);
+    ctx.fillStyle=sprinkleColors[i];
+    ctx.beginPath();
+    ctx.roundRect(-2,-5,4,10,2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Hole shine
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  ctx.beginPath();ctx.arc(0,0,innerR-2,0,Math.PI*2);ctx.fill();
+
+  ctx.restore();
+}
+
+function drawMallet(){
+  ctx.save();
+  ctx.translate(mallet.x, mallet.y);
+  const t=Date.now()/1000;
+  const bob=Math.sin(t*3)*2; // gentle bounce
+
+  // ── Shadow ──
+  ctx.fillStyle='rgba(0,0,0,0.18)';
+  ctx.beginPath();
+  ctx.ellipse(3,PLAYER_R+4,PLAYER_R*0.85,10,0,0,Math.PI*2);
+  ctx.fill();
+
+  // ── BIG BELLY (lower circle) ──
+  const bellyR=PLAYER_R+4;
+  const bellyG=ctx.createRadialGradient(-8,-4+bob,4,0,4+bob,bellyR);
+  bellyG.addColorStop(0,'#ffe0f5');
+  bellyG.addColorStop(0.5,'#ff9de2');
+  bellyG.addColorStop(1,'#ff4db8');
+  ctx.fillStyle=bellyG;
+  ctx.beginPath();
+  ctx.arc(0,8+bob,bellyR,0,Math.PI*2);
+  ctx.fill();
+
+  // Belly highlight
+  ctx.fillStyle='rgba(255,255,255,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(-10,-2+bob,14,10,Math.PI*0.3,0,Math.PI*2);
+  ctx.fill();
+
+  // Belly button
+  ctx.strokeStyle='rgba(255,100,180,0.6)';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.arc(0,12+bob,4,0,Math.PI*2);
+  ctx.stroke();
+
+  // ── HEAD ──
+  const headY=-PLAYER_R*0.6+bob;
+  const headR=PLAYER_R*0.72;
+  const headG=ctx.createRadialGradient(-6,headY-6,2,0,headY,headR);
+  headG.addColorStop(0,'#ffe8f7');
+  headG.addColorStop(0.6,'#ffb3e0');
+  headG.addColorStop(1,'#ff6ec0');
+  ctx.fillStyle=headG;
+  ctx.beginPath();
+  ctx.arc(0,headY,headR,0,Math.PI*2);
+  ctx.fill();
+
+  // Head shine
+  ctx.fillStyle='rgba(255,255,255,0.4)';
+  ctx.beginPath();
+  ctx.ellipse(-9,headY-10,8,6,Math.PI*0.3,0,Math.PI*2);
+  ctx.fill();
+
+  // ── EYES ──
+  const eyeY=headY-4;
+  [-10,10].forEach(ex=>{
+    // white
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.ellipse(ex,eyeY,8,9,0,0,Math.PI*2);ctx.fill();
+    // iris
+    ctx.fillStyle='#5533ff';
+    ctx.beginPath();ctx.ellipse(ex+1,eyeY+1,5,6,0,0,Math.PI*2);ctx.fill();
+    // pupil
+    ctx.fillStyle='#111';
+    ctx.beginPath();ctx.ellipse(ex+1.5,eyeY+1.5,3,3.5,0,0,Math.PI*2);ctx.fill();
+    // sparkle
+    ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.arc(ex+3,eyeY-1,1.5,0,Math.PI*2);ctx.fill();
+  });
+
+  // ── ROSY CHEEKS ──
+  ctx.fillStyle='rgba(255,100,160,0.3)';
+  ctx.beginPath();ctx.ellipse(-18,headY+5,9,6,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(18,headY+5,9,6,0,0,Math.PI*2);ctx.fill();
+
+  // ── BIG SMILE ──
+  ctx.strokeStyle='#cc2277';ctx.lineWidth=3;ctx.lineCap='round';
+  ctx.beginPath();
+  ctx.arc(0,headY+5,10,0.2,Math.PI-0.2);
+  ctx.stroke();
+
+  // Tongue
+  ctx.fillStyle='#ff6699';
+  ctx.beginPath();ctx.ellipse(0,headY+14,5,4,0,0,Math.PI*2);ctx.fill();
+
+  // ── LITTLE ARMS ──
+  ctx.strokeStyle='#ff6ec0';ctx.lineWidth=9;ctx.lineCap='round';
+  // Left arm raised up slightly
+  ctx.beginPath();ctx.moveTo(-PLAYER_R+4,4+bob);ctx.lineTo(-PLAYER_R-12,-10+bob);ctx.stroke();
+  // Right arm
+  ctx.beginPath();ctx.moveTo(PLAYER_R-4,4+bob);ctx.lineTo(PLAYER_R+12,-10+bob);ctx.stroke();
+  // Hands (small circles)
+  ctx.fillStyle='#ffb3e0';
+  ctx.beginPath();ctx.arc(-PLAYER_R-12,-14+bob,8,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(PLAYER_R+12,-14+bob,8,0,Math.PI*2);ctx.fill();
+
+  // ── LITTLE FEET ──
+  ctx.fillStyle='#ff4db8';
+  ctx.beginPath();ctx.ellipse(-14,PLAYER_R+12+bob,10,7,0.2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(14,PLAYER_R+12+bob,10,7,-0.2,0,Math.PI*2);ctx.fill();
+
+  ctx.restore();
+}
+
+// Countdown timer ring around chute
+let spawnProgress=0;
+function drawSpawnTimer(){
+  const now=Date.now();
+  const elapsed=now-(nextSpawn-SPAWN_INTERVAL);
+  spawnProgress=Math.min(1, elapsed/SPAWN_INTERVAL);
+  ctx.save();
+  ctx.strokeStyle='rgba(255,215,0,0.5)';
+  ctx.lineWidth=5;
+  ctx.lineCap='round';
+  ctx.beginPath();
+  // Glow ring on whichever chute fires next
+  const timerChute = lastChute==='L' ? CHUTE_R : CHUTE_L;
+  ctx.arc(timerChute.x, 46, 36, -Math.PI/2, -Math.PI/2 + spawnProgress*Math.PI*2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function draw(){
+  ctx.clearRect(0,0,GW,GH);
+  drawBackground();
+  drawChute();
+  drawSpawnTimer();
+  drawGoal();
+  donuts.forEach(drawDonut);
+  chefs.forEach(drawChef);
+  drawMallet();
+}
+
+// ── MAIN LOOP ─────────────────────────────────────────
+function loop(){
+  updateDonuts();
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// ── DESKTOP MOUSE ─────────────────────────────────────
+if(!isMobile){
+  canvas.addEventListener('mousemove',e=>{
+    const r=canvas.getBoundingClientRect();
+    malletTarget.x=(e.clientX-r.left)/r.width*GW;
+    malletTarget.y=(e.clientY-r.top)/r.height*GH;
+  });
+  canvas.addEventListener('mousedown',()=>ac());
+  canvas.style.cursor='none';
+}
+
+// ── MOBILE TRACKPAD ───────────────────────────────────
+let tpActive=false, tpLX=0, tpLY=0;
+const TPSENS=2.6;
+
+function moveDot(cx,cy){
+  const r=trackpad.getBoundingClientRect();
+  trackpadDot.style.left=(clamp(cx-r.left,8,r.width-8)-24)+'px';
+  trackpadDot.style.top=(clamp(cy-r.top,8,r.height-8)-24)+'px';
+}
+trackpad.addEventListener('pointerdown',e=>{
+  trackpad.setPointerCapture(e.pointerId);
+  tpActive=true; tpLX=e.clientX; tpLY=e.clientY;
+  moveDot(e.clientX,e.clientY); ac();
+},{passive:false});
+trackpad.addEventListener('pointermove',e=>{
+  if(!tpActive) return;
+  const dx=(e.clientX-tpLX)*TPSENS, dy=(e.clientY-tpLY)*TPSENS;
+  tpLX=e.clientX; tpLY=e.clientY;
+  const r=canvas.getBoundingClientRect();
+  malletTarget.x=clamp(malletTarget.x+dx*(GW/r.width), MALLET_R, GW-MALLET_R);
+  malletTarget.y=clamp(malletTarget.y+dy*(GH/r.height), MALLET_R, GH-MALLET_R);
+  moveDot(e.clientX,e.clientY);
+},{passive:false});
+trackpad.addEventListener('pointerup',()=>tpActive=false,{passive:true});
+trackpad.addEventListener('pointercancel',()=>tpActive=false,{passive:true});
+</script>
+</body>
+</html>
