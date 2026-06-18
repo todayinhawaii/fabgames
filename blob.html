@@ -101,38 +101,38 @@ function resize(){
 }
 window.addEventListener('resize',resize);resize();
 
-// ── AUDIO ───────────────────────────────────────────────
-// AC is ONLY created inside a user gesture — never before
-let AC = null;
+// ── AUDIO — same pattern as donut game (known working) ──
+const AC = new(window.AudioContext||window.webkitAudioContext)();
 
-function unlockAudio(){
-  if(AC && AC.state==='running') return;
-  try{
-    if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
-    AC.resume();
-    // Silent buffer to fully wake it up
-    const b=AC.createBuffer(1,1,AC.sampleRate),s=AC.createBufferSource();
-    s.buffer=b;s.connect(AC.destination);s.start(0);
-  }catch(e){ AC=null; }
+function ac(){
+  if(AC.state==='suspended') AC.resume();
+  return AC;
 }
-
-// Keep listeners permanent — each touch ensures AC stays running
-document.addEventListener('pointerdown',unlockAudio,{passive:true});
-document.addEventListener('touchstart',unlockAudio,{passive:true});
-document.addEventListener('click',unlockAudio,{passive:true});
+function kickAudio(){
+  try{
+    AC.resume().then(()=>{
+      const b=AC.createBuffer(1,1,AC.sampleRate),s=AC.createBufferSource();
+      s.buffer=b;s.connect(AC.destination);s.start(0);
+    });
+  }catch(e){}
+}
+['pointerdown','touchstart','mousedown','keydown'].forEach(ev=>{
+  document.addEventListener(ev,function u(){
+    kickAudio();
+    ['pointerdown','touchstart','mousedown','keydown'].forEach(e=>document.removeEventListener(e,u));
+  },{passive:true});
+});
 
 function osc(type,f0,f1,dur,vol){
-  // Bail if AC not ready — NO getAC() call, NO resume() here
-  if(!AC || AC.state!=='running') return;
   try{
-    const o=AC.createOscillator(),g=AC.createGain();
+    const a=ac(),o=a.createOscillator(),g=a.createGain();
     o.type=type;
-    o.frequency.setValueAtTime(f0,AC.currentTime);
-    if(f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,AC.currentTime+dur);
-    g.gain.setValueAtTime(vol,AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+dur);
-    o.connect(g);g.connect(AC.destination);
-    o.start();o.stop(AC.currentTime+dur+0.05);
+    o.frequency.setValueAtTime(f0,a.currentTime);
+    if(f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,a.currentTime+dur);
+    g.gain.setValueAtTime(vol,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+    o.connect(g);g.connect(a.destination);
+    o.start();o.stop(a.currentTime+dur+0.02);
   }catch(e){}
 }
 function sndEat(){
@@ -143,20 +143,19 @@ function sndEat(){
 function sndPop(){
   osc('sine',160,20,0.45,1.1);
   setTimeout(()=>osc('sine',440,55,0.35,0.8),25);
-  if(!AC||AC.state!=='running') return;
   try{
-    const buf=AC.createBuffer(1,AC.sampleRate*0.5,AC.sampleRate);
+    const a=ac();
+    const buf=a.createBuffer(1,a.sampleRate*0.5,a.sampleRate);
     const d=buf.getChannelData(0);
     for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/d.length*5);
-    const src=AC.createBufferSource(),g=AC.createGain();
+    const src=a.createBufferSource(),g=a.createGain();
     src.buffer=buf;
-    g.gain.setValueAtTime(1.3,AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.5);
-    src.connect(g);g.connect(AC.destination);src.start();
+    g.gain.setValueAtTime(1.3,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.5);
+    src.connect(g);g.connect(a.destination);src.start();
   }catch(e){}
 }
 function sndWhoosh(){osc('sine',600,120,0.5,0.3);}
-function kickAudio(){unlockAudio();}
 
 // ── BLOBBOY IMAGE ────────────────────────────────────────
 const blobImg=new Image();
@@ -482,7 +481,7 @@ if(!isMobile){
     blob.tx=(e.clientX-r.left)/r.width*GW;
     blob.ty=(e.clientY-r.top)/r.height*GH;
   });
-  canvas.addEventListener('mousedown',unlockAudio);
+  canvas.addEventListener('mousedown',kickAudio);
 }
 let tpActive=false,tpLX=0,tpLY=0;
 function moveDot(cx,cy){
@@ -490,7 +489,7 @@ function moveDot(cx,cy){
   tpDot.style.left=(Math.max(8,Math.min(r.width-8,cx-r.left))-22)+'px';
   tpDot.style.top=(Math.max(8,Math.min(r.height-8,cy-r.top))-22)+'px';
 }
-tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);unlockAudio();},{passive:false});
+tp.addEventListener('pointerdown',e=>{tp.setPointerCapture(e.pointerId);tpActive=true;tpLX=e.clientX;tpLY=e.clientY;moveDot(e.clientX,e.clientY);kickAudio();},{passive:false});
 tp.addEventListener('pointermove',e=>{
   if(!tpActive)return;
   const dx=(e.clientX-tpLX)*2.8,dy=(e.clientY-tpLY)*2.8;
