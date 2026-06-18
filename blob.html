@@ -105,24 +105,28 @@ window.addEventListener('resize',resize);resize();
 let AC=null;
 function ac(){
   if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)();
-  if(AC.state==='suspended') AC.resume();
+  if(AC.state!=='running') AC.resume();
   return AC;
 }
 function kickAudio(){
   try{
     const a=ac();
-    a.resume().then(()=>{
+    if(a.state==='suspended'){
+      a.resume().then(()=>{
+        const b=a.createBuffer(1,1,a.sampleRate),s=a.createBufferSource();
+        s.buffer=b;s.connect(a.destination);s.start(0);
+      });
+    } else {
       const b=a.createBuffer(1,1,a.sampleRate),s=a.createBufferSource();
       s.buffer=b;s.connect(a.destination);s.start(0);
-    });
+    }
   }catch(e){}
 }
-['pointerdown','touchstart','mousedown','keydown'].forEach(ev=>{
-  document.addEventListener(ev,function u(){
-    kickAudio();
-    ['pointerdown','touchstart','mousedown','keydown'].forEach(e=>document.removeEventListener(e,u));
-  },{passive:true});
-});
+// Keep listeners PERMANENT — every touch keeps AC alive
+document.addEventListener('pointerdown',kickAudio,{passive:true});
+document.addEventListener('touchstart',kickAudio,{passive:true});
+document.addEventListener('mousedown',kickAudio,{passive:true});
+document.addEventListener('keydown',kickAudio,{passive:true});
 
 function osc(type,f0,f1,dur,vol){
   try{
