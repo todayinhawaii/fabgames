@@ -71,9 +71,9 @@ const GAMES=[
    desc:'195 countries · 195 capitals · Can you name them all? Take the ultimate geography challenge!',
    color:'#0a0a20',href:'/capitals'},
 
-  {id:'jigsaw',title:'Jigsaw Puzzle Gallery',emoji:'🧩',
-   desc:'9 beautiful artworks · drag & drop pieces · snap to place · 4 difficulty levels!',
-   color:'#0d0d0f',href:'/jigsaw'},
+  {id:'jigsaw',emoji:'🧩',cat:'Puzzle · Art',title:'Jigsaw Puzzle',
+   desc:'Drag and snap a beautiful original artwork puzzle together! Easy, Medium, Hard or Expert — then discover hundreds more at jigsaw.games!',
+   color:'rgba(201,168,76,0.12)',href:'/jigsaw'},
 
   {id:'trash',emoji:'🧹',cat:'Arcade · Fun',title:'Pick Up The Trash!',
    desc:'Choose your hero and clean up the park or beach!! Pick up litter, dump it in the bins. Fun for all ages!!',
