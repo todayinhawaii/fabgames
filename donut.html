@@ -32,7 +32,7 @@ html,body{
   animation:warnPulse 2.5s ease-in-out infinite;
 }
 body.is-mobile #chefWarning{
-  top:auto;bottom:160px;
+  top:auto;bottom:47px;
   border-bottom:none;
   border-top:1.5px solid rgba(255,80,80,0.3);
 }
@@ -174,7 +174,7 @@ const trackpad=document.getElementById('trackpad');
 const trackpadDot=document.getElementById('trackpadDot');
 
 // Wider on desktop, portrait on mobile
-const GW = isMobile ? 480 : 860;
+const GW = isMobile ? window.innerWidth : 860;
 const GH = isMobile ? 780 : 580;
 
 function resize(){
