@@ -32,7 +32,7 @@ html,body{
   animation:warnPulse 2.5s ease-in-out infinite;
 }
 body.is-mobile #chefWarning{
-  top:auto;bottom:47px;
+  top:auto;bottom:123px;
   border-bottom:none;
   border-top:1.5px solid rgba(255,80,80,0.3);
 }
@@ -181,7 +181,7 @@ function resize(){
   const sw=stage.clientWidth;
   const tph=isMobile?130:0;
   const sh=stage.clientHeight-tph;
-  const scale=Math.min(sw/GW, sh/GH);
+  const scale=isMobile ? sw/GW : Math.min(sw/GW, sh/GH);
   canvas.style.width=(GW*scale)+'px';
   canvas.style.height=(GH*scale)+'px';
   const dpr=window.devicePixelRatio||1;
