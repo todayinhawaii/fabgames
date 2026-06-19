@@ -99,4 +99,8 @@ const GAMES=[
   {id:'blob',emoji:'🍦',cat:'Arcade · Fun',title:'Blobby Feast',
    desc:'Move Blobby to eat ice creams and cakes!! He grows bigger and bigger with every bite — until Prof. Popper floats in with his pin and POP!! How many treats can you eat??',
    color:'rgba(255,157,226,0.15)',href:'/blob'},
-];
+],
+
+  {id:'spinme',emoji:'🌍',cat:'Educational · Fun',title:'Spin Me',
+   desc:'Spin the globe and land on a city — discover amazing facts, flight times and world wonders from wherever you call home! 50 cities, real geography, Vegas roulette spin!',
+   url:'/spinme',hot:true};
