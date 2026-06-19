@@ -181,9 +181,15 @@ function resize(){
   const sw=stage.clientWidth;
   const tph=isMobile?130:0;
   const sh=stage.clientHeight-tph;
-  const scale=isMobile ? sw/GW : Math.min(sw/GW, sh/GH);
-  canvas.style.width=(GW*scale)+'px';
-  canvas.style.height=(GH*scale)+'px';
+  if(isMobile){
+    const scale=Math.min(sw/GW, sh/GH);
+    canvas.style.width=sw+'px';           // always fill full screen width
+    canvas.style.height=(GH*scale)+'px'; // height stays constrained so trackpad shows
+  } else {
+    const scale=Math.min(sw/GW, sh/GH);
+    canvas.style.width=(GW*scale)+'px';
+    canvas.style.height=(GH*scale)+'px';
+  }
   const dpr=window.devicePixelRatio||1;
   canvas.width=Math.round(GW*dpr);
   canvas.height=Math.round(GH*dpr);
