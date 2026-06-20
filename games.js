@@ -3,6 +3,41 @@
 // Both index.html and play.html load this file via <script src="/games.js"></script>
 
 const GAMES=[
+  // ── ROW 1 ──
+  {id:'donut',emoji:'🍩',cat:'Arcade · Fun',title:'Donut Dash',
+   desc:'Hit the falling donuts into the goal — but watch out for the mad chef!! He floats around and if he touches you, you lose ALL your points!! How high can you score??',
+   color:'rgba(255,157,226,0.15)',href:'/donut'},
+
+  {id:'blob',emoji:'🍦',cat:'Arcade · Fun',title:'Blob Boy',
+   desc:'Move Blob Boy to eat ice creams and cakes! He grows bigger and bigger with every bite — until Professor Popper shows up!!',
+   color:'rgba(255,157,226,0.15)',href:'/blob'},
+
+  {id:'learn-the-body',emoji:'🧠',cat:'Educational · Kids',title:'Learn The Body',
+   desc:'Tap any part of the boy or girl body to learn what it does! Switch to Quiz Mode to test yourself - fun for all ages!!',
+   color:'rgba(255,143,171,0.10)',href:'/learn-the-body'},
+
+  {emoji:'🎭',cat:'Fun · Personality',title:'Who Are You?',id:'whoareyou',
+   desc:'Find out which Hawaiian spirit animal you are. Fun for everyone!',
+   href:'/who-are-you',color:'rgba(236,72,153,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+
+  // ── ROW 2 ──
+  {emoji:'🎈',cat:'Arcade · Fun',title:'Pop That Balloon!',
+   desc:'Pop as many balloons as you can before time runs out!',
+   href:'/balloons',color:'rgba(234,179,8,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+
+  {id:'trash',emoji:'🧹',cat:'Arcade · Fun',title:'Pick Up The Trash!',
+   desc:'Choose your hero and clean up the park or beach!! Pick up litter, dump it in the bins. Fun for all ages!!',
+   color:'rgba(34,197,94,0.12)',href:'/trash'},
+
+  {id:'happy-buttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
+   desc:'Press the adorable squishy animal buttons for a satisfying ASMR experience!! 10 different sounds - pop, squish, boing and more. Just press and relax!!',
+   color:'rgba(255,183,197,0.15)',href:'/happy-buttons'},
+
+  {emoji:'🧠',cat:'Memory · Puzzle',title:'Aloha Memory Game',
+   desc:'This fun game is perfect for helping improve your memory for any age!',
+   href:'/memory',color:'rgba(59,130,246,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
+
+  // ── REST ──
   {emoji:'🎨',cat:'Art & Creativity',title:'Art Lab',
    desc:'Professional drawing app. Pencils, watercolour, oil paint, layers and more. Create and share your art.',
    href:'/artlab',color:'rgba(155,89,182,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
@@ -35,10 +70,6 @@ const GAMES=[
    desc:'Test your knowledge of the islands. History, culture, nature and more.',
    href:'/trivia',color:'rgba(244,114,182,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
-  {emoji:'🧠',cat:'Memory · Puzzle',title:'Aloha Memory Game',
-   desc:'This fun game is perfect for helping improve your memory for any age!',
-   href:'/memory',color:'rgba(59,130,246,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
-
   {emoji:'🔤',cat:'Word · Puzzle',title:'Hawaii Word Search',
    desc:'Find hidden Hawaiian words in this beautiful island word puzzle.',
    href:'/word-search',color:'rgba(245,158,11,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
@@ -47,17 +78,9 @@ const GAMES=[
    desc:'Fast-paced letter matching arcade game with Hawaiian words.',
    href:'/aloha-letters',color:'rgba(168,85,247,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
-  {emoji:'🎈',cat:'Arcade · Fun',title:'Pop That Balloon!',
-   desc:'Pop as many balloons as you can before time runs out!',
-   href:'/balloons',color:'rgba(234,179,8,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
-
   {emoji:'🔮',cat:'Fun · Social',title:'Fortune Roulette',
    desc:'Spin the wheel, discover your Hawaiian fortune. Share with friends!',
    href:'/fortune',color:'rgba(99,102,241,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
-
-  {emoji:'🎭',cat:'Fun · Personality',title:'Who Are You?',id:'whoareyou',
-   desc:'Find out which Hawaiian spirit animal you are. Fun for everyone!',
-   href:'/who-are-you',color:'rgba(236,72,153,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🧪',cat:'Creative · Art',title:'Slime Artists',
    desc:'Mix colours, create slime art. A messy, beautiful creative experience.',
@@ -75,30 +98,9 @@ const GAMES=[
    desc:'Drag and snap a beautiful original artwork puzzle together! Easy, Medium, Hard or Expert — then discover hundreds more at jigsaw.games!',
    color:'rgba(201,168,76,0.12)',href:'/jigsaw'},
 
-  {id:'trash',emoji:'🧹',cat:'Arcade · Fun',title:'Pick Up The Trash!',
-   desc:'Choose your hero and clean up the park or beach!! Pick up litter, dump it in the bins. Fun for all ages!!',
-   color:'rgba(34,197,94,0.12)',href:'/trash'},
-
   {id:'coloring',emoji:'🎨',cat:'Creative · Art',title:'Fab Coloring Book',
    desc:'20 beautiful pages! Pencil, crayon and watercolor brushes, zoom in to color the details, then save or share your masterpiece!!',
    color:'rgba(255,215,0,0.10)',href:'/coloring'},
-
-
-  {id:'learn-the-body',emoji:'🧠',cat:'Educational · Kids',title:'Learn The Body',
-   desc:'Tap any part of the boy or girl body to learn what it does! Switch to Quiz Mode to test yourself - fun for all ages!!',
-   color:'rgba(255,143,171,0.10)',href:'/learn-the-body'},
-
-  {id:'happy-buttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
-   desc:'Press the adorable squishy animal buttons for a satisfying ASMR experience!! 10 different sounds - pop, squish, boing and more. Just press and relax!!',
-   color:'rgba(255,183,197,0.15)',href:'/happy-buttons'},
-
-  {id:'donut',emoji:'🍩',cat:'Arcade · Fun',title:'Donut Dash',
-   desc:'Hit the falling donuts into the goal — but watch out for the mad chef!! He floats around and if he touches you, you lose ALL your points!! How high can you score??',
-   color:'rgba(255,157,226,0.15)',href:'/donut'},
-
-  {id:'blob',emoji:'🍦',cat:'Arcade · Fun',title:'Blob Boy',
-   desc:'Move Blob Boy to eat ice creams and cakes! He grows bigger and bigger with every bite — until Professor Popper shows up!!',
-   color:'rgba(255,157,226,0.15)',href:'/blob'},
 
   {id:'spinme',emoji:'🌍',cat:'Educational · Fun',title:'Spin Me',
    desc:'Spin the globe and land on a city — discover amazing facts, flight times and world wonders from wherever you call home! 50 cities, real geography, Vegas roulette spin!',
