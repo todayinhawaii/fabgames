@@ -501,6 +501,18 @@ footer{
 }
 #videoStrip::before{left:0;background:linear-gradient(to right,rgba(0,0,0,0.6),transparent);}
 #videoStrip::after{right:0;background:linear-gradient(to left,rgba(0,0,0,0.6),transparent);}
+/* ── PILLARS ── */
+.pillars-wrap{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:28px;padding:24px 0;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);}
+.pillar{position:relative;display:inline-flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:rgba(240,239,232,0.92);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);border-radius:40px;padding:11px 20px;animation:pillarRock 3.5s ease-in-out infinite;}
+.pillar:nth-child(2){animation-delay:0.5s;}
+.pillar:nth-child(3){animation-delay:1.0s;}
+.pillar:nth-child(4){animation-delay:1.5s;}
+.p-emoji{font-size:20px;}
+.p-hearts{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+.p-heart{position:absolute;font-size:15px;pointer-events:none;animation:pHeartFloat var(--phd) ease-out forwards;}
+@keyframes pillarRock{0%{transform:rotate(0deg);}20%{transform:rotate(2deg);}40%{transform:rotate(-1.5deg);}60%{transform:rotate(1deg);}80%{transform:rotate(-0.5deg);}100%{transform:rotate(0deg);}}
+@keyframes pHeartFloat{0%{opacity:var(--pho);transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-110px) scale(0.3);}}
+@media(max-width:600px){.pillar{font-size:12px;padding:9px 14px;}.p-emoji{font-size:17px;}}
 </style>
 </head>
 <body>
@@ -547,19 +559,11 @@ footer{
     <a href="/join" class="btn-secondary">🎁 Start Free Month</a>
     <a href="/join?tab=paid" class="btn-primary">Subscribe $4.99 / month</a>
   </div>
-  <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:28px;padding:20px 0;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">
-    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
-      💚 No violence or dark content
-    </div>
-    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
-      👨‍👩‍👧‍👦 Safe for all ages
-    </div>
-    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
-      🌺 Good vibes only
-    </div>
-    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
-      🧠 Brain friendly games
-    </div>
+  <div class="pillars-wrap">
+    <div class="pillar"><span class="p-emoji">💚</span> No Violence or Dark Content<div class="p-hearts"></div></div>
+    <div class="pillar"><span class="p-emoji">👨‍👩‍👧‍👦</span> Safe for All Ages<div class="p-hearts"></div></div>
+    <div class="pillar"><span class="p-emoji">🌺</span> Good Vibes Only<div class="p-hearts"></div></div>
+    <div class="pillar"><span class="p-emoji">🧠</span> Brain Friendly Games<div class="p-hearts"></div></div>
   </div>
 </div>
 <!-- FAMILY SAFE SECTION -->
@@ -853,6 +857,33 @@ if('serviceWorker' in navigator){
       document.getElementById('accountLi').style.display='';
     }
   }catch(e){console.log('Account check:',e);}
+})();
+</script>
+<script>
+// ── PILLAR HEARTS ─────────────────────────────────
+(function(){
+  var hearts=['❤️','🧡','💛','💚','💙','💜','🩷','🩵','💖','💗'];
+  document.querySelectorAll('.pillar').forEach(function(pillar,i){
+    setTimeout(function(){
+      function spawn(){
+        var container=pillar.querySelector('.p-hearts');
+        if(!container)return;
+        var h=document.createElement('span');
+        h.className='p-heart';
+        h.textContent=hearts[Math.floor(Math.random()*hearts.length)];
+        h.style.left=(10+Math.random()*70)+'%';
+        h.style.top='20%';
+        var dur=(1.2+Math.random()*0.8).toFixed(2)+'s';
+        var opa=(0.25+Math.random()*0.35).toFixed(2);
+        h.style.setProperty('--phd',dur);
+        h.style.setProperty('--pho',opa);
+        container.appendChild(h);
+        setTimeout(function(){h.remove();},parseFloat(dur)*1000);
+      }
+      spawn();
+      setInterval(spawn,900);
+    },1000+i*350);
+  });
 })();
 </script>
 </body>
