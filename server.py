@@ -395,6 +395,11 @@ def learn_the_body():
 def happy_buttons():
     return send_from_directory('.', 'happy_buttons.html')
 
+
+@app.route('/fun-with-numbers')
+def fun_with_numbers():
+    return send_from_directory('.', 'fun-with-numbers.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
