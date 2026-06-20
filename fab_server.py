@@ -335,6 +335,10 @@ def blob():
 def spinme():
     return send_from_directory('.', 'spinme.html')
 
+@app.route('/freegames')
+def freegames():
+    return send_from_directory('.', 'play.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
 # ── MIGRATED GAMES FROM TODAYINHAWAII ──────────────
