@@ -194,6 +194,24 @@ nav.scrolled{
   0%{opacity:0;transform:translateY(24px);}
   100%{opacity:1;transform:translateY(0);}
 }
+@keyframes logoRock{
+  0%{transform:rotate(0deg);}
+  20%{transform:rotate(6deg);}
+  40%{transform:rotate(-5deg);}
+  60%{transform:rotate(4deg);}
+  80%{transform:rotate(-3deg);}
+  100%{transform:rotate(0deg);}
+}
+@keyframes heartFloat{
+  0%{transform:translateY(0) scale(1);opacity:var(--ho);}
+  100%{transform:translateY(-180px) scale(0.4);opacity:0;}
+}
+.heart{
+  position:absolute;
+  font-size:22px;
+  animation:heartFloat var(--hd) ease-out forwards;
+  pointer-events:none;
+}
 /* ── SECTION COMMON ── */
 section{padding:100px 48px;max-width:1600px;margin:0 auto;}
 .section-badge{
@@ -516,7 +534,11 @@ footer{
 <div class="hero">
   <div class="hero-bg"></div>
   <div class="hero-line"></div>
-  <img src="/FAB.GAMES_LOGO.png" alt="fab.games" style="width:clamp(160px,28vw,320px);margin-bottom:28px;animation:fadeUp 0.8s 0.2s ease both;">
+  <!-- LOGO + HEARTS -->
+  <div id="logoWrap" style="position:relative;display:inline-block;margin-bottom:28px;">
+    <img src="/FAB.GAMES_LOGO.png" alt="fab.games" id="fabLogo" style="width:clamp(160px,28vw,320px);display:block;animation:fadeUp 0.8s 0.2s ease both,logoRock 4s 1.2s ease-in-out infinite;">
+    <div id="heartsContainer" style="position:absolute;inset:0;pointer-events:none;overflow:visible;"></div>
+  </div>
   <div class="hero-badge">Games · Family · World · Fun</div>
   <div class="hero-title">The World's Most <span>Fabulous</span></div>
   <div class="hero-title-games">Games</div>
@@ -774,6 +796,31 @@ GAMES.forEach(function(g,i){
   card.appendChild(overlay);
   grid.appendChild(card);
 });
+// ── FLOATING HEARTS ───────────────────────────────
+const heartsContainer=document.getElementById('heartsContainer');
+const heartColors=['❤️','🧡','💛','💚','💙','💜','🩷','🩵','🤍'];
+function spawnHeart(){
+  const h=document.createElement('span');
+  h.className='heart';
+  h.textContent=heartColors[Math.floor(Math.random()*heartColors.length)];
+  const logo=document.getElementById('fabLogo');
+  const w=logo.offsetWidth;
+  const ht=logo.offsetHeight;
+  // random position across the logo
+  h.style.left=(Math.random()*w)+'px';
+  h.style.top=(Math.random()*ht*0.6+ht*0.2)+'px';
+  const dur=(1.8+Math.random()*1.4).toFixed(2)+'s';
+  const opacity=(0.25+Math.random()*0.35).toFixed(2);
+  h.style.setProperty('--hd',dur);
+  h.style.setProperty('--ho',opacity);
+  heartsContainer.appendChild(h);
+  setTimeout(()=>h.remove(), parseFloat(dur)*1000);
+}
+// Start hearts after logo fades in
+setTimeout(()=>{
+  spawnHeart();
+  setInterval(spawnHeart, 600);
+}, 1400);
 // ── SMOOTH SCROLL ─────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
