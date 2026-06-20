@@ -35,8 +35,8 @@ const GAMES=[
    desc:'Test your knowledge of the islands. History, culture, nature and more.',
    href:'/trivia',color:'rgba(244,114,182,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
-  {emoji:'🧠',cat:'Memory · Puzzle',title:'Aloha Memory',
-   desc:'Match beautiful Hawaiian image pairs. Train your memory island style.',
+  {emoji:'🧠',cat:'Memory · Puzzle',title:'Aloha Memory Game',
+   desc:'This fun game is perfect for helping improve your memory for any age!',
    href:'/memory',color:'rgba(59,130,246,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
   {emoji:'🔤',cat:'Word · Puzzle',title:'Hawaii Word Search',
@@ -96,8 +96,8 @@ const GAMES=[
    desc:'Hit the falling donuts into the goal — but watch out for the mad chef!! He floats around and if he touches you, you lose ALL your points!! How high can you score??',
    color:'rgba(255,157,226,0.15)',href:'/donut'},
 
-  {id:'blob',emoji:'🍦',cat:'Arcade · Fun',title:'Blobby Feast',
-   desc:'Move Blobby to eat ice creams and cakes!! He grows bigger and bigger with every bite — until Prof. Popper floats in with his pin and POP!! How many treats can you eat??',
+  {id:'blob',emoji:'🍦',cat:'Arcade · Fun',title:'Blob Boy',
+   desc:'Move Blob Boy to eat ice creams and cakes! He grows bigger and bigger with every bite — until Professor Popper shows up!!',
    color:'rgba(255,157,226,0.15)',href:'/blob'},
 
   {id:'spinme',emoji:'🌍',cat:'Educational · Fun',title:'Spin Me',
