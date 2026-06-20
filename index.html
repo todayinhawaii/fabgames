@@ -685,6 +685,8 @@ window.addEventListener('scroll',()=>{
     src.src = '/'+vidId+'_video.mp4';
     src.type = 'video/mp4';
     v.appendChild(src);
+    // Force play as soon as possible — don't wait for browser autoplay queue
+    v.addEventListener('canplay', function(){ v.play().catch(function(){}); }, {once:true});
     return v;
   }
   // Build one set, then duplicate it for seamless loop
@@ -750,15 +752,27 @@ GAMES.forEach(function(g,i){
   const vid=document.createElement('video');
   vid.muted=true;vid.loop=true;vid.playsInline=true;
   vid.setAttribute('autoplay','');
-  vid.setAttribute('preload','metadata');
+  // First 6 cards preload fully; rest preload metadata to stay fast
+  vid.setAttribute('preload', i < 6 ? 'auto' : 'metadata');
   vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;z-index:0;';
   const vidId=g.id||(g.href||'').replace(/\//g,'');
   vid.innerHTML='<source src="/'+vidId+'_video.mp4" type="video/mp4">';
+  // Show on first frame — don't wait for full buffer
   vid.addEventListener('canplay',function(){
     this.style.opacity='1';
     bg.style.opacity='0.18';
     bg.style.zIndex='1';
   },{once:true});
+  // Force play as soon as card enters viewport
+  const cardObserver=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        vid.play().catch(function(){});
+        cardObserver.disconnect();
+      }
+    });
+  },{threshold:0.1});
+  cardObserver.observe(card);
     card.appendChild(vid);
   card.appendChild(bg);
   card.appendChild(badge);
