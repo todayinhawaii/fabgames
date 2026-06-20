@@ -337,7 +337,7 @@ def spinme():
 
 @app.route('/freegames')
 def freegames():
-    return send_from_directory('.', 'play.html')
+    return send_from_directory('.', 'freegames.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
