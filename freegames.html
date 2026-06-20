@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="fab.games">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <meta name="theme-color" content="#070708">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Play — fab.games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,600&family=Inter:wght@300;400;600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{--black:#050506;--card:#111114;--border:rgba(255,255,255,0.07);--gold:#c9a84c;--gold2:#e8c96a;--gold3:#fff3b0;--white:#f0efe8;--muted:rgba(240,239,232,0.45);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(201,168,76,0.015) 2px,rgba(201,168,76,0.015) 4px);pointer-events:none;z-index:1;}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.1;}50%{opacity:0.8;}}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:rgba(5,5,6,0.97);border-bottom:1px solid rgba(201,168,76,0.2);backdrop-filter:blur(20px);}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.nav-welcome{font-size:13px;font-weight:600;color:var(--muted);}
+.nav-welcome span{color:var(--gold2);}
+.hero{text-align:center;padding:60px 20px 50px;position:relative;z-index:2;}
+.hero-badge{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,10vw,96px);font-weight:300;line-height:0.95;margin-bottom:16px;}
+.hero-title em{font-style:italic;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-sub{font-size:15px;color:var(--muted);margin-bottom:32px;}
+.hero-line{width:120px;height:1px;margin:0 auto;background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),var(--gold),transparent);box-shadow:0 0 10px rgba(201,168,76,0.6);}
+.wrap{max-width:1400px;margin:0 auto;padding:40px 20px 100px;position:relative;z-index:2;}
+.section-label{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;display:flex;align-items:center;gap:16px;}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent);}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:3px;}
+
+
+/* ── GAMES GRID ── */
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  padding:8px 0;
+}
+@media(max-width:600px){
+  .games-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+}
+
+/* ── GLASS CARD 9×16 ── */
+.game-card{
+  position:relative;overflow:hidden;
+  aspect-ratio:9/16;
+  text-decoration:none;display:block;
+  border-radius:16px;
+  background:linear-gradient(
+    145deg,
+    rgba(255,255,255,0.10) 0%,
+    rgba(180,160,255,0.05) 40%,
+    rgba(100,180,255,0.04) 70%,
+    rgba(255,255,255,0.06) 100%
+  );
+  border:1px solid rgba(255,255,255,0.13);
+  border-top:1px solid rgba(255,255,255,0.22);
+  border-left:1px solid rgba(255,255,255,0.16);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.45),
+    0 0 50px rgba(201,168,76,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.1);
+  transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
+}
+/* Per-card warm glow behind */
+.game-card::before{
+  content:'';
+  position:absolute;inset:-20px;
+  background:radial-gradient(ellipse at 50% 65%,rgba(201,168,76,0.18),rgba(120,80,20,0.08) 55%,transparent 75%);
+  z-index:0;
+  pointer-events:none;
+}
+.game-card:hover{
+  transform:translateY(-6px) scale(1.02);
+  border-color:rgba(255,255,255,0.22);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.55),
+    0 0 50px rgba(201,168,76,0.13),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+}
+
+/* Background emoji */
+.game-card-bg{
+  position:absolute;inset:0;z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  font-size:80px;
+  opacity:0.15;
+  transition:all 0.5s ease;
+  filter:blur(1px);
+transition:opacity 0.8s;z-index:1;}
+.game-card:hover .game-card-bg{opacity:0.25;transform:scale(1.08);filter:blur(0);}
+
+/* Gradient overlay */
+.game-card-overlay{
+  position:absolute;inset:0;z-index:2;
+  background:linear-gradient(
+    to bottom,
+    rgba(4,4,8,0) 0%,
+    rgba(4,4,8,0.45) 45%,
+    rgba(4,4,8,0.92) 100%
+  );
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:16px 14px 14px;
+}
+
+.game-card-cat{
+  font-size:8px;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(201,168,76,0.7);margin-bottom:5px;font-weight:600;
+}
+.game-card-title{
+  font-family:'Inter',sans-serif;
+  font-size:16px;font-weight:700;line-height:1.3;
+  color:#fff;margin-bottom:7px;
+}
+.game-card-desc{
+  font-size:14px;color:rgba(255,255,255,0.80);
+  line-height:1.5;margin-bottom:12px;
+  display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+
+/* PLAY button — muted green, gold font, gold rim */
+.play-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 0;
+  background:rgba(30,80,50,0.55);
+  border:1px solid rgba(201,168,76,0.5);
+  border-radius:8px;
+  color:#c9a84c;
+  font-size:10px;font-weight:700;letter-spacing:2.5px;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;cursor:pointer;
+  box-shadow:0 1px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.06);
+  transition:all 0.22s;width:100%;margin-bottom:7px;
+  backdrop-filter:blur(4px);
+}
+.play-btn:hover{
+  background:rgba(40,100,60,0.7);
+  border-color:rgba(255,215,0,0.7);
+  color:#ffd700;
+  box-shadow:0 3px 14px rgba(0,0,0,0.3),0 0 10px rgba(201,168,76,0.15);
+  transform:translateY(-1px);
+}
+
+/* Add to Home Screen */
+.game-dl-btn{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:8px 0;
+  background:rgba(45,22,8,0.75);
+  border:1px solid rgba(201,168,76,0.4);
+  border-radius:8px;
+  color:#c9a84c;
+  font-size:9px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;cursor:pointer;width:100%;
+  transition:all 0.2s;
+  backdrop-filter:blur(4px);
+}
+.game-dl-btn:hover{
+  background:rgba(60,30,10,0.88);
+  border-color:rgba(255,215,0,0.65);
+  color:#ffd700;
+  box-shadow:0 2px 10px rgba(201,168,76,0.15);
+}
+
+/* Live badge */
+.live-badge{
+  position:absolute;top:10px;right:10px;z-index:3;
+  font-size:7px;letter-spacing:1.5px;text-transform:uppercase;
+  padding:3px 8px;
+  background:rgba(201,168,76,0.12);
+  border:1px solid rgba(201,168,76,0.3);
+  border-radius:20px;color:rgba(201,168,76,0.8);
+  font-weight:600;
+}
+
+.pwa-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  z-index:500;
+  padding:14px 20px;
+  background:rgba(7,7,8,0.97);
+  border-top:1px solid rgba(201,168,76,0.2);
+  backdrop-filter:blur(20px);
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.pwa-bar.show{display:flex;}
+.pwa-bar-text{
+  font-size:13px;color:rgba(240,239,232,0.7);
+  line-height:1.4;
+}
+.pwa-bar-text strong{color:#c9a84c;display:block;font-size:14px;margin-bottom:2px;}
+.pwa-install-btn{
+  flex-shrink:0;
+  padding:10px 20px;
+  background:linear-gradient(135deg,#c9a84c,#a87d2a);
+  color:#000;
+  border:none;
+  font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;
+  font-family:Inter,sans-serif;
+  border-radius:2px;
+  white-space:nowrap;
+  transition:all 0.2s;
+}
+.pwa-install-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,0.4);}
+.pwa-dismiss{
+  background:none;border:none;
+  color:rgba(240,239,232,0.3);
+  font-size:18px;cursor:pointer;
+  flex-shrink:0;padding:4px;
+}
+/* Per-card download button */
+.game-dl-btn{
+  display:flex;align-items:center;gap:5px;
+  margin-top:8px;
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(201,168,76,0.5);
+  background:none;border:none;cursor:pointer;
+  font-family:Inter,sans-serif;
+  transition:color 0.2s;
+  padding:0;
+}
+.game-dl-btn:hover{color:rgba(201,168,76,0.9);}
+.game-dl-btn svg{flex-shrink:0;}
+
+footer{text-align:center;padding:40px;border-top:1px solid rgba(201,168,76,0.1);font-size:11px;color:rgba(240,239,232,0.2);position:relative;z-index:2;}
+@media(max-width:768px){nav{padding:12px 16px;}.wrap{padding:20px 2px 80px;}.games-grid{grid-template-columns:repeat(2,1fr);gap:2px;}.hero{padding:40px 20px 30px;}}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<nav>
+  <a href="/" class="nav-logo">fab.games</a>
+  <div class="nav-welcome">Welcome <span id="welcomeName">Player</span>! 🌺</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">✦ Your Games Collection ✦</div>
+  <h1 class="hero-title">Let's<br><em>Play!</em></h1>
+  <p class="hero-sub">Every game is yours — pick one and have fun!!</p>
+  <div class="hero-line"></div>
+</div>
+
+<div class="wrap">
+  <div class="section-label">All Games</div>
+  <div class="games-grid" id="gamesGrid"></div>
+</div>
+
+<footer>© 2026 fab.games — Made with 🌺 in Hawaii · <a href="/" style="color:var(--gold);text-decoration:none;">Home</a></footer>
+
+<script src="/games.js"></script>
+<script>
+// Stars
+const sw=document.getElementById('stars');
+for(let i=0;i<80;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=0.5+Math.random()*2;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s;`;
+  sw.appendChild(s);
+}
+
+// Welcome name
+const n=localStorage.getItem('fabName')||'Player';
+document.getElementById('welcomeName').textContent=n.split(' ')[0];
+
+// Games
+
+
+const grid=document.getElementById('gamesGrid');
+GAMES.forEach(function(g,i){
+  const card=document.createElement('a');
+  card.href=g.href;
+  card.className='game-card';
+  card.style.textDecoration='none';
+  const bg=document.createElement('div');
+  bg.className='game-card-bg';
+  bg.style.background=g.color||'rgba(201,168,76,0.1)';
+  if(g.featured){
+    bg.style.cssText='display:flex;align-items:center;justify-content:center;background:'+(g.color||'')+';width:100%;height:100%;position:absolute;inset:0;font-size:0;';
+    bg.innerHTML='<svg width="60" height="60" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"><path d="M110 155 C108 140 104 120 100 100" stroke-width="1.2"/><path d="M110 155 C112 138 116 118 122 98" stroke-width="1.2"/><path d="M110 155 C110 138 110 118 110 96" stroke-width="1.1"/><circle cx="110" cy="78" r="18" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><circle cx="96" cy="108" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/><circle cx="108" cy="108" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/></g></svg>';
+  } else {
+    bg.textContent=g.emoji||'🎮';
+  }
+  const badge=document.createElement('div');
+  badge.className='live-badge';
+  badge.textContent='✦ Live';
+  const overlay=document.createElement('div');
+  overlay.className='game-card-overlay';
+  const cat=document.createElement('div');
+  cat.className='game-card-cat';
+  cat.textContent=g.cat||'';
+  const ttl=document.createElement('div');
+  ttl.className='game-card-title';
+  ttl.textContent=g.title;
+  ttl.style.animationDelay=(Math.random()*3)+'s';
+  const dsc=document.createElement('div');
+  dsc.className='game-card-desc';
+  dsc.textContent=g.desc||'';
+  const btn=document.createElement('div');
+  btn.className='play-btn';
+  btn.innerHTML='<span>▶ Play Now</span>';
+  const dl=document.createElement('button');
+  dl.className='game-dl-btn';
+  dl.innerHTML='⊕ Add to Home Screen';
+  dl.onclick=function(e){
+    e.preventDefault();e.stopPropagation();
+    if(window.deferredPrompt){
+      window.deferredPrompt.prompt();
+      window.deferredPrompt.userChoice.then(function(r){
+        if(r.outcome==='accepted'){dl.innerHTML='✓ Added!!';dl.style.color='rgba(74,222,128,0.8)';}
+        window.deferredPrompt=null;
+      });
+    } else {
+      dl.innerHTML='✓ Use browser + menu';
+      setTimeout(()=>{dl.innerHTML='⊕ Add to Home Screen';},2500);
+    }
+  };
+  overlay.appendChild(cat);
+  overlay.appendChild(ttl);
+  overlay.appendChild(dsc);
+  overlay.appendChild(btn);
+  overlay.appendChild(dl);
+// Video background
+  const vid=document.createElement('video');
+  vid.muted=true;vid.loop=true;vid.playsInline=true;
+  vid.setAttribute('autoplay','');
+  vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.8s;z-index:0;';
+  const vidId=g.id||(g.href||'').replace(/\//g,'');
+  vid.innerHTML='<source src="/'+vidId+'_video.mp4" type="video/mp4">';
+  vid.addEventListener('canplaythrough',function(){
+    this.style.opacity='1';
+    bg.style.opacity='0.18';
+    bg.style.zIndex='1';
+  },{once:true});
+    card.appendChild(vid);
+  card.appendChild(bg);
+  card.appendChild(badge);
+  card.appendChild(overlay);
+  grid.appendChild(card);
+});
+
+// Captain's secret link - no auth check needed! 🏴‍☠️
+</script>
+
+<!-- PWA Install Bar -->
+<div class="pwa-bar" id="pwaBar">
+  <div class="pwa-bar-text">
+    <strong>📲 Add fab.games to your home screen</strong>
+    All 13 games — one tap away, anytime!!
+  </div>
+  <button class="pwa-install-btn" id="pwaInstallBtn">Install Free</button>
+  <button class="pwa-dismiss" id="pwaDismiss" aria-label="Dismiss">✕</button>
+</div>
+
+<script>
+// ── SERVICE WORKER ─────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg=>console.log('[fab.games] SW registered:', reg.scope))
+      .catch(err=>console.log('[fab.games] SW failed:', err));
+  });
+}
+
+// ── PWA INSTALL PROMPT ─────────────────────────
+let deferredPrompt = null;
+const pwaBar = document.getElementById('pwaBar');
+const pwaBtn = document.getElementById('pwaInstallBtn');
+const pwaDismiss = document.getElementById('pwaDismiss');
+
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show bar after 3 seconds
+  setTimeout(()=>{ pwaBar.classList.add('show'); }, 3000);
+});
+
+pwaBtn.addEventListener('click', async ()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if(outcome === 'accepted'){
+    pwaBar.classList.remove('show');
+    pwaBtn.textContent = '✓ Added!!';
+  }
+  deferredPrompt = null;
+});
+
+pwaDismiss.addEventListener('click', ()=>{
+  pwaBar.classList.remove('show');
+  sessionStorage.setItem('pwaDismissed','1');
+});
+
+// Hide if already dismissed this session
+if(sessionStorage.getItem('pwaDismissed')) pwaBar.style.display='none';
+
+// Already installed check
+window.addEventListener('appinstalled', ()=>{
+  pwaBar.classList.remove('show');
+  console.log('[fab.games] PWA installed!!');
+});
+</script>
+</body>
+</html>
