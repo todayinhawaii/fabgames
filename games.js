@@ -19,7 +19,7 @@ const GAMES=[
    desc:'Flip the full 52-card deck across 2 rounds. Find every pair to win.',
    href:'/dolphins',color:'rgba(34,211,238,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
-  {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",
+  {emoji:'🌋',cat:'Arcade · Strategy',title:"Pele's Fury",id:'pelesfury',
    desc:"Stack the lava rocks, trigger eruptions. Hawaii's most explosive game.",
    href:'/peles-fury',color:'rgba(239,68,68,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
