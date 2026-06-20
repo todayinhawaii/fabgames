@@ -501,7 +501,54 @@ footer{
 }
 #videoStrip::before{left:0;background:linear-gradient(to right,rgba(0,0,0,0.6),transparent);}
 #videoStrip::after{right:0;background:linear-gradient(to left,rgba(0,0,0,0.6),transparent);}
-</style>
+/* ── PILLARS ── */
+.pillars-wrap{
+  display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
+  margin-top:28px;padding:24px 0;
+  border-top:1px solid rgba(255,255,255,0.06);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.pillar{
+  position:relative;
+  display:flex;align-items:center;gap:10px;
+  font-size:15px;font-weight:700;letter-spacing:0.4px;
+  color:rgba(240,239,232,0.92);
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:40px;
+  padding:12px 22px;
+  cursor:default;
+  animation:pillarRock 3.5s ease-in-out infinite;
+  overflow:visible;
+}
+.pillar:nth-child(2){animation-delay:0.5s;}
+.pillar:nth-child(3){animation-delay:1.0s;}
+.pillar:nth-child(4){animation-delay:1.5s;}
+.pillar-emoji{font-size:22px;}
+.pillar-hearts{position:absolute;inset:0;pointer-events:none;overflow:visible;}
+@keyframes pillarRock{
+  0%{transform:rotate(0deg);}
+  20%{transform:rotate(2.5deg);}
+  40%{transform:rotate(-2deg);}
+  60%{transform:rotate(1.5deg);}
+  80%{transform:rotate(-1deg);}
+  100%{transform:rotate(0deg);}
+}
+@keyframes pillarHeart{
+  0%{transform:translateY(0) scale(1);opacity:var(--pho);}
+  100%{transform:translateY(-130px) scale(0.2);opacity:0;}
+}
+.pillar-heart{
+  position:absolute;
+  font-size:16px;
+  animation:pillarHeart var(--phd) ease-out forwards;
+  pointer-events:none;
+  z-index:10;
+}
+@media(max-width:600px){
+  .pillars-wrap{gap:10px;}
+  .pillar{font-size:13px;padding:10px 16px;}
+}
 </head>
 <body>
 <!-- Custom cursor -->
@@ -547,18 +594,26 @@ footer{
     <a href="/join" class="btn-secondary">🎁 Start Free Month</a>
     <a href="/join?tab=paid" class="btn-primary">Subscribe $4.99 / month</a>
   </div>
-  <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:28px;padding:20px 0;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);">
-    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
-      💚 No violence or dark content
+  <div class="pillars-wrap">
+    <div class="pillar" data-hearts="💚🌿✨">
+      <span class="pillar-emoji">💚</span>
+      <span class="pillar-text">No Violence or Dark Content</span>
+      <div class="pillar-hearts"></div>
     </div>
-    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
-      👨‍👩‍👧‍👦 Safe for all ages
+    <div class="pillar" data-hearts="👨‍👩‍👧‍👦❤️🌟">
+      <span class="pillar-emoji">👨‍👩‍👧‍👦</span>
+      <span class="pillar-text">Safe for All Ages</span>
+      <div class="pillar-hearts"></div>
     </div>
-    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
-      🌺 Good vibes only
+    <div class="pillar" data-hearts="🌺💛🧡">
+      <span class="pillar-emoji">🌺</span>
+      <span class="pillar-text">Good Vibes Only</span>
+      <div class="pillar-hearts"></div>
     </div>
-    <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(240,239,232,0.55);letter-spacing:0.5px;">
-      🧠 Brain friendly games
+    <div class="pillar" data-hearts="🧠💙💜">
+      <span class="pillar-emoji">🧠</span>
+      <span class="pillar-text">Brain Friendly Games</span>
+      <div class="pillar-hearts"></div>
     </div>
   </div>
 </div>
@@ -821,6 +876,33 @@ setTimeout(()=>{
   spawnHeart();
   setInterval(spawnHeart, 600);
 }, 1400);
+// ── PILLAR HEARTS ─────────────────────────────────
+(function(){
+  const pillars=document.querySelectorAll('.pillar');
+  const allHearts=['❤️','🧡','💛','💚','💙','💜','🩷','🩵','🤍','💖','💗','💓'];
+  function spawnPillarHeart(pillar){
+    const container=pillar.querySelector('.pillar-hearts');
+    const h=document.createElement('span');
+    h.className='pillar-heart';
+    h.textContent=allHearts[Math.floor(Math.random()*allHearts.length)];
+    const pw=pillar.offsetWidth;
+    h.style.left=(Math.random()*pw*0.8+pw*0.1)+'px';
+    h.style.top='10px';
+    const dur=(1.2+Math.random()*1.0).toFixed(2)+'s';
+    const opacity=(0.3+Math.random()*0.4).toFixed(2);
+    h.style.setProperty('--phd',dur);
+    h.style.setProperty('--pho',opacity);
+    container.appendChild(h);
+    setTimeout(()=>h.remove(),parseFloat(dur)*1000);
+  }
+  // stagger each pillar's heart interval
+  pillars.forEach(function(pillar,i){
+    setTimeout(function(){
+      spawnPillarHeart(pillar);
+      setInterval(function(){ spawnPillarHeart(pillar); }, 900);
+    }, 800 + i*300);
+  });
+})();
 // ── SMOOTH SCROLL ─────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
