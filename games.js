@@ -55,7 +55,7 @@ const GAMES=[
    desc:'Spin the wheel, discover your Hawaiian fortune. Share with friends!',
    href:'/fortune',color:'rgba(99,102,241,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
-  {emoji:'🎭',cat:'Fun · Personality',title:'Who Are You?',
+  {emoji:'🎭',cat:'Fun · Personality',title:'Who Are You?',id:'whoareyou',
    desc:'Find out which Hawaiian spirit animal you are. Fun for everyone!',
    href:'/who-are-you',color:'rgba(236,72,153,0.12)',neon:'#ffd700',neonbg:'rgba(255,215,0,0.06)'},
 
@@ -84,11 +84,11 @@ const GAMES=[
    color:'rgba(255,215,0,0.10)',href:'/coloring'},
 
 
-  {id:'learnthebody',emoji:'🧠',cat:'Educational · Kids',title:'Learn The Body',
+  {id:'learn-the-body',emoji:'🧠',cat:'Educational · Kids',title:'Learn The Body',
    desc:'Tap any part of the boy or girl body to learn what it does! Switch to Quiz Mode to test yourself - fun for all ages!!',
    color:'rgba(255,143,171,0.10)',href:'/learn-the-body'},
 
-  {id:'happybuttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
+  {id:'happy-buttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
    desc:'Press the adorable squishy animal buttons for a satisfying ASMR experience!! 10 different sounds - pop, squish, boing and more. Just press and relax!!',
    color:'rgba(255,183,197,0.15)',href:'/happy-buttons'},
 
