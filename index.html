@@ -223,7 +223,7 @@ section{padding:100px 48px;max-width:1400px;margin:0 auto;}
   padding:8px 0;
 }
 @media(max-width:600px){
-  .games-grid{grid-template-columns:repeat(1,1fr);gap:8px;}
+  .games-grid{grid-template-columns:repeat(1,1fr);gap:18px;}
 }
 /* ── GLASS CARD 9×16 ── */
 .game-card{
@@ -453,7 +453,7 @@ footer{
 #videoTrack video{
   height:220px;width:auto;
   object-fit:cover;flex-shrink:0;
-  opacity:0.375;
+  opacity:0.28;
   min-width:120px;
 }
 @keyframes stripScroll{
@@ -678,7 +678,7 @@ window.addEventListener('scroll',()=>{
     const vidId = g.id || (g.href||'').replace(/\//g,'');
     const v = document.createElement('video');
     v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
-    v.setAttribute('preload','none');
+    v.setAttribute('preload','auto');
     v.onerror = function(){ this.style.display='none'; };
     const src = document.createElement('source');
     src.src = '/'+vidId+'_video.mp4';
@@ -749,10 +749,11 @@ GAMES.forEach(function(g,i){
   const vid=document.createElement('video');
   vid.muted=true;vid.loop=true;vid.playsInline=true;
   vid.setAttribute('autoplay','');
-  vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.8s;z-index:0;';
+  vid.setAttribute('preload','metadata');
+  vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;z-index:0;';
   const vidId=g.id||(g.href||'').replace(/\//g,'');
   vid.innerHTML='<source src="/'+vidId+'_video.mp4" type="video/mp4">';
-  vid.addEventListener('canplaythrough',function(){
+  vid.addEventListener('canplay',function(){
     this.style.opacity='1';
     bg.style.opacity='0.18';
     bg.style.zIndex='1';
