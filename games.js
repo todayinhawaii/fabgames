@@ -106,4 +106,8 @@ const GAMES=[
    desc:'Spin the globe and land on a city — discover amazing facts, flight times and world wonders from wherever you call home! 50 cities, real geography, Vegas roulette spin!',
    color:'rgba(74,176,255,0.15)',href:'/spinme'},
 
+  {id:'fun-with-numbers',emoji:'🔢',cat:'Educational · Kids',title:'Fun With Numbers',
+   desc:'Drag big chunky 3D numbers into their matching carved wooden holes! Perfect for kids and families. Numbers 0–100, Vegas celebrations and happy sounds!!',
+   color:'rgba(255,180,0,0.15)',href:'/fun-with-numbers'},
+
 ];
