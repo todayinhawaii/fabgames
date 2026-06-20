@@ -439,6 +439,55 @@ footer{
   font-size:10px;color:rgba(255,255,255,0.15);
   letter-spacing:1px;
 }
+
+/* ── VIDEO STRIP ─────────────────────────────────── */
+#videoStrip{
+  position:relative;width:100%;height:220px;
+  overflow:hidden;background:#000;flex-shrink:0;
+}
+#videoTrack{
+  display:flex;gap:6px;height:100%;
+  animation:stripScroll 90s linear infinite;
+  width:max-content;
+}
+#videoTrack video{
+  height:220px;width:auto;
+  object-fit:cover;flex-shrink:0;
+  opacity:0.5;
+  min-width:120px;
+}
+@keyframes stripScroll{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-50%);}
+}
+#videoStrip:hover #videoTrack{animation-play-state:paused;}
+#stripTitle{
+  position:absolute;inset:0;z-index:3;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  pointer-events:none;
+}
+#stripTitle .st-main{
+  font-size:clamp(22px,5vw,52px);
+  font-weight:900;
+  color:#fff;
+  letter-spacing:0.06em;
+  text-align:center;
+  line-height:1.1;
+  text-shadow:0 2px 20px rgba(0,0,0,0.8),0 0 40px rgba(0,0,0,0.5);
+  font-family:'Inter',sans-serif;
+}
+#stripTitle .st-main span{
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+/* left/right fade edges */
+#videoStrip::before,#videoStrip::after{
+  content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;
+}
+#videoStrip::before{left:0;background:linear-gradient(to right,rgba(0,0,0,0.6),transparent);}
+#videoStrip::after{right:0;background:linear-gradient(to left,rgba(0,0,0,0.6),transparent);}
 </style>
 </head>
 <body>
@@ -458,6 +507,64 @@ footer{
   </ul>
   <button class="nav-mobile-btn">☰</button>
 </nav>
+<!-- ── VIDEO STRIP ────────────────────────────── -->
+<div id="videoStrip">
+  <div id="videoTrack">
+    <video muted loop autoplay playsinline preload="none" src="/artlab_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/pinball_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/veggies_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/dolphins_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/turtle-checkers_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/mermaid-chess_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/trivia_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/memory_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/word-search_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/aloha-letters_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/balloons_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/fortune_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/whoareyou_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/slime_video.mp4" onerror="this.style.display='none'"></video>
+<video muted loop autoplay playsinline preload="none" src="/capitals_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/jigsaw_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/trash_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/coloring_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/learn-the-body_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/happy-buttons_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/donut_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/blob_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/spinme_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/pelesfury_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/artlab_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/pinball_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/veggies_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/dolphins_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/turtle-checkers_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/mermaid-chess_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/trivia_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/memory_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/word-search_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/aloha-letters_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/balloons_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/fortune_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/whoareyou_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/slime_video.mp4" onerror="this.style.display='none'"></video>
+<video muted loop autoplay playsinline preload="none" src="/capitals_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/jigsaw_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/trash_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/coloring_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/learn-the-body_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/happy-buttons_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/donut_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/blob_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/spinme_video.mp4" onerror="this.style.display='none'"></video>
+    <video muted loop autoplay playsinline preload="none" src="/pelesfury_video.mp4" onerror="this.style.display='none'"></video>
+    
+  </div>
+  <div id="stripTitle">
+    <div class="st-main">The World's Most <span>Fabulous</span> Games</div>
+  </div>
+</div>
+
 <!-- HERO -->
 <div class="hero">
   <div class="hero-bg"></div>
