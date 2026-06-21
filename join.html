@@ -417,9 +417,10 @@ const PLAN_PRICES = {
   bundle: '30 days free · then $7.99/month · Save $2/month!'
 };
 
-let selectedPlan = null;
-let supabase = null;
+var selectedPlan = null;
+var supabase = null;
 
+// Init supabase in background — doesn't block UI
 async function init(){
   try{
     const res = await fetch('/api/config');
