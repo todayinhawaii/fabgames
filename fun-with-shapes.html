@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Fun With Shapes! 🌈</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Nunito',sans-serif;
+  background:#0a0015;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── VEGAS NEON BACKGROUND ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(255,0,128,0.15), transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(0,200,255,0.15), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(128,0,255,0.1), transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(255,200,0,0.1), transparent 40%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:1;
+  text-align:center;
+  padding:16px 20px 8px;
+  border-bottom:2px solid rgba(255,255,255,0.05);
+  background:rgba(0,0,0,0.4);
+  backdrop-filter:blur(10px);
+}
+header h1{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(24px,5vw,42px);
+  background:linear-gradient(90deg,#ff0080,#ff8c00,#ffd700,#00ff88,#00cfff,#8000ff,#ff0080);
+  background-size:200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:rainbowShift 3s linear infinite;
+  text-shadow:none;
+  letter-spacing:2px;
+}
+@keyframes rainbowShift{0%{background-position:0%}100%{background-position:200%}}
+header p{color:rgba(255,255,255,0.6);font-size:13px;margin-top:4px;font-weight:700;}
+
+/* ── LEVEL BAR ── */
+.level-bar{
+  position:relative;z-index:1;
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.5);
+}
+.level-btn{
+  font-family:'Fredoka One',cursive;
+  font-size:16px;padding:10px 22px;
+  border:2px solid rgba(0,255,100,0.4);
+  border-radius:30px;cursor:pointer;
+  background:rgba(0,255,100,0.05);
+  color:rgba(255,255,255,0.85);
+  box-shadow:0 0 10px rgba(0,255,100,0.2);
+  transition:all 0.2s;
+}
+.level-btn:hover{transform:scale(1.08);border-color:rgba(255,255,255,0.4);}
+.level-btn.active{
+  background:linear-gradient(135deg,#ff0080,#8000ff);
+  color:#fff;border-color:transparent;
+  box-shadow:0 0 20px rgba(255,0,128,0.5);
+  transform:scale(1.08);
+}
+
+/* ── SCORE BAR ── */
+.score-bar{
+  position:relative;z-index:1;
+  display:flex;justify-content:center;gap:28px;
+  padding:8px 20px 10px;
+  background:rgba(0,0,0,0.3);
+}
+.sc{text-align:center;}
+.sc-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);font-weight:700;}
+.sc-val{font-family:'Fredoka One',cursive;font-size:26px;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.8);line-height:1.1;}
+
+/* ── GAME AREA ── */
+.game-area{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;
+  padding:16px 16px 40px;gap:20px;
+}
+
+/* ── PROGRESS ── */
+.prog-wrap{width:100%;max-width:500px;}
+.prog-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;margin-bottom:5px;}
+.prog-bar{height:12px;background:rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,#ff0080,#ffd700,#00ff88,#00cfff,#8000ff);border-radius:20px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);background-size:200%;}
+
+/* ── TARGET DISPLAY ── */
+.target-wrap{
+  background:rgba(0,0,0,0.4);
+  border:2px solid rgba(255,255,255,0.08);
+  border-radius:20px;
+  padding:12px 32px;
+  text-align:center;
+  backdrop-filter:blur(10px);
+}
+.target-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);font-weight:700;}
+.target-name{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(28px,6vw,48px);
+  color:#ffd700;
+  text-shadow:0 0 30px rgba(255,215,0,0.6);
+  line-height:1.2;
+}
+
+/* ── WOODEN BOARD ── */
+.board{
+  position:relative;
+  background:linear-gradient(160deg,#1a0530,#0d0020,#1a0530);
+  border-radius:24px;
+  padding:20px;
+  box-shadow:
+    0 0 0 3px rgba(255,0,128,0.3),
+    0 0 0 6px rgba(128,0,255,0.2),
+    0 0 0 9px rgba(0,200,255,0.1),
+    0 20px 60px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  max-width:700px;width:100%;
+}
+/* Neon corner glow */
+.board::before{
+  content:'';position:absolute;inset:-2px;
+  border-radius:26px;
+  background:linear-gradient(45deg,#ff0080,#8000ff,#00cfff,#00ff88,#ffd700,#ff0080);
+  background-size:300%;
+  animation:borderGlow 4s linear infinite;
+  z-index:-1;
+  filter:blur(4px);
+  opacity:0.6;
+}
+@keyframes borderGlow{0%{background-position:0%}100%{background-position:300%}}
+
+/* ── HOLES GRID ── */
+.holes-grid{
+  display:flex;flex-wrap:wrap;
+  gap:12px;justify-content:center;
+}
+
+/* ── HOLE ── */
+.hole{
+  width:150px;height:150px;
+  border-radius:20px;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.5);
+  border:4px dashed rgba(0,255,100,0.6);
+  animation:holePulse 1.2s ease-in-out infinite;
+  transition:background 0.3s;
+  cursor:pointer;
+}
+@keyframes holePulse{
+  0%,100%{border-color:rgba(0,255,100,0.4);box-shadow:0 0 15px rgba(0,255,100,0.2);}
+  50%{border-color:rgba(0,255,100,1);box-shadow:0 0 40px rgba(0,255,100,0.8),0 0 80px rgba(0,255,100,0.3);}
+}
+.hole.highlight{
+  border-color:#00ff64!important;
+  background:rgba(0,255,100,0.1);
+  box-shadow:0 0 60px rgba(0,255,100,0.9),0 0 120px rgba(0,255,100,0.4)!important;
+  transform:scale(1.08);
+  animation:none;
+}
+.hole.filled{
+  border-style:solid;
+  border-color:rgba(255,255,255,0.3);
+}
+.hole-shape{
+  width:90px;height:90px;
+  opacity:0.12;
+  transition:all 0.3s;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+.hole.filled .hole-shape{opacity:1;}
+.hole-label{
+  position:absolute;
+  top:-22px;left:50%;transform:translateX(-50%);
+  text-align:center;
+  font-size:11px;font-weight:900;letter-spacing:1px;
+  color:rgba(255,255,255,0.5);
+  text-transform:uppercase;
+  text-shadow:0 1px 4px rgba(0,0,0,0.8);
+  pointer-events:none;
+  white-space:nowrap;
+  z-index:2;
+}
+.hole.filled .hole-label{color:rgba(255,255,255,0.9);text-shadow:0 2px 8px rgba(0,0,0,0.6);}
+
+/* ── SCATTER FIELD ── */
+.scatter-field{
+  position:relative;
+  width:100%;max-width:700px;
+  min-height:180px;
+  background:rgba(0,0,0,0.3);
+  border:2px solid rgba(255,255,255,0.06);
+  border-radius:20px;
+  backdrop-filter:blur(5px);
+}
+.scatter-inner{
+  display:flex;flex-wrap:wrap;gap:10px;
+  padding:16px;
+  justify-content:center;align-items:center;
+}
+
+/* ── SHAPE TILES ── */
+.shape-tile{
+  width:132px;height:132px;
+  border-radius:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:grab;
+  user-select:none;
+  touch-action:none;
+  position:relative;
+  transition:filter 0.15s;
+  background:rgba(0,0,0,0.3);
+  border:2px solid rgba(255,255,255,0.08);
+  gap:6px;
+  animation:tileRock var(--rock-dur,3s) var(--rock-delay,0s) ease-in-out infinite;
+}
+@keyframes tileRock{
+  0%,100%{transform:rotate(0deg) translateY(0px);}
+  25%{transform:rotate(3deg) translateY(-4px);}
+  75%{transform:rotate(-3deg) translateY(-2px);}
+}
+.shape-tile svg{
+  width:75px;height:75px;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+  transition:filter 0.2s;
+}
+.shape-tile .tile-label{
+  font-size:12px;font-weight:700;letter-spacing:1px;
+  color:rgba(255,255,255,0.6);
+  text-transform:uppercase;
+}
+.shape-tile:hover{
+  border-color:rgba(255,255,255,0.35);
+  background:rgba(255,255,255,0.07);
+  filter:brightness(1.2) drop-shadow(0 0 20px currentColor);
+}
+.shape-tile:hover svg{filter:drop-shadow(0 8px 16px rgba(0,0,0,0.5)) brightness(1.2);}
+.shape-tile.dragging{
+  cursor:grabbing;
+  animation:none!important;
+  transform:translateY(-10px) rotate(5deg) scale(1.15)!important;
+  filter:drop-shadow(0 20px 30px rgba(0,0,0,0.6));
+  z-index:1000;
+  border-color:rgba(255,255,255,0.5);
+}
+
+/* ── CELEBRATE ── */
+.celebrate{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.75);
+  z-index:9999;opacity:0;pointer-events:none;
+  transition:opacity 0.3s;
+  backdrop-filter:blur(6px);
+}
+.celebrate.show{opacity:1;pointer-events:all;}
+.cel-box{
+  background:linear-gradient(145deg,#0d0020,#1a0530);
+  border-radius:28px;padding:36px 52px;
+  text-align:center;
+  box-shadow:
+    0 0 0 2px rgba(255,0,128,0.5),
+    0 0 0 4px rgba(128,0,255,0.3),
+    0 30px 80px rgba(0,0,0,0.6);
+  animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.cel-shape{font-size:80px;line-height:1;margin-bottom:8px;}
+.cel-name{
+  font-family:'Fredoka One',cursive;font-size:32px;
+  background:linear-gradient(90deg,#ff0080,#ffd700,#00ff88);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:6px;
+}
+.cel-msg{font-family:'Fredoka One',cursive;font-size:28px;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.8);}
+.cel-sub{font-size:14px;color:rgba(255,255,255,0.5);margin-top:6px;}
+.next-btn{
+  margin-top:20px;
+  font-family:'Fredoka One',cursive;font-size:18px;
+  padding:13px 36px;
+  background:linear-gradient(135deg,#ff0080,#8000ff);
+  color:#fff;border:none;border-radius:50px;cursor:pointer;
+  box-shadow:0 6px 0 #500040,0 8px 24px rgba(255,0,128,0.4);
+  transition:transform 0.1s;
+}
+.next-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #500040;}
+
+/* ── CONFETTI ── */
+.confetti-p{position:fixed;pointer-events:none;z-index:10000;animation:cFall var(--cd) ease-in forwards;}
+@keyframes cFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1;}100%{transform:translateY(105vh) rotate(900deg);opacity:0;}}
+
+/* ── SPARKLE ── */
+.sparkle{position:fixed;pointer-events:none;z-index:10000;font-size:20px;animation:sparklePop 0.8s ease-out forwards;}
+@keyframes sparklePop{0%{transform:scale(0);opacity:1;}60%{transform:scale(1.4);opacity:1;}100%{transform:scale(0.5) translateY(-50px);opacity:0;}}
+
+@keyframes popIn{0%{transform:scale(0.3);opacity:0;}100%{transform:scale(1);opacity:1;}}
+
+@media(max-width:480px){
+  .hole{width:120px;height:120px;}
+  .hole-shape{width:72px;height:72px;}
+  .shape-tile{width:108px;height:108px;}
+  .shape-tile svg{width:62px;height:62px;}
+  .cel-box{padding:24px 28px;}
+  .holes-grid{gap:8px;}
+  .scatter-inner{gap:8px;padding:12px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌈 Fun With Shapes! 🌈</h1>
+  <p>Drag each shape into its matching hole!</p>
+</header>
+
+<div class="level-bar" id="levelBar"></div>
+
+<div class="score-bar">
+  <div class="sc"><div class="sc-label">Score</div><div class="sc-val" id="score">0</div></div>
+  <div class="sc"><div class="sc-label">⭐ Best</div><div class="sc-val" id="best">0</div></div>
+  <div class="sc"><div class="sc-label">✅ Done</div><div class="sc-val" id="done">0</div></div>
+</div>
+
+<div class="game-area">
+  <div class="prog-wrap">
+    <div class="prog-label">Progress</div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="target-wrap">
+    <div class="target-label">Match This Shape</div>
+    <div class="target-name" id="targetName">?</div>
+  </div>
+
+  <div class="board">
+    <div class="holes-grid" id="holesGrid"></div>
+  </div>
+
+  <div class="scatter-field">
+    <div class="scatter-inner" id="scatterField"></div>
+  </div>
+</div>
+
+<!-- CELEBRATE -->
+<div class="celebrate" id="celebrate">
+  <div class="cel-box">
+    <div class="cel-shape" id="celShape">🌈</div>
+    <div class="cel-name" id="celName">Circle!</div>
+    <div class="cel-msg" id="celMsg">Amazing!!</div>
+    <div class="cel-sub" id="celSub">+10 points!</div>
+    <button class="next-btn" id="nextBtn">Next Shape! →</button>
+  </div>
+</div>
+
+<script>
+// ── SHAPES DATA ─────────────────────────────────
+const SHAPES = [
+  { id:'circle',    name:'Circle',       color:'#FF4444', light:'#FF8888', dark:'#AA0000',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="35%" cy="30%"><stop offset="0%" stop-color="LIGHT"/><stop offset="60%" stop-color="FILL"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><circle cx="50" cy="50" r="44" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><ellipse cx="38" cy="32" rx="12" ry="8" fill="rgba(255,255,255,0.35)" transform="rotate(-20,38,32)"/>`},
+  { id:'square',    name:'Square',       color:'#FF8C00', light:'#FFBB44', dark:'#AA5500',
+    svg:`<defs><linearGradient id="g_SHAPEID" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="LIGHT"/><stop offset="50%" stop-color="FILL"/><stop offset="100%" stop-color="DARK"/></linearGradient><filter id="sh_SHAPEID"><feDropShadow dx="4" dy="7" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><rect x="6" y="6" width="88" height="88" rx="10" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><rect x="12" y="10" width="40" height="18" rx="6" fill="rgba(255,255,255,0.3)"/>`},
+  { id:'triangle',  name:'Triangle',     color:'#FFD700', light:'#FFEE88', dark:'#AA8800',
+    svg:`<defs><linearGradient id="g_SHAPEID" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></linearGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><polygon points="50,6 94,94 6,94" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><polygon points="50,14 62,40 38,40" fill="rgba(255,255,255,0.3)"/>`},
+  { id:'rectangle', name:'Rectangle',    color:'#00CC44', light:'#44FF88', dark:'#007722',
+    svg:`<defs><linearGradient id="g_SHAPEID" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></linearGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><rect x="4" y="22" width="92" height="56" rx="10" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><rect x="10" y="26" width="38" height="14" rx="5" fill="rgba(255,255,255,0.3)"/>`},
+  { id:'oval',      name:'Oval',         color:'#4488FF', light:'#88BBFF', dark:'#0044BB',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="35%" cy="30%"><stop offset="0%" stop-color="LIGHT"/><stop offset="60%" stop-color="FILL"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><ellipse cx="50" cy="50" rx="46" ry="30" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><ellipse cx="34" cy="36" rx="12" ry="7" fill="rgba(255,255,255,0.35)"/>`},
+  { id:'star',      name:'Star',         color:'#AA44FF', light:'#DD88FF', dark:'#660099',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="50%" cy="40%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><polygon points="50,4 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><polygon points="50,12 57,30 68,30 60,42 64,60 50,50" fill="rgba(255,255,255,0.2)"/>`},
+  { id:'heart',     name:'Heart',        color:'#FF1493', light:'#FF66BB', dark:'#990055',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="40%" cy="30%"><stop offset="0%" stop-color="LIGHT"/><stop offset="60%" stop-color="FILL"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><path d="M50,85 C50,85 8,55 8,28 C8,15 18,6 30,6 C38,6 45,11 50,18 C55,11 62,6 70,6 C82,6 92,15 92,28 C92,55 50,85 50,85Z" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><path d="M28,14 C22,14 16,20 16,28 C16,22 22,16 28,14Z" fill="rgba(255,255,255,0.4)"/>`},
+  { id:'pentagon',  name:'Pentagon',     color:'#FF69B4', light:'#FFAAD4', dark:'#BB1166',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="50%" cy="35%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><polygon points="50,4 96,36 78,92 22,92 4,36" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><polygon points="50,12 70,28 62,50 38,50 30,28" fill="rgba(255,255,255,0.2)"/>`},
+  { id:'hexagon',   name:'Hexagon',      color:'#00BCD4', light:'#66EEFF', dark:'#006688',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="40%" cy="30%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><polygon points="50,4 93,27 93,73 50,96 7,73 7,27" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><polygon points="50,12 76,26 76,44 50,20" fill="rgba(255,255,255,0.2)"/>`},
+  { id:'diamond',   name:'Diamond',      color:'#00E5FF', light:'#88F8FF', dark:'#0088AA',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="50%" cy="30%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><polygon points="50,4 96,50 50,96 4,50" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><polygon points="50,12 70,40 50,32" fill="rgba(255,255,255,0.35)"/>`},
+  { id:'octagon',   name:'Octagon',      color:'#FF6B35', light:'#FFAA77', dark:'#AA3300',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="40%" cy="30%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><polygon points="30,4 70,4 96,30 96,70 70,96 30,96 4,70 4,30" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><polygon points="34,10 66,10 82,26 66,18 34,18" fill="rgba(255,255,255,0.25)"/>`},
+  { id:'crescent',  name:'Crescent',     color:'#9B59B6', light:'#CC88EE', dark:'#551177',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="60%" cy="30%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><path d="M70,10 C40,10 16,32 16,58 C16,84 40,96 60,92 C44,84 34,72 34,58 C34,38 50,22 70,18 C74,16 76,12 70,10Z" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/>`},
+  { id:'arrow',     name:'Arrow',        color:'#FF4081', light:'#FF88BB', dark:'#AA0044',
+    svg:`<defs><linearGradient id="g_SHAPEID" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></linearGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><polygon points="4,35 60,35 60,15 96,50 60,85 60,65 4,65" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><polygon points="8,38 56,38 56,20 66,30 56,20 56,38" fill="rgba(255,255,255,0.25)"/>`},
+  { id:'cross',     name:'Cross',        color:'#2196F3', light:'#77CCFF', dark:'#0055AA',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="50%" cy="50%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><path d="M35,4 L65,4 L65,35 L96,35 L96,65 L65,65 L65,96 L35,96 L35,65 L4,65 L4,35 L35,35 Z" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><rect x="38" y="6" width="24" height="14" rx="4" fill="rgba(255,255,255,0.25)"/>`},
+  { id:'semicircle',name:'Semicircle',   color:'#FF5722', light:'#FF9966', dark:'#AA2200',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="50%" cy="80%"><stop offset="0%" stop-color="LIGHT"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><path d="M6,54 A44,44 0 0,1 94,54 Z" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><path d="M18,54 A32,20 0 0,1 50,34 A32,20 0 0,0 18,54Z" fill="rgba(255,255,255,0.25)"/>`},
+  { id:'ring',      name:'Ring',         color:'#4CAF50', light:'#88EE88', dark:'#226622',
+    svg:`<defs><radialGradient id="g_SHAPEID" cx="35%" cy="30%"><stop offset="0%" stop-color="LIGHT"/><stop offset="60%" stop-color="FILL"/><stop offset="100%" stop-color="DARK"/></radialGradient><filter id="sh_SHAPEID"><feDropShadow dx="3" dy="6" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/></filter></defs><circle cx="50" cy="50" r="44" fill="url(#g_SHAPEID)" filter="url(#sh_SHAPEID)"/><circle cx="50" cy="50" r="26" fill="#0a0015"/><path d="M26,34 A24,24 0 0,1 50,28 A18,18 0 0,0 26,34Z" fill="rgba(255,255,255,0.3)"/>`},
+];
+
+// ── LEVELS ──────────────────────────────────────
+const LEVELS = [
+  { label:'Basic',    shapes:['circle','square','triangle','rectangle','star','heart'] },
+  { label:'Medium',   shapes:['circle','square','triangle','rectangle','star','heart','oval','pentagon','hexagon','diamond'] },
+  { label:'Advanced', shapes:['circle','square','triangle','rectangle','star','heart','oval','pentagon','hexagon','diamond','octagon','crescent','arrow','cross','semicircle','ring'] },
+  { label:'Expert',   shapes:SHAPES.map(s=>s.id) },
+];
+
+const PRAISES=['🌟 Superstar!!','🎰 JACKPOT!!','🏆 You got it!!','🌈 Brilliant!!','💫 Fantastic!!','🎊 WOW!!','🦄 Magic!!','🎯 Perfect!!','🚀 Rockstar!!','💖 Beautiful!!','⚡ Electric!!','🎆 Dazzling!!'];
+const CONFETTI=['#FF0080','#FFD700','#00FF88','#00CFFF','#8000FF','#FF8C00','#FF1493','#4488FF'];
+const SPARKLES=['✨','⭐','💫','🌟','⚡','🎇'];
+
+let curLevel=0, levelShapes=[], curIdx=0, curTarget=null;
+let score=0, best=parseInt(localStorage.getItem('fws_best')||'0'), doneCount=0;
+
+// Audio
+let actx=null;
+function ac(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();return actx;}
+
+function playCorrect(){
+  try{
+    const a=ac();
+    [[261,0],[329,0.1],[392,0.2],[523,0.3],[659,0.4],[784,0.5]].forEach(([f,t])=>{
+      const o=a.createOscillator(),g=a.createGain();
+      o.connect(g);g.connect(a.destination);
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,a.currentTime+t);
+      g.gain.linearRampToValueAtTime(0.25,a.currentTime+t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+t+0.35);
+      o.start(a.currentTime+t);o.stop(a.currentTime+t+0.4);
+    });
+    setTimeout(()=>{
+      try{
+        const a2=ac(),o=a2.createOscillator(),g=a2.createGain();
+        o.connect(g);g.connect(a2.destination);o.type='sine';
+        o.frequency.setValueAtTime(200,a2.currentTime);
+        o.frequency.exponentialRampToValueAtTime(1200,a2.currentTime+0.15);
+        o.frequency.exponentialRampToValueAtTime(800,a2.currentTime+0.3);
+        g.gain.setValueAtTime(0.3,a2.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001,a2.currentTime+0.4);
+        o.start();o.stop(a2.currentTime+0.45);
+      }catch(e){}
+    },550);
+  }catch(e){}
+}
+
+function playWrong(){
+  try{
+    const a=ac(),o=a.createOscillator(),g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.type='sawtooth';o.frequency.value=150;
+    g.gain.setValueAtTime(0.2,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.3);
+    o.start();o.stop(a.currentTime+0.3);
+  }catch(e){}
+}
+
+function playFanfare(){
+  try{
+    const a=ac();
+    [523,659,784,659,784,1047,784,1047,1319,1568].forEach((f,i)=>{
+      const o=a.createOscillator(),g=a.createGain();
+      o.connect(g);g.connect(a.destination);
+      o.type=i%2===0?'sine':'triangle';o.frequency.value=f;
+      g.gain.setValueAtTime(0,a.currentTime+i*0.09);
+      g.gain.linearRampToValueAtTime(0.22,a.currentTime+i*0.09+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+i*0.09+0.4);
+      o.start(a.currentTime+i*0.09);o.stop(a.currentTime+i*0.09+0.5);
+    });
+  }catch(e){}
+}
+
+function getShape(id){ return SHAPES.find(s=>s.id===id); }
+
+function makeSVG(shape, size=50, fillColor=null, uid=''){
+  if(fillColor){
+    // Hole ghost mode — simple solid fill
+    const S = 'stroke="rgba(255,255,255,0.7)" stroke-width="2.5"';
+    const ghostSVGs = {
+      circle:`<circle cx="50" cy="50" r="44" fill="FILL" ${S}/>`,
+      square:`<rect x="6" y="6" width="88" height="88" rx="10" fill="FILL" ${S}/>`,
+      triangle:`<polygon points="50,6 94,94 6,94" fill="FILL" ${S}/>`,
+      rectangle:`<rect x="4" y="22" width="92" height="56" rx="10" fill="FILL" ${S}/>`,
+      oval:`<ellipse cx="50" cy="50" rx="46" ry="30" fill="FILL" ${S}/>`,
+      star:`<polygon points="50,4 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="FILL" ${S}/>`,
+      heart:`<path d="M50,85 C50,85 8,55 8,28 C8,15 18,6 30,6 C38,6 45,11 50,18 C55,11 62,6 70,6 C82,6 92,15 92,28 C92,55 50,85 50,85Z" fill="FILL" ${S}/>`,
+      pentagon:`<polygon points="50,4 96,36 78,92 22,92 4,36" fill="FILL" ${S}/>`,
+      hexagon:`<polygon points="50,4 93,27 93,73 50,96 7,73 7,27" fill="FILL" ${S}/>`,
+      diamond:`<polygon points="50,4 96,50 50,96 4,50" fill="FILL" ${S}/>`,
+      octagon:`<polygon points="30,4 70,4 96,30 96,70 70,96 30,96 4,70 4,30" fill="FILL" ${S}/>`,
+      crescent:`<path d="M70,10 C40,10 16,32 16,58 C16,84 40,96 60,92 C44,84 34,72 34,58 C34,38 50,22 70,18 C74,16 76,12 70,10Z" fill="FILL" ${S}/>`,
+      arrow:`<polygon points="4,35 60,35 60,15 96,50 60,85 60,65 4,65" fill="FILL" ${S}/>`,
+      cross:`<path d="M35,4 L65,4 L65,35 L96,35 L96,65 L65,65 L65,96 L35,96 L35,65 L4,65 L4,35 L35,35 Z" fill="FILL" ${S}/>`,
+      semicircle:`<path d="M6,54 A44,44 0 0,1 94,54 Z" fill="FILL" ${S}/>`,
+      ring:`<circle cx="50" cy="50" r="44" fill="FILL" ${S}/><circle cx="50" cy="50" r="26" fill="#0a0015" stroke="rgba(255,255,255,0.7)" stroke-width="2.5"/>`,
+    };
+    const svg = (ghostSVGs[shape.id]||'').replace(/FILL/g, fillColor);
+    return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`;
+  }
+  // 3D mode
+  const id = uid || shape.id + '_' + Math.random().toString(36).slice(2,6);
+  let svg = shape.svg
+    .replace(/SHAPEID/g, id)
+    .replace(/FILL/g, shape.color)
+    .replace(/LIGHT/g, shape.light)
+    .replace(/DARK/g, shape.dark);
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`;
+}
+
+// ── BUILD LEVEL BAR ──────────────────────────────
+function buildLevelBar(){
+  const bar=document.getElementById('levelBar');
+  bar.innerHTML='';
+  LEVELS.forEach((lv,i)=>{
+    const b=document.createElement('button');
+    b.className='level-btn'+(i===curLevel?' active':'');
+    b.textContent=lv.label+' · '+lv.shapes.length+' shapes';
+    b.onclick=()=>setLevel(i);
+    bar.appendChild(b);
+  });
+}
+
+// ── SET LEVEL ────────────────────────────────────
+function setLevel(i){
+  curLevel=i;
+  const lv=LEVELS[i];
+  levelShapes=[...lv.shapes];
+  // shuffle
+  for(let j=levelShapes.length-1;j>0;j--){
+    const k=Math.floor(Math.random()*(j+1));
+    [levelShapes[j],levelShapes[k]]=[levelShapes[k],levelShapes[j]];
+  }
+  curIdx=0;doneCount=0;score=0;
+  updateScores();buildLevelBar();loadShape();
+}
+
+// ── LOAD SHAPE ───────────────────────────────────
+function loadShape(){
+  if(curIdx>=levelShapes.length){levelComplete();return;}
+  curTarget=levelShapes[curIdx];
+  const shape=getShape(curTarget);
+  document.getElementById('targetName').textContent=shape.name;
+  updateProgress();
+
+  // Build ONE hole for current shape
+  const grid=document.getElementById('holesGrid');
+  grid.innerHTML='';
+  const hole=document.createElement('div');
+  hole.className='hole';
+  hole.dataset.shape=curTarget;
+  hole.innerHTML=`${makeSVG(shape,96,'rgba(255,255,255,0.12)')}<div class="hole-label">${shape.name}</div>`;
+  hole.addEventListener('dragover',e=>{e.preventDefault();hole.classList.add('highlight');});
+  hole.addEventListener('dragleave',()=>hole.classList.remove('highlight'));
+  hole.addEventListener('drop',e=>{e.preventDefault();hole.classList.remove('highlight');tryDrop(hole,e.dataTransfer.getData('shape'));});
+  grid.appendChild(hole);
+
+  buildTiles();
+}
+
+// ── BUILD TILES ──────────────────────────────────
+function buildTiles(){
+  const field=document.getElementById('scatterField');
+  field.innerHTML='';
+  const lv=LEVELS[curLevel];
+
+  lv.shapes.forEach(shapeId=>{
+    const shape=getShape(shapeId);
+    const tile=document.createElement('div');
+    tile.className='shape-tile';
+    tile.dataset.shape=shapeId;
+    tile.draggable=true;
+    const rockDur=(2.5+Math.random()*2).toFixed(1)+'s';
+    const rockDelay=(Math.random()*2).toFixed(1)+'s';
+    tile.style.setProperty('--rock-dur', rockDur);
+    tile.style.setProperty('--rock-delay', rockDelay);
+    tile.innerHTML=`${makeSVG(shape,75)}<div class="tile-label">${shape.name}</div>`;
+
+    // Desktop drag
+    tile.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('shape',shapeId);
+      setTimeout(()=>tile.classList.add('dragging'),0);
+    });
+    tile.addEventListener('dragend',()=>tile.classList.remove('dragging'));
+
+    // Touch
+    tile.addEventListener('touchstart',onTS,{passive:false});
+    tile.addEventListener('touchmove',onTM,{passive:false});
+    tile.addEventListener('touchend',onTE,{passive:false});
+
+    field.appendChild(tile);
+  });
+}
+
+// ── DROP LOGIC ───────────────────────────────────
+function tryDrop(hole, shapeId){
+  if(shapeId === hole.dataset.shape){
+    // CORRECT!
+    const shape=getShape(shapeId);
+    hole.classList.add('filled');
+    hole.innerHTML=`${makeSVG(shape,96)}<div class="hole-label">${shape.name}</div>`;
+    hole.style.borderColor=shape.color;
+    hole.style.boxShadow=`0 0 30px ${shape.color}66, inset 0 0 20px ${shape.color}22`;
+    spawnSparkles(hole, shape.color);
+    playCorrect();
+    score+=10;
+    updateScores();
+    setTimeout(showCelebration,400);
+  } else {
+    // WRONG
+    hole.animate([
+      {transform:'translateX(0)'},{transform:'translateX(-10px)'},
+      {transform:'translateX(10px)'},{transform:'translateX(-8px)'},
+      {transform:'translateX(8px)'},{transform:'translateX(0)'}
+    ],{duration:350,easing:'ease-out'});
+    hole.style.borderColor='#FF0000';
+    hole.style.boxShadow='0 0 20px rgba(255,0,0,0.4)';
+    setTimeout(()=>{hole.style.borderColor='';hole.style.boxShadow='';},400);
+    playWrong();
+    score=Math.max(0,score-2);
+    updateScores();
+  }
+}
+
+// ── SPARKLES ─────────────────────────────────────
+function spawnSparkles(hole, color){
+  const rect=hole.getBoundingClientRect();
+  const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+  for(let i=0;i<10;i++){
+    const s=document.createElement('div');
+    s.className='sparkle';
+    s.textContent=SPARKLES[Math.floor(Math.random()*SPARKLES.length)];
+    const ang=Math.random()*360, dist=50+Math.random()*70;
+    s.style.left=(cx+Math.cos(ang*Math.PI/180)*dist-10)+'px';
+    s.style.top=(cy+Math.sin(ang*Math.PI/180)*dist-10)+'px';
+    s.style.fontSize=(14+Math.random()*16)+'px';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),900);
+  }
+}
+
+// ── CELEBRATION ──────────────────────────────────
+function showCelebration(){
+  const shape=getShape(curTarget);
+  const praise=PRAISES[Math.floor(Math.random()*PRAISES.length)];
+  document.getElementById('celShape').innerHTML=makeSVG(shape,90);
+  document.getElementById('celName').textContent=shape.name+'!';
+  document.getElementById('celMsg').textContent=praise;
+  document.getElementById('celSub').textContent=`You matched the ${shape.name}! +10 points! 🎉`;
+  document.getElementById('nextBtn').textContent='Next Shape! →';
+  document.getElementById('nextBtn').onclick=nextShape;
+  document.getElementById('celebrate').classList.add('show');
+  launchConfetti(false);
+  doneCount++;
+  if(score>best){best=score;localStorage.setItem('fws_best',best);}
+  updateScores();
+}
+
+function nextShape(){
+  document.getElementById('celebrate').classList.remove('show');
+  curIdx++;
+  loadShape();
+}
+
+function levelComplete(){
+  playFanfare();
+  document.getElementById('celShape').textContent='🏆';
+  document.getElementById('celName').textContent='Level Complete!!';
+  document.getElementById('celMsg').textContent='You\'re a Shape Master!!';
+  document.getElementById('celSub').textContent=`Finished ${LEVELS[curLevel].label}! Score: ${score} 🎊`;
+  document.getElementById('nextBtn').textContent='Play Again! 🔄';
+  document.getElementById('nextBtn').onclick=()=>{
+    document.getElementById('celebrate').classList.remove('show');
+    setLevel(curLevel);
+  };
+  document.getElementById('celebrate').classList.add('show');
+  launchConfetti(true);
+}
+
+// ── CONFETTI ─────────────────────────────────────
+function launchConfetti(big){
+  const n=big?150:70;
+  for(let i=0;i<n;i++){
+    setTimeout(()=>{
+      const c=document.createElement('div');
+      c.className='confetti-p';
+      c.style.left=Math.random()*100+'vw';
+      c.style.top='-15px';
+      c.style.width=(8+Math.random()*10)+'px';
+      c.style.height=(8+Math.random()*10)+'px';
+      c.style.background=CONFETTI[Math.floor(Math.random()*CONFETTI.length)];
+      c.style.borderRadius=Math.random()>0.5?'50%':'3px';
+      const dur=(1.4+Math.random()*2.2).toFixed(2)+'s';
+      c.style.setProperty('--cd',dur);
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(),parseFloat(dur)*1000+100);
+    },i*20);
+  }
+}
+
+// ── TOUCH DRAG ───────────────────────────────────
+let tTile=null,tClone=null,tOffX=0,tOffY=0;
+function onTS(e){
+  e.preventDefault();
+  tTile=e.currentTarget;
+  const t=e.touches[0];
+  const r=tTile.getBoundingClientRect();
+  tOffX=t.clientX-r.left;tOffY=t.clientY-r.top;
+  tClone=tTile.cloneNode(true);
+  tClone.style.cssText=`position:fixed;width:${r.width}px;height:${r.height}px;left:${r.left}px;top:${r.top}px;z-index:9998;pointer-events:none;transform:scale(1.2) rotate(5deg);opacity:0.9;transition:none;`;
+  document.body.appendChild(tClone);
+}
+function onTM(e){
+  e.preventDefault();
+  if(!tClone)return;
+  const t=e.touches[0];
+  tClone.style.left=(t.clientX-tOffX)+'px';
+  tClone.style.top=(t.clientY-tOffY)+'px';
+  document.querySelectorAll('.hole').forEach(h=>{
+    const r=h.getBoundingClientRect();
+    if(t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom)h.classList.add('highlight');
+    else h.classList.remove('highlight');
+  });
+}
+function onTE(e){
+  e.preventDefault();
+  if(tClone){tClone.remove();tClone=null;}
+  if(!tTile)return;
+  const t=e.changedTouches[0];
+  document.querySelectorAll('.hole').forEach(h=>{
+    h.classList.remove('highlight');
+    const r=h.getBoundingClientRect();
+    if(t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom){
+      tryDrop(h,tTile.dataset.shape);
+    }
+  });
+  tTile=null;
+}
+
+// ── UTILS ────────────────────────────────────────
+function updateScores(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('best').textContent=best;
+  document.getElementById('done').textContent=doneCount;
+}
+function updateProgress(){
+  document.getElementById('progFill').style.width=(curIdx/levelShapes.length*100)+'%';
+}
+
+// ── INIT ─────────────────────────────────────────
+buildLevelBar();
+setLevel(0);
+</script>
+</body>
+</html>
