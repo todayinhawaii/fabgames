@@ -13,8 +13,10 @@ STRIPE_PRICE_ID = os.environ.get('STRIPE_PRICE_ID')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
 # Supabase config
 SUPABASE_URL = os.environ.get('SUPABASE_URL') or 'https://xbzeakoypdyslnnriaef.supabase.co'
-SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY')
+SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY') or 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiemVha295cGR5c2xubnJpYWVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDI5MzIsImV4cCI6MjA5NjIxODkzMn0.-pS2FE-Q-_EetM5ONbJycZWFm336wJ-z4MTOGCdA1LE'
 SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
+print(f"SUPABASE_URL: {SUPABASE_URL}", flush=True)
+print(f"SUPABASE_SERVICE_KEY set: {bool(SUPABASE_SERVICE_KEY)}", flush=True)
 def supabase_request(method, path, data=None, use_service_key=False):
     """Make a request to Supabase REST API"""
     url = f"{SUPABASE_URL}/rest/v1/{path}"
