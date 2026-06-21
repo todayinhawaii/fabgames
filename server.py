@@ -12,7 +12,7 @@ STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
 STRIPE_PRICE_ID = os.environ.get('STRIPE_PRICE_ID')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
 # Supabase config
-SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_URL = os.environ.get('SUPABASE_URL') or 'https://xbzeakoypdyslnnriaef.supabase.co'
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY')
 SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 def supabase_request(method, path, data=None, use_service_key=False):
