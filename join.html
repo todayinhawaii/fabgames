@@ -58,7 +58,7 @@ nav{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:16px;
-  align-items:start;
+  align-items:stretch;
 }
 
 /* ── PRICE CARD ── */
@@ -71,7 +71,6 @@ nav{
   transition:transform 0.2s,box-shadow 0.2s;
   cursor:pointer;
   display:flex;flex-direction:column;
-  height:100%;
 }
 .pc:hover{
   transform:translateY(-4px);
@@ -122,9 +121,9 @@ nav{
 }
 .pc-desc{
   font-size:12px;color:var(--muted);line-height:1.7;
-  margin-bottom:16px;flex:1;
+  margin-bottom:16px;
 }
-.pc-perks{margin-bottom:20px;}
+.pc-perks{margin-bottom:20px;margin-top:auto;}
 .pc-perk{
   font-size:11px;color:rgba(201,168,76,0.75);
   padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);
