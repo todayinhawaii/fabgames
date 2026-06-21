@@ -6,7 +6,7 @@
 <title>Join fab.games — One Month Free</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --black:#070708;--gold:#c9a84c;--gold2:#e8c96a;
@@ -423,7 +423,8 @@ var supabase = null;
 // Init supabase
 window.addEventListener('load', function(){
   try{
-    const { createClient } = supabaseJs;
+    const SB = window.supabase || window.Supabase;
+    const createClient = SB.createClient;
     supabase = createClient(
       'https://xbzeakoypdyslnnriaef.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiemVha295cGR5c2xubnJpYWVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDI5MzIsImV4cCI6MjA5NjIxODkzMn0.-pS2FE-Q-_EetM5ONbJycZWFm336wJ-z4MTOGCdA1LE'
@@ -503,38 +504,17 @@ async function startSignup(){
   showMsg('Setting up your account...', 'info');
 
   try{
-    // Step 1 — Create Supabase account
-    const { data, error } = await supabase.auth.signUp({
-      email, password,
-      options:{
-        data:{ name, status:'pending', plan:selectedPlan },
-        emailRedirectTo:'https://www.fab.games/play'
-      }
+    // Step 1 — Register via server (handles Supabase + members table)
+    showMsg('Setting up your account...', 'info');
+    const regRes = await fetch('/api/free-trial',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ name, email, password, plan:selectedPlan })
     });
+    const regData = await regRes.json();
 
-    if(error){
-      if(error.message.toLowerCase().includes('already')){
-        showMsg('This email already has an account! <a href="/login" style="color:var(--gold2);">Sign in here →</a>', 'info');
-      } else {
-        showMsg(error.message);
-      }
-      btn.disabled = false;
-      btn.textContent = '🎁 Start My Free Month →';
-      return;
-    }
-
-    // Step 2 — Save to members table
-    try{
-      await fetch('/api/free-trial',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ name, email, plan:selectedPlan })
-      });
-    }catch(e){ /* continue */ }
-
-    // Step 3 — Stripe checkout with the correct price for selected plan
+    // Step 2 — Stripe checkout
     showMsg('Account created!! Redirecting to secure payment...', 'info');
-
     const res = await fetch('/api/create-checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
