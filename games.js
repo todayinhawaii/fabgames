@@ -110,4 +110,8 @@ const GAMES=[
    desc:'Drag big chunky 3D numbers into their matching carved wooden holes! Perfect for kids and families. Numbers 0–100, Vegas celebrations and happy sounds!!',
    color:'rgba(255,180,0,0.15)',href:'/fun-with-numbers'},
 
+  {id:'fun-with-shapes',emoji:'🌈',cat:'Educational · Kids',title:'Fun With Shapes',
+   desc:'Drag gorgeous 3D rainbow shapes into their matching glowing holes! Circle, Square, Triangle and 13 more — Vegas celebrations, neon colours and big happy sounds!!',
+   color:'rgba(128,0,255,0.15)',href:'/fun-with-shapes'},
+
 ];
