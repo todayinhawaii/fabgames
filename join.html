@@ -56,6 +56,54 @@ h1 em{font-style:italic;color:var(--gold);}
 .already-member a:hover{text-decoration:underline;}
 .password-strength{height:3px;border-radius:99px;margin-top:6px;background:rgba(255,255,255,0.08);overflow:hidden;}
 .strength-bar{height:100%;width:0%;border-radius:99px;transition:all 0.3s;}
+
+/* ── PRICING CARDS ── */
+.pricing-cards{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap;justify-content:center;}
+.price-card{
+  flex:1;min-width:160px;max-width:220px;
+  background:#111114;
+  border:1px solid rgba(201,168,76,0.15);
+  border-radius:12px;padding:20px 16px;
+  text-align:center;position:relative;
+  transition:transform 0.2s,box-shadow 0.2s;
+  cursor:pointer;
+}
+.price-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4);}
+.pc-featured{
+  border-color:rgba(201,168,76,0.5);
+  background:linear-gradient(145deg,#131108,#0d0d0f);
+  box-shadow:0 0 40px rgba(201,168,76,0.12);
+  transform:scale(1.03);
+}
+.pc-featured:hover{transform:scale(1.03) translateY(-4px);}
+.pc-best{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  color:#0d0d0f;font-size:9px;font-weight:800;
+  letter-spacing:2px;padding:4px 12px;border-radius:20px;
+  white-space:nowrap;
+}
+.pc-badge{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;font-weight:700;}
+.bundle-badge{color:#ffd700;}
+.pc-icon{font-size:28px;margin-bottom:8px;}
+.pc-price{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:#fff;line-height:1;}
+.pc-price span{font-size:13px;color:var(--muted);font-family:'Inter',sans-serif;}
+.pc-save{font-size:11px;color:#22c55e;font-weight:700;margin:4px 0;}
+.pc-desc{font-size:11px;color:var(--muted);line-height:1.6;margin:10px 0;min-height:52px;}
+.pc-perks{text-align:left;margin-bottom:14px;}
+.pc-perk{font-size:10px;color:rgba(201,168,76,0.8);margin-bottom:4px;line-height:1.4;}
+.pc-btn{width:100%;padding:11px 8px;border:none;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+.fab-btn{background:linear-gradient(135deg,var(--gold),#a87d2a);color:#000;}
+.bundle-btn{background:linear-gradient(135deg,#ffd700,#c9a84c);color:#0d0d0f;font-size:12px;}
+.jigsaw-btn{background:linear-gradient(135deg,#764ba2,#667eea);color:#fff;}
+.pc-btn:hover{transform:translateY(-1px);filter:brightness(1.1);}
+.price-card.selected{border-color:rgba(201,168,76,0.8);box-shadow:0 0 30px rgba(201,168,76,0.2);}
+@media(max-width:520px){
+  .pricing-cards{flex-direction:column;align-items:center;}
+  .price-card{max-width:100%;width:100%;}
+  .pc-featured{transform:none;}
+  .pc-featured:hover{transform:translateY(-4px);}
+}
 footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2);}
 @media(max-width:480px){.card{padding:28px 20px;}nav{padding:16px 20px;}}
 </style>
@@ -91,235 +139,208 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2)
       <span style="color:#c9a84c;font-style:normal;font-weight:700;font-size:14px;">✦</span>
     </div>
 
-    <div class="tabs">
-      <div class="tab active" id="freeTabBtn" onclick="showTab('free')">🎁 Free Month</div>
-      <div class="tab paid-tab" id="paidTabBtn" onclick="showTab('paid')">💳 Subscribe $4.99/mo</div>
-    </div>
-
     <div id="msgBox" class="msg"></div>
 
-    <!-- FREE TRIAL -->
-    <div id="freeTab">
+    <!-- ── 3 PRICING CARDS ── -->
+    <div class="pricing-cards">
+
+      <!-- CARD 1: fab.games only -->
+      <div class="price-card" id="card-fab">
+        <div class="pc-badge">fab.games</div>
+        <div class="pc-icon">🎮</div>
+        <div class="pc-price">$4.99<span>/mo</span></div>
+        <div class="pc-desc">Ever-growing library of incredible games — ad-free, family friendly, cancel anytime.</div>
+        <div class="pc-perks">
+          <div class="pc-perk">✦ All fab.games games</div>
+          <div class="pc-perk">✦ 30 day free trial</div>
+          <div class="pc-perk">✦ Cancel anytime</div>
+        </div>
+        <button class="pc-btn fab-btn" onclick="selectPlan('fab')">Start Free Month →</button>
+      </div>
+
+      <!-- CARD 2: BUNDLE (featured) -->
+      <div class="price-card pc-featured" id="card-bundle">
+        <div class="pc-best">⭐ BEST VALUE</div>
+        <div class="pc-badge bundle-badge">fab.games + jigsaw.games</div>
+        <div class="pc-icon">🎮🧩</div>
+        <div class="pc-price">$7.99<span>/mo</span></div>
+        <div class="pc-save">Save $2 every month!</div>
+        <div class="pc-desc">Get both worlds for less! An ever-growing library of incredible games PLUS hundreds of stunning puzzles — like getting one site completely free!</div>
+        <div class="pc-perks">
+          <div class="pc-perk">✦ Everything on fab.games</div>
+          <div class="pc-perk">✦ Everything on jigsaw.games</div>
+          <div class="pc-perk">✦ 30 day free trial</div>
+          <div class="pc-perk">✦ Cancel anytime</div>
+        </div>
+        <button class="pc-btn bundle-btn" onclick="selectPlan('bundle')">Get The Bundle →</button>
+      </div>
+
+      <!-- CARD 3: jigsaw.games only -->
+      <div class="price-card" id="card-jigsaw">
+        <div class="pc-badge">jigsaw.games</div>
+        <div class="pc-icon">🧩</div>
+        <div class="pc-price">$4.99<span>/mo</span></div>
+        <div class="pc-desc">Hundreds of stunning jigsaw puzzles — beautiful original artwork, multiple difficulty levels.</div>
+        <div class="pc-perks">
+          <div class="pc-perk">✦ All jigsaw puzzles</div>
+          <div class="pc-perk">✦ 30 day free trial</div>
+          <div class="pc-perk">✦ Cancel anytime</div>
+        </div>
+        <button class="pc-btn jigsaw-btn" onclick="selectPlan('jigsaw')">Start Free Month →</button>
+      </div>
+
+    </div><!-- end pricing-cards -->
+
+    <!-- SIGNUP FORM — shown after selecting a plan -->
+    <div id="signupForm" style="display:none;margin-top:24px;">
+      <div id="selectedPlanBox" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:12px 16px;margin-bottom:18px;text-align:center;">
+      </div>
       <div class="form-group">
         <label class="form-label">Your Name</label>
-        <input class="form-input" id="freeName" type="text" placeholder="What do we call you?">
+        <input class="form-input" id="signupName" type="text" placeholder="What do we call you?">
       </div>
       <div class="form-group">
         <label class="form-label">Email Address</label>
-        <input class="form-input" id="freeEmail" type="email" placeholder="your@email.com">
+        <input class="form-input" id="signupEmail" type="email" placeholder="your@email.com">
       </div>
       <div class="form-group">
         <label class="form-label">Choose a Password</label>
-        <input class="form-input" id="freePassword" type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)">
+        <div style="position:relative;">
+          <input class="form-input" id="signupPassword" type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)" style="padding-right:44px;">
+          <span onclick="togglePw('signupPassword',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;opacity:0.5;">👁</span>
+        </div>
         <div class="password-strength"><div class="strength-bar" id="strengthBar"></div></div>
       </div>
       <div class="form-group">
         <label class="form-label">Confirm Password</label>
-        <input class="form-input" id="freePassword2" type="password" placeholder="Repeat your password">
+        <div style="position:relative;">
+          <input class="form-input" id="signupPassword2" type="password" placeholder="Repeat your password" style="padding-right:44px;">
+          <span onclick="togglePw('signupPassword2',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;opacity:0.5;">👁</span>
+        </div>
       </div>
-      <button class="main-btn" id="freeBtn" onclick="startFreeTrial()">🎁 Start My Free Month →</button>
-      <div class="perks">
-        <div class="perk">Every game — all of them</div>
-        <div class="perk">No credit card needed</div>
-        <div class="perk">Confirmation email sent instantly</div>
-        <div class="perk">30 days full access</div>
-        <div class="perk">Cancel anytime — no fuss</div>
-      </div>
-    </div>
-
-    <!-- PAID -->
-    <div id="paidTab" style="display:none;">
-      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);
-        border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:center;">
-        <div style="font-size:22px;font-weight:900;color:#ffd700;">$4.99<span style="font-size:13px;color:var(--muted);">/month</span></div>
-        <div style="font-size:11px;color:#c9a84c;margin-top:2px;">✦ All 17 games · Ad-free · Cancel anytime ✦</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Your Name</label>
-        <input class="form-input" id="paidName" type="text" placeholder="What do we call you?">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" id="paidEmail" type="email" placeholder="your@email.com">
-      </div>
-      <button class="main-btn" onclick="startSubscription()" style="background:linear-gradient(135deg,#c9a84c,#ffd700);color:#0d0d0f;font-weight:800;">
-        💳 Subscribe Now — $4.99/month →
-      </button>
+      <button class="main-btn" id="signupBtn" onclick="startSignup()">🎁 Start My Free Month →</button>
       <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.7;">
-        🔒 Secure payment via Stripe · Cancel anytime<br>
-        Less than a coffee a month ☕<br>
-        <span style="color:#c9a84c;">First month free — charged after 30 days</span>
+        🔒 Secure payment via Stripe · Cancel anytime<br>No violence · No ads · Built with love in Hawaii 🌺
       </p>
+      <button onclick="document.getElementById('signupForm').style.display='none';document.getElementById('pricing-cards-wrap').style.display='block';" 
+        style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:8px;display:block;width:100%;text-align:center;">
+        ← Choose a different plan
+      </button>
     </div>
+// ── PRICE IDs ────────────────────────────────────
+const PRICES = {
+  fab:    'price_1TemBdRszIkvwb2pMlZbPBjC',
+  jigsaw: 'price_1TgXljRszIkvwb2pYi75vBvK',
+  bundle: 'price_1TkbaVRszIkvwb2peR2Ne9Vb'
+};
+const PLAN_LABELS = {
+  fab:    '🎮 fab.games — $4.99/month',
+  jigsaw: '🧩 jigsaw.games — $4.99/month',
+  bundle: '🎮🧩 fab.games + jigsaw.games Bundle — $7.99/month'
+};
 
-    <div class="already-member">Already have an account? <a href="/login">Sign in →</a></div>
-  </div>
-</div>
+let selectedPlan = null;
 
-<footer>© 2026 fab.games — Made with 🌺 in Hawaii</footer>
-
-<script>
-let sbClient;
-
-async function init(){
-  try{
-    const res = await fetch('/api/config');
-    const config = await res.json();
-    sbClient = window.supabase.createClient(config.supabase_url, config.supabase_anon_key);
-
-    // Check tab from URL
-    const params = new URLSearchParams(window.location.search);
-    // Show correct tab based on URL param
-    const tabParam = params.get('tab');
-    if(tabParam==='paid'){
-      showTab('paid');
-      // Scroll to form
-      setTimeout(()=>document.querySelector('.card')?.scrollIntoView({behavior:'smooth'}),300);
-    }
-
-    // Check if already logged in
-    const { data:{ session } } = await sbClient.auth.getSession();
-    if(session) window.location.href='/play';
-  }catch(e){ console.log('Init error:', e); }
-}
-init();
-
-function showTab(tab){
-  const freeBtn=document.getElementById('freeTabBtn');
-  const paidBtn=document.getElementById('paidTabBtn');
-  if(freeBtn){ freeBtn.classList.toggle('active', tab==='free'); freeBtn.classList.remove('paid-tab'); }
-  if(paidBtn){ paidBtn.classList.toggle('active', tab==='paid'); if(tab==='paid') paidBtn.classList.add('paid-tab'); }
-  document.getElementById('freeTab').style.display = tab==='free'?'block':'none';
-  document.getElementById('paidTab').style.display = tab==='paid'?'block':'none';
+function selectPlan(plan){
+  selectedPlan = plan;
+  // Highlight selected card
+  document.querySelectorAll('.price-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('card-'+plan).classList.add('selected');
+  // Show signup form
+  document.getElementById('signupForm').style.display='block';
+  document.getElementById('selectedPlanBox').innerHTML=
+    '<div style="font-size:13px;color:var(--gold);font-weight:700;">Selected: '+PLAN_LABELS[plan]+'</div>';
+  // Scroll to form
+  setTimeout(()=>document.getElementById('signupForm').scrollIntoView({behavior:'smooth'}),100);
   hideMsg();
 }
 
-function showMsg(msg,type='error'){
-  const el=document.getElementById('msgBox');
-  el.innerHTML=msg;
-  el.className='msg '+type;
-  el.style.display='block';
+function togglePw(id,icon){
+  const el=document.getElementById(id);
+  el.type=el.type==='password'?'text':'password';
+  icon.style.opacity=el.type==='text'?'1':'0.5';
 }
-function hideMsg(){ document.getElementById('msgBox').style.display='none'; }
 
 function checkStrength(pw){
   const bar=document.getElementById('strengthBar');
-  let strength=0;
-  if(pw.length>=8) strength++;
-  if(/[A-Z]/.test(pw)) strength++;
-  if(/[0-9]/.test(pw)) strength++;
-  if(/[^A-Za-z0-9]/.test(pw)) strength++;
-  const colors=['#ef4444','#f97316','#eab308','#22c55e'];
-  const widths=['25%','50%','75%','100%'];
-  bar.style.width = pw.length>0 ? widths[strength-1]||'10%' : '0%';
-  bar.style.background = pw.length>0 ? colors[strength-1]||'#ef4444' : '';
+  let s=0;
+  if(pw.length>=8)s++;if(/[A-Z]/.test(pw))s++;
+  if(/[0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
+  bar.style.width=pw.length>0?['25%','50%','75%','100%'][s-1]||'10%':'0%';
+  bar.style.background=pw.length>0?['#ef4444','#f97316','#eab308','#22c55e'][s-1]||'#ef4444':'';
 }
 
-async function startFreeTrial(){
-  const name     = document.getElementById('freeName').value.trim();
-  const email    = document.getElementById('freeEmail').value.trim().toLowerCase();
-  const password = document.getElementById('freePassword').value;
-  const password2= document.getElementById('freePassword2').value;
+async function startSignup(){
+  if(!selectedPlan){ showMsg('Please choose a plan above!'); return; }
+  const name     = document.getElementById('signupName').value.trim();
+  const email    = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const password = document.getElementById('signupPassword').value;
+  const password2= document.getElementById('signupPassword2').value;
 
-  // Validation
   if(!name){ showMsg('Please enter your name!'); return; }
   if(!email||!email.includes('@')){ showMsg('Please enter a valid email address!'); return; }
   if(password.length<8){ showMsg('Password must be at least 8 characters!'); return; }
-  if(password!==password2){ showMsg('Passwords don\'t match — please try again!'); return; }
+  if(password!==password2){ showMsg('Passwords don't match — please try again!'); return; }
 
-  const btn=document.getElementById('freeBtn');
+  const btn=document.getElementById('signupBtn');
   btn.disabled=true;
   btn.textContent='Creating your account...';
-  showMsg('Setting up your free month...','info');
+  showMsg('Setting up your account...','info');
 
   try{
-    // Try to sign up with Supabase Auth
-    const { data, error } = await sbClient.auth.signUp({
-      email, password,
+    // Step 1: Create Supabase Auth account
+    const{data,error}=await sbClient.auth.signUp({
+      email,password,
       options:{
-        data:{ name, status:'trial' },
+        data:{name,status:'pending',plan:selectedPlan},
         emailRedirectTo:'https://www.fab.games/play'
       }
     });
 
     if(error){
-      // Already registered
-      if(error.message.includes('already registered') || error.message.includes('already been registered')){
-        // Check if they already used free trial
-        const checkRes = await fetch('/api/check-member', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({email, name:document.getElementById('paidName')?.value.trim()||''})
-        });
-        const checkData = await checkRes.json();
-
-        if(checkData.status==='active'){
-          showMsg('🌟 You\'re already a Premium member! <a href="/login" style="color:var(--gold2);font-weight:700;">Sign in here →</a>','info');
-        } else if(checkData.status==='trial'){
-          showMsg('🎮 You already have a free trial account! <a href="/login" style="color:var(--gold2);font-weight:700;">Sign in here →</a>','info');
-        } else {
-          showMsg('📧 This email already has an account. <a href="/login" style="color:var(--gold2);font-weight:700;">Sign in here →</a> or <a href="/login" style="color:var(--gold2);">reset your password</a>','info');
-        }
+      if(error.message.includes('already')){
+        showMsg('This email already has an account. <a href="/login" style="color:var(--gold2);">Sign in →</a>','info');
       } else {
         showMsg(error.message);
       }
-      btn.disabled=false;
-      btn.textContent='Start Free Month →';
+      btn.disabled=false;btn.textContent='🎁 Start My Free Month →';
       return;
     }
 
-    // Save to members table via API
+    // Step 2: Save to members table
     await fetch('/api/free-trial',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name, email})
+      body:JSON.stringify({name,email,plan:selectedPlan})
     });
 
-    // Save locally
-    localStorage.setItem('fabEmail', email);
-    localStorage.setItem('fabName', name);
+    localStorage.setItem('fabEmail',email);
+    localStorage.setItem('fabName',name);
+    localStorage.setItem('fabPlan',selectedPlan);
 
-    // Show success — tell them to check email
-    hideMsg();
-    document.getElementById('freeTab').innerHTML=`
-      <div style="text-align:center;padding:20px 0;">
-        <div style="font-size:56px;margin-bottom:16px;">📧</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold);margin-bottom:12px;">Check Your Email!!</div>
-        <p style="font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:20px;">We sent a confirmation link to <strong style="color:var(--white);">${email}</strong><br>Click it to confirm your account and start playing!!</p>
-        <p style="font-size:12px;color:var(--muted);line-height:1.7;">Didn't get it? Check your spam folder.<br>The email comes from <strong>fab.games</strong></p>
-      </div>`;
-
-  }catch(e){
-    showMsg('Connection error — please try again!');
-    btn.disabled=false;
-    btn.textContent='Start Free Month →';
-  }
-}
-
-async function startSubscription(){
-  const email=document.getElementById('paidEmail').value.trim();
-  if(!email||!email.includes('@')){ showMsg('Please enter a valid email address!'); return; }
-  showMsg('Redirecting to secure checkout...','info');
-  try{
+    // Step 3: Redirect to Stripe checkout with correct price
+    showMsg('Account created!! Redirecting to payment...','info');
     const res=await fetch('/api/create-checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email, name:document.getElementById('paidName')?.value.trim()||''})
+      body:JSON.stringify({email,name,price_id:PRICES[selectedPlan],plan:selectedPlan})
     });
-    const data=await res.json();
-    if(data.ok){ window.location.href=data.url; }
-    else{ showMsg(data.msg||'Something went wrong!'); }
-  }catch(e){ showMsg('Connection error — please try again!'); }
+    const checkoutData=await res.json();
+    if(checkoutData.ok && checkoutData.url){
+      window.location.href=checkoutData.url;
+    } else {
+      showMsg(checkoutData.msg||'Something went wrong — please try again!');
+      btn.disabled=false;btn.textContent='🎁 Start My Free Month →';
+    }
+
+  }catch(e){
+    showMsg('Connection error — please try again!');
+    btn.disabled=false;btn.textContent='🎁 Start My Free Month →';
+  }
 }
-</script>
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(r=>console.log('[fab.games] SW ready'))
-      .catch(e=>console.log('[fab.games] SW error',e));
-  });
-}
-</script>
-</body>
-</html>
+
+// Keep old functions for compatibility
+async function startFreeTrial(){ selectPlan('fab'); }
+async function startSubscription(){ selectPlan('fab'); }
+
+
