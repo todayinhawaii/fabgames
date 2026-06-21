@@ -184,13 +184,18 @@ header p{color:rgba(255,255,255,0.6);font-size:13px;margin-top:4px;font-weight:7
 }
 .hole.filled .hole-shape{opacity:1;}
 .hole-label{
-  position:absolute;bottom:4px;left:0;right:0;
+  position:absolute;
+  top:-22px;left:50%;transform:translateX(-50%);
   text-align:center;
-  font-size:14px;font-weight:700;letter-spacing:1px;
-  color:rgba(255,255,255,0.3);
+  font-size:11px;font-weight:900;letter-spacing:1px;
+  color:rgba(255,255,255,0.5);
   text-transform:uppercase;
+  text-shadow:0 1px 4px rgba(0,0,0,0.8);
+  pointer-events:none;
+  white-space:nowrap;
+  z-index:2;
 }
-.hole.filled .hole-label{color:rgba(255,255,255,0.7);}
+.hole.filled .hole-label{color:rgba(255,255,255,0.9);text-shadow:0 2px 8px rgba(0,0,0,0.6);}
 
 /* ── SCATTER FIELD ── */
 .scatter-field{
