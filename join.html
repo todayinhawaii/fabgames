@@ -420,18 +420,23 @@ const PLAN_PRICES = {
 var selectedPlan = null;
 var supabase = null;
 
-// Init supabase directly — no /api/config dependency
-async function init(){
+// Init supabase — wait for library to load
+function initSupabase(){
+  if(typeof window.supabase === 'undefined' || !window.supabase.createClient){
+    setTimeout(initSupabase, 100);
+    return;
+  }
   try{
     supabase = window.supabase.createClient(
       'https://xbzeakoypdyslnnriaef.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiemVha295cGR5c2xubnJpYWVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDI5MzIsImV4cCI6MjA5NjIxODkzMn0.-pS2FE-Q-_EetM5ONbJycZWFm336wJ-z4MTOGCdA1LE'
     );
-    const { data:{ session } } = await supabase.auth.getSession();
-    if(session) window.location.href = '/play';
-  }catch(e){ console.log('Init:', e); }
+    supabase.auth.getSession().then(({data:{session}})=>{
+      if(session) window.location.href='/play';
+    });
+  }catch(e){ console.log('Supabase init error:', e); }
 }
-init();
+window.addEventListener('load', initSupabase);
 
 // ── PLAN SELECTION ───────────────────────────────
 function selectPlan(plan){
