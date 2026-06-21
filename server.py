@@ -454,6 +454,10 @@ def happy_buttons():
 def fun_with_numbers():
     return send_from_directory('.', 'fun-with-numbers.html')
 
+@app.route('/fun-with-shapes')
+def fun_with_shapes():
+    return send_from_directory('.', 'fun-with-shapes.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
