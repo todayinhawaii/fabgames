@@ -420,12 +420,13 @@ const PLAN_PRICES = {
 var selectedPlan = null;
 var supabase = null;
 
-// Init supabase in background — doesn't block UI
+// Init supabase directly — no /api/config dependency
 async function init(){
   try{
-    const res = await fetch('/api/config');
-    const config = await res.json();
-    supabase = window.supabase.createClient(config.supabase_url, config.supabase_anon_key);
+    supabase = window.supabase.createClient(
+      'https://xbzeakoypdyslnnriaef.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiemVha295cGR5c2xubnJpYWVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDI5MzIsImV4cCI6MjA5NjIxODkzMn0.-pS2FE-Q-_EetM5ONbJycZWFm336wJ-z4MTOGCdA1LE'
+    );
     const { data:{ session } } = await supabase.auth.getSession();
     if(session) window.location.href = '/play';
   }catch(e){ console.log('Init:', e); }
