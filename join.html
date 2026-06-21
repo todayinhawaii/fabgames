@@ -2,324 +2,545 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="fab.games">
-  <link rel="apple-touch-icon" href="/icon-192.png">
-  <meta name="theme-color" content="#070708">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Join fab.games — Free for 30 Days</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>Join fab.games — One Month Free</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--black:#070708;--gold:#c9a84c;--gold2:#e8c96a;--white:#f0efe8;--muted:rgba(240,239,232,0.5);--border:rgba(255,255,255,0.07);}
+:root{
+  --black:#070708;--gold:#c9a84c;--gold2:#e8c96a;
+  --white:#f0efe8;--muted:rgba(240,239,232,0.5);
+  --border:rgba(255,255,255,0.07);
+}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(201,168,76,0.05),transparent);pointer-events:none;}
-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);}
-.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
-.nav-back{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+body{
+  background:var(--black);color:var(--white);
+  font-family:'Inter',sans-serif;font-weight:300;
+  min-height:100vh;display:flex;flex-direction:column;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(201,168,76,0.05),transparent);
+  pointer-events:none;
+}
+nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 48px;border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-decoration:none;
+}
+.nav-back{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;}
 .nav-back:hover{color:var(--gold);}
-.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
-.card{width:100%;max-width:440px;background:#0d0d0f;border:1px solid rgba(201,168,76,0.15);border-radius:4px;padding:40px 36px;box-shadow:0 0 60px rgba(201,168,76,0.06);}
-.card-badge{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;text-align:center;}
-h1{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;text-align:center;margin-bottom:6px;}
-h1 em{font-style:italic;color:var(--gold);}
-.card-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:28px;line-height:1.7;}
-.tabs{display:flex;gap:6px;margin-bottom:24px;}
-.tab{flex:1;padding:13px 8px;text-align:center;font-size:12px;font-weight:700;
-  letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:10px;
-  transition:all 0.2s;border:1.5px solid rgba(255,255,255,0.1);
-  color:rgba(255,255,255,0.45);background:rgba(255,255,255,0.04);}
-.tab:hover{border-color:rgba(135,206,235,0.3);color:rgba(135,206,235,0.7);}
-.tab.active{color:#fff;background:rgba(201,168,76,0.15);border-color:rgba(201,168,76,0.5);}
-.tab.active.paid-tab{background:rgba(135,206,235,0.12);border-color:rgba(135,206,235,0.5);color:#87ceeb;}
-.form-group{margin-bottom:14px;}
-.form-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;display:block;}
-.form-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:2px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:48px 20px 32px;}
+.hero-badge{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,6vw,56px);font-weight:300;
+  margin-bottom:12px;
+}
+.hero h1 em{font-style:italic;color:var(--gold);}
+.hero p{font-size:14px;color:var(--muted);line-height:1.8;max-width:480px;margin:0 auto;}
+
+/* ── PRICING GRID ── */
+.pricing-wrap{
+  max-width:900px;margin:0 auto;
+  padding:0 20px 48px;
+  width:100%;
+}
+.pricing-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:16px;
+  align-items:stretch;
+}
+
+/* ── PRICE CARD ── */
+.pc{
+  background:#0d0d0f;
+  border:1px solid rgba(201,168,76,0.15);
+  border-radius:8px;
+  padding:28px 22px;
+  position:relative;
+  transition:transform 0.2s,box-shadow 0.2s;
+  cursor:pointer;
+  display:flex;flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+.pc:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 48px rgba(0,0,0,0.4);
+  border-color:rgba(201,168,76,0.3);
+}
+.pc.selected{
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px var(--gold), 0 16px 48px rgba(201,168,76,0.15);
+}
+
+/* Bundle — featured card */
+.pc.featured{
+  background:linear-gradient(160deg,#0f0e06,#0d0d0f);
+  border-color:rgba(201,168,76,0.4);
+  box-shadow:0 0 60px rgba(201,168,76,0.08);
+  transform:scale(1.02);
+}
+.pc.featured:hover{transform:scale(1.02) translateY(-4px);}
+.pc.featured.selected{
+  border-color:var(--gold2);
+  box-shadow:0 0 0 1px var(--gold2),0 0 60px rgba(201,168,76,0.2);
+}
+
+.best-badge{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  color:#0a0a00;font-size:9px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:4px 14px;border-radius:20px;white-space:nowrap;
+}
+
+.pc-site{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:12px;font-weight:600;
+}
+.pc-icon{font-size:32px;margin-bottom:12px;}
+.pc-price{
+  font-family:'Cormorant Garamond',serif;
+  font-size:44px;font-weight:600;color:var(--white);
+  line-height:1;margin-bottom:2px;
+}
+.pc-price sup{font-size:20px;vertical-align:top;margin-top:8px;}
+.pc-price sub{font-size:14px;color:var(--muted);font-family:'Inter',sans-serif;font-weight:300;}
+.pc-save{
+  font-size:11px;color:#22c55e;font-weight:600;
+  margin-bottom:12px;
+}
+.pc-desc{
+  font-size:12px;color:var(--muted);line-height:1.7;
+  margin-bottom:16px;
+}
+.pc-perks{margin-bottom:20px;margin-top:auto;width:100%;text-align:left;}
+.pc-perk{
+  font-size:11px;color:rgba(201,168,76,0.75);
+  padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);
+  display:flex;align-items:center;gap:6px;
+}
+.pc-perk:last-child{border-bottom:none;}
+
+/* Buttons */
+.pc-btn{
+  width:100%;padding:13px;border:none;border-radius:4px;
+  font-size:11px;font-weight:600;letter-spacing:2px;
+  text-transform:uppercase;cursor:pointer;
+  font-family:'Inter',sans-serif;
+  transition:all 0.2s;
+}
+.btn-fab{
+  background:linear-gradient(135deg,var(--gold),#8a6420);
+  color:#000;
+  box-shadow:0 4px 0 #5a3d0a;
+}
+.btn-bundle{
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  color:#0a0a00;font-size:12px;
+  box-shadow:0 4px 0 #7a5c00;
+}
+.btn-jigsaw{
+  background:linear-gradient(135deg,#764ba2,#4a2580);
+  color:#fff;
+  box-shadow:0 4px 0 #2a1040;
+}
+.pc-btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
+.pc-btn:active{transform:translateY(2px);box-shadow:none;}
+
+/* ── SIGNUP FORM ── */
+.signup-wrap{
+  max-width:480px;margin:0 auto;
+  padding:0 20px 60px;
+  display:none;
+}
+.signup-card{
+  background:#0d0d0f;
+  border:1px solid rgba(201,168,76,0.2);
+  border-radius:8px;
+  padding:32px 28px;
+}
+.selected-plan-box{
+  background:rgba(201,168,76,0.06);
+  border:1px solid rgba(201,168,76,0.2);
+  border-radius:6px;
+  padding:14px 16px;
+  margin-bottom:24px;
+  text-align:center;
+}
+.selected-plan-name{font-size:13px;color:var(--gold);font-weight:600;}
+.selected-plan-price{font-size:11px;color:var(--muted);margin-top:3px;}
+.change-plan{
+  font-size:11px;color:var(--muted);cursor:pointer;
+  margin-top:6px;display:inline-block;
+  text-decoration:underline;
+}
+.change-plan:hover{color:var(--gold);}
+.form-group{margin-bottom:16px;}
+.form-label{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:6px;display:block;
+}
+.form-input{
+  width:100%;padding:13px 16px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:4px;color:var(--white);
+  font-size:14px;font-family:'Inter',sans-serif;
+  outline:none;transition:border-color 0.2s;
+}
 .form-input:focus{border-color:rgba(201,168,76,0.5);}
 .form-input::placeholder{color:rgba(240,239,232,0.2);}
-.main-btn{width:100%;padding:15px;border:none;border-radius:2px;background:linear-gradient(135deg,var(--gold),#a87d2a);color:#000;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 0 30px rgba(201,168,76,0.2);transition:all 0.2s;margin-top:6px;}
-.main-btn:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 0 50px rgba(201,168,76,0.4);transform:translateY(-1px);}
-.main-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
-.msg{padding:12px 16px;border-radius:2px;font-size:13px;margin-bottom:14px;display:none;text-align:center;line-height:1.6;}
+.pw-wrap{position:relative;}
+.pw-toggle{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  cursor:pointer;font-size:16px;opacity:0.4;
+}
+.strength-bar-wrap{height:3px;background:rgba(255,255,255,0.06);border-radius:99px;margin-top:6px;overflow:hidden;}
+.strength-bar{height:100%;width:0;border-radius:99px;transition:all 0.3s;}
+.submit-btn{
+  width:100%;padding:16px;border:none;border-radius:4px;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  background:linear-gradient(135deg,var(--gold),#8a6420);
+  color:#000;
+  box-shadow:0 6px 0 #5a3d0a, 0 8px 24px rgba(201,168,76,0.3);
+  transition:all 0.15s;margin-top:4px;
+}
+.submit-btn:hover{transform:translateY(-2px);}
+.submit-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #5a3d0a;}
+.submit-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:none;}
+.fine-print{
+  font-size:11px;color:var(--muted);
+  text-align:center;margin-top:14px;line-height:1.8;
+}
+.msg{
+  padding:12px 16px;border-radius:4px;font-size:13px;
+  margin-bottom:16px;display:none;text-align:center;line-height:1.6;
+}
 .msg.success{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#86efac;}
 .msg.error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;}
 .msg.info{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);color:var(--gold);}
-.perks{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
-.perk{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:8px;}
-.perk::before{content:'—';color:var(--gold);font-size:10px;}
-.already-member{text-align:center;margin-top:16px;font-size:12px;color:var(--muted);}
-.already-member a{color:var(--gold);text-decoration:none;}
-.already-member a:hover{text-decoration:underline;}
-.password-strength{height:3px;border-radius:99px;margin-top:6px;background:rgba(255,255,255,0.08);overflow:hidden;}
-.strength-bar{height:100%;width:0%;border-radius:99px;transition:all 0.3s;}
-footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2);}
-@media(max-width:480px){.card{padding:28px 20px;}nav{padding:16px 20px;}}
+
+.already{text-align:center;margin-top:20px;font-size:12px;color:var(--muted);}
+.already a{color:var(--gold);text-decoration:none;}
+
+/* ── TRUST BAR ── */
+.trust-bar{
+  display:flex;justify-content:center;gap:32px;flex-wrap:wrap;
+  padding:20px 20px 40px;
+  border-top:1px solid var(--border);
+}
+.trust-item{
+  font-size:11px;color:var(--muted);
+  display:flex;align-items:center;gap:6px;
+}
+
+footer{
+  text-align:center;padding:20px;
+  font-size:11px;color:rgba(240,239,232,0.2);
+  border-top:1px solid var(--border);
+}
+
+@media(max-width:700px){
+  .pricing-grid{grid-template-columns:1fr;}
+  .pc.featured{transform:none;}
+  .pc.featured:hover{transform:translateY(-4px);}
+  nav{padding:16px 20px;}
+}
 </style>
 </head>
 <body>
+
 <nav>
   <a href="/" class="nav-logo">fab.games</a>
   <a href="/login" class="nav-back">Sign In →</a>
 </nav>
 
-<div class="wrap">
-  <div class="card">
-    <div class="card-badge">— Join Today</div>
-    <h1>One Month <em>Free</em></h1>
-    <p class="card-sub">No credit card. Full access. 30 days on us.<br>Then just $4.99/month — cancel anytime.</p>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">— Join Today</div>
+  <h1>One Month <em>Free</em></h1>
+  <p>No credit card needed for your first 30 days. Full access to everything. Cancel anytime.</p>
+</div>
 
-    <!-- Mission statement -->
-    <div style="
-      background:rgba(201,168,76,0.05);
-      border:1px solid rgba(201,168,76,0.15);
-      border-radius:12px;
-      padding:16px 18px;
-      margin-bottom:20px;
-      font-size:13px;
-      line-height:1.75;
-      color:rgba(255,255,255,0.75);
-      font-family:system-ui,sans-serif;
-      font-style:italic;
-      text-align:center;
-    ">
-      <span style="color:#c9a84c;font-style:normal;font-weight:700;font-size:14px;">✦</span>
-      &nbsp;Join a growing community of curious minds. Your subscription helps us build world-class games that educate and inspire every age group — games built on positivity, discovery and fun. No violence, no mindless content, just experiences that help us all grow a little wiser every day. fab.games is proudly independent — your support is what keeps us creating, improving and dreaming up the next great game.&nbsp;
-      <span style="color:#c9a84c;font-style:normal;font-weight:700;font-size:14px;">✦</span>
+<!-- PRICING CARDS -->
+<div class="pricing-wrap">
+  <div class="pricing-grid">
+
+    <!-- fab.games only -->
+    <div class="pc" id="card-fab" onclick="selectPlan('fab')">
+      <div class="pc-site">fab.games</div>
+      <div class="pc-icon">🎮</div>
+      <div class="pc-price"><sup>$</sup>4<sub>.99/mo</sub></div>
+      <div class="pc-desc">An ever-growing library of incredible games — ad-free, family friendly, built with love.</div>
+      <div class="pc-perks">
+        <div class="pc-perk">✦ All fab.games games</div>
+        <div class="pc-perk">✦ 30 day free trial</div>
+        <div class="pc-perk">✦ No credit card today</div>
+        <div class="pc-perk">✦ Cancel anytime</div>
+      </div>
+      <button class="pc-btn btn-fab" onclick="selectPlan('fab')">Start Free Month →</button>
     </div>
 
-    <div class="tabs">
-      <div class="tab active" id="freeTabBtn" onclick="showTab('free')">🎁 Free Month</div>
-      <div class="tab paid-tab" id="paidTabBtn" onclick="showTab('paid')">💳 Subscribe $4.99/mo</div>
+    <!-- BUNDLE — featured -->
+    <div class="pc featured" id="card-bundle" onclick="selectPlan('bundle')">
+      <div class="best-badge">⭐ Best Value</div>
+      <div class="pc-site" style="color:#ffd700;">fab.games + jigsaw.games</div>
+      <div class="pc-icon">🎮🧩</div>
+      <div class="pc-price"><sup>$</sup>7<sub>.99/mo</sub></div>
+      <div class="pc-save">Save $2 every month!</div>
+      <div class="pc-desc">Get both worlds for less! An ever-growing library of incredible games PLUS hundreds of stunning puzzles — like getting one site completely free!</div>
+      <div class="pc-perks">
+        <div class="pc-perk">✦ Everything on fab.games</div>
+        <div class="pc-perk">✦ Everything on jigsaw.games</div>
+        <div class="pc-perk">✦ 30 day free trial</div>
+        <div class="pc-perk">✦ No credit card today</div>
+        <div class="pc-perk">✦ Cancel anytime</div>
+      </div>
+      <button class="pc-btn btn-bundle" onclick="selectPlan('bundle')">Get The Bundle →</button>
+    </div>
+
+    <!-- jigsaw.games only -->
+    <div class="pc" id="card-jigsaw" onclick="selectPlan('jigsaw')">
+      <div class="pc-site">jigsaw.games</div>
+      <div class="pc-icon">🧩</div>
+      <div class="pc-price"><sup>$</sup>4<sub>.99/mo</sub></div>
+      <div class="pc-desc">Hundreds of stunning jigsaw puzzles — beautiful original artwork, multiple difficulty levels.</div>
+      <div class="pc-perks">
+        <div class="pc-perk">✦ All jigsaw puzzles</div>
+        <div class="pc-perk">✦ 30 day free trial</div>
+        <div class="pc-perk">✦ No credit card today</div>
+        <div class="pc-perk">✦ Cancel anytime</div>
+      </div>
+      <button class="pc-btn btn-jigsaw" onclick="selectPlan('jigsaw')">Start Free Month →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- SIGNUP FORM — slides in after plan selected -->
+<div class="signup-wrap" id="signupWrap">
+  <div class="signup-card">
+    <div class="selected-plan-box">
+      <div class="selected-plan-name" id="planName">—</div>
+      <div class="selected-plan-price" id="planPrice">—</div>
+      <span class="change-plan" onclick="changePlan()">← Change plan</span>
     </div>
 
     <div id="msgBox" class="msg"></div>
 
-    <!-- FREE TRIAL -->
-    <div id="freeTab">
-      <div class="form-group">
-        <label class="form-label">Your Name</label>
-        <input class="form-input" id="freeName" type="text" placeholder="What do we call you?">
+    <div class="form-group">
+      <label class="form-label">Your Name</label>
+      <input class="form-input" id="signupName" type="text" placeholder="What do we call you?">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input class="form-input" id="signupEmail" type="email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Choose a Password</label>
+      <div class="pw-wrap">
+        <input class="form-input" id="signupPassword" type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)" style="padding-right:44px;">
+        <span class="pw-toggle" onclick="togglePw('signupPassword',this)">👁</span>
       </div>
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" id="freeEmail" type="email" placeholder="your@email.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Choose a Password</label>
-        <input class="form-input" id="freePassword" type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)">
-        <div class="password-strength"><div class="strength-bar" id="strengthBar"></div></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Confirm Password</label>
-        <input class="form-input" id="freePassword2" type="password" placeholder="Repeat your password">
-      </div>
-      <button class="main-btn" id="freeBtn" onclick="startFreeTrial()">🎁 Start My Free Month →</button>
-      <div class="perks">
-        <div class="perk">Every game — all of them</div>
-        <div class="perk">No credit card needed</div>
-        <div class="perk">Confirmation email sent instantly</div>
-        <div class="perk">30 days full access</div>
-        <div class="perk">Cancel anytime — no fuss</div>
+      <div class="strength-bar-wrap"><div class="strength-bar" id="strengthBar"></div></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirm Password</label>
+      <div class="pw-wrap">
+        <input class="form-input" id="signupPassword2" type="password" placeholder="Repeat your password" style="padding-right:44px;">
+        <span class="pw-toggle" onclick="togglePw('signupPassword2',this)">👁</span>
       </div>
     </div>
 
-    <!-- PAID -->
-    <div id="paidTab" style="display:none;">
-      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);
-        border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:center;">
-        <div style="font-size:22px;font-weight:900;color:#ffd700;">$4.99<span style="font-size:13px;color:var(--muted);">/month</span></div>
-        <div style="font-size:11px;color:#c9a84c;margin-top:2px;">✦ All 17 games · Ad-free · Cancel anytime ✦</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Your Name</label>
-        <input class="form-input" id="paidName" type="text" placeholder="What do we call you?">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input class="form-input" id="paidEmail" type="email" placeholder="your@email.com">
-      </div>
-      <button class="main-btn" onclick="startSubscription()" style="background:linear-gradient(135deg,#c9a84c,#ffd700);color:#0d0d0f;font-weight:800;">
-        💳 Subscribe Now — $4.99/month →
-      </button>
-      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.7;">
-        🔒 Secure payment via Stripe · Cancel anytime<br>
-        Less than a coffee a month ☕<br>
-        <span style="color:#c9a84c;">First month free — charged after 30 days</span>
-      </p>
+    <button class="submit-btn" id="submitBtn" onclick="startSignup()">🎁 Start My Free Month →</button>
+
+    <div class="fine-print">
+      🔒 Secure payment via Stripe · $0.00 today<br>
+      Cancel before 30 days and you'll never be charged<br>
+      No violence · No ads · Built with love in Hawaii 🌺
     </div>
 
-    <div class="already-member">Already have an account? <a href="/login">Sign in →</a></div>
+    <div class="already">Already have an account? <a href="/login">Sign in →</a></div>
   </div>
+</div>
+
+<!-- JIGSAW CROSSPROMO -->
+<div style="max-width:500px;margin:0 auto 40px;padding:0 20px;">
+  <div style="background:linear-gradient(135deg,#0d0b1a,#120d20);border:1px solid rgba(118,75,162,0.3);border-radius:8px;padding:32px 28px;text-align:center;">
+    <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#9b59b6;margin-bottom:16px;font-weight:600;">Also from the same team</div>
+    <div style="font-size:56px;margin-bottom:12px;">🧩</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--white);margin-bottom:10px;">jigsaw.games</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:20px;">Hundreds of stunning jigsaw puzzles featuring beautiful original artwork. Easy, Medium, Hard or Expert — endlessly relaxing, endlessly beautiful.</div>
+    <a href="https://www.jigsaw.games" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#764ba2,#4a2580);color:#fff;padding:13px 32px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:filter 0.2s;" onmouseover="this.style.filter='brightness(1.2)'" onmouseout="this.style.filter='none'">Visit jigsaw.games →</a>
+  </div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item">🔒 Secure via Stripe</div>
+  <div class="trust-item">💚 No violence or dark content</div>
+  <div class="trust-item">👨‍👩‍👧‍👦 Safe for all ages</div>
+  <div class="trust-item">🌺 Made in Hawaii</div>
+  <div class="trust-item">❌ Cancel anytime</div>
 </div>
 
 <footer>© 2026 fab.games — Made with 🌺 in Hawaii</footer>
 
 <script>
-let sbClient;
+// ── CONFIG & INIT ────────────────────────────────
+const PRICES = {
+  fab:    'price_1TemBdRszIkvwb2pMlZbPBjC',
+  jigsaw: 'price_1TgXljRszIkvwb2pYi75vBvK',
+  bundle: 'price_1TkbaVRszIkvwb2peR2Ne9Vb'
+};
+const PLAN_NAMES = {
+  fab:    '🎮 fab.games Premium',
+  jigsaw: '🧩 jigsaw.games Premium',
+  bundle: '🎮🧩 fab.games + jigsaw.games Bundle'
+};
+const PLAN_PRICES = {
+  fab:    '30 days free · then $4.99/month',
+  jigsaw: '30 days free · then $4.99/month',
+  bundle: '30 days free · then $7.99/month · Save $2/month!'
+};
 
-async function init(){
+var selectedPlan = null;
+var supabase = null;
+
+// Init supabase
+window.addEventListener('load', function(){
   try{
-    const res = await fetch('/api/config');
-    const config = await res.json();
-    sbClient = window.supabase.createClient(config.supabase_url, config.supabase_anon_key);
+    const SB = window.supabase || window.Supabase;
+    const createClient = SB.createClient;
+    supabase = createClient(
+      'https://xbzeakoypdyslnnriaef.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiemVha295cGR5c2xubnJpYWVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDI5MzIsImV4cCI6MjA5NjIxODkzMn0.-pS2FE-Q-_EetM5ONbJycZWFm336wJ-z4MTOGCdA1LE'
+    );
+    supabase.auth.getSession().then(({data:{session}})=>{
+      if(session) window.location.href='/play';
+    });
+  }catch(e){ console.log('Supabase init error:', e); }
+});
 
-    // Check tab from URL
-    const params = new URLSearchParams(window.location.search);
-    // Show correct tab based on URL param
-    const tabParam = params.get('tab');
-    if(tabParam==='paid'){
-      showTab('paid');
-      // Scroll to form
-      setTimeout(()=>document.querySelector('.card')?.scrollIntoView({behavior:'smooth'}),300);
-    }
-
-    // Check if already logged in
-    const { data:{ session } } = await sbClient.auth.getSession();
-    if(session) window.location.href='/play';
-  }catch(e){ console.log('Init error:', e); }
-}
-init();
-
-function showTab(tab){
-  const freeBtn=document.getElementById('freeTabBtn');
-  const paidBtn=document.getElementById('paidTabBtn');
-  if(freeBtn){ freeBtn.classList.toggle('active', tab==='free'); freeBtn.classList.remove('paid-tab'); }
-  if(paidBtn){ paidBtn.classList.toggle('active', tab==='paid'); if(tab==='paid') paidBtn.classList.add('paid-tab'); }
-  document.getElementById('freeTab').style.display = tab==='free'?'block':'none';
-  document.getElementById('paidTab').style.display = tab==='paid'?'block':'none';
+// ── PLAN SELECTION ───────────────────────────────
+function selectPlan(plan){
+  selectedPlan = plan;
+  // Highlight selected card
+  document.querySelectorAll('.pc').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card-'+plan).classList.add('selected');
+  // Update form header
+  document.getElementById('planName').textContent = PLAN_NAMES[plan];
+  document.getElementById('planPrice').textContent = PLAN_PRICES[plan];
+  // Show form
+  const wrap = document.getElementById('signupWrap');
+  wrap.style.display = 'block';
+  setTimeout(() => wrap.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
   hideMsg();
 }
 
-function showMsg(msg,type='error'){
-  const el=document.getElementById('msgBox');
-  el.innerHTML=msg;
-  el.className='msg '+type;
-  el.style.display='block';
+function changePlan(){
+  document.getElementById('signupWrap').style.display = 'none';
+  document.querySelectorAll('.pc').forEach(c => c.classList.remove('selected'));
+  selectedPlan = null;
+  window.scrollTo({ top:0, behavior:'smooth' });
 }
-function hideMsg(){ document.getElementById('msgBox').style.display='none'; }
+
+// ── HELPERS ──────────────────────────────────────
+function showMsg(msg, type='error'){
+  const el = document.getElementById('msgBox');
+  el.innerHTML = msg; el.className = 'msg ' + type; el.style.display = 'block';
+}
+function hideMsg(){ document.getElementById('msgBox').style.display = 'none'; }
+
+function togglePw(id, icon){
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+  icon.style.opacity = el.type === 'text' ? '1' : '0.4';
+}
 
 function checkStrength(pw){
-  const bar=document.getElementById('strengthBar');
-  let strength=0;
-  if(pw.length>=8) strength++;
-  if(/[A-Z]/.test(pw)) strength++;
-  if(/[0-9]/.test(pw)) strength++;
-  if(/[^A-Za-z0-9]/.test(pw)) strength++;
-  const colors=['#ef4444','#f97316','#eab308','#22c55e'];
-  const widths=['25%','50%','75%','100%'];
-  bar.style.width = pw.length>0 ? widths[strength-1]||'10%' : '0%';
-  bar.style.background = pw.length>0 ? colors[strength-1]||'#ef4444' : '';
+  const bar = document.getElementById('strengthBar');
+  let s = 0;
+  if(pw.length >= 8) s++;
+  if(/[A-Z]/.test(pw)) s++;
+  if(/[0-9]/.test(pw)) s++;
+  if(/[^A-Za-z0-9]/.test(pw)) s++;
+  const colors = ['#ef4444','#f97316','#eab308','#22c55e'];
+  const widths = ['25%','50%','75%','100%'];
+  bar.style.width = pw.length > 0 ? widths[s-1] || '10%' : '0';
+  bar.style.background = pw.length > 0 ? colors[s-1] || '#ef4444' : '';
 }
 
-async function startFreeTrial(){
-  const name     = document.getElementById('freeName').value.trim();
-  const email    = document.getElementById('freeEmail').value.trim().toLowerCase();
-  const password = document.getElementById('freePassword').value;
-  const password2= document.getElementById('freePassword2').value;
+// ── SIGNUP FLOW ──────────────────────────────────
+async function startSignup(){
+  if(!selectedPlan){ showMsg('Please choose a plan above!'); return; }
 
-  // Validation
-  if(!name){ showMsg('Please enter your name!'); return; }
-  if(!email||!email.includes('@')){ showMsg('Please enter a valid email address!'); return; }
-  if(password.length<8){ showMsg('Password must be at least 8 characters!'); return; }
-  if(password!==password2){ showMsg('Passwords don\'t match — please try again!'); return; }
+  const name      = document.getElementById('signupName').value.trim();
+  const email     = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const password  = document.getElementById('signupPassword').value;
+  const password2 = document.getElementById('signupPassword2').value;
 
-  const btn=document.getElementById('freeBtn');
-  btn.disabled=true;
-  btn.textContent='Creating your account...';
-  showMsg('Setting up your free month...','info');
+  if(!name)   { showMsg('Please enter your name!'); return; }
+  if(!email || !email.includes('@')) { showMsg('Please enter a valid email address!'); return; }
+  if(password.length < 8) { showMsg('Password must be at least 8 characters!'); return; }
+  if(password !== password2) { showMsg('Passwords don\'t match — please check and try again!'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Creating your account...';
+  showMsg('Setting up your account...', 'info');
 
   try{
-    // Try to sign up with Supabase Auth
-    const { data, error } = await sbClient.auth.signUp({
-      email, password,
-      options:{
-        data:{ name, status:'trial' },
-        emailRedirectTo:'https://www.fab.games/play'
-      }
-    });
-
-    if(error){
-      // Already registered
-      if(error.message.includes('already registered') || error.message.includes('already been registered')){
-        // Check if they already used free trial
-        const checkRes = await fetch('/api/check-member', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({email, name:document.getElementById('paidName')?.value.trim()||''})
-        });
-        const checkData = await checkRes.json();
-
-        if(checkData.status==='active'){
-          showMsg('🌟 You\'re already a Premium member! <a href="/login" style="color:var(--gold2);font-weight:700;">Sign in here →</a>','info');
-        } else if(checkData.status==='trial'){
-          showMsg('🎮 You already have a free trial account! <a href="/login" style="color:var(--gold2);font-weight:700;">Sign in here →</a>','info');
-        } else {
-          showMsg('📧 This email already has an account. <a href="/login" style="color:var(--gold2);font-weight:700;">Sign in here →</a> or <a href="/login" style="color:var(--gold2);">reset your password</a>','info');
-        }
-      } else {
-        showMsg(error.message);
-      }
-      btn.disabled=false;
-      btn.textContent='Start Free Month →';
-      return;
-    }
-
-    // Save to members table via API
-    await fetch('/api/free-trial',{
+    // Step 1 — Register via server (handles Supabase + members table)
+    showMsg('Setting up your account...', 'info');
+    const regRes = await fetch('/api/free-trial',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name, email})
+      body:JSON.stringify({ name, email, password, plan:selectedPlan })
     });
+    const regData = await regRes.json();
 
-    // Save locally
-    localStorage.setItem('fabEmail', email);
-    localStorage.setItem('fabName', name);
+    // Step 2 — Stripe checkout
+    showMsg('Account created!! Redirecting to secure payment...', 'info');
+    const res = await fetch('/api/create-checkout',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ email, name, plan:selectedPlan })
+    });
+    const checkout = await res.json();
 
-    // Show success — tell them to check email
-    hideMsg();
-    document.getElementById('freeTab').innerHTML=`
-      <div style="text-align:center;padding:20px 0;">
-        <div style="font-size:56px;margin-bottom:16px;">📧</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold);margin-bottom:12px;">Check Your Email!!</div>
-        <p style="font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:20px;">We sent a confirmation link to <strong style="color:var(--white);">${email}</strong><br>Click it to confirm your account and start playing!!</p>
-        <p style="font-size:12px;color:var(--muted);line-height:1.7;">Didn't get it? Check your spam folder.<br>The email comes from <strong>fab.games</strong></p>
-      </div>`;
+    if(checkout.ok && checkout.url){
+      window.location.href = checkout.url;
+    } else {
+      showMsg(checkout.msg || 'Something went wrong — please try again!');
+      btn.disabled = false;
+      btn.textContent = '🎁 Start My Free Month →';
+    }
 
   }catch(e){
     showMsg('Connection error — please try again!');
-    btn.disabled=false;
-    btn.textContent='Start Free Month →';
+    btn.disabled = false;
+    btn.textContent = '🎁 Start My Free Month →';
   }
 }
 
-async function startSubscription(){
-  const email=document.getElementById('paidEmail').value.trim();
-  if(!email||!email.includes('@')){ showMsg('Please enter a valid email address!'); return; }
-  showMsg('Redirecting to secure checkout...','info');
-  try{
-    const res=await fetch('/api/create-checkout',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email, name:document.getElementById('paidName')?.value.trim()||''})
-    });
-    const data=await res.json();
-    if(data.ok){ window.location.href=data.url; }
-    else{ showMsg(data.msg||'Something went wrong!'); }
-  }catch(e){ showMsg('Connection error — please try again!'); }
-}
-</script>
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(r=>console.log('[fab.games] SW ready'))
-      .catch(e=>console.log('[fab.games] SW error',e));
-  });
-}
+// Enter key support
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter') startSignup();
+});
 </script>
 </body>
 </html>

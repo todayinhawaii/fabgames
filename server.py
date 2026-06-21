@@ -12,9 +12,11 @@ STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
 STRIPE_PRICE_ID = os.environ.get('STRIPE_PRICE_ID')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
 # Supabase config
-SUPABASE_URL = os.environ.get('SUPABASE_URL')
-SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY')
+SUPABASE_URL = os.environ.get('SUPABASE_URL') or 'https://xbzeakoypdyslnnriaef.supabase.co'
+SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY') or 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiemVha295cGR5c2xubnJpYWVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDI5MzIsImV4cCI6MjA5NjIxODkzMn0.-pS2FE-Q-_EetM5ONbJycZWFm336wJ-z4MTOGCdA1LE'
 SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
+print(f"SUPABASE_URL: {SUPABASE_URL}", flush=True)
+print(f"SUPABASE_SERVICE_KEY set: {bool(SUPABASE_SERVICE_KEY)}", flush=True)
 def supabase_request(method, path, data=None, use_service_key=False):
     """Make a request to Supabase REST API"""
     url = f"{SUPABASE_URL}/rest/v1/{path}"
@@ -91,12 +93,43 @@ def config():
 @app.route('/api/free-trial', methods=['POST'])
 def free_trial():
     data = request.get_json()
-    email = data.get('email', '').strip().lower()
-    name  = data.get('name', '').strip()
+    email    = data.get('email', '').strip().lower()
+    name     = data.get('name', '').strip()
+    password = data.get('password', '').strip()
+    plan     = data.get('plan', 'fab')
     if not email or '@' not in email:
         return jsonify({'ok': False, 'msg': 'Please enter a valid email!'})
     trial_end = (datetime.utcnow() + timedelta(days=30)).isoformat()
-    # Check if member already exists
+
+    # Step 1: Create Supabase Auth user via Admin API
+    if password:
+        try:
+            auth_url = f"{SUPABASE_URL}/auth/v1/admin/users"
+            auth_headers = {
+                'apikey': SUPABASE_SERVICE_KEY,
+                'Authorization': f'Bearer {SUPABASE_SERVICE_KEY}',
+                'Content-Type': 'application/json'
+            }
+            auth_body = json.dumps({
+                'email': email,
+                'password': password,
+                'email_confirm': True,
+                'user_metadata': {'name': name, 'plan': plan}
+            }).encode()
+            req = urllib.request.Request(auth_url, data=auth_body, headers=auth_headers, method='POST')
+            try:
+                with urllib.request.urlopen(req) as res:
+                    auth_result = json.loads(res.read().decode())
+                    print(f"Auth user created: {email}", flush=True)
+            except urllib.error.HTTPError as e:
+                err = e.read().decode()
+                print(f"Auth error: {err}", flush=True)
+                if 'already registered' in err or 'already been registered' in err:
+                    pass  # User exists, continue to members table
+        except Exception as e:
+            print(f"Auth exception: {e}", flush=True)
+
+    # Step 2: Check if member already exists
     existing = supabase_request('GET',
         f"members?email=eq.{urllib.parse.quote(email)}&select=*",
         use_service_key=True)
@@ -104,18 +137,19 @@ def free_trial():
         m = existing[0]
         if m.get('status') in ['trial', 'active']:
             return jsonify({'ok': True, 'existing': True, 'msg': 'Welcome back!!'})
-    # Insert new member
+
+    # Step 3: Insert new member
     result = supabase_request('POST', 'members', {
         'email': email,
         'name': name,
         'status': 'trial',
-        'trial_end': trial_end
+        'trial_end': trial_end,
+        'plan': plan
     }, use_service_key=True)
     if result is None:
-        # Try upsert
         supabase_request('PATCH',
             f"members?email=eq.{urllib.parse.quote(email)}",
-            {'status': 'trial', 'trial_end': trial_end, 'name': name},
+            {'status': 'trial', 'trial_end': trial_end, 'name': name, 'plan': plan},
             use_service_key=True)
     return jsonify({'ok': True, 'msg': 'Welcome to fab.games! Enjoy your free month!!'})
 # ── PWA FILES ────────────────────────────────────
@@ -174,18 +208,30 @@ def check_access():
 def create_checkout():
     data = request.get_json()
     email = data.get('email', '').strip().lower()
+    name  = data.get('name', '').strip()
+    plan  = data.get('plan', 'fab')
+    # Use passed price_id if provided, otherwise fall back to env
+    price_id = data.get('price_id') or STRIPE_PRICE_ID
     try:
+        # Build metadata so webhook knows which plan was purchased
+        metadata = {'plan': plan, 'name': name}
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             mode='subscription',
             customer_email=email,
-            line_items=[{'price': STRIPE_PRICE_ID, 'quantity': 1}],
+            line_items=[{'price': price_id, 'quantity': 1}],
+            subscription_data={
+                'trial_period_days': 30,
+                'metadata': metadata,
+            },
             success_url='https://www.fab.games/success?session_id={CHECKOUT_SESSION_ID}',
             cancel_url='https://www.fab.games/join',
             allow_promotion_codes=True,
+            metadata=metadata,
         )
         return jsonify({'ok': True, 'url': session.url})
     except Exception as e:
+        print(f'CHECKOUT ERROR: {e}', flush=True)
         return jsonify({'ok': False, 'msg': str(e)})
 # ── STRIPE BILLING PORTAL ─────────────────────────
 @app.route('/api/create-portal-session', methods=['POST'])
@@ -223,21 +269,29 @@ def webhook():
         session = event['data']['object']
         email = session.get('customer_email', '').lower()
         customer_id = session.get('customer')
-        # Update or insert member as active
+        metadata = session.get('metadata', {})
+        plan = metadata.get('plan', 'fab')
+        name = metadata.get('name', '')
+        # Update or insert member as active with plan info
         existing = supabase_request('GET',
             f"members?email=eq.{urllib.parse.quote(email)}&select=*",
             use_service_key=True)
+        patch = {
+            'status': 'active',
+            'stripe_customer': customer_id,
+            'plan': plan,
+        }
+        if name:
+            patch['name'] = name
         if existing and len(existing) > 0:
             supabase_request('PATCH',
                 f"members?email=eq.{urllib.parse.quote(email)}",
-                {'status': 'active', 'stripe_customer': customer_id},
+                patch,
                 use_service_key=True)
         else:
-            supabase_request('POST', 'members', {
-                'email': email,
-                'status': 'active',
-                'stripe_customer': customer_id
-            }, use_service_key=True)
+            patch['email'] = email
+            supabase_request('POST', 'members', patch, use_service_key=True)
+        print(f'MEMBER ACTIVATED: {email} plan={plan}', flush=True)
     elif event['type'] == 'customer.subscription.updated':
         sub = event['data']['object']
         customer_id = sub.get('customer')
@@ -394,6 +448,11 @@ def learn_the_body():
 @app.route('/happy-buttons')
 def happy_buttons():
     return send_from_directory('.', 'happy_buttons.html')
+
+
+@app.route('/fun-with-numbers')
+def fun_with_numbers():
+    return send_from_directory('.', 'fun-with-numbers.html')
 
 @app.route('/freegames')
 def freegames():
