@@ -174,18 +174,30 @@ def check_access():
 def create_checkout():
     data = request.get_json()
     email = data.get('email', '').strip().lower()
+    name  = data.get('name', '').strip()
+    plan  = data.get('plan', 'fab')
+    # Use passed price_id if provided, otherwise fall back to env
+    price_id = data.get('price_id') or STRIPE_PRICE_ID
     try:
+        # Build metadata so webhook knows which plan was purchased
+        metadata = {'plan': plan, 'name': name}
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             mode='subscription',
             customer_email=email,
-            line_items=[{'price': STRIPE_PRICE_ID, 'quantity': 1}],
+            line_items=[{'price': price_id, 'quantity': 1}],
+            subscription_data={
+                'trial_period_days': 30,
+                'metadata': metadata,
+            },
             success_url='https://www.fab.games/success?session_id={CHECKOUT_SESSION_ID}',
             cancel_url='https://www.fab.games/join',
             allow_promotion_codes=True,
+            metadata=metadata,
         )
         return jsonify({'ok': True, 'url': session.url})
     except Exception as e:
+        print(f'CHECKOUT ERROR: {e}', flush=True)
         return jsonify({'ok': False, 'msg': str(e)})
 # ── STRIPE BILLING PORTAL ─────────────────────────
 @app.route('/api/create-portal-session', methods=['POST'])
@@ -223,21 +235,29 @@ def webhook():
         session = event['data']['object']
         email = session.get('customer_email', '').lower()
         customer_id = session.get('customer')
-        # Update or insert member as active
+        metadata = session.get('metadata', {})
+        plan = metadata.get('plan', 'fab')
+        name = metadata.get('name', '')
+        # Update or insert member as active with plan info
         existing = supabase_request('GET',
             f"members?email=eq.{urllib.parse.quote(email)}&select=*",
             use_service_key=True)
+        patch = {
+            'status': 'active',
+            'stripe_customer': customer_id,
+            'plan': plan,
+        }
+        if name:
+            patch['name'] = name
         if existing and len(existing) > 0:
             supabase_request('PATCH',
                 f"members?email=eq.{urllib.parse.quote(email)}",
-                {'status': 'active', 'stripe_customer': customer_id},
+                patch,
                 use_service_key=True)
         else:
-            supabase_request('POST', 'members', {
-                'email': email,
-                'status': 'active',
-                'stripe_customer': customer_id
-            }, use_service_key=True)
+            patch['email'] = email
+            supabase_request('POST', 'members', patch, use_service_key=True)
+        print(f'MEMBER ACTIVATED: {email} plan={plan}', flush=True)
     elif event['type'] == 'customer.subscription.updated':
         sub = event['data']['object']
         customer_id = sub.get('customer')
