@@ -114,4 +114,8 @@ const GAMES=[
    desc:'Drag gorgeous 3D rainbow shapes into their matching glowing holes! Circle, Square, Triangle and 13 more — Vegas celebrations, neon colours and big happy sounds!!',
    color:'rgba(128,0,255,0.15)',href:'/fun-with-shapes'},
 
+  {id:'magic-sound-keys',emoji:'🎹',cat:'Music · Creative',title:'Magic Sound Keys',
+   desc:'Play a real piano keyboard OR unleash 44 hilarious sound effects — animals, crowd, transport, silly sounds, nature and party!! Hours of musical fun for all ages!!',
+   color:'rgba(200,0,255,0.15)',href:'/magic-sound-keys'},
+
 ];
