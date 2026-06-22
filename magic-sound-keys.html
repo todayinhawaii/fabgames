@@ -611,7 +611,7 @@ function setMode(mode){
 }
 
 // ── REAL SOUND FX ENGINE ─────────────────────────
-// Load real MP3s from /sounds/ folder
+// Load real MP3s from / folder
 const AUDIO_CACHE = {};
 
 function playFX(name){
@@ -624,53 +624,53 @@ function playFX(name){
   // Map FX name to MP3 file
   const soundMap = {
     // Animals
-    dog:       '/sounds/dog.mp3',
-    cat:       '/sounds/cat.mp3',
-    cow:       '/sounds/cow.mp3',
-    elephant:  '/sounds/elephant.mp3',
-    lion:      '/sounds/lion.mp3',
-    frog:      '/sounds/frog.mp3',
-    bird:      '/sounds/bird.mp3',
-    horse:     '/sounds/horse.mp3',
+    dog:       '/dog.mp3',
+    cat:       '/cat.mp3',
+    cow:       '/cow.mp3',
+    elephant:  '/elephant.mp3',
+    lion:      '/lion.mp3',
+    frog:      '/frog.mp3',
+    bird:      '/bird.mp3',
+    horse:     '/horse.mp3',
     // Crowd
-    clap:      '/sounds/clap.mp3',
-    cheer:     '/sounds/cheer.mp3',
-    boo:       '/sounds/boo.mp3',
-    laugh:     '/sounds/laugh.mp3',
-    whistle:   '/sounds/whistle.mp3',
-    gasp:      '/sounds/gasp.mp3',
+    clap:      '/clap.mp3',
+    cheer:     '/cheer.mp3',
+    boo:       '/boo.mp3',
+    laugh:     '/laugh.mp3',
+    whistle:   '/whistle.mp3',
+    gasp:      '/gasp.mp3',
     // Transport
-    carhorn:   '/sounds/carhorn.mp3',
-    traffic:   '/sounds/traffic.mp3',
-    train:     '/sounds/train.mp3',
-    airplane:  '/sounds/airplane.mp3',
-    siren:     '/sounds/siren.mp3',
-    bike:      '/sounds/bike.mp3',
+    carhorn:   '/carhorn.mp3',
+    traffic:   '/traffic.mp3',
+    train:     '/train.mp3',
+    airplane:  '/airplane.mp3',
+    siren:     '/siren.mp3',
+    bike:      '/bike.mp3',
     // Silly
-    fart:      '/sounds/fart.mp3',
-    burp:      '/sounds/burp.mp3',
-    boing:     '/sounds/boing.mp3',
-    splat:     '/sounds/splat.mp3',
-    slidewhistle:'/sounds/slidewhistle.mp3',
-    womp:      '/sounds/womp.mp3',
-    spring:    '/sounds/spring.mp3',
-    zap:       '/sounds/zap.mp3',
+    fart:      '/fart.mp3',
+    burp:      '/burp.mp3',
+    boing:     '/boing.mp3',
+    splat:     '/splat.mp3',
+    slidewhistle:'/slidewhistle.mp3',
+    womp:      '/womp.mp3',
+    spring:    '/spring.mp3',
+    zap:       '/zap.mp3',
     // Nature
-    thunder:   '/sounds/thunder.mp3',
-    rain:      '/sounds/rain.mp3',
-    ocean:     '/sounds/ocean.mp3',
-    wind:      '/sounds/wind.mp3',
-    fire:      '/sounds/fire.mp3',
-    earthquake:'/sounds/earthquake.mp3',
+    thunder:   '/thunder.mp3',
+    rain:      '/rain.mp3',
+    ocean:     '/ocean.mp3',
+    wind:      '/wind.mp3',
+    fire:      '/fire.mp3',
+    earthquake:'/earthquake.mp3',
     // Party
-    airhorn:   '/sounds/airhorn.mp3',
-    drumroll:  '/sounds/drumroll.mp3',
-    fanfare:   '/sounds/fanfare.mp3',
-    pop:       '/sounds/pop.mp3',
-    ding:      '/sounds/ding.mp3',
-    buzzer:    '/sounds/buzzer.mp3',
-    levelup:   '/sounds/levelup.mp3',
-    coin:      '/sounds/coin.mp3',
+    airhorn:   '/airhorn.mp3',
+    drumroll:  '/drumroll.mp3',
+    fanfare:   '/fanfare.mp3',
+    pop:       '/pop.mp3',
+    ding:      '/ding.mp3',
+    buzzer:    '/buzzer.mp3',
+    levelup:   '/levelup.mp3',
+    coin:      '/coin.mp3',
   };
 
   const url = soundMap[name];
@@ -683,19 +683,16 @@ function playFX(name){
   }
   const audio = AUDIO_CACHE[name];
   audio.currentTime = 0;
-  audio.play().catch(e => {
-    // Fallback — create fresh Audio if cached one fails
+  audio.volume = 0.9;
+  audio.play().then(()=>{
+    console.log('✅ Playing:', url);
+  }).catch(e => {
+    console.log('❌ Failed:', url, e.message);
+    // Try fresh instance
     const fresh = new Audio(url);
-    fresh.volume = 0.8;
-    fresh.play().catch(err => console.log('Sound failed:', err));
+    fresh.volume = 0.9;
+    fresh.play().catch(err => console.log('❌ Fresh also failed:', err));
   });
-
-  // Feed into visualizer if possible
-  try{
-    getAC();
-    const src = actx.createMediaElementSource(audio);
-    src.connect(analyser);
-  }catch(e){}
 }
 
 // playFX defined above in real sound engine
