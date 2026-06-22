@@ -462,6 +462,10 @@ def fun_with_shapes():
 def magic_sound_keys():
     return send_from_directory('.', 'magic-sound-keys.html')
 
+@app.route('/street-hustler')
+def street_hustler():
+    return send_from_directory('.', 'street-hustler.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
