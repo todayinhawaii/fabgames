@@ -555,8 +555,37 @@ const SPEEDS = {
   hustler: { shuffles:18, duration:140, pause:60  },
 };
 
-const PRAISES = ['🎉 CORRECT!!','🔥 AMAZING!!','💫 SHARP EYES!!','⭐ BRILLIANT!!','🎯 GOT IT!!','🦅 EAGLE EYES!!'];
-const TAUNTS = ['😈 FOOLED YOU!!','👹 TOO FAST!!','🃏 THE HUSTLER WINS!!','😏 BETTER LUCK!!','💀 NOT THIS TIME!!'];
+const PRAISES = [
+  "🔥 YO YOU GOT IT!! NICE!!",
+  "👀 SHARP EYES B!!",
+  "🎯 AYO YOU GOOD!! REAL GOOD!!",
+  "💫 NOBODY FOOLS YOU SON!!",
+  "🦅 EAGLE EYES ON THE BLOCK!!",
+  "🏆 YOU ON FIRE RIGHT NOW!!",
+  "😤 RESPECT!! YOU SAW THAT!!",
+  "🗽 NEW YORK IN YA BLOOD!!",
+  "🎉 GET IT GET IT GET IT!!",
+  "👊 THAT'S WHAT I'M TALKIN ABOUT!!",
+  "🔥 YOU TOO SMART FOR THIS HUSTLE!!",
+  "💪 AIN'T NO STOPPIN YOU TODAY!!",
+];
+const TAUNTS = [
+  "😈 YO, you got PLAYED son!!",
+  "🃏 Haha! Too slow homie!!",
+  "👹 The streets don't lie, YOU DO!!",
+  "😏 Yo eyes ain't fast enough B!!",
+  "🗽 Welcome to New York baby!!",
+  "💀 Fuggedaboutit!!",
+  "😂 You thought you had me?! NAH!!",
+  "🎩 That's why they call me the HUSTLER!!",
+  "👋 Better luck next time chump!!",
+  "🃏 Ayo I been doin this since '92!!",
+  "😎 You can't see me kid!!",
+  "💸 Step ya game up homie!!",
+  "🗣️ Yo cuz, you gotta pay attention!!",
+  "👀 Eyes on the prize... TOO LATE!!",
+  "🤣 Get outta here with that!!",
+];
 
 // ── BUILD CUPS ────────────────────────────────────
 function buildCups(){
@@ -759,7 +788,7 @@ async function guess(index){
     streak = 0;
     document.getElementById('resultEmoji').textContent = '😈';
     document.getElementById('resultTitle').textContent = TAUNTS[Math.floor(Math.random()*TAUNTS.length)];
-    document.getElementById('resultSub').textContent = `The ball was under cup ${ballCup+1}!`;
+    document.getElementById('resultSub').textContent = `Round ${round} · Keep watching next time!`;
   }
 
   updateStreak();
