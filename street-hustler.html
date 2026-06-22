@@ -536,6 +536,105 @@ header p{color:rgba(255,200,100,0.6);font-size:12px;margin-top:3px;font-weight:7
 </div>
 
 <script>
+// ── AUDIO ENGINE ─────────────────────────────────
+let actx = null;
+function ac(){
+  if(!actx) actx = new(window.AudioContext||window.webkitAudioContext)();
+  return actx;
+}
+
+function playTone(freq, dur=0.3, vol=0.3, type='sine'){
+  const a=ac(), o=a.createOscillator(), g=a.createGain();
+  o.connect(g); g.connect(a.destination);
+  o.type=type; o.frequency.value=freq;
+  g.gain.setValueAtTime(vol, a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, a.currentTime+dur);
+  o.start(); o.stop(a.currentTime+dur+0.05);
+}
+
+function playSweep(f1, f2, dur=0.3, vol=0.3, type='sine'){
+  const a=ac(), o=a.createOscillator(), g=a.createGain();
+  o.connect(g); g.connect(a.destination);
+  o.type=type;
+  o.frequency.setValueAtTime(f1, a.currentTime);
+  o.frequency.exponentialRampToValueAtTime(f2, a.currentTime+dur);
+  g.gain.setValueAtTime(vol, a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, a.currentTime+dur);
+  o.start(); o.stop(a.currentTime+dur+0.05);
+}
+
+function playNoise(dur=0.2, vol=0.3, lowpass=800){
+  const a=ac();
+  const buf=a.createBuffer(1,a.sampleRate*dur,a.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
+  const src=a.createBufferSource();
+  src.buffer=buf;
+  const f=a.createBiquadFilter(); f.type='lowpass'; f.frequency.value=lowpass;
+  const g=a.createGain(); g.gain.setValueAtTime(vol,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+  src.connect(f); f.connect(g); g.connect(a.destination);
+  src.start();
+}
+
+// ── GAME SOUNDS ──────────────────────────────────
+function soundReveal(){
+  // Drum roll reveal — rising tension
+  playSweep(80, 120, 0.6, 0.3, 'sawtooth');
+  playNoise(0.6, 0.15, 400);
+}
+
+function soundShuffle(){
+  // Quick whoosh per swap
+  playSweep(300, 150, 0.08, 0.2, 'sine');
+}
+
+function soundWin(){
+  // Vegas fanfare!
+  const notes = [[523,0],[659,0.1],[784,0.2],[1047,0.35],[1319,0.5],[1047,0.65],[1319,0.8],[1568,0.95]];
+  notes.forEach(([f,t])=>{
+    const a=ac(), o=a.createOscillator(), g=a.createGain();
+    o.connect(g); g.connect(a.destination);
+    o.type='triangle'; o.frequency.value=f;
+    g.gain.setValueAtTime(0,a.currentTime+t);
+    g.gain.linearRampToValueAtTime(0.25,a.currentTime+t+0.03);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+t+0.35);
+    o.start(a.currentTime+t); o.stop(a.currentTime+t+0.4);
+  });
+  // Coin shower sound
+  setTimeout(()=>{
+    for(let i=0;i<8;i++) setTimeout(()=>{
+      playTone(1200+Math.random()*600, 0.08, 0.15, 'sine');
+    }, i*80);
+  }, 500);
+}
+
+function soundLose(){
+  // Sad trombone womp womp
+  [523,440,370,311].forEach((f,i)=>{
+    setTimeout(()=>playSweep(f, f*0.88, 0.25, 0.3, 'sawtooth'), i*220);
+  });
+}
+
+function soundCupLift(){
+  playSweep(200, 400, 0.15, 0.2, 'sine');
+}
+
+function soundCupDown(){
+  playSweep(400, 180, 0.12, 0.2, 'sine');
+}
+
+function soundTick(){
+  playTone(800, 0.04, 0.15, 'square');
+}
+
+function soundStart(){
+  // Air horn style
+  [233, 311, 175].forEach((f,i)=>{
+    setTimeout(()=>playTone(f, 0.4, 0.2, 'sawtooth'), i*60);
+  });
+}
+
 // ── STATE ────────────────────────────────────────
 let cups = [0,1,2,3,4]; // positions array — cups[i] = which cup is at position i
 let ballCup = 0; // which cup index has the ball
@@ -644,6 +743,7 @@ async function liftCup(index, up=true){
   return new Promise(res=>{
     cup.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
     cup.style.transform = up ? 'translateY(-70px)' : 'translateY(0)';
+    if(up) soundCupLift(); else soundCupDown();
     setTimeout(res, 420);
   });
 }
@@ -670,6 +770,7 @@ async function swapCups(a, b, dur){
   cupA.style.transform = `translateX(${diff}px)`;
   cupB.style.transform = `translateX(${-diff}px)`;
 
+  soundShuffle();
   await new Promise(res=>setTimeout(res, dur+30));
 
   // Actually swap DOM positions
@@ -711,6 +812,7 @@ async function startGame(){
   // Reset cups
   buildCups();
   ballCup = Math.floor(Math.random()*5);
+  soundStart();
 
   // Show ball
   showBall(true);
@@ -759,6 +861,7 @@ async function guess(index){
   gamePhase = 'revealing';
 
   // Lift ALL cups to reveal
+  soundReveal();
   for(let i=0;i<5;i++) liftCup(i,true);
   showBall(true);
   await sleep(500);
@@ -766,6 +869,7 @@ async function guess(index){
   const correct = index===ballCup;
 
   if(correct){
+    soundWin();
     score += getPoints();
     streak++;
     if(score>best){ best=score; localStorage.setItem('witb_best',best); }
