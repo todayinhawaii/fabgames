@@ -118,4 +118,8 @@ const GAMES=[
    desc:'Play a real piano keyboard OR unleash 44 hilarious sound effects — animals, crowd, transport, silly sounds, nature and party!! Hours of musical fun for all ages!!',
    color:'rgba(200,0,255,0.15)',href:'/magic-sound-keys'},
 
+  {id:'street-hustler',emoji:'🎩',cat:'Arcade · Strategy',title:'Street Hustler',
+   desc:'Watch the ball... or lose it all! 5 cups, 1 ball, NYC back alley vibes. Can you beat the hustler? Easy to Hustler difficulty — the ultimate shell game!!',
+   color:'rgba(255,50,0,0.15)',href:'/street-hustler'},
+
 ];
