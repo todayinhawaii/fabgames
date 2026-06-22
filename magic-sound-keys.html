@@ -278,10 +278,15 @@ header p{color:rgba(255,255,255,0.5);font-size:12px;margin-top:3px;font-weight:7
 #vizCanvas{width:100%;height:60px;}
 
 @media(max-width:500px){
-  .key.white{width:40px;}
-  .key.black{width:26px;margin:0 -13px;}
+  .key.white{width:28px;height:140px;font-size:8px;}
+  .key.black{width:18px;height:86px;margin:0 -9px;font-size:7px;}
   .fx-btn{min-width:76px;padding:12px 12px;}
   .fx-emoji{font-size:24px;}
+  .keyboard{gap:1px;padding:0 4px;}
+}
+@media(max-width:380px){
+  .key.white{width:22px;height:120px;font-size:7px;}
+  .key.black{width:14px;height:74px;margin:0 -7px;}
 }
 </style>
 </head>
@@ -370,7 +375,7 @@ header p{color:rgba(255,255,255,0.5);font-size:12px;margin-top:3px;font-weight:7
       <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-train" onclick="toggleFX('train',this)"><div class="fx-emoji">🚂</div><div class="fx-label">Train</div><div class="fx-play-indicator" id="fxind-train">▶</div></button></div>
       <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-airplane" onclick="toggleFX('airplane',this)"><div class="fx-emoji">✈️</div><div class="fx-label">Airplane</div><div class="fx-play-indicator" id="fxind-airplane">▶</div></button></div>
       <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-siren" onclick="toggleFX('siren',this)"><div class="fx-emoji">🚨</div><div class="fx-label">Siren</div><div class="fx-play-indicator" id="fxind-siren">▶</div></button></div>
-      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-bike" onclick="toggleFX('bike',this)"><div class="fx-emoji">🏍️</div><div class="fx-label">Motorbike</div><div class="fx-play-indicator" id="fxind-bike">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-bike" onclick="toggleFX('bike',this)"><div class="fx-emoji">🏍️</div><div class="fx-label">Bike</div><div class="fx-play-indicator" id="fxind-bike">▶</div></button></div>
     </div>
   </div>
 
