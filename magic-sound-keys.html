@@ -229,6 +229,34 @@ header p{color:rgba(255,255,255,0.5);font-size:12px;margin-top:3px;font-weight:7
   box-shadow:0 0 30px currentColor;
 }
 
+/* ── STOP ALL BUTTON ── */
+.stop-all-btn{
+  display:block;
+  width:100%;max-width:300px;
+  margin:0 auto 20px;
+  font-family:'Fredoka One',cursive;font-size:20px;
+  padding:16px 32px;border-radius:20px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#ff0040,#cc0020);
+  color:#fff;
+  box-shadow:0 6px 0 #880020,0 8px 24px rgba(255,0,64,0.4);
+  transition:all 0.15s;letter-spacing:1px;
+}
+.stop-all-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #880020;}
+.stop-all-btn:hover{filter:brightness(1.15);}
+
+/* ── INDIVIDUAL PAUSE ── */
+.fx-btn-wrap{position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:4px;}
+.fx-pause-btn{
+  font-size:10px;font-weight:700;letter-spacing:1px;
+  padding:4px 10px;border-radius:10px;border:none;cursor:pointer;
+  background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);
+  font-family:'Nunito',sans-serif;
+  transition:all 0.2s;
+  width:100%;
+}
+.fx-pause-btn:hover{background:rgba(255,255,255,0.2);color:#fff;}
+.fx-pause-btn.paused{background:rgba(255,200,0,0.2);color:#ffd700;}
+
 /* Category colours */
 .cat-animals .fx-btn{background:linear-gradient(135deg,#1a3a00,#0d2000);border-color:rgba(100,220,50,0.3);color:#88ff44;}
 .cat-crowd .fx-btn{background:linear-gradient(135deg,#3a1a00,#200d00);border-color:rgba(255,150,50,0.3);color:#ff8822;}
@@ -315,78 +343,204 @@ header p{color:rgba(255,255,255,0.5);font-size:12px;margin-top:3px;font-weight:7
   <div class="fx-category cat-animals">
     <div class="fx-cat-title">🐾 Animals</div>
     <div class="fx-grid">
-      <button class="fx-btn" onclick="playFX('dog')"><div class="fx-emoji">🐕</div><div class="fx-label">Dog Bark</div></button>
-      <button class="fx-btn" onclick="playFX('cat')"><div class="fx-emoji">🐱</div><div class="fx-label">Cat Meow</div></button>
-      <button class="fx-btn" onclick="playFX('cow')"><div class="fx-emoji">🐄</div><div class="fx-label">Cow Moo</div></button>
-      <button class="fx-btn" onclick="playFX('elephant')"><div class="fx-emoji">🐘</div><div class="fx-label">Elephant</div></button>
-      <button class="fx-btn" onclick="playFX('lion')"><div class="fx-emoji">🦁</div><div class="fx-label">Lion Roar</div></button>
-      <button class="fx-btn" onclick="playFX('frog')"><div class="fx-emoji">🐸</div><div class="fx-label">Frog</div></button>
-      <button class="fx-btn" onclick="playFX('bird')"><div class="fx-emoji">🐦</div><div class="fx-label">Bird Song</div></button>
-      <button class="fx-btn" onclick="playFX('horse')"><div class="fx-emoji">🐴</div><div class="fx-label">Horse</div></button>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-dog" onclick="playFX('dog')"><div class="fx-emoji">🐕</div><div class="fx-label">Dog Bark</div></button>
+      <button class="fx-pause-btn" id="fxpause-dog" onclick="pauseFX('dog', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-cat" onclick="playFX('cat')"><div class="fx-emoji">🐱</div><div class="fx-label">Cat Meow</div></button>
+      <button class="fx-pause-btn" id="fxpause-cat" onclick="pauseFX('cat', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-cow" onclick="playFX('cow')"><div class="fx-emoji">🐄</div><div class="fx-label">Cow Moo</div></button>
+      <button class="fx-pause-btn" id="fxpause-cow" onclick="pauseFX('cow', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-elephant" onclick="playFX('elephant')"><div class="fx-emoji">🐘</div><div class="fx-label">Elephant</div></button>
+      <button class="fx-pause-btn" id="fxpause-elephant" onclick="pauseFX('elephant', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-lion" onclick="playFX('lion')"><div class="fx-emoji">🦁</div><div class="fx-label">Lion Roar</div></button>
+      <button class="fx-pause-btn" id="fxpause-lion" onclick="pauseFX('lion', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-frog" onclick="playFX('frog')"><div class="fx-emoji">🐸</div><div class="fx-label">Frog</div></button>
+      <button class="fx-pause-btn" id="fxpause-frog" onclick="pauseFX('frog', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-bird" onclick="playFX('bird')"><div class="fx-emoji">🐦</div><div class="fx-label">Bird Song</div></button>
+      <button class="fx-pause-btn" id="fxpause-bird" onclick="pauseFX('bird', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-horse" onclick="playFX('horse')"><div class="fx-emoji">🐴</div><div class="fx-label">Horse</div></button>
+      <button class="fx-pause-btn" id="fxpause-horse" onclick="pauseFX('horse', this)">⏸ Pause</button>
+    </div>
     </div>
   </div>
 
   <div class="fx-category cat-crowd">
     <div class="fx-cat-title">👏 Crowd</div>
     <div class="fx-grid">
-      <button class="fx-btn" onclick="playFX('clap')"><div class="fx-emoji">👏</div><div class="fx-label">Clapping</div></button>
-      <button class="fx-btn" onclick="playFX('cheer')"><div class="fx-emoji">🎉</div><div class="fx-label">Cheering</div></button>
-      <button class="fx-btn" onclick="playFX('boo')"><div class="fx-emoji">😤</div><div class="fx-label">Booing</div></button>
-      <button class="fx-btn" onclick="playFX('laugh')"><div class="fx-emoji">😂</div><div class="fx-label">Laughter</div></button>
-      <button class="fx-btn" onclick="playFX('whistle')"><div class="fx-emoji">😗</div><div class="fx-label">Whistle</div></button>
-      <button class="fx-btn" onclick="playFX('gasp')"><div class="fx-emoji">😱</div><div class="fx-label">Gasp</div></button>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-clap" onclick="playFX('clap')"><div class="fx-emoji">👏</div><div class="fx-label">Clapping</div></button>
+      <button class="fx-pause-btn" id="fxpause-clap" onclick="pauseFX('clap', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-cheer" onclick="playFX('cheer')"><div class="fx-emoji">🎉</div><div class="fx-label">Cheering</div></button>
+      <button class="fx-pause-btn" id="fxpause-cheer" onclick="pauseFX('cheer', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-boo" onclick="playFX('boo')"><div class="fx-emoji">😤</div><div class="fx-label">Booing</div></button>
+      <button class="fx-pause-btn" id="fxpause-boo" onclick="pauseFX('boo', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-laugh" onclick="playFX('laugh')"><div class="fx-emoji">😂</div><div class="fx-label">Laughter</div></button>
+      <button class="fx-pause-btn" id="fxpause-laugh" onclick="pauseFX('laugh', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-whistle" onclick="playFX('whistle')"><div class="fx-emoji">😗</div><div class="fx-label">Whistle</div></button>
+      <button class="fx-pause-btn" id="fxpause-whistle" onclick="pauseFX('whistle', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-gasp" onclick="playFX('gasp')"><div class="fx-emoji">😱</div><div class="fx-label">Gasp</div></button>
+      <button class="fx-pause-btn" id="fxpause-gasp" onclick="pauseFX('gasp', this)">⏸ Pause</button>
+    </div>
     </div>
   </div>
 
   <div class="fx-category cat-transport">
     <div class="fx-cat-title">🚗 Transport</div>
     <div class="fx-grid">
-      <button class="fx-btn" onclick="playFX('carhorn')"><div class="fx-emoji">🚗</div><div class="fx-label">Car Horn</div></button>
-      <button class="fx-btn" onclick="playFX('traffic')"><div class="fx-emoji">🛣️</div><div class="fx-label">Traffic</div></button>
-      <button class="fx-btn" onclick="playFX('train')"><div class="fx-emoji">🚂</div><div class="fx-label">Train</div></button>
-      <button class="fx-btn" onclick="playFX('airplane')"><div class="fx-emoji">✈️</div><div class="fx-label">Airplane</div></button>
-      <button class="fx-btn" onclick="playFX('siren')"><div class="fx-emoji">🚨</div><div class="fx-label">Siren</div></button>
-      <button class="fx-btn" onclick="playFX('bike')"><div class="fx-emoji">🏍️</div><div class="fx-label">Motorbike</div></button>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-carhorn" onclick="playFX('carhorn')"><div class="fx-emoji">🚗</div><div class="fx-label">Car Horn</div></button>
+      <button class="fx-pause-btn" id="fxpause-carhorn" onclick="pauseFX('carhorn', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-traffic" onclick="playFX('traffic')"><div class="fx-emoji">🛣️</div><div class="fx-label">Traffic</div></button>
+      <button class="fx-pause-btn" id="fxpause-traffic" onclick="pauseFX('traffic', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-train" onclick="playFX('train')"><div class="fx-emoji">🚂</div><div class="fx-label">Train</div></button>
+      <button class="fx-pause-btn" id="fxpause-train" onclick="pauseFX('train', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-airplane" onclick="playFX('airplane')"><div class="fx-emoji">✈️</div><div class="fx-label">Airplane</div></button>
+      <button class="fx-pause-btn" id="fxpause-airplane" onclick="pauseFX('airplane', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-siren" onclick="playFX('siren')"><div class="fx-emoji">🚨</div><div class="fx-label">Siren</div></button>
+      <button class="fx-pause-btn" id="fxpause-siren" onclick="pauseFX('siren', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-bike" onclick="playFX('bike')"><div class="fx-emoji">🏍️</div><div class="fx-label">Motorbike</div></button>
+      <button class="fx-pause-btn" id="fxpause-bike" onclick="pauseFX('bike', this)">⏸ Pause</button>
+    </div>
     </div>
   </div>
 
   <div class="fx-category cat-silly">
     <div class="fx-cat-title">😜 Silly</div>
     <div class="fx-grid">
-      <button class="fx-btn" onclick="playFX('fart')"><div class="fx-emoji">💨</div><div class="fx-label">Fart 💨</div></button>
-      <button class="fx-btn" onclick="playFX('burp')"><div class="fx-emoji">🤢</div><div class="fx-label">Burp</div></button>
-      <button class="fx-btn" onclick="playFX('boing')"><div class="fx-emoji">🌀</div><div class="fx-label">Boing!</div></button>
-      <button class="fx-btn" onclick="playFX('splat')"><div class="fx-emoji">💦</div><div class="fx-label">Splat</div></button>
-      <button class="fx-btn" onclick="playFX('slidewhistle')"><div class="fx-emoji">🎶</div><div class="fx-label">Slide Whistle</div></button>
-      <button class="fx-btn" onclick="playFX('womp')"><div class="fx-emoji">😞</div><div class="fx-label">Womp Womp</div></button>
-      <button class="fx-btn" onclick="playFX('spring')"><div class="fx-emoji">🌀</div><div class="fx-label">Spring</div></button>
-      <button class="fx-btn" onclick="playFX('zap')"><div class="fx-emoji">⚡</div><div class="fx-label">Zap!</div></button>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-fart" onclick="playFX('fart')"><div class="fx-emoji">💨</div><div class="fx-label">Fart 💨</div></button>
+      <button class="fx-pause-btn" id="fxpause-fart" onclick="pauseFX('fart', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-burp" onclick="playFX('burp')"><div class="fx-emoji">🤢</div><div class="fx-label">Burp</div></button>
+      <button class="fx-pause-btn" id="fxpause-burp" onclick="pauseFX('burp', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-boing" onclick="playFX('boing')"><div class="fx-emoji">🌀</div><div class="fx-label">Boing!</div></button>
+      <button class="fx-pause-btn" id="fxpause-boing" onclick="pauseFX('boing', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-splat" onclick="playFX('splat')"><div class="fx-emoji">💦</div><div class="fx-label">Splat</div></button>
+      <button class="fx-pause-btn" id="fxpause-splat" onclick="pauseFX('splat', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-slidewhistle" onclick="playFX('slidewhistle')"><div class="fx-emoji">🎶</div><div class="fx-label">Slide Whistle</div></button>
+      <button class="fx-pause-btn" id="fxpause-slidewhistle" onclick="pauseFX('slidewhistle', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-womp" onclick="playFX('womp')"><div class="fx-emoji">😞</div><div class="fx-label">Womp Womp</div></button>
+      <button class="fx-pause-btn" id="fxpause-womp" onclick="pauseFX('womp', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-spring" onclick="playFX('spring')"><div class="fx-emoji">🌀</div><div class="fx-label">Spring</div></button>
+      <button class="fx-pause-btn" id="fxpause-spring" onclick="pauseFX('spring', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-zap" onclick="playFX('zap')"><div class="fx-emoji">⚡</div><div class="fx-label">Zap!</div></button>
+      <button class="fx-pause-btn" id="fxpause-zap" onclick="pauseFX('zap', this)">⏸ Pause</button>
+    </div>
     </div>
   </div>
 
   <div class="fx-category cat-nature">
     <div class="fx-cat-title">🌍 Nature</div>
     <div class="fx-grid">
-      <button class="fx-btn" onclick="playFX('thunder')"><div class="fx-emoji">⛈️</div><div class="fx-label">Thunder</div></button>
-      <button class="fx-btn" onclick="playFX('rain')"><div class="fx-emoji">🌧️</div><div class="fx-label">Rain</div></button>
-      <button class="fx-btn" onclick="playFX('ocean')"><div class="fx-emoji">🌊</div><div class="fx-label">Ocean</div></button>
-      <button class="fx-btn" onclick="playFX('wind')"><div class="fx-emoji">💨</div><div class="fx-label">Wind</div></button>
-      <button class="fx-btn" onclick="playFX('fire')"><div class="fx-emoji">🔥</div><div class="fx-label">Fire</div></button>
-      <button class="fx-btn" onclick="playFX('earthquake')"><div class="fx-emoji">🌋</div><div class="fx-label">Rumble</div></button>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-thunder" onclick="playFX('thunder')"><div class="fx-emoji">⛈️</div><div class="fx-label">Thunder</div></button>
+      <button class="fx-pause-btn" id="fxpause-thunder" onclick="pauseFX('thunder', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-rain" onclick="playFX('rain')"><div class="fx-emoji">🌧️</div><div class="fx-label">Rain</div></button>
+      <button class="fx-pause-btn" id="fxpause-rain" onclick="pauseFX('rain', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-ocean" onclick="playFX('ocean')"><div class="fx-emoji">🌊</div><div class="fx-label">Ocean</div></button>
+      <button class="fx-pause-btn" id="fxpause-ocean" onclick="pauseFX('ocean', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-wind" onclick="playFX('wind')"><div class="fx-emoji">💨</div><div class="fx-label">Wind</div></button>
+      <button class="fx-pause-btn" id="fxpause-wind" onclick="pauseFX('wind', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-fire" onclick="playFX('fire')"><div class="fx-emoji">🔥</div><div class="fx-label">Fire</div></button>
+      <button class="fx-pause-btn" id="fxpause-fire" onclick="pauseFX('fire', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-earthquake" onclick="playFX('earthquake')"><div class="fx-emoji">🌋</div><div class="fx-label">Rumble</div></button>
+      <button class="fx-pause-btn" id="fxpause-earthquake" onclick="pauseFX('earthquake', this)">⏸ Pause</button>
+    </div>
     </div>
   </div>
 
   <div class="fx-category cat-party">
     <div class="fx-cat-title">🎉 Party</div>
     <div class="fx-grid">
-      <button class="fx-btn" onclick="playFX('airhorn')"><div class="fx-emoji">📯</div><div class="fx-label">Air Horn</div></button>
-      <button class="fx-btn" onclick="playFX('drumroll')"><div class="fx-emoji">🥁</div><div class="fx-label">Drum Roll</div></button>
-      <button class="fx-btn" onclick="playFX('fanfare')"><div class="fx-emoji">🎺</div><div class="fx-label">Fanfare</div></button>
-      <button class="fx-btn" onclick="playFX('pop')"><div class="fx-emoji">🎊</div><div class="fx-label">Confetti Pop</div></button>
-      <button class="fx-btn" onclick="playFX('ding')"><div class="fx-emoji">🔔</div><div class="fx-label">Ding!</div></button>
-      <button class="fx-btn" onclick="playFX('buzzer')"><div class="fx-emoji">🔴</div><div class="fx-label">Buzzer</div></button>
-      <button class="fx-btn" onclick="playFX('levelup')"><div class="fx-emoji">⬆️</div><div class="fx-label">Level Up!</div></button>
-      <button class="fx-btn" onclick="playFX('coin')"><div class="fx-emoji">🪙</div><div class="fx-label">Coin</div></button>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-airhorn" onclick="playFX('airhorn')"><div class="fx-emoji">📯</div><div class="fx-label">Air Horn</div></button>
+      <button class="fx-pause-btn" id="fxpause-airhorn" onclick="pauseFX('airhorn', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-drumroll" onclick="playFX('drumroll')"><div class="fx-emoji">🥁</div><div class="fx-label">Drum Roll</div></button>
+      <button class="fx-pause-btn" id="fxpause-drumroll" onclick="pauseFX('drumroll', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-fanfare" onclick="playFX('fanfare')"><div class="fx-emoji">🎺</div><div class="fx-label">Fanfare</div></button>
+      <button class="fx-pause-btn" id="fxpause-fanfare" onclick="pauseFX('fanfare', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-pop" onclick="playFX('pop')"><div class="fx-emoji">🎊</div><div class="fx-label">Confetti Pop</div></button>
+      <button class="fx-pause-btn" id="fxpause-pop" onclick="pauseFX('pop', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-ding" onclick="playFX('ding')"><div class="fx-emoji">🔔</div><div class="fx-label">Ding!</div></button>
+      <button class="fx-pause-btn" id="fxpause-ding" onclick="pauseFX('ding', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-buzzer" onclick="playFX('buzzer')"><div class="fx-emoji">🔴</div><div class="fx-label">Buzzer</div></button>
+      <button class="fx-pause-btn" id="fxpause-buzzer" onclick="pauseFX('buzzer', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-levelup" onclick="playFX('levelup')"><div class="fx-emoji">⬆️</div><div class="fx-label">Level Up!</div></button>
+      <button class="fx-pause-btn" id="fxpause-levelup" onclick="pauseFX('levelup', this)">⏸ Pause</button>
+    </div>
+      <div class="fx-btn-wrap">
+      <button class="fx-btn" id="fxbtn-coin" onclick="playFX('coin')"><div class="fx-emoji">🪙</div><div class="fx-label">Coin</div></button>
+      <button class="fx-pause-btn" id="fxpause-coin" onclick="pauseFX('coin', this)">⏸ Pause</button>
+    </div>
     </div>
   </div>
 
@@ -696,6 +850,35 @@ function playFX(name){
 }
 
 // playFX defined above in real sound engine
+
+// ── PAUSE / STOP CONTROLS ────────────────────────
+function pauseFX(name, btn){
+  const audio = AUDIO_CACHE[name];
+  if(!audio) return;
+  if(audio.paused){
+    audio.play();
+    btn.textContent='⏸ Pause';
+    btn.classList.remove('paused');
+  } else {
+    audio.pause();
+    btn.textContent='▶ Resume';
+    btn.classList.add('paused');
+  }
+}
+
+function stopAllSounds(){
+  Object.keys(AUDIO_CACHE).forEach(name=>{
+    const audio = AUDIO_CACHE[name];
+    if(audio){
+      audio.pause();
+      audio.currentTime=0;
+    }
+    // Reset all pause buttons
+    const btn = document.getElementById('fxpause-'+name);
+    if(btn){ btn.textContent='⏸ Pause'; btn.classList.remove('paused'); }
+  });
+  document.getElementById('noteDisplay').textContent='⏹ All sounds stopped!';
+}
 
 // ── INIT ─────────────────────────────────────────
 buildKeyboard();
