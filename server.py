@@ -458,6 +458,10 @@ def fun_with_numbers():
 def fun_with_shapes():
     return send_from_directory('.', 'fun-with-shapes.html')
 
+@app.route('/magic-sound-keys')
+def magic_sound_keys():
+    return send_from_directory('.', 'magic-sound-keys.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
