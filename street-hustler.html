@@ -556,35 +556,25 @@ const SPEEDS = {
 };
 
 const PRAISES = [
-  "🔥 YO YOU GOT IT!! NICE!!",
-  "👀 SHARP EYES B!!",
-  "🎯 AYO YOU GOOD!! REAL GOOD!!",
-  "💫 NOBODY FOOLS YOU SON!!",
-  "🦅 EAGLE EYES ON THE BLOCK!!",
-  "🏆 YOU ON FIRE RIGHT NOW!!",
-  "😤 RESPECT!! YOU SAW THAT!!",
-  "🗽 NEW YORK IN YA BLOOD!!",
-  "🎉 GET IT GET IT GET IT!!",
-  "👊 THAT'S WHAT I'M TALKIN ABOUT!!",
-  "🔥 YOU TOO SMART FOR THIS HUSTLE!!",
-  "💪 AIN'T NO STOPPIN YOU TODAY!!",
+  "Winner winner!",
+  "Easy money!",
+  "You win boss!",
+  "King of New York!",
+  "Bada bing, bada boom!",
+  "That's a wrap!",
+  "What a pro!",
 ];
 const TAUNTS = [
-  "😈 YO, you got PLAYED son!!",
-  "🃏 Haha! Too slow homie!!",
-  "👹 The streets don't lie, YOU DO!!",
-  "😏 Yo eyes ain't fast enough B!!",
-  "🗽 Welcome to New York baby!!",
-  "💀 Fuggedaboutit!!",
-  "😂 You thought you had me?! NAH!!",
-  "🎩 That's why they call me the HUSTLER!!",
-  "👋 Better luck next time chump!!",
-  "🃏 Ayo I been doin this since '92!!",
-  "😎 You can't see me kid!!",
-  "💸 Step ya game up homie!!",
-  "🗣️ Yo cuz, you gotta pay attention!!",
-  "👀 Eyes on the prize... TOO LATE!!",
-  "🤣 Get outta here with that!!",
+  "Close, but no cigar!",
+  "I'm the boss!",
+  "Pity the fool!",
+  "Tough luck!",
+  "That's rough, buddy.",
+  "You got cooked.",
+  "You got smoked.",
+  "Game over, pal.",
+  "Oopsie daisy!",
+  "No dice!",
 ];
 
 // ── BUILD CUPS ────────────────────────────────────
@@ -781,14 +771,14 @@ async function guess(index){
     if(score>best){ best=score; localStorage.setItem('witb_best',best); }
     updateScores();
     document.getElementById('resultEmoji').textContent = streak>=3?'🔥':'🎉';
-    document.getElementById('resultTitle').textContent = PRAISES[Math.floor(Math.random()*PRAISES.length)];
-    document.getElementById('resultSub').textContent = `+${getPoints()} points! ${streak>=3?'🔥 '+streak+' streak!!':''}`;
+    document.getElementById('resultTitle').textContent = 'Gotta a winner here!';
+    document.getElementById('resultSub').textContent = PRAISES[Math.floor(Math.random()*PRAISES.length)] + '  +'+getPoints()+' pts'+(streak>=3?' 🔥 '+streak+' streak!!':'');
     launchConfetti();
   } else {
     streak = 0;
     document.getElementById('resultEmoji').textContent = '😈';
-    document.getElementById('resultTitle').textContent = TAUNTS[Math.floor(Math.random()*TAUNTS.length)];
-    document.getElementById('resultSub').textContent = `Round ${round} · Keep watching next time!`;
+    document.getElementById('resultTitle').textContent = 'OOPS!';
+    document.getElementById('resultSub').textContent = TAUNTS[Math.floor(Math.random()*TAUNTS.length)];
   }
 
   updateStreak();
