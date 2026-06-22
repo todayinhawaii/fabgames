@@ -770,14 +770,14 @@ async function guess(index){
     streak++;
     if(score>best){ best=score; localStorage.setItem('witb_best',best); }
     updateScores();
-    const WIN_TITLES = ['YOU GOT IT!','WE GOTTA WINNER HERE!','YOU'RE GOOD!','NO FOOLING THIS ONE!','BIG WIN RIGHT HERE!','YEAH YEAH YEAH, YOU WIN!'];
+    const WIN_TITLES = ["YOU GOT IT!","WE GOTTA WINNER HERE!","YOU ARE GOOD!","NO FOOLING THIS ONE!","BIG WIN RIGHT HERE!","YEAH YEAH YEAH, YOU WIN!"];
     document.getElementById('resultEmoji').textContent = streak>=3?'🔥':'🎉';
     document.getElementById('resultTitle').textContent = WIN_TITLES[Math.floor(Math.random()*WIN_TITLES.length)];
     document.getElementById('resultSub').textContent = PRAISES[Math.floor(Math.random()*PRAISES.length)] + '  +'+getPoints()+' pts'+(streak>=3?' 🔥 '+streak+' streak!!':'');
     launchConfetti();
   } else {
     streak = 0;
-    const LOSE_TITLES = ['OOPS!','COME ON BOSS YOU CAN DO BETTER!','NAA NOT TODAY!','I GOT YA!','NOOOO!','AHHH COME ON!'];
+    const LOSE_TITLES = ["OOPS!","COME ON BOSS YOU CAN DO BETTER!","NAA NOT TODAY!","I GOT YA!","NOOOO!","AHHH COME ON!"];
     document.getElementById('resultEmoji').textContent = '😈';
     document.getElementById('resultTitle').textContent = LOSE_TITLES[Math.floor(Math.random()*LOSE_TITLES.length)];
     document.getElementById('resultSub').textContent = TAUNTS[Math.floor(Math.random()*TAUNTS.length)];
