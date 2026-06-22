@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Magic Sound Keys! 🎹</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Nunito',sans-serif;
+  background:#0a0010;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255,0,200,0.12), transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(0,150,255,0.12), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(100,0,255,0.08), transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:1;
+  text-align:center;padding:16px 20px 10px;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+header h1{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(22px,5vw,40px);
+  background:linear-gradient(90deg,#ff00cc,#ff8c00,#ffd700,#00ff88,#00cfff,#cc00ff,#ff00cc);
+  background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:rainbowShift 3s linear infinite;letter-spacing:2px;
+}
+@keyframes rainbowShift{0%{background-position:0%}100%{background-position:200%}}
+header p{color:rgba(255,255,255,0.5);font-size:12px;margin-top:3px;font-weight:700;}
+
+/* ── MODE SWITCHER ── */
+.mode-bar{
+  position:relative;z-index:1;
+  display:flex;gap:0;justify-content:center;
+  padding:14px 20px;
+  background:rgba(0,0,0,0.4);
+}
+.mode-btn{
+  font-family:'Fredoka One',cursive;
+  font-size:16px;padding:12px 32px;
+  border:2px solid rgba(255,255,255,0.1);
+  cursor:pointer;background:rgba(255,255,255,0.04);
+  color:rgba(255,255,255,0.5);transition:all 0.3s;
+}
+.mode-btn:first-child{border-radius:30px 0 0 30px;}
+.mode-btn:last-child{border-radius:0 30px 30px 0;}
+.mode-btn.active{
+  background:linear-gradient(135deg,#cc00ff,#6600cc);
+  color:#fff;border-color:transparent;
+  box-shadow:0 0 30px rgba(200,0,255,0.5);
+}
+.mode-btn:hover:not(.active){background:rgba(255,255,255,0.08);color:#fff;}
+
+/* ── PIANO SECTION ── */
+#pianoSection{position:relative;z-index:1;}
+
+.piano-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px 16px 10px;gap:16px;
+}
+
+/* Piano controls */
+.piano-controls{
+  display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center;
+  margin-bottom:8px;
+}
+.octave-btn{
+  font-family:'Fredoka One',cursive;font-size:20px;
+  padding:14px 28px;border-radius:16px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#4400aa,#6600ff);
+  color:#fff;
+  box-shadow:0 6px 0 #220066, 0 8px 24px rgba(100,0,255,0.4);
+  transition:all 0.15s;
+  letter-spacing:1px;
+}
+.octave-btn:hover{filter:brightness(1.2);}
+.octave-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #220066;}
+.octave-label{
+  font-family:'Fredoka One',cursive;
+  font-size:18px;color:#cc88ff;
+  text-shadow:0 0 20px rgba(200,136,255,0.8);
+  min-width:100px;text-align:center;
+}
+/* Octave level bar */
+.octave-bar-wrap{
+  width:100%;max-width:400px;
+  padding:0 16px;
+}
+.octave-bar-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);text-align:center;margin-bottom:5px;font-weight:700;}
+.octave-bar-track{
+  height:16px;background:rgba(255,255,255,0.06);border-radius:20px;
+  overflow:hidden;border:1px solid rgba(255,255,255,0.08);
+}
+.octave-bar-fill{
+  height:100%;border-radius:20px;
+  background:linear-gradient(90deg,#4400aa,#cc00ff,#ff88ff);
+  transition:width 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow:0 0 12px rgba(200,0,255,0.6);
+}
+.record-btn{
+  font-family:'Fredoka One',cursive;font-size:16px;
+  padding:12px 22px;border-radius:16px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#ff0040,#cc0020);
+  color:#fff;
+  box-shadow:0 5px 0 #880020,0 6px 20px rgba(255,0,64,0.4);
+  transition:all 0.15s;
+}
+.record-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #880020;}
+.record-btn.recording{animation:recordPulse 0.8s ease-in-out infinite;}
+@keyframes recordPulse{0%,100%{box-shadow:0 5px 0 #880020,0 0 10px rgba(255,0,64,0.5);}50%{box-shadow:0 5px 0 #880020,0 0 30px rgba(255,0,64,1);}}
+.play-btn{
+  font-family:'Fredoka One',cursive;font-size:16px;
+  padding:12px 22px;border-radius:16px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#00cc44,#008822);
+  color:#fff;
+  box-shadow:0 5px 0 #004411,0 6px 20px rgba(0,204,68,0.4);
+  transition:all 0.15s;
+}
+.play-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #004411;}
+
+/* ── PIANO KEYBOARD ── */
+.keyboard-container{
+  overflow-x:auto;padding-bottom:8px;width:100%;
+  scrollbar-width:thin;scrollbar-color:rgba(200,0,255,0.4) transparent;
+}
+.keyboard{
+  display:flex;position:relative;
+  height:180px;
+  width:max-content;
+  margin:0 auto;
+  padding:0 8px;
+  gap:3px;
+}
+.key{
+  position:relative;
+  border-radius:0 0 10px 10px;
+  cursor:pointer;
+  transition:all 0.05s;
+  user-select:none;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:8px;
+  font-family:'Fredoka One',cursive;
+  font-size:11px;
+  font-weight:700;
+}
+.key.white{
+  width:52px;height:180px;
+  background:linear-gradient(180deg,#f8f4ff 0%,#fff 60%,#e8e0f8 100%);
+  border:1px solid rgba(150,100,200,0.3);
+  color:rgba(100,60,160,0.6);
+  box-shadow:0 4px 0 rgba(100,60,160,0.2),0 8px 20px rgba(0,0,0,0.3);
+  z-index:1;
+}
+.key.white:active,.key.white.pressed{
+  background:linear-gradient(180deg,#cc88ff 0%,#aa44ff 100%);
+  color:#fff;
+  box-shadow:0 1px 0 rgba(100,60,160,0.4),0 0 30px rgba(170,68,255,0.6);
+  transform:translateY(3px);
+}
+.key.black{
+  width:34px;height:110px;
+  background:linear-gradient(180deg,#1a0030 0%,#0a0018 60%,#2a0050 100%);
+  border:1px solid rgba(200,100,255,0.3);
+  color:rgba(200,150,255,0.5);font-size:9px;
+  box-shadow:0 6px 0 rgba(0,0,0,0.6),0 8px 20px rgba(0,0,0,0.5);
+  z-index:2;
+  margin:0 -17px;
+}
+.key.black:active,.key.black.pressed{
+  background:linear-gradient(180deg,#8800cc 0%,#5500aa 100%);
+  color:#fff;
+  box-shadow:0 2px 0 rgba(0,0,0,0.6),0 0 25px rgba(136,0,204,0.8);
+  transform:translateY(2px);
+}
+
+/* ── SOUND FX SECTION ── */
+#fxSection{display:none;position:relative;z-index:1;padding:16px;}
+
+.fx-category{margin-bottom:20px;}
+.fx-cat-title{
+  font-family:'Fredoka One',cursive;font-size:16px;
+  color:rgba(255,255,255,0.6);letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:10px;
+  padding-left:4px;
+  border-left:3px solid #cc00ff;
+  padding-left:10px;
+}
+.fx-grid{
+  display:flex;flex-wrap:wrap;gap:10px;
+}
+.fx-btn-wrap{position:relative;display:inline-flex;flex-direction:column;align-items:center;}
+.fx-btn{
+  font-family:'Fredoka One',cursive;
+  font-size:14px;
+  padding:14px 18px 10px;
+  border-radius:16px;
+  border:2px solid transparent;
+  cursor:pointer;
+  transition:all 0.15s;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  min-width:90px;
+  user-select:none;
+  position:relative;
+  overflow:hidden;
+}
+.fx-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  opacity:0;transition:opacity 0.2s;
+}
+.fx-btn:hover::before{opacity:1;}
+.fx-emoji{font-size:26px;line-height:1;}
+.fx-label{font-size:10px;color:rgba(255,255,255,0.85);text-align:center;}
+/* Play/Pause indicator */
+.fx-play-indicator{
+  font-size:18px;line-height:1;margin-top:2px;
+  transition:all 0.2s;
+}
+.fx-btn.is-playing .fx-play-indicator{ font-size:22px; }
+.fx-btn:hover .fx-play-indicator{ transform:scale(1.2); }
+
+/* ── STOP ALL BUTTON ── */
+.stop-all-btn{
+  display:block;
+  width:100%;max-width:300px;
+  margin:0 auto 20px;
+  font-family:'Fredoka One',cursive;font-size:20px;
+  padding:16px 32px;border-radius:20px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#ff0040,#cc0020);
+  color:#fff;
+  box-shadow:0 6px 0 #880020,0 8px 24px rgba(255,0,64,0.4);
+  transition:all 0.15s;letter-spacing:1px;
+}
+.stop-all-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #880020;}
+.stop-all-btn:hover{filter:brightness(1.15);}
+
+
+
+/* Category colours */
+.cat-animals .fx-btn{background:linear-gradient(135deg,#1a3a00,#0d2000);border-color:rgba(100,220,50,0.3);color:#88ff44;}
+.cat-crowd .fx-btn{background:linear-gradient(135deg,#3a1a00,#200d00);border-color:rgba(255,150,50,0.3);color:#ff8822;}
+.cat-transport .fx-btn{background:linear-gradient(135deg,#001a3a,#000d20);border-color:rgba(50,150,255,0.3);color:#4488ff;}
+.cat-silly .fx-btn{background:linear-gradient(135deg,#3a003a,#200020);border-color:rgba(255,50,255,0.3);color:#ff44ff;}
+.cat-nature .fx-btn{background:linear-gradient(135deg,#003a3a,#002020);border-color:rgba(50,220,220,0.3);color:#44dddd;}
+.cat-party .fx-btn{background:linear-gradient(135deg,#3a3a00,#202000);border-color:rgba(255,215,0,0.3);color:#ffd700;}
+
+/* ── NOTE DISPLAY ── */
+.note-display{
+  position:relative;z-index:1;
+  text-align:center;padding:8px;
+  font-family:'Fredoka One',cursive;font-size:24px;
+  color:#cc88ff;
+  text-shadow:0 0 20px rgba(200,136,255,0.8);
+  min-height:40px;
+  transition:all 0.1s;
+}
+
+/* ── VISUALIZER ── */
+.visualizer{
+  position:relative;z-index:1;
+  width:100%;height:60px;
+  background:rgba(0,0,0,0.3);
+  overflow:hidden;
+}
+#vizCanvas{width:100%;height:60px;}
+
+@media(max-width:500px){
+  .key.white{width:28px;height:140px;font-size:8px;}
+  .key.black{width:18px;height:86px;margin:0 -9px;font-size:7px;}
+  .fx-btn{min-width:76px;padding:12px 12px;}
+  .fx-emoji{font-size:24px;}
+  .keyboard{gap:1px;padding:0 4px;}
+}
+@media(max-width:380px){
+  .key.white{width:22px;height:120px;font-size:7px;}
+  .key.black{width:14px;height:74px;margin:0 -7px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎹 Magic Sound Keys! 🎹</h1>
+  <p>Play piano or unleash the ultimate sound effects library!</p>
+</header>
+
+<!-- MODE SWITCHER -->
+<div class="mode-bar">
+  <button class="mode-btn active" id="pianoBtn" onclick="setMode('piano')">🎹 Piano</button>
+  <button class="mode-btn" id="fxBtn" onclick="setMode('fx')">🎭 Sound FX</button>
+</div>
+
+<!-- NOTE DISPLAY -->
+<div class="note-display" id="noteDisplay">🎵 Press a key to play!</div>
+
+<!-- VISUALIZER -->
+<div class="visualizer"><canvas id="vizCanvas"></canvas></div>
+
+<!-- ── PIANO ── -->
+<div id="pianoSection">
+  <div class="piano-wrap">
+    <div class="piano-controls">
+      <button class="octave-btn" onclick="changeOctave(-1)">◀ Lower</button>
+      <span class="octave-label" id="octaveLabel">Octave 4</span>
+      <button class="octave-btn" onclick="changeOctave(1)">Higher ▶</button>
+    </div>
+    <div class="octave-bar-wrap">
+      <div class="octave-bar-label">Octave Range</div>
+      <div class="octave-bar-track"><div class="octave-bar-fill" id="octaveBar" style="width:43%"></div></div>
+    </div>
+    <div class="piano-controls" style="margin-top:8px;">
+      <button class="record-btn" id="recordBtn" onclick="toggleRecord()">⏺ Record</button>
+      <button class="play-btn" id="playBtn" onclick="playRecording()" style="display:none;">▶ Play Back</button>
+    </div>
+    <div class="keyboard-container">
+      <div class="keyboard" id="keyboard"></div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center;margin-top:4px;">
+      Keyboard: A S D F G H J K L → white keys · W E T Y U → black keys
+    </div>
+  </div>
+</div>
+
+<!-- ── SOUND FX ── -->
+<div id="fxSection" style="display:none;padding:16px;">
+
+  <div style="text-align:center;margin-bottom:20px;">
+    <button class="stop-all-btn" onclick="stopAllSounds()">⏹ STOP ALL SOUNDS</button>
+  </div>
+
+  <div class="fx-category cat-animals">
+    <div class="fx-cat-title">🐾 Animals</div>
+    <div class="fx-grid">
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-dog" onclick="toggleFX('dog',this)"><div class="fx-emoji">🐕</div><div class="fx-label">Dog Bark</div><div class="fx-play-indicator" id="fxind-dog">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-cat" onclick="toggleFX('cat',this)"><div class="fx-emoji">🐱</div><div class="fx-label">Cat Meow</div><div class="fx-play-indicator" id="fxind-cat">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-cow" onclick="toggleFX('cow',this)"><div class="fx-emoji">🐄</div><div class="fx-label">Cow Moo</div><div class="fx-play-indicator" id="fxind-cow">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-elephant" onclick="toggleFX('elephant',this)"><div class="fx-emoji">🐘</div><div class="fx-label">Elephant</div><div class="fx-play-indicator" id="fxind-elephant">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-lion" onclick="toggleFX('lion',this)"><div class="fx-emoji">🦁</div><div class="fx-label">Lion Roar</div><div class="fx-play-indicator" id="fxind-lion">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-frog" onclick="toggleFX('frog',this)"><div class="fx-emoji">🐸</div><div class="fx-label">Frog</div><div class="fx-play-indicator" id="fxind-frog">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-bird" onclick="toggleFX('bird',this)"><div class="fx-emoji">🐦</div><div class="fx-label">Bird Song</div><div class="fx-play-indicator" id="fxind-bird">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-horse" onclick="toggleFX('horse',this)"><div class="fx-emoji">🐴</div><div class="fx-label">Horse</div><div class="fx-play-indicator" id="fxind-horse">▶</div></button></div>
+    </div>
+  </div>
+
+  <div class="fx-category cat-crowd">
+    <div class="fx-cat-title">👏 Crowd</div>
+    <div class="fx-grid">
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-clap" onclick="toggleFX('clap',this)"><div class="fx-emoji">👏</div><div class="fx-label">Clapping</div><div class="fx-play-indicator" id="fxind-clap">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-cheer" onclick="toggleFX('cheer',this)"><div class="fx-emoji">🎉</div><div class="fx-label">Cheering</div><div class="fx-play-indicator" id="fxind-cheer">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-boo" onclick="toggleFX('boo',this)"><div class="fx-emoji">😤</div><div class="fx-label">Booing</div><div class="fx-play-indicator" id="fxind-boo">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-laugh" onclick="toggleFX('laugh',this)"><div class="fx-emoji">😂</div><div class="fx-label">Laughter</div><div class="fx-play-indicator" id="fxind-laugh">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-whistle" onclick="toggleFX('whistle',this)"><div class="fx-emoji">😗</div><div class="fx-label">Whistle</div><div class="fx-play-indicator" id="fxind-whistle">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-gasp" onclick="toggleFX('gasp',this)"><div class="fx-emoji">😱</div><div class="fx-label">Gasp</div><div class="fx-play-indicator" id="fxind-gasp">▶</div></button></div>
+    </div>
+  </div>
+
+  <div class="fx-category cat-transport">
+    <div class="fx-cat-title">🚗 Transport</div>
+    <div class="fx-grid">
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-carhorn" onclick="toggleFX('carhorn',this)"><div class="fx-emoji">🚗</div><div class="fx-label">Car Horn</div><div class="fx-play-indicator" id="fxind-carhorn">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-traffic" onclick="toggleFX('traffic',this)"><div class="fx-emoji">🛣️</div><div class="fx-label">Traffic</div><div class="fx-play-indicator" id="fxind-traffic">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-train" onclick="toggleFX('train',this)"><div class="fx-emoji">🚂</div><div class="fx-label">Train</div><div class="fx-play-indicator" id="fxind-train">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-airplane" onclick="toggleFX('airplane',this)"><div class="fx-emoji">✈️</div><div class="fx-label">Airplane</div><div class="fx-play-indicator" id="fxind-airplane">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-siren" onclick="toggleFX('siren',this)"><div class="fx-emoji">🚨</div><div class="fx-label">Siren</div><div class="fx-play-indicator" id="fxind-siren">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-bike" onclick="toggleFX('bike',this)"><div class="fx-emoji">🏍️</div><div class="fx-label">Bike</div><div class="fx-play-indicator" id="fxind-bike">▶</div></button></div>
+    </div>
+  </div>
+
+  <div class="fx-category cat-silly">
+    <div class="fx-cat-title">😜 Silly</div>
+    <div class="fx-grid">
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-fart" onclick="toggleFX('fart',this)"><div class="fx-emoji">💨</div><div class="fx-label">Fart 💨</div><div class="fx-play-indicator" id="fxind-fart">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-burp" onclick="toggleFX('burp',this)"><div class="fx-emoji">🤢</div><div class="fx-label">Burp</div><div class="fx-play-indicator" id="fxind-burp">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-boing" onclick="toggleFX('boing',this)"><div class="fx-emoji">🌀</div><div class="fx-label">Boing!</div><div class="fx-play-indicator" id="fxind-boing">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-splat" onclick="toggleFX('splat',this)"><div class="fx-emoji">💦</div><div class="fx-label">Splat</div><div class="fx-play-indicator" id="fxind-splat">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-slidewhistle" onclick="toggleFX('slidewhistle',this)"><div class="fx-emoji">🎶</div><div class="fx-label">Slide Whistle</div><div class="fx-play-indicator" id="fxind-slidewhistle">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-womp" onclick="toggleFX('womp',this)"><div class="fx-emoji">😞</div><div class="fx-label">Womp Womp</div><div class="fx-play-indicator" id="fxind-womp">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-spring" onclick="toggleFX('spring',this)"><div class="fx-emoji">🌀</div><div class="fx-label">Spring</div><div class="fx-play-indicator" id="fxind-spring">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-zap" onclick="toggleFX('zap',this)"><div class="fx-emoji">⚡</div><div class="fx-label">Zap!</div><div class="fx-play-indicator" id="fxind-zap">▶</div></button></div>
+    </div>
+  </div>
+
+  <div class="fx-category cat-nature">
+    <div class="fx-cat-title">🌍 Nature</div>
+    <div class="fx-grid">
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-thunder" onclick="toggleFX('thunder',this)"><div class="fx-emoji">⛈️</div><div class="fx-label">Thunder</div><div class="fx-play-indicator" id="fxind-thunder">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-rain" onclick="toggleFX('rain',this)"><div class="fx-emoji">🌧️</div><div class="fx-label">Rain</div><div class="fx-play-indicator" id="fxind-rain">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-ocean" onclick="toggleFX('ocean',this)"><div class="fx-emoji">🌊</div><div class="fx-label">Ocean</div><div class="fx-play-indicator" id="fxind-ocean">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-wind" onclick="toggleFX('wind',this)"><div class="fx-emoji">💨</div><div class="fx-label">Wind</div><div class="fx-play-indicator" id="fxind-wind">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-fire" onclick="toggleFX('fire',this)"><div class="fx-emoji">🔥</div><div class="fx-label">Fire</div><div class="fx-play-indicator" id="fxind-fire">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-earthquake" onclick="toggleFX('earthquake',this)"><div class="fx-emoji">🌋</div><div class="fx-label">Rumble</div><div class="fx-play-indicator" id="fxind-earthquake">▶</div></button></div>
+    </div>
+  </div>
+
+  <div class="fx-category cat-party">
+    <div class="fx-cat-title">🎉 Party</div>
+    <div class="fx-grid">
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-airhorn" onclick="toggleFX('airhorn',this)"><div class="fx-emoji">📯</div><div class="fx-label">Air Horn</div><div class="fx-play-indicator" id="fxind-airhorn">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-drumroll" onclick="toggleFX('drumroll',this)"><div class="fx-emoji">🥁</div><div class="fx-label">Drum Roll</div><div class="fx-play-indicator" id="fxind-drumroll">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-fanfare" onclick="toggleFX('fanfare',this)"><div class="fx-emoji">🎺</div><div class="fx-label">Fanfare</div><div class="fx-play-indicator" id="fxind-fanfare">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-pop" onclick="toggleFX('pop',this)"><div class="fx-emoji">🎊</div><div class="fx-label">Confetti Pop</div><div class="fx-play-indicator" id="fxind-pop">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-ding" onclick="toggleFX('ding',this)"><div class="fx-emoji">🔔</div><div class="fx-label">Ding!</div><div class="fx-play-indicator" id="fxind-ding">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-buzzer" onclick="toggleFX('buzzer',this)"><div class="fx-emoji">🔴</div><div class="fx-label">Buzzer</div><div class="fx-play-indicator" id="fxind-buzzer">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-levelup" onclick="toggleFX('levelup',this)"><div class="fx-emoji">⬆️</div><div class="fx-label">Level Up!</div><div class="fx-play-indicator" id="fxind-levelup">▶</div></button></div>
+      <div class="fx-btn-wrap"><button class="fx-btn" id="fxbtn-coin" onclick="toggleFX('coin',this)"><div class="fx-emoji">🪙</div><div class="fx-label">Coin</div><div class="fx-play-indicator" id="fxind-coin">▶</div></button></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── AUDIO CONTEXT ────────────────────────────────
+let actx = null;
+let analyser = null;
+let vizAnim = null;
+
+function getAC(){
+  if(!actx){
+    actx = new(window.AudioContext||window.webkitAudioContext)();
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.connect(actx.destination);
+    startViz();
+  }
+  return actx;
+}
+
+// ── VISUALIZER ───────────────────────────────────
+function startViz(){
+  const canvas = document.getElementById('vizCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 60 * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W = canvas.offsetWidth, H = 60;
+  const bufLen = analyser.frequencyBinCount;
+  const dataArr = new Uint8Array(bufLen);
+
+  function draw(){
+    vizAnim = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArr);
+    ctx.fillStyle = 'rgba(0,0,10,0.3)';
+    ctx.fillRect(0,0,W,H);
+    const barW = W/bufLen*2.5;
+    let x=0;
+    for(let i=0;i<bufLen;i++){
+      const h = (dataArr[i]/255)*H;
+      const hue = (i/bufLen)*360;
+      ctx.fillStyle = `hsl(${hue},100%,60%)`;
+      ctx.fillRect(x, H-h, barW-1, h);
+      x += barW;
+    }
+  }
+  draw();
+}
+
+// ── NOTE FREQUENCIES ─────────────────────────────
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+function noteFreq(note, octave){ return 440 * Math.pow(2, (note + (octave-4)*12 - 9) / 12); }
+
+// ── PIANO ────────────────────────────────────────
+let octave = 4;
+let isRecording = false;
+let recording = [];
+let recordStart = 0;
+let playbackTimeout = [];
+
+const WHITE_NOTES = [0,2,4,5,7,9,11]; // C D E F G A B
+const BLACK_NOTES = [1,3,-1,6,8,10,-1]; // C# D# - F# G# A# -
+const KB_WHITE = ['a','s','d','f','g','h','j','k','l'];
+const KB_BLACK = ['w','e','','t','y','u',''];
+
+function buildKeyboard(){
+  const kb = document.getElementById('keyboard');
+  kb.innerHTML = '';
+  // 2 octaves
+  for(let oct=octave; oct<=octave+1; oct++){
+    WHITE_NOTES.forEach((note,i)=>{
+      const key = document.createElement('div');
+      key.className = 'key white';
+      const noteName = NOTE_NAMES[note];
+      const kbHint = (oct===octave && i<KB_WHITE.length) ? KB_WHITE[i] : '';
+      key.innerHTML = `<span>${noteName}${oct}<br><small style="font-size:9px;opacity:0.5">${kbHint}</small></span>`;
+      key.dataset.freq = noteFreq(note, oct);
+      key.dataset.name = noteName+oct;
+      key.addEventListener('mousedown', ()=>pressKey(key));
+      key.addEventListener('touchstart', e=>{e.preventDefault();pressKey(key);},{passive:false});
+      key.addEventListener('mouseup', ()=>releaseKey(key));
+      key.addEventListener('mouseleave', ()=>releaseKey(key));
+      key.addEventListener('touchend', ()=>releaseKey(key));
+      kb.appendChild(key);
+
+      // Add black key after this white key if applicable
+      const blackNote = BLACK_NOTES[i];
+      if(blackNote >= 0){
+        const bkey = document.createElement('div');
+        bkey.className = 'key black';
+        const bname = NOTE_NAMES[blackNote];
+        const bkbHint = (oct===octave && i<KB_BLACK.length) ? KB_BLACK[i] : '';
+        bkey.innerHTML = `<span>${bname}${oct}<br><small style="font-size:8px;opacity:0.5">${bkbHint}</small></span>`;
+        bkey.dataset.freq = noteFreq(blackNote, oct);
+        bkey.dataset.name = bname+oct;
+        bkey.addEventListener('mousedown', e=>{e.stopPropagation();pressKey(bkey);});
+        bkey.addEventListener('touchstart', e=>{e.preventDefault();e.stopPropagation();pressKey(bkey);},{passive:false});
+        bkey.addEventListener('mouseup', ()=>releaseKey(bkey));
+        bkey.addEventListener('mouseleave', ()=>releaseKey(bkey));
+        bkey.addEventListener('touchend', ()=>releaseKey(bkey));
+        kb.appendChild(bkey);
+      }
+    });
+  }
+}
+
+let activeOscs = {};
+
+function pressKey(key){
+  const freq = parseFloat(key.dataset.freq);
+  const name = key.dataset.name;
+  if(activeOscs[freq]) return;
+  getAC();
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  osc.connect(gain); gain.connect(analyser);
+  osc.type = 'triangle';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0,actx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.3, actx.currentTime+0.01);
+  osc.start();
+  activeOscs[freq] = {osc, gain};
+  key.classList.add('pressed');
+  document.getElementById('noteDisplay').textContent = '🎵 ' + name;
+
+  if(isRecording){
+    recording.push({freq, name, time: Date.now()-recordStart, type:'start'});
+  }
+}
+
+function releaseKey(key){
+  const freq = parseFloat(key.dataset.freq);
+  if(!activeOscs[freq]) return;
+  const {osc, gain} = activeOscs[freq];
+  gain.gain.setValueAtTime(gain.gain.value, actx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+0.3);
+  osc.stop(actx.currentTime+0.35);
+  delete activeOscs[freq];
+  key.classList.remove('pressed');
+
+  if(isRecording){
+    recording.push({freq, time: Date.now()-recordStart, type:'end'});
+  }
+}
+
+// Keyboard input
+const keyMap = {
+  'a':0,'w':1,'s':2,'e':3,'d':4,'f':5,'t':6,'g':7,'y':8,'h':9,'u':10,'j':11,
+  'k':12,'o':13,'l':14,'p':15,';':16
+};
+const pressedKeys = new Set();
+document.addEventListener('keydown',e=>{
+  if(e.repeat || document.activeElement.tagName==='INPUT') return;
+  const k = e.key.toLowerCase();
+  if(pressedKeys.has(k)) return;
+  pressedKeys.add(k);
+  const noteIdx = keyMap[k];
+  if(noteIdx === undefined) return;
+  const noteInOctave = noteIdx % 12;
+  const octOffset = Math.floor(noteIdx/12);
+  const freq = noteFreq(noteInOctave, octave+octOffset);
+  const key = [...document.querySelectorAll('.key')].find(el=>Math.abs(parseFloat(el.dataset.freq)-freq)<0.1);
+  if(key) pressKey(key);
+});
+document.addEventListener('keyup',e=>{
+  const k = e.key.toLowerCase();
+  pressedKeys.delete(k);
+  const noteIdx = keyMap[k];
+  if(noteIdx===undefined) return;
+  const noteInOctave = noteIdx%12;
+  const octOffset = Math.floor(noteIdx/12);
+  const freq = noteFreq(noteInOctave, octave+octOffset);
+  const key = [...document.querySelectorAll('.key')].find(el=>Math.abs(parseFloat(el.dataset.freq)-freq)<0.1);
+  if(key) releaseKey(key);
+});
+
+function changeOctave(dir){
+  octave = Math.max(1, Math.min(7, octave+dir));
+  document.getElementById('octaveLabel').textContent = 'Octave '+octave;
+  // Update bar: octave 1=0%, octave 7=100%
+  const pct = ((octave-1)/6*100).toFixed(0);
+  document.getElementById('octaveBar').style.width = pct+'%';
+  buildKeyboard();
+}
+
+function toggleRecord(){
+  isRecording = !isRecording;
+  const btn = document.getElementById('recordBtn');
+  if(isRecording){
+    recording=[];recordStart=Date.now();
+    btn.textContent='⏹ Stop';btn.classList.add('recording');
+    document.getElementById('playBtn').style.display='none';
+  } else {
+    btn.textContent='⏺ Record';btn.classList.remove('recording');
+    if(recording.length>0) document.getElementById('playBtn').style.display='';
+  }
+}
+
+function playRecording(){
+  if(!recording.length) return;
+  playbackTimeout.forEach(clearTimeout);
+  playbackTimeout=[];
+  recording.forEach(ev=>{
+    const t = setTimeout(()=>{
+      const key = [...document.querySelectorAll('.key')].find(el=>Math.abs(parseFloat(el.dataset.freq)-ev.freq)<0.1);
+      if(!key) return;
+      if(ev.type==='start') pressKey(key);
+      else releaseKey(key);
+    }, ev.time);
+    playbackTimeout.push(t);
+  });
+}
+
+// ── MODE SWITCHER ─────────────────────────────────
+function setMode(mode){
+  document.getElementById('pianoSection').style.display = mode==='piano'?'block':'none';
+  document.getElementById('fxSection').style.display = mode==='fx'?'block':'none';
+  document.getElementById('pianoBtn').classList.toggle('active', mode==='piano');
+  document.getElementById('fxBtn').classList.toggle('active', mode==='fx');
+}
+
+// ── REAL SOUND FX ENGINE ─────────────────────────
+// Load real MP3s from / folder
+const AUDIO_CACHE = {};
+
+function toggleFX(name, btn){
+  if(!btn) btn = document.getElementById('fxbtn-'+name);
+  const ind = document.getElementById('fxind-'+name);
+  const url = soundMap[name];
+  if(!url) return;
+
+  // Update note display
+  if(btn){
+    const emoji = btn.querySelector('.fx-emoji') ? btn.querySelector('.fx-emoji').textContent : '';
+    const label = btn.querySelector('.fx-label') ? btn.querySelector('.fx-label').textContent : name;
+    document.getElementById('noteDisplay').textContent = emoji + ' ' + label;
+  }
+
+  if(!AUDIO_CACHE[name]){
+    AUDIO_CACHE[name] = new Audio(url);
+    AUDIO_CACHE[name].volume = 0.9;
+    // When sound ends naturally, reset button
+    AUDIO_CACHE[name].addEventListener('ended', ()=>{
+      if(btn) btn.classList.remove('is-playing');
+      if(ind) ind.textContent='▶';
+    });
+  }
+
+  const audio = AUDIO_CACHE[name];
+
+  if(!audio.paused){
+    // Currently playing — pause it
+    audio.pause();
+    if(btn) btn.classList.remove('is-playing');
+    if(ind) ind.textContent='▶';
+  } else {
+    // Stopped or paused — play it
+    // Stop all other sounds first? No — allow multiple. Just play.
+    audio.currentTime = audio.paused && audio.currentTime > 0 ? audio.currentTime : 0;
+    audio.play().then(()=>{
+      if(btn) btn.classList.add('is-playing');
+      if(ind) ind.textContent='⏸';
+    }).catch(e=>{
+      console.log('Sound failed:', url, e.message);
+      const fresh = new Audio(url);
+      fresh.volume=0.9;
+      fresh.play();
+      AUDIO_CACHE[name]=fresh;
+      fresh.addEventListener('ended',()=>{
+        if(btn) btn.classList.remove('is-playing');
+        if(ind) ind.textContent='▶';
+      });
+      if(btn) btn.classList.add('is-playing');
+      if(ind) ind.textContent='⏸';
+    });
+  }
+}
+
+// Sound URL map — accessible to toggleFX
+const soundMap = {
+  dog:'/dog.mp3', cat:'/cat.mp3', cow:'/cow.mp3', elephant:'/elephant.mp3',
+  lion:'/lion.mp3', frog:'/frog.mp3', bird:'/bird.mp3', horse:'/horse.mp3',
+  clap:'/clap.mp3', cheer:'/cheer.mp3', boo:'/boo.mp3', laugh:'/laugh.mp3',
+  whistle:'/whistle.mp3', gasp:'/gasp.mp3',
+  carhorn:'/carhorn.mp3', traffic:'/traffic.mp3', train:'/train.mp3',
+  airplane:'/airplane.mp3', siren:'/siren.mp3', bike:'/bike.mp3',
+  fart:'/fart.mp3', burp:'/burp.mp3', boing:'/boing.mp3', splat:'/splat.mp3',
+  slidewhistle:'/slidewhistle.mp3', womp:'/womp.mp3', spring:'/spring.mp3', zap:'/zap.mp3',
+  thunder:'/thunder.mp3', rain:'/rain.mp3', ocean:'/ocean.mp3', wind:'/wind.mp3',
+  fire:'/fire.mp3', earthquake:'/earthquake.mp3',
+  airhorn:'/airhorn.mp3', drumroll:'/drumroll.mp3', fanfare:'/fanfare.mp3',
+  pop:'/pop.mp3', ding:'/ding.mp3', buzzer:'/buzzer.mp3', levelup:'/levelup.mp3', coin:'/coin.mp3',
+};
+
+
+
+function stopAllSounds(){
+  Object.keys(AUDIO_CACHE).forEach(name=>{
+    const audio = AUDIO_CACHE[name];
+    if(audio){ audio.pause(); audio.currentTime=0; }
+    const btn = document.getElementById('fxbtn-'+name);
+    const ind = document.getElementById('fxind-'+name);
+    if(btn) btn.classList.remove('is-playing');
+    if(ind) ind.textContent='▶';
+  });
+  document.getElementById('noteDisplay').textContent='⏹ All sounds stopped!';
+}
+
+// ── INIT ─────────────────────────────────────────
+buildKeyboard();
+</script>
+</body>
+</html>
