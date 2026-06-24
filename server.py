@@ -466,6 +466,10 @@ def magic_sound_keys():
 def street_hustler():
     return send_from_directory('.', 'street-hustler.html')
 
+@app.route('/cash-wheel')
+def cash_wheel():
+    return send_from_directory('.', 'cash-wheel.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
