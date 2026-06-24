@@ -660,15 +660,14 @@ function spinWheel(){
 
 function landedOnSegment(){
   spinning = false;
-  const segAngle = (Math.PI*2)/SEGMENTS.length;
-  // Segments are drawn starting at wheelAngle - PI/2
-  // Pointer is fixed at top (0 degrees absolute)
-  // So we need to find which segment contains angle 0
-  // Each segment i starts at: wheelAngle + i*segAngle - PI/2
-  // We want: wheelAngle + i*segAngle - PI/2 <= 0 < wheelAngle + (i+1)*segAngle - PI/2
-  // Normalise wheel so segment 0 starts at 0
-  const offset = ((wheelAngle - Math.PI/2) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
-  const idx = Math.floor(((Math.PI*2) - offset) / segAngle) % SEGMENTS.length;
+  const n = SEGMENTS.length;
+  const segAngle = (Math.PI*2) / n;
+  // Segments drawn: segment i starts at wheelAngle + i*segAngle - PI/2
+  // Pointer fixed at top = canvas angle 0
+  // Pointer hits segment i where: wheelAngle + i*segAngle - PI/2 <= 0
+  // => idx = floor((PI/2 - wheelAngle) / segAngle) mod n
+  let idx = Math.floor((Math.PI/2 - wheelAngle) / segAngle) % n;
+  if(idx < 0) idx = ((idx % n) + n) % n;
   const seg = SEGMENTS[idx];
   console.log('Landed on:', seg.label, 'idx:', idx);
   soundLand();
