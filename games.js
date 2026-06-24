@@ -122,4 +122,8 @@ const GAMES=[
    desc:'Watch the ball... or lose it all! 5 cups, 1 ball, NYC back alley vibes. Can you beat the hustler? Easy to Hustler difficulty — the ultimate shell game!!',
    color:'rgba(255,50,0,0.15)',href:'/street-hustler'},
 
+  {id:'cash-wheel',emoji:'💰',cat:'Game Show · Word',title:'Cash Wheel',
+   desc:'Spin the wheel, guess the letters and solve the puzzle to win big! BANKRUPT wipes your cash! Buy vowels, solve early and rack up the highest score across 3 rounds!!',
+   color:'rgba(255,215,0,0.15)',href:'/cash-wheel'},
+
 ];
