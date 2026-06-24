@@ -543,6 +543,7 @@ function drawWheel(){
   SEGMENTS.forEach((seg,i)=>{
     const start = wheelAngle + i*segAngle - Math.PI/2;
     const end   = start + segAngle;
+    // Note: segment 0 starts at wheelAngle - PI/2 (top when wheelAngle=0 points seg0 center at top)
     const glow = 0.5 + 0.5 * Math.sin(glowPhase + i * 0.8);
 
     // Segment glow layer
@@ -616,6 +617,19 @@ function animateGlow(){
 animateGlow();
 
 // ── SPIN WHEEL ───────────────────────────────────
+function getSegmentAtPointer(){
+  // Canvas arc: segment i drawn from [wheelAngle + i*seg - PI/2] to [wheelAngle + (i+1)*seg - PI/2]
+  // Pointer at canvas top = angle -PI/2
+  // Segment i contains pointer when: wheelAngle + i*seg - PI/2 <= -PI/2 < wheelAngle + (i+1)*seg - PI/2
+  // Simplify: wheelAngle + i*seg <= 0 mod 2PI
+  // => i = floor(-wheelAngle / seg) mod n
+  const n = SEGMENTS.length;
+  const segAngle = (Math.PI*2) / n;
+  let idx = Math.floor(-wheelAngle / segAngle) % n;
+  if(idx < 0) idx += n;
+  return idx;
+}
+
 function spinWheel(){
   if(spinning || canGuess) return;
   spinning = true;
@@ -631,7 +645,7 @@ function spinWheel(){
   const duration = 3000 + Math.random()*1500;
   const start = performance.now();
   const startAngle = wheelAngle;
-  let lastTickAngle = 0;
+  let lastIdx = -1;
 
   function animate(now){
     const elapsed = now - start;
@@ -639,12 +653,11 @@ function spinWheel(){
     const ease = 1 - Math.pow(1-progress, 3);
     wheelAngle = startAngle + totalSpin * ease;
 
-    // Tick sound per segment
-    const segAngle = (Math.PI*2)/SEGMENTS.length;
-    const currentTick = Math.floor(wheelAngle/segAngle);
-    if(currentTick !== lastTickAngle){
+    // Tick sound when segment changes
+    const curIdx = getSegmentAtPointer();
+    if(curIdx !== lastIdx){
       soundTick();
-      lastTickAngle = currentTick;
+      lastIdx = curIdx;
     }
 
     drawWheel();
@@ -660,16 +673,9 @@ function spinWheel(){
 
 function landedOnSegment(){
   spinning = false;
-  const n = SEGMENTS.length;
-  const segAngle = (Math.PI*2) / n;
-  // Segments drawn: segment i starts at wheelAngle + i*segAngle - PI/2
-  // Pointer fixed at top = canvas angle 0
-  // Pointer hits segment i where: wheelAngle + i*segAngle - PI/2 <= 0
-  // => idx = floor((PI/2 - wheelAngle) / segAngle) mod n
-  let idx = Math.floor((Math.PI/2 - wheelAngle) / segAngle) % n;
-  if(idx < 0) idx = ((idx % n) + n) % n;
+  const idx = getSegmentAtPointer();
   const seg = SEGMENTS[idx];
-  console.log('Landed on:', seg.label, 'idx:', idx);
+  console.log('Landed idx:', idx, 'seg:', seg.label);
   soundLand();
   currentValue = seg.value;
 
