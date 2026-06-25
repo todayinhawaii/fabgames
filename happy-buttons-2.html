@@ -22,16 +22,18 @@ html,body{
 }
 .floatie{
   position:absolute;
-  animation:floatUp var(--dur) var(--delay) ease-in-out infinite;
+  animation:floatUp var(--dur) var(--delay) linear infinite;
   opacity:0;
   font-size:var(--size);
   user-select:none;
+  will-change:transform,opacity;
 }
 @keyframes floatUp{
-  0%{transform:translateY(110vh) rotate(var(--rot0)) scale(0.6);opacity:0;}
-  10%{opacity:var(--maxop);}
-  85%{opacity:var(--maxop);}
-  100%{transform:translateY(-20vh) rotate(var(--rot1)) scale(1.1);opacity:0;}
+  0%{transform:translateY(110vh) rotate(var(--rot0)) scale(0.8);opacity:0;}
+  15%{opacity:var(--maxop);}
+  80%{opacity:var(--maxop);}
+  95%{transform:translateY(-10vh) rotate(var(--rot1)) scale(1.0);opacity:0;}
+  100%{transform:translateY(-10vh) rotate(var(--rot1)) scale(1.0);opacity:0;}
 }
 
 /* ── TOP BAR ── */
