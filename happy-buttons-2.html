@@ -14,6 +14,26 @@ html,body{
   background:#c8bfb0;
 }
 
+/* ── FLOATING BACKGROUND ELEMENTS ── */
+.float-wrap{
+  position:fixed;inset:0;
+  pointer-events:none;z-index:0;
+  overflow:hidden;
+}
+.floatie{
+  position:absolute;
+  animation:floatUp var(--dur) var(--delay) ease-in-out infinite;
+  opacity:0;
+  font-size:var(--size);
+  user-select:none;
+}
+@keyframes floatUp{
+  0%{transform:translateY(110vh) rotate(var(--rot0)) scale(0.6);opacity:0;}
+  10%{opacity:var(--maxop);}
+  85%{opacity:var(--maxop);}
+  100%{transform:translateY(-20vh) rotate(var(--rot1)) scale(1.1);opacity:0;}
+}
+
 /* ── TOP BAR ── */
 #topbar{
   position:fixed;top:0;left:0;right:0;z-index:50;
@@ -207,6 +227,9 @@ body.immersive #collapseBtn{bottom:4px;}
 </style>
 </head>
 <body>
+
+<!-- FLOATING BACKGROUND -->
+<div class="float-wrap" id="floatWrap"></div>
 
 <div id="topbar">
   <div class="logo">🎨 Happy Buttons 2</div>
@@ -453,6 +476,40 @@ document.addEventListener('touchstart', e => {
   if(!immersive) return;
   if(e.touches[0].clientY > window.innerHeight-80){ setImmersive(false); lastRestoreTime=Date.now(); }
 }, {passive:true});
+
+// ── FLOATING RAINBOWS & HEARTS ────────────────────────
+const FLOATIES = [
+  '🌈','🌈','🌈','🌈',
+  '❤️','💕','💖','💗','💝','💓','💞',
+  '🩷','🧡','💛','💚','💙','💜',
+  '✨','⭐','🌟','💫',
+  '🎀','🦋','🌸','🌺',
+];
+
+(function spawnFloaties(){
+  const wrap = document.getElementById('floatWrap');
+  const count = 28;
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.className = 'floatie';
+    el.textContent = FLOATIES[Math.floor(Math.random()*FLOATIES.length)];
+    const size = 16 + Math.random()*28;
+    const dur  = 6 + Math.random()*10;
+    const delay = -(Math.random()*dur); // start at random point in cycle
+    const left = Math.random()*100;
+    const rot0 = (Math.random()*40-20)+'deg';
+    const rot1 = (Math.random()*40-20)+'deg';
+    const maxop = 0.15 + Math.random()*0.25;
+    el.style.setProperty('--size', size+'px');
+    el.style.setProperty('--dur', dur+'s');
+    el.style.setProperty('--delay', delay+'s');
+    el.style.setProperty('--rot0', rot0);
+    el.style.setProperty('--rot1', rot1);
+    el.style.setProperty('--maxop', maxop);
+    el.style.left = left+'%';
+    wrap.appendChild(el);
+  }
+})();
 </script>
 </body>
 </html>
