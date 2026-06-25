@@ -284,10 +284,10 @@ header h1{
 <div class="main">
 
   <div class="mode-bar">
-    <button class="mode-btn active" id="m-3" onclick="setMode(3,3)">3×3 Classic</button>
-    <button class="mode-btn" id="m-5" onclick="setMode(5,4)">5×5 · 4 in a row</button>
-    <button class="mode-btn" id="m-9" onclick="setMode(9,5)">9×9 Gomoku · 5 in a row</button>
-    <button class="mode-btn" id="m-15" onclick="setMode(15,5)">15×15 Pro · 5 in a row</button>
+    <button class="mode-btn active" id="m-3" onclick="setMode(3,3)">3×3 · 3 in a row</button>
+    <button class="mode-btn" id="m-5" onclick="setMode(5,4)">5×5 · get 4 in a row</button>
+    <button class="mode-btn" id="m-9" onclick="setMode(9,5)">9×9 · get 5 in a row</button>
+    <button class="mode-btn" id="m-15" onclick="setMode(15,5)">15×15 · get 5 in a row</button>
   </div>
 
   <div class="diff-bar">
@@ -581,12 +581,12 @@ function endGame(result){
   document.getElementById('thinking').textContent='';
   if(result==='X'){
     scores.X++;
-    setMsg('🎉 You WIN!! Amazing!!');
+    setMsg(`🎉 You WIN!! ${winLen} in a row!!`);
     sndWin();
     launchConfetti();
   } else if(result==='O'){
     scores.O++;
-    setMsg('🤖 Computer wins! Try again!');
+    setMsg(`🤖 Computer wins with ${winLen} in a row!`);
     sndLose();
   } else {
     scores.D++;
@@ -617,6 +617,7 @@ function setMode(size, wlen){
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('m-'+size).classList.add('active');
   newGame();
+  setMsg(`Your turn! ❌  (get ${winLen} in a row to win!)`);
 }
 
 // ── DIFFICULTY ────────────────────────────────────
