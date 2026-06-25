@@ -453,6 +453,22 @@ def happy_buttons():
 def happy_buttons_2():
     return send_from_directory('.', 'happy-buttons-2.html')
 
+@app.route('/happy-buttons-3')
+def happy_buttons_3():
+    return send_from_directory('.', 'happy-buttons-3.html')
+
+@app.route('/happy-buttons-4')
+def happy_buttons_4():
+    return send_from_directory('.', 'happy-buttons-4.html')
+
+@app.route('/happy-buttons-5')
+def happy_buttons_5():
+    return send_from_directory('.', 'happy-buttons-5.html')
+
+@app.route('/happy-buttons-6')
+def happy_buttons_6():
+    return send_from_directory('.', 'happy-buttons-6.html')
+
 
 @app.route('/fun-with-numbers')
 def fun_with_numbers():
