@@ -449,6 +449,10 @@ def learn_the_body():
 def happy_buttons():
     return send_from_directory('.', 'happy_buttons.html')
 
+@app.route('/happy-buttons-2')
+def happy_buttons_2():
+    return send_from_directory('.', 'happy-buttons-2.html')
+
 
 @app.route('/fun-with-numbers')
 def fun_with_numbers():
