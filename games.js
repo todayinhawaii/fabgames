@@ -33,6 +33,26 @@ const GAMES=[
    desc:'Six gorgeous big squishy buttons with slime sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
    color:'rgba(255,100,200,0.15)',href:'/happy-buttons-2'},
 
+  {id:'happy-buttons-3',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 3',
+   desc:'Six brand new squishy art buttons with fun sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(100,200,255,0.15)',href:'/happy-buttons-3'},
+
+  {id:'happy-buttons-4',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 4',
+   desc:'Six gorgeous squishy art buttons with amazing sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(200,255,100,0.15)',href:'/happy-buttons-4'},
+
+  {id:'happy-buttons-5',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 5',
+   desc:'Six incredible squishy art buttons with wild sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(255,200,100,0.15)',href:'/happy-buttons-5'},
+
+  {id:'happy-buttons-6',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 6',
+   desc:'Six fantastic squishy art buttons with cool sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(200,100,255,0.15)',href:'/happy-buttons-6'},
+
+  {id:'happy-buttons-2',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 2',
+   desc:'Six gorgeous big squishy buttons with slime sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(255,100,200,0.15)',href:'/happy-buttons-2'},
+
   {id:'happy-buttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
    desc:'Press the adorable squishy animal buttons for a satisfying ASMR experience!! 10 different sounds - pop, squish, boing and more. Just press and relax!!',
    color:'rgba(255,183,197,0.15)',href:'/happy-buttons'},
