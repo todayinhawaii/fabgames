@@ -29,6 +29,10 @@ const GAMES=[
    desc:'Choose your hero and clean up the park or beach!! Pick up litter, dump it in the bins. Fun for all ages!!',
    color:'rgba(34,197,94,0.12)',href:'/trash'},
 
+  {id:'happy-buttons-2',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 2',
+   desc:'Six gorgeous big squishy buttons with slime sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(255,100,200,0.15)',href:'/happy-buttons-2'},
+
   {id:'happy-buttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
    desc:'Press the adorable squishy animal buttons for a satisfying ASMR experience!! 10 different sounds - pop, squish, boing and more. Just press and relax!!',
    color:'rgba(255,183,197,0.15)',href:'/happy-buttons'},
