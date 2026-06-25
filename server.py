@@ -474,6 +474,10 @@ def street_hustler():
 def mystery_phrase():
     return send_from_directory('.', 'mystery-phrase.html')
 
+@app.route('/tic-tac-toe')
+def tic_tac_toe():
+    return send_from_directory('.', 'tic-tac-toe.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
