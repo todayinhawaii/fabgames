@@ -29,6 +29,30 @@ const GAMES=[
    desc:'Choose your hero and clean up the park or beach!! Pick up litter, dump it in the bins. Fun for all ages!!',
    color:'rgba(34,197,94,0.12)',href:'/trash'},
 
+  {id:'happy-buttons-2',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 2',
+   desc:'Six gorgeous big squishy buttons with slime sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(255,100,200,0.15)',href:'/happy-buttons-2'},
+
+  {id:'happy-buttons-3',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 3',
+   desc:'Six brand new squishy art buttons with fun sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(100,200,255,0.15)',href:'/happy-buttons-3'},
+
+  {id:'happy-buttons-4',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 4',
+   desc:'Six gorgeous squishy art buttons with amazing sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(200,255,100,0.15)',href:'/happy-buttons-4'},
+
+  {id:'happy-buttons-5',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 5',
+   desc:'Six incredible squishy art buttons with wild sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(255,200,100,0.15)',href:'/happy-buttons-5'},
+
+  {id:'happy-buttons-6',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 6',
+   desc:'Six fantastic squishy art buttons with cool sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(200,100,255,0.15)',href:'/happy-buttons-6'},
+
+  {id:'happy-buttons-2',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 2',
+   desc:'Six gorgeous big squishy buttons with slime sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
+   color:'rgba(255,100,200,0.15)',href:'/happy-buttons-2'},
+
   {id:'happy-buttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
    desc:'Press the adorable squishy animal buttons for a satisfying ASMR experience!! 10 different sounds - pop, squish, boing and more. Just press and relax!!',
    color:'rgba(255,183,197,0.15)',href:'/happy-buttons'},
@@ -121,5 +145,13 @@ const GAMES=[
   {id:'street-hustler',emoji:'🎩',cat:'Arcade · Strategy',title:'Street Hustler',
    desc:'Watch the ball... or lose it all! 5 cups, 1 ball, NYC back alley vibes. Can you beat the hustler? Easy to Hustler difficulty — the ultimate shell game!!',
    color:'rgba(255,50,0,0.15)',href:'/street-hustler'},
+
+  {id:'tic-tac-toe',emoji:'⭕',cat:'Strategy · Classic',title:'Tic Tac Toe',
+   desc:'The classic game! Play against the computer on 3×3, 5×5, 9×9 Gomoku or 15×15 Pro! Easy, Good or Excellent difficulty — can you beat the AI??',
+   color:'rgba(0,200,255,0.15)',href:'/tic-tac-toe'},
+
+  {id:'mystery-phrase',emoji:'🔤',cat:'Game Show · Word',title:'Mystery Phrase',
+   desc:'Spin the wheel, guess the letters and solve the mystery phrase to win big! BANKRUPT wipes your cash! Buy vowels, solve early and rack up the highest score across 3 rounds!!',
+   color:'rgba(255,215,0,0.15)',href:'/mystery-phrase'},
 
 ];

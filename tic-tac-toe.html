@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tic Tac Toe! ⭕❌</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Nunito',sans-serif;
+  background:#0a0020;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255,0,150,0.1), transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(0,150,255,0.1), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(150,0,255,0.07), transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:1;
+  text-align:center;padding:14px 20px 8px;width:100%;
+  background:rgba(0,0,0,0.6);
+  border-bottom:2px solid rgba(255,255,255,0.06);
+  backdrop-filter:blur(10px);
+}
+header h1{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(22px,5vw,40px);
+  background:linear-gradient(90deg,#ff00aa,#ff8c00,#ffd700,#00ff88,#00cfff,#aa00ff,#ff00aa);
+  background-size:200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shift 3s linear infinite;letter-spacing:2px;
+}
+@keyframes shift{0%{background-position:0%}100%{background-position:200%}}
+
+/* ── SCORE BAR ── */
+.score-bar{
+  position:relative;z-index:1;
+  display:flex;justify-content:center;gap:8px;
+  padding:10px 20px;width:100%;
+  background:rgba(0,0,0,0.4);
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  flex-wrap:wrap;
+}
+.sc{
+  display:flex;flex-direction:column;align-items:center;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;padding:8px 20px;min-width:90px;
+}
+.sc-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);font-weight:700;}
+.sc-val{font-family:'Fredoka One',cursive;font-size:26px;line-height:1.1;}
+.sc.player .sc-val{color:#00cfff;text-shadow:0 0 15px rgba(0,207,255,0.6);}
+.sc.draws .sc-val{color:rgba(255,255,255,0.4);}
+.sc.computer .sc-val{color:#ff4488;text-shadow:0 0 15px rgba(255,68,136,0.6);}
+
+/* ── MAIN AREA ── */
+.main{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;
+  padding:16px 20px 40px;gap:16px;flex:1;
+  width:100%;
+}
+
+/* ── MODE SELECTOR ── */
+.mode-bar{
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+}
+.mode-btn{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  padding:8px 16px;border-radius:20px;border:none;cursor:pointer;
+  background:rgba(0,0,0,0.4);
+  color:rgba(255,255,255,0.8);
+  border:2px solid rgba(0,255,100,0.6);
+  box-shadow:0 0 8px rgba(0,255,100,0.2);
+  animation:greenPill 1.4s ease-in-out infinite;
+  transition:all 0.2s;
+}
+@keyframes greenPill{
+  0%,100%{border-color:rgba(0,255,100,0.4);box-shadow:0 0 6px rgba(0,255,100,0.15);}
+  50%{border-color:rgba(0,255,100,1);box-shadow:0 0 18px rgba(0,255,100,0.6),0 0 35px rgba(0,255,100,0.15);}
+}
+.mode-btn:hover{background:rgba(0,255,100,0.08);color:#fff;transform:scale(1.05);}
+.mode-btn.active{
+  background:linear-gradient(135deg,#aa00ff,#ff00aa);
+  color:#fff;border-color:#ffd700;
+  box-shadow:0 0 25px rgba(170,0,255,0.5);
+  animation:none;
+}
+
+/* ── DIFFICULTY ── */
+.diff-bar{
+  display:flex;gap:8px;justify-content:center;
+}
+.diff-btn{
+  font-family:'Fredoka One',cursive;font-size:14px;
+  padding:8px 20px;border-radius:20px;border:none;cursor:pointer;
+  background:rgba(0,0,0,0.4);
+  color:rgba(255,255,255,0.8);
+  border:2px solid rgba(0,255,100,0.6);
+  box-shadow:0 0 8px rgba(0,255,100,0.2);
+  animation:greenPill 1.4s ease-in-out infinite;
+  transition:all 0.2s;
+}
+.diff-btn:hover{filter:brightness(1.15);transform:scale(1.05);}
+/* Unselected — solid yellow */
+.diff-btn.easy{background:linear-gradient(135deg,#aa8800,#ffd700);color:#000;border-color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,0.3);}
+.diff-btn.medium{background:linear-gradient(135deg,#aa8800,#ffd700);color:#000;border-color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,0.3);}
+.diff-btn.hard{background:linear-gradient(135deg,#aa8800,#ffd700);color:#000;border-color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,0.3);}
+/* Selected — solid green */
+.diff-btn.active.easy{background:linear-gradient(135deg,#00aa44,#00ff88);color:#000;border-color:#00ff88;box-shadow:0 0 20px rgba(0,255,136,0.6);animation:none;}
+.diff-btn.active.medium{background:linear-gradient(135deg,#00aa44,#00ff88);color:#000;border-color:#00ff88;box-shadow:0 0 20px rgba(0,255,136,0.6);animation:none;}
+.diff-btn.active.hard{background:linear-gradient(135deg,#00aa44,#00ff88);color:#000;border-color:#00ff88;box-shadow:0 0 20px rgba(0,255,136,0.6);animation:none;}
+
+/* ── MESSAGE ── */
+.msg{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(18px,4vw,26px);
+  color:#ffd700;
+  text-shadow:0 0 20px rgba(255,215,0,0.5);
+  text-align:center;min-height:36px;
+}
+
+/* ── BOARD ── */
+.board-wrap{
+  position:relative;
+  width:min(92vw,520px);
+  height:min(92vw,520px);
+}
+
+.board{
+  width:100%;height:100%;
+  display:grid;
+  gap:var(--gap,8px);
+  background:rgba(255,255,255,0.05);
+  border-radius:20px;
+  padding:10px;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.08),
+    0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* ── CELL ── */
+.cell{
+  position:relative;
+  border-radius:14px;
+  background:linear-gradient(145deg,#1a0a2e,#0d0520);
+  border:2px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:all 0.15s;
+  overflow:hidden;
+}
+.cell:hover:not(.taken){
+  background:linear-gradient(145deg,#2a1a3e,#1a1030);
+  border-color:rgba(255,255,255,0.15);
+  transform:scale(1.03);
+}
+.cell.taken{cursor:default;}
+
+/* X mark */
+.cell-x{
+  font-family:'Fredoka One',cursive;
+  font-size:var(--mark-size,clamp(36px,10vw,80px));
+  color:#00cfff;
+  text-shadow:0 0 20px rgba(0,207,255,0.8),0 0 40px rgba(0,207,255,0.4);
+  animation:popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  line-height:1;
+}
+
+/* O mark */
+.cell-o{
+  font-family:'Fredoka One',cursive;
+  font-size:var(--mark-size,clamp(36px,10vw,80px));
+  color:#ff4488;
+  text-shadow:0 0 20px rgba(255,68,136,0.8),0 0 40px rgba(255,68,136,0.4);
+  animation:popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  line-height:1;
+}
+
+@keyframes popIn{
+  0%{transform:scale(0) rotate(-10deg);opacity:0;}
+  100%{transform:scale(1) rotate(0deg);opacity:1;}
+}
+
+/* Winning cell highlight */
+.cell.winner{
+  background:linear-gradient(145deg,#1a0a2e,#0d0520);
+  border-color:rgba(255,215,0,0.6);
+  box-shadow:0 0 20px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,215,0,0.1);
+  animation:winPulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes winPulse{
+  0%{box-shadow:0 0 15px rgba(255,215,0,0.3),inset 0 0 10px rgba(255,215,0,0.05);}
+  100%{box-shadow:0 0 35px rgba(255,215,0,0.7),inset 0 0 25px rgba(255,215,0,0.15);}
+}
+
+/* Win line SVG */
+.win-line{
+  position:absolute;inset:0;pointer-events:none;z-index:10;
+}
+
+/* ── NEW GAME BTN ── */
+.new-game-btn{
+  font-family:'Fredoka One',cursive;font-size:20px;
+  padding:14px 44px;border-radius:16px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#aa00ff,#ff00aa);
+  color:#fff;letter-spacing:1px;
+  box-shadow:0 6px 0 #550077,0 8px 24px rgba(170,0,255,0.3);
+  transition:all 0.15s;
+  animation:btnPulse 2s ease-in-out infinite;
+}
+.new-game-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #550077;}
+.new-game-btn:hover{filter:brightness(1.1);}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 6px 0 #550077,0 0 15px rgba(170,0,255,0.2);}
+  50%{box-shadow:0 6px 0 #550077,0 0 30px rgba(170,0,255,0.5);}
+}
+
+/* ── WHO GOES FIRST ── */
+.turn-indicator{
+  display:flex;gap:12px;align-items:center;
+  font-family:'Fredoka One',cursive;font-size:14px;
+  color:rgba(255,255,255,0.3);
+}
+.turn-pill{
+  padding:6px 16px;border-radius:20px;
+  font-family:'Fredoka One',cursive;font-size:13px;
+  border:none;cursor:pointer;
+  transition:all 0.2s;
+  background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.4);
+  border:1px solid rgba(255,255,255,0.08);
+}
+.turn-pill.active-x{background:rgba(0,207,255,0.15);color:#00cfff;border-color:rgba(0,207,255,0.4);}
+.turn-pill.active-o{background:rgba(255,68,136,0.15);color:#ff4488;border-color:rgba(255,68,136,0.4);}
+
+/* ── CONFETTI ── */
+.confetti-p{position:fixed;pointer-events:none;z-index:10000;animation:cFall var(--cd) ease-in forwards;}
+@keyframes cFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1;}100%{transform:translateY(105vh) rotate(720deg);opacity:0;}}
+
+/* ── COMPUTER THINKING ── */
+.thinking{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  color:rgba(255,68,136,0.6);letter-spacing:2px;
+  min-height:20px;text-align:center;
+  animation:blink 0.6s ease-in-out infinite alternate;
+}
+@keyframes blink{0%{opacity:0.3;}100%{opacity:1;}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⭕ TIC TAC TOE ❌</h1>
+</header>
+
+<div class="score-bar">
+  <div class="sc player">
+    <div class="sc-label">You ❌</div>
+    <div class="sc-val" id="scoreX">0</div>
+  </div>
+  <div class="sc draws">
+    <div class="sc-label">Draws</div>
+    <div class="sc-val" id="scoreD">0</div>
+  </div>
+  <div class="sc computer">
+    <div class="sc-label">Computer ⭕</div>
+    <div class="sc-val" id="scoreO">0</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="mode-bar">
+    <button class="mode-btn active" id="m-3" onclick="setMode(3,3)">3×3 · 3 in a row</button>
+    <button class="mode-btn" id="m-5" onclick="setMode(5,4)">5×5 · get 4 in a row</button>
+    <button class="mode-btn" id="m-9" onclick="setMode(9,5)">9×9 · get 5 in a row</button>
+    <button class="mode-btn" id="m-15" onclick="setMode(15,5)">15×15 · get 5 in a row</button>
+  </div>
+
+  <div class="diff-bar">
+    <button class="diff-btn easy active" id="d-easy"   onclick="setDiff('easy')">🐢 Easy</button>
+    <button class="diff-btn medium"      id="d-medium" onclick="setDiff('medium')">🦊 Good</button>
+    <button class="diff-btn hard"        id="d-hard"   onclick="setDiff('hard')">🔥 Excellent</button>
+  </div>
+
+  <div class="msg" id="msg">Your turn! ❌</div>
+  <div class="thinking" id="thinking"></div>
+
+  <div class="board-wrap">
+    <div class="board" id="board"></div>
+    <svg class="win-line" id="winLine" viewBox="0 0 3 3"></svg>
+  </div>
+
+  <button class="new-game-btn" onclick="newGame()">🔄 New Game</button>
+
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────
+let gridSize = 3;
+let winLen = 3;
+let board = Array(9).fill(null);
+let gameOver = false;
+let playerTurn = true;
+let diff = 'easy';
+let scores = {X:0, O:0, D:0};
+
+function getWinLines(size, wlen){
+  const lines = [];
+  // Rows
+  for(let r=0;r<size;r++)
+    for(let c=0;c<=size-wlen;c++){
+      const l=[];for(let i=0;i<wlen;i++) l.push(r*size+c+i);
+      lines.push(l);
+    }
+  // Cols
+  for(let c=0;c<size;c++)
+    for(let r=0;r<=size-wlen;r++){
+      const l=[];for(let i=0;i<wlen;i++) l.push((r+i)*size+c);
+      lines.push(l);
+    }
+  // Diag down-right
+  for(let r=0;r<=size-wlen;r++)
+    for(let c=0;c<=size-wlen;c++){
+      const l=[];for(let i=0;i<wlen;i++) l.push((r+i)*size+c+i);
+      lines.push(l);
+    }
+  // Diag down-left
+  for(let r=0;r<=size-wlen;r++)
+    for(let c=wlen-1;c<size;c++){
+      const l=[];for(let i=0;i<wlen;i++) l.push((r+i)*size+c-i);
+      lines.push(l);
+    }
+  return lines;
+}
+
+let WIN_LINES = getWinLines(3,3);
+
+// ── AUDIO ────────────────────────────────────────
+let actx = null;
+function ac(){ if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)(); return actx; }
+function tone(f,d=0.15,v=0.3,t='sine'){
+  const a=ac(),o=a.createOscillator(),g=a.createGain();
+  o.connect(g);g.connect(a.destination);o.type=t;o.frequency.value=f;
+  g.gain.setValueAtTime(v,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+d);
+  o.start();o.stop(a.currentTime+d+0.05);
+}
+function sndX(){ tone(440,0.08,0.3,'square'); setTimeout(()=>tone(550,0.1,0.2,'sine'),60); }
+function sndO(){ tone(330,0.08,0.3,'sine'); setTimeout(()=>tone(260,0.12,0.2,'sine'),60); }
+function sndWin(){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,0.2,0.3,'triangle'),i*100)); }
+function sndLose(){ [400,320,240,180].forEach((f,i)=>setTimeout(()=>tone(f,0.2,0.25,'sawtooth'),i*120)); }
+function sndDraw(){ tone(440,0.3,0.2,'sine'); setTimeout(()=>tone(440,0.3,0.15,'sine'),200); }
+
+// ── BUILD BOARD ───────────────────────────────────
+function buildBoard(){
+  const b = document.getElementById('board');
+  b.innerHTML = '';
+  const gap = gridSize<=3?10:gridSize<=5?7:gridSize<=9?4:2;
+  const radius = gridSize<=3?14:gridSize<=5?10:gridSize<=9?6:4;
+  b.style.setProperty('--gap', gap+'px');
+  b.style.gridTemplateColumns = `repeat(${gridSize},1fr)`;
+  b.style.gridTemplateRows = `repeat(${gridSize},1fr)`;
+  b.style.gap = gap+'px';
+  b.style.padding = (gap+2)+'px';
+  // Mark size based on grid
+  const markSize = gridSize<=3?'clamp(40px,12vw,88px)':
+                   gridSize<=5?'clamp(24px,7vw,52px)':
+                   gridSize<=9?'clamp(14px,4vw,30px)':'clamp(10px,2.5vw,20px)';
+  document.documentElement.style.setProperty('--mark-size', markSize);
+  for(let i=0;i<gridSize*gridSize;i++){
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.idx = i;
+    cell.style.borderRadius = radius+'px';
+    cell.onclick = ()=>playerMove(i);
+    b.appendChild(cell);
+  }
+}
+
+// ── PLAYER MOVE ───────────────────────────────────
+function playerMove(idx){
+  if(!playerTurn || gameOver || board[idx]) return;
+  ac();
+  makeMove(idx, 'X');
+  sndX();
+  const winner = checkWinner();
+  if(winner){ endGame(winner); return; }
+  if(board.every(c=>c)){ endGame('draw'); return; }
+  playerTurn = false;
+  setMsg('Computer thinking... ⭕');
+  document.getElementById('thinking').textContent = '● ● ●';
+  const delay = diff==='easy'?600 : diff==='medium'?400 : 250;
+  setTimeout(()=>{ computerMove(); }, delay);
+}
+
+// ── COMPUTER MOVE ─────────────────────────────────
+function computerMove(){
+  document.getElementById('thinking').textContent = '';
+  if(gameOver) return;
+  let idx;
+  if(diff==='easy')        idx = easyMove();
+  else if(diff==='medium') idx = mediumMove();
+  else                     idx = hardMove();
+  makeMove(idx,'O');
+  sndO();
+  const winner = checkWinner();
+  if(winner){ endGame(winner); return; }
+  if(board.every(c=>c)){ endGame('draw'); return; }
+  playerTurn = true;
+  setMsg('Your turn! ❌');
+}
+
+// Easy — mostly random with occasional block
+function easyMove(){
+  const empty = board.map((v,i)=>v===null?i:-1).filter(i=>i>=0);
+  // 20% chance to block
+  if(Math.random() < 0.2){
+    const block = findWinMove('X');
+    if(block !== -1) return block;
+  }
+  return empty[Math.floor(Math.random()*empty.length)];
+}
+
+// Medium — always block, sometimes win, random otherwise
+function mediumMove(){
+  const win = findWinMove('O');
+  if(win !== -1) return win;
+  const block = findWinMove('X');
+  if(block !== -1 && Math.random() > 0.2) return block;
+  const empty = board.map((v,i)=>v===null?i:-1).filter(i=>i>=0);
+  return empty[Math.floor(Math.random()*empty.length)];
+}
+
+// Hard — minimax, unbeatable
+function hardMove(){
+  // For 3x3 use full minimax — for larger boards use strategic heuristic
+  if(gridSize === 3){
+    let best=-Infinity, bestIdx=-1;
+    board.forEach((v,i)=>{
+      if(v!==null) return;
+      board[i]='O';
+      const score=minimax(board,0,false);
+      board[i]=null;
+      if(score>best){best=score;bestIdx=i;}
+    });
+    return bestIdx;
+  }
+  return strategicMove();
+}
+
+function strategicMove(){
+  // Win if possible
+  const win=findWinMove('O'); if(win!==-1) return win;
+  // Block player win
+  const block=findWinMove('X'); if(block!==-1) return block;
+  // Block player 3-in-a-row threat
+  const threat=findThreat('X',winLen-2); if(threat!==-1) return threat;
+  // Take centre
+  const mid=Math.floor(gridSize/2)*gridSize+Math.floor(gridSize/2);
+  if(!board[mid]) return mid;
+  // Take near centre
+  const near=[mid-1,mid+1,mid-gridSize,mid+gridSize,mid-gridSize-1,mid-gridSize+1,mid+gridSize-1,mid+gridSize+1];
+  for(const n of near) if(n>=0&&n<board.length&&!board[n]) return n;
+  // Random
+  const empty=board.map((v,i)=>v===null?i:-1).filter(i=>i>=0);
+  return empty[Math.floor(Math.random()*empty.length)];
+}
+
+function findThreat(player, count){
+  for(const line of WIN_LINES){
+    const playerCount=line.filter(i=>board[i]===player).length;
+    const emptyCount=line.filter(i=>board[i]===null).length;
+    if(playerCount>=count && emptyCount>0){
+      const empty=line.find(i=>board[i]===null);
+      if(empty!==undefined) return empty;
+    }
+  }
+  return -1;
+}
+
+function minimax(b,depth,isMax){
+  const w=checkWinnerBoard(b);
+  if(w==='O') return 10-depth;
+  if(w==='X') return depth-10;
+  if(b.every(c=>c)) return 0;
+  if(depth>=6) return 0; // depth limit
+  if(isMax){
+    let best=-Infinity;
+    b.forEach((v,i)=>{if(v!==null)return;b[i]='O';best=Math.max(best,minimax(b,depth+1,false));b[i]=null;});
+    return best;
+  } else {
+    let best=Infinity;
+    b.forEach((v,i)=>{if(v!==null)return;b[i]='X';best=Math.min(best,minimax(b,depth+1,true));b[i]=null;});
+    return best;
+  }
+}
+
+function findWinMove(player){
+  for(let i=0;i<9;i++){
+    if(board[i]!==null) continue;
+    board[i]=player;
+    if(checkWinnerBoard(board)===player){ board[i]=null; return i; }
+    board[i]=null;
+  }
+  return -1;
+}
+
+// ── MAKE MOVE ─────────────────────────────────────
+function makeMove(idx, player){
+  board[idx] = player;
+  const cell = document.querySelector(`.cell[data-idx="${idx}"]`);
+  cell.classList.add('taken');
+  const mark = document.createElement('div');
+  mark.className = player==='X' ? 'cell-x' : 'cell-o';
+  mark.textContent = player==='X' ? '❌' : '⭕';
+  cell.appendChild(mark);
+}
+
+// ── CHECK WINNER ──────────────────────────────────
+function checkWinnerBoard(b){
+  for(const line of WIN_LINES){
+    const first=b[line[0]];
+    if(first && line.every(i=>b[i]===first)) return first;
+  }
+  return null;
+}
+
+function checkWinner(){
+  for(const line of WIN_LINES){
+    const first = board[line[0]];
+    if(first && line.every(i=>board[i]===first)){
+      line.forEach(i=>{
+        document.querySelector(`.cell[data-idx="${i}"]`).classList.add('winner');
+      });
+      drawWinLine(line);
+      return first;
+    }
+  }
+  return null;
+}
+
+// ── DRAW WIN LINE ─────────────────────────────────
+function drawWinLine(winLine){
+  const svg = document.getElementById('winLine');
+  svg.innerHTML='';
+  svg.setAttribute('viewBox',`0 0 ${gridSize} ${gridSize}`);
+  const pos = i=>({ x:i%gridSize+0.5, y:Math.floor(i/gridSize)+0.5 });
+  const pa=pos(winLine[0]), pc=pos(winLine[winLine.length-1]);
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1',pa.x); line.setAttribute('y1',pa.y);
+  line.setAttribute('x2',pc.x); line.setAttribute('y2',pc.y);
+  line.setAttribute('stroke','#FFD700');
+  line.setAttribute('stroke-width', gridSize<=3?'0.18':'0.12');
+  line.setAttribute('stroke-linecap','round');
+  const dl = Math.sqrt(Math.pow(pc.x-pa.x,2)+Math.pow(pc.y-pa.y,2));
+  line.setAttribute('stroke-dasharray',dl);
+  line.setAttribute('stroke-dashoffset',dl);
+  line.setAttribute('opacity','0.9');
+  svg.appendChild(line);
+  line.style.transition='stroke-dashoffset 0.4s ease';
+  requestAnimationFrame(()=>{ line.style.strokeDashoffset='0'; });
+}
+
+// ── END GAME ──────────────────────────────────────
+function endGame(result){
+  gameOver = true;
+  document.getElementById('thinking').textContent='';
+  if(result==='X'){
+    scores.X++;
+    setMsg(`🎉 You WIN!! ${winLen} in a row!!`);
+    sndWin();
+    launchConfetti();
+  } else if(result==='O'){
+    scores.O++;
+    setMsg(`🤖 Computer wins with ${winLen} in a row!`);
+    sndLose();
+  } else {
+    scores.D++;
+    setMsg("🤝 It's a Draw!");
+    sndDraw();
+  }
+  // Disable all cells
+  document.querySelectorAll('.cell').forEach(c=>c.style.cursor='default');
+  updateScores();
+}
+
+// ── NEW GAME ──────────────────────────────────────
+function newGame(){
+  board = Array(gridSize*gridSize).fill(null);
+  gameOver = false;
+  playerTurn = true;
+  document.getElementById('winLine').innerHTML='';
+  document.getElementById('thinking').textContent='';
+  buildBoard();
+  setMsg('Your turn! ❌');
+}
+
+// ── MODE ──────────────────────────────────────────
+function setMode(size, wlen){
+  gridSize = size;
+  winLen = wlen;
+  WIN_LINES = getWinLines(size, wlen);
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('m-'+size).classList.add('active');
+  newGame();
+  setMsg(`Your turn! ❌  (get ${winLen} in a row to win!)`);
+}
+
+// ── DIFFICULTY ────────────────────────────────────
+function setDiff(d){
+  diff = d;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('d-'+d).classList.add('active');
+  newGame();
+}
+
+// ── HELPERS ───────────────────────────────────────
+function setMsg(m){ document.getElementById('msg').textContent=m; }
+function updateScores(){
+  document.getElementById('scoreX').textContent=scores.X;
+  document.getElementById('scoreO').textContent=scores.O;
+  document.getElementById('scoreD').textContent=scores.D;
+}
+
+function launchConfetti(){
+  const colors=['#FFD700','#FF00AA','#00CFFF','#00FF88','#AA00FF','#FF8C00'];
+  for(let i=0;i<80;i++) setTimeout(()=>{
+    const c=document.createElement('div');c.className='confetti-p';
+    c.style.left=Math.random()*100+'vw';c.style.top='-15px';
+    c.style.width=(8+Math.random()*8)+'px';c.style.height=(8+Math.random()*8)+'px';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.borderRadius=Math.random()>0.5?'50%':'3px';
+    const dur=(1.5+Math.random()*2).toFixed(2)+'s';
+    c.style.setProperty('--cd',dur);document.body.appendChild(c);
+    setTimeout(()=>c.remove(),parseFloat(dur)*1000+100);
+  },i*20);
+}
+
+// ── INIT ─────────────────────────────────────────
+buildBoard();
+</script>
+</body>
+</html>

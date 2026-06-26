@@ -449,6 +449,26 @@ def learn_the_body():
 def happy_buttons():
     return send_from_directory('.', 'happy_buttons.html')
 
+@app.route('/happy-buttons-2')
+def happy_buttons_2():
+    return send_from_directory('.', 'happy-buttons-2.html')
+
+@app.route('/happy-buttons-3')
+def happy_buttons_3():
+    return send_from_directory('.', 'happy-buttons-3.html')
+
+@app.route('/happy-buttons-4')
+def happy_buttons_4():
+    return send_from_directory('.', 'happy-buttons-4.html')
+
+@app.route('/happy-buttons-5')
+def happy_buttons_5():
+    return send_from_directory('.', 'happy-buttons-5.html')
+
+@app.route('/happy-buttons-6')
+def happy_buttons_6():
+    return send_from_directory('.', 'happy-buttons-6.html')
+
 
 @app.route('/fun-with-numbers')
 def fun_with_numbers():
@@ -465,6 +485,14 @@ def magic_sound_keys():
 @app.route('/street-hustler')
 def street_hustler():
     return send_from_directory('.', 'street-hustler.html')
+
+@app.route('/mystery-phrase')
+def mystery_phrase():
+    return send_from_directory('.', 'mystery-phrase.html')
+
+@app.route('/tic-tac-toe')
+def tic_tac_toe():
+    return send_from_directory('.', 'tic-tac-toe.html')
 
 @app.route('/freegames')
 def freegames():

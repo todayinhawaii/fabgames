@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Happy Buttons 4 🎨</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  font-family:'Baloo 2',sans-serif;
+  touch-action:none;
+  background:#c8bfb0;
+}
+
+/* ── FLOATING BACKGROUND ELEMENTS ── */
+.float-wrap{
+  position:fixed;inset:0;
+  pointer-events:none;z-index:0;
+  overflow:hidden;
+}
+.floatie{
+  position:absolute;
+  animation:floatUp var(--dur) var(--delay) linear infinite;
+  opacity:0;
+  font-size:var(--size);
+  user-select:none;
+  will-change:transform,opacity;
+}
+@keyframes floatUp{
+  0%{transform:translateY(110vh) rotate(var(--rot0)) scale(0.8);opacity:0;}
+  15%{opacity:var(--maxop);}
+  80%{opacity:var(--maxop);}
+  95%{transform:translateY(-10vh) rotate(var(--rot1)) scale(1.0);opacity:0;}
+  100%{transform:translateY(-10vh) rotate(var(--rot1)) scale(1.0);opacity:0;}
+}
+
+/* ── TOP BAR ── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;
+  background:rgba(22,16,12,0.92);backdrop-filter:blur(6px);
+  border-bottom:2px solid rgba(255,215,0,0.3);
+}
+.logo{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;
+  background:linear-gradient(135deg,#ffd700,#ffb347,#ff8fab);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.home-link{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,215,0,0.35);
+  color:#e8c96a;text-decoration:none;font-size:16px;
+}
+
+/* ── STAGE ── */
+#stage{
+  position:fixed;top:50px;bottom:110px;left:0;right:0;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+
+/* ── GRID — 2 cols × 3 rows ── */
+#grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+  padding:16px;
+  background:linear-gradient(145deg,#b0a498,#c8bfb0);
+  border-radius:24px;
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.45),
+    0 0 0 3px rgba(255,255,255,0.15),
+    inset 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* ── EACH BUTTON ── */
+.sqbtn{
+  position:relative;
+  border-radius:22px;
+  cursor:pointer;
+  overflow:hidden;
+
+  /* 3D RAISED — same as original */
+  box-shadow:
+    0 8px 0 rgba(0,0,0,0.32),
+    0 12px 20px rgba(0,0,0,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.45),
+    inset 0 -2px 4px rgba(0,0,0,0.12);
+
+  transform:translateY(0px);
+  transition:
+    transform 0.12s cubic-bezier(.35,0,.2,1),
+    box-shadow 0.12s cubic-bezier(.35,0,.2,1),
+    filter 0.12s;
+  will-change:transform,box-shadow;
+}
+
+.sqbtn img{
+  display:block;width:100%;height:100%;
+  object-fit:cover;border-radius:20px;
+  pointer-events:none;
+  -webkit-user-drag:none;
+}
+
+/* Placeholder when no image yet */
+.sqbtn-placeholder{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:10px;
+  border-radius:20px;
+  background:linear-gradient(160deg,#f8f4ff,#ddd0ff);
+}
+.sqbtn-placeholder .ph-icon{font-size:clamp(40px,10vw,80px);}
+.sqbtn-placeholder .ph-text{
+  font-family:'Baloo 2',sans-serif;font-weight:800;
+  font-size:clamp(11px,2.5vw,16px);
+  color:rgba(100,60,160,0.45);
+  letter-spacing:1px;text-align:center;
+}
+
+/* ── PRESSED STATE ── */
+.sqbtn.pressed{
+  transform:translateY(14px) scale(0.90);
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.35),
+    0 2px 6px rgba(0,0,0,0.2),
+    inset 0 10px 26px rgba(0,0,0,0.45),
+    inset 0 3px 8px rgba(0,0,0,0.30);
+  filter:brightness(0.78) saturate(1.4);
+}
+
+/* Glow ring on press */
+.sqbtn::after{
+  content:'';
+  position:absolute;inset:0;border-radius:20px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.1s;
+  box-shadow:0 0 0 4px var(--glow,#ffd700), 0 0 28px var(--glow,#ffd700);
+}
+.sqbtn.pressed::after{opacity:1;}
+
+/* ── SOUND BAR ── */
+#soundBar{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  padding:8px 10px 42px;
+  background:rgba(12,22,12,0.96);backdrop-filter:blur(8px);
+  border-top:2px solid rgba(255,215,0,0.4);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+#soundLabel{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,215,0,0.75);font-weight:800;
+}
+#soundScroll{
+  display:flex;gap:8px;overflow-x:auto;width:100%;
+  padding:2px 4px;scrollbar-width:none;justify-content:flex-start;
+}
+#soundScroll::-webkit-scrollbar{display:none;}
+@media(min-width:600px){
+  #soundScroll{justify-content:center;flex-wrap:wrap;overflow-x:visible;}
+}
+
+@keyframes pillPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(200,255,100,0.0),0 2px 0 #1a3a0a;}
+  50%{box-shadow:0 0 0 5px rgba(200,255,100,0.18),0 2px 0 #1a3a0a;}
+}
+@keyframes pillPulseActive{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.0),0 3px 0 #7a5800,0 0 12px rgba(255,215,0,0.4);}
+  50%{box-shadow:0 0 0 6px rgba(255,215,0,0.25),0 3px 0 #7a5800,0 0 22px rgba(255,215,0,0.65);}
+}
+.snd-btn{
+  flex-shrink:0;padding:6px 15px;border-radius:22px;
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:11px;
+  background:linear-gradient(135deg,#1a3a0a,#2a5a12);
+  border:2px solid rgba(180,230,80,0.35);
+  color:#c8f06a;cursor:pointer;white-space:nowrap;
+  transition:transform 0.12s;
+  box-shadow:0 2px 0 #1a3a0a;
+  animation:pillPulse 2.2s ease-in-out infinite;
+}
+.snd-btn:active{transform:scale(0.95);}
+.snd-btn.active{
+  background:linear-gradient(135deg,#3a6a00,#5a9a00);
+  border:2.5px solid #ffd700;color:#ffd700;
+  box-shadow:0 3px 0 #7a5800,0 0 14px rgba(255,215,0,0.5);
+  animation:pillPulseActive 1.8s ease-in-out infinite;
+}
+
+/* ── IMMERSIVE / COLLAPSE ── */
+#collapseBtn{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:56;
+  width:54px;height:22px;border-radius:10px 10px 0 0;
+  background:rgba(12,28,8,0.9);border:1.5px solid rgba(255,215,0,0.5);
+  border-bottom:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:#c8f06a;cursor:pointer;
+  transition:bottom 0.3s ease,border-radius 0.3s ease,height 0.3s ease;
+  box-shadow:0 -3px 12px rgba(0,0,0,0.4);
+}
+#collapseBtn:hover{background:rgba(30,60,12,0.98);color:#ffd700;}
+body.immersive #collapseBtn{
+  bottom:6px;border-radius:14px;border:1.5px solid rgba(255,215,0,0.55);
+  height:26px;width:60px;
+  box-shadow:0 0 16px rgba(255,215,0,0.35);
+  animation:arrowPulse 2s ease-in-out infinite;
+}
+@keyframes arrowPulse{
+  0%,100%{box-shadow:0 0 6px rgba(255,215,0,0.2);}
+  50%{box-shadow:0 0 18px rgba(255,215,0,0.55);}
+}
+
+#topbar{transition:transform 0.3s ease,opacity 0.3s ease;}
+#soundBar{transition:transform 0.3s ease,opacity 0.3s ease;}
+body.immersive #topbar{transform:translateY(-100%);opacity:0;pointer-events:none;}
+body.immersive #soundBar{transform:translateY(100%);opacity:0;pointer-events:none;}
+body.immersive #stage{top:0!important;bottom:0!important;}
+body:not(.immersive) #stage{top:50px!important;bottom:110px!important;}
+body:not(.immersive) #topbar{transform:translateY(0)!important;opacity:1!important;pointer-events:auto!important;}
+body:not(.immersive) #soundBar{transform:translateY(0)!important;opacity:1!important;pointer-events:auto!important;}
+body.immersive #collapseBtn{bottom:4px;}
+
+/* Particles */
+.particle{position:fixed;pointer-events:none;z-index:60;border-radius:50%;}
+</style>
+</head>
+<body>
+
+<!-- FLOATING BACKGROUND -->
+<div class="float-wrap" id="floatWrap"></div>
+
+<div id="topbar">
+  <div class="logo">🎨 Happy Buttons 4</div>
+  <a href="/" class="home-link">🏠</a>
+</div>
+
+<div id="collapseBtn" title="Expand / Collapse">▼</div>
+
+<div id="stage">
+  <div id="grid"></div>
+</div>
+
+<div id="soundBar">
+  <div id="soundLabel">🔊 Choose your sound</div>
+  <div id="soundScroll"></div>
+</div>
+
+<script>
+// ── BUTTON DATA ── (6 buttons, 2 cols × 3 rows)
+// Replace file names with your actual art files
+// Recommended art size: 400 × 400px square
+const BUTTONS = [
+  {name:'Button 1', file:'hb4_01.jpg', glow:'#ffb3c6'},
+  {name:'Button 2', file:'hb4_02.jpg', glow:'#bbdefb'},
+  {name:'Button 3', file:'hb4_03.jpg', glow:'#c5e1a5'},
+  {name:'Button 4', file:'hb4_04.jpg', glow:'#fff9c4'},
+  {name:'Button 5', file:'hb4_05.jpg', glow:'#f3e5f5'},
+  {name:'Button 6', file:'hb4_06.jpg', glow:'#fce4ec'},
+];
+
+// ── BUILD GRID ────────────────────────────────────────
+const grid = document.getElementById('grid');
+const stage = document.getElementById('stage');
+
+function buildGrid(){
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  // 2 cols, 3 rows, 16px gap, 16px padding
+  const maxBW = Math.floor((sw - 32 - 16) / 2);
+  const maxBH = Math.floor((sh - 32 - 32) / 3);
+  const bSize = Math.min(maxBW, maxBH, 280);
+
+  grid.style.gridTemplateColumns = `repeat(2,${bSize}px)`;
+  grid.style.gridTemplateRows    = `repeat(3,${bSize}px)`;
+
+  if(grid.children.length === 6) return;
+
+  BUTTONS.forEach((btn, i) => {
+    const div = document.createElement('div');
+    div.className = 'sqbtn';
+    div.dataset.idx = i;
+    div.style.setProperty('--glow', btn.glow);
+
+    // Try image first, fallback to placeholder
+    const img = document.createElement('img');
+    img.src = '/' + btn.file;
+    img.alt = btn.name;
+    img.draggable = false;
+    img.onerror = () => {
+      // Show placeholder if image not found
+      div.innerHTML = '';
+      const ph = document.createElement('div');
+      ph.className = 'sqbtn-placeholder';
+      ph.innerHTML = `<div class="ph-icon">🎨</div><div class="ph-text">${btn.name}<br><span style="font-size:0.8em;opacity:0.6">400 × 400px</span></div>`;
+      div.appendChild(ph);
+    };
+    div.appendChild(img);
+    grid.appendChild(div);
+  });
+}
+
+function resizeGrid(){
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  const maxBW = Math.floor((sw - 32 - 16) / 2);
+  const maxBH = Math.floor((sh - 32 - 32) / 3);
+  const bSize = Math.min(maxBW, maxBH, 280);
+  grid.style.gridTemplateColumns = `repeat(2,${bSize}px)`;
+  grid.style.gridTemplateRows    = `repeat(3,${bSize}px)`;
+}
+window.addEventListener('resize', resizeGrid);
+buildGrid();
+
+// ── AUDIO ─────────────────────────────────────────────
+let AC = null;
+function ac(){
+  if(!AC) AC = new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function osc(type,f0,f1,dur,vol){
+  const a=ac(),o=a.createOscillator(),g=a.createGain();
+  o.type=type;
+  o.frequency.setValueAtTime(f0,a.currentTime);
+  if(f1!==f0) o.frequency.exponentialRampToValueAtTime(f1,a.currentTime+dur);
+  g.gain.setValueAtTime(vol,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+  o.connect(g);g.connect(a.destination);
+  o.start();o.stop(a.currentTime+dur+0.02);
+}
+function noise(dur,vol,fc){
+  const a=ac(),buf=a.createBuffer(1,a.sampleRate*dur,a.sampleRate);
+  const d=buf.getChannelData(0);for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();
+  s.buffer=buf;f.type='lowpass';f.frequency.value=fc;
+  g.gain.setValueAtTime(vol,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+  s.connect(f);f.connect(g);g.connect(a.destination);
+  s.start();s.stop(a.currentTime+dur+0.02);
+}
+
+// Audio cache for MP3s
+const audioCache = {};
+function playMP3(file){
+  if(!audioCache[file]) audioCache[file] = new Audio('/'+file);
+  const a = audioCache[file];
+  a.currentTime = 0;
+  a.volume = 0.9;
+  a.play().catch(()=>{});
+}
+
+// Same sounds as original Happy Buttons!
+const SOUNDS = {
+  'Pop 🫧':()=>{ osc('sine',520,920,0.10,0.85); osc('sine',820,1200,0.06,0.4); },
+  'Click 🖱️':()=>{ noise(0.04,1.1,5000); osc('square',220,220,0.035,0.4); },
+  'Squish 🫠':()=>{ osc('sine',320,28,0.35,1.1); osc('sine',280,18,0.38,0.7); noise(0.25,0.4,300); },
+  'Boing 🏀':()=>{ osc('triangle',60,1400,0.18,1.2); osc('sine',80,1800,0.14,0.8); setTimeout(()=>osc('triangle',900,200,0.22,0.5),80); },
+  'Bubble 🫧':()=>{ osc('sine',580+Math.random()*100,1050,0.16,0.75); setTimeout(()=>osc('sine',820,400,0.10,0.4),60); },
+  'Tap 👆':()=>{ noise(0.028,1.1,2500); osc('triangle',400,400,0.028,0.35); },
+  'Plop 💧':()=>{ osc('sine',780,160,0.15,0.9); noise(0.06,0.35,600); },
+  'Ping ✨':()=>{ osc('sine',1320,1320,0.5,0.6); osc('sine',2000,2000,0.3,0.35); osc('sine',660,660,0.4,0.3); },
+  'Thud 🥁':()=>{ osc('sine',85,22,0.22,1.3); noise(0.09,0.7,900); osc('sine',140,40,0.15,0.6); },
+  'Squeak 🐭':()=>{ osc('sawtooth',820,1600,0.09,0.45); setTimeout(()=>osc('sawtooth',1400,600,0.09,0.3),70); },
+  'Slime 🟢':()=>{ playMP3('hb2_01.mp3'); },
+  'Slime 2 🫧':()=>{ playMP3('hb2_02.mp3'); },
+  'Slime 3 💚':()=>{ playMP3('hb2_03.mp3'); },
+  'Slime 4 🌀':()=>{ playMP3('hb2_04.mp3'); },
+  'Slime 5 🐸':()=>{ playMP3('hb2_05.mp3'); },
+  'Slime 6 ✨':()=>{ playMP3('hb2_06.mp3'); },
+};
+let currentSound = 'Pop 🫧';
+
+// ── SOUND PICKER ──────────────────────────────────────
+const soundScroll = document.getElementById('soundScroll');
+Object.keys(SOUNDS).forEach(name => {
+  const b = document.createElement('div');
+  b.className = 'snd-btn' + (name === currentSound ? ' active' : '');
+  b.textContent = name;
+  b.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    currentSound = name;
+    document.querySelectorAll('.snd-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    SOUNDS[name]();
+  });
+  soundScroll.appendChild(b);
+});
+
+// ── PARTICLES ─────────────────────────────────────────
+const EMOJIS = ['✨','⭐','💫','🌟','🎉','💕','🌈'];
+function burst(x, y, color){
+  for(let i=0;i<16;i++){
+    const p = document.createElement('div');
+    const isEmoji = Math.random() < 0.4;
+    if(isEmoji){
+      p.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${16+Math.random()*18}px;pointer-events:none;z-index:60;transform:translate(-50%,-50%)`;
+      p.textContent = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    } else {
+      const sz = 4+Math.random()*8;
+      p.className = 'particle';
+      p.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;background:${color};transform:translate(-50%,-50%)`;
+    }
+    document.body.appendChild(p);
+    const ang = Math.random()*Math.PI*2, dist = 40+Math.random()*110;
+    const dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist;
+    requestAnimationFrame(()=>{
+      p.style.transition = 'transform 0.55s cubic-bezier(.2,.8,.4,1),opacity 0.5s ease';
+      p.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(${0.4+Math.random()*0.9})`;
+      p.style.opacity = '0';
+    });
+    setTimeout(()=>p.remove(), 600);
+  }
+}
+
+// ── PRESS / RELEASE ───────────────────────────────────
+const held = new Map();
+
+function press(btn, cx, cy){
+  if(btn.classList.contains('pressed')) return;
+  btn.classList.add('pressed');
+  const idx = +btn.dataset.idx;
+  SOUNDS[currentSound]();
+  burst(cx, cy, BUTTONS[idx].glow);
+}
+function release(btn){ btn.classList.remove('pressed'); }
+
+document.addEventListener('pointerdown', e => {
+  const btn = e.target.closest('.sqbtn');
+  if(!btn) return;
+  e.preventDefault();
+  ac();
+  held.set(e.pointerId, btn);
+  press(btn, e.clientX, e.clientY);
+}, {passive:false});
+
+document.addEventListener('pointermove', e => {
+  if(!held.has(e.pointerId)) return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const newBtn = el?.closest('.sqbtn');
+  const oldBtn = held.get(e.pointerId);
+  if(newBtn !== oldBtn){
+    if(oldBtn) release(oldBtn);
+    if(newBtn){ held.set(e.pointerId, newBtn); press(newBtn, e.clientX, e.clientY); }
+    else held.delete(e.pointerId);
+  }
+}, {passive:true});
+
+function end(e){ const btn=held.get(e.pointerId); if(btn) release(btn); held.delete(e.pointerId); }
+document.addEventListener('pointerup', end, {passive:true});
+document.addEventListener('pointercancel', end, {passive:true});
+
+// ── IMMERSIVE TOGGLE ──────────────────────────────────
+const collapseBtn = document.getElementById('collapseBtn');
+let immersive = false, lastRestoreTime = 0;
+
+function setImmersive(on){
+  immersive = on;
+  document.body.classList.toggle('immersive', on);
+  collapseBtn.textContent = on ? '▲' : '▼';
+  setTimeout(resizeGrid, 320);
+}
+collapseBtn.addEventListener('click', () => {
+  if(!immersive && Date.now()-lastRestoreTime < 400) return;
+  setImmersive(!immersive);
+});
+collapseBtn.addEventListener('touchend', e => {
+  e.preventDefault();
+  if(!immersive && Date.now()-lastRestoreTime < 400) return;
+  setImmersive(!immersive);
+});
+document.addEventListener('mousemove', e => {
+  if(!immersive) return;
+  if(e.clientY > window.innerHeight-70){ setImmersive(false); lastRestoreTime=Date.now(); }
+});
+document.addEventListener('touchstart', e => {
+  if(!immersive) return;
+  if(e.touches[0].clientY > window.innerHeight-80){ setImmersive(false); lastRestoreTime=Date.now(); }
+}, {passive:true});
+
+// ── FLOATING RAINBOWS & HEARTS ────────────────────────
+const FLOATIES = [
+  '🌈','🌈','🌈','🌈',
+  '❤️','💕','💖','💗','💝','💓','💞',
+  '🩷','🧡','💛','💚','💙','💜',
+  '✨','⭐','🌟','💫',
+  '🎀','🦋','🌸','🌺',
+];
+
+(function spawnFloaties(){
+  const wrap = document.getElementById('floatWrap');
+  const count = 28;
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.className = 'floatie';
+    el.textContent = FLOATIES[Math.floor(Math.random()*FLOATIES.length)];
+    const size = 16 + Math.random()*28;
+    const dur  = 6 + Math.random()*10;
+    const delay = -(Math.random()*dur); // start at random point in cycle
+    const left = Math.random()*100;
+    const rot0 = (Math.random()*40-20)+'deg';
+    const rot1 = (Math.random()*40-20)+'deg';
+    const maxop = 0.15 + Math.random()*0.25;
+    el.style.setProperty('--size', size+'px');
+    el.style.setProperty('--dur', dur+'s');
+    el.style.setProperty('--delay', delay+'s');
+    el.style.setProperty('--rot0', rot0);
+    el.style.setProperty('--rot1', rot1);
+    el.style.setProperty('--maxop', maxop);
+    el.style.left = left+'%';
+    wrap.appendChild(el);
+  }
+})();
+</script>
+</body>
+</html>
