@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Galaxy Explorer! 🚀</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Exo 2',sans-serif;
+  background:#000008;
+  min-height:100vh;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+
+/* ── STARFIELD ── */
+#starfield{position:fixed;inset:0;z-index:0;overflow:hidden;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--td) ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:var(--op);}50%{opacity:0.05;}}
+.shoot{
+  position:absolute;height:2px;
+  background:linear-gradient(90deg,transparent,#fff,transparent);
+  animation:shoot var(--sd) var(--delay) ease-in infinite;opacity:0;
+  border-radius:2px;
+}
+@keyframes shoot{
+  0%{opacity:0;transform:translateX(-100px) rotate(var(--ang));}
+  15%{opacity:1;}
+  70%{opacity:1;}
+  100%{opacity:0;transform:translateX(300px) rotate(var(--ang));}
+}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 18px;
+  background:rgba(0,0,20,0.85);
+  border-bottom:2px solid rgba(100,150,255,0.2);
+  backdrop-filter:blur(12px);
+}
+.logo{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(14px,3.5vw,24px);
+  color:#00cfff;
+  text-shadow:0 0 20px rgba(0,200,255,0.8);
+  letter-spacing:3px;
+}
+.star-count{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(14px,3vw,20px);
+  color:#ffd700;
+  text-shadow:0 0 15px rgba(255,215,0,0.8);
+}
+.home-btn{
+  font-family:'Exo 2',sans-serif;font-size:14px;font-weight:700;
+  padding:7px 16px;border-radius:14px;border:none;cursor:pointer;
+  background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);
+  border:1px solid rgba(255,255,255,0.15);
+  text-decoration:none;display:flex;align-items:center;
+  transition:all 0.2s;
+}
+.home-btn:hover{background:rgba(255,255,255,0.15);color:#fff;}
+
+/* ── SCENE ── */
+#scene{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+
+/* ── LAUNCH SCREEN ── */
+#launchScreen{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;z-index:20;padding:24px;text-align:center;
+  background:radial-gradient(ellipse at 50% 30%, rgba(0,100,255,0.08), transparent 60%);
+}
+.launch-img{
+  width:min(180px,40vw);height:min(180px,40vw);
+  object-fit:contain;
+  animation:shipBob 2s ease-in-out infinite;
+  filter:drop-shadow(0 0 30px rgba(100,200,255,0.9));
+  margin-bottom:20px;
+}
+@keyframes shipBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-20px);}}
+.launch-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(26px,6vw,52px);
+  color:#00cfff;
+  text-shadow:0 0 30px rgba(0,200,255,0.8);
+  margin-bottom:10px;letter-spacing:3px;
+}
+.launch-sub{
+  font-size:clamp(14px,3vw,20px);
+  color:rgba(255,255,255,0.65);
+  margin-bottom:32px;line-height:1.8;max-width:500px;
+}
+.launch-btn{
+  font-family:'Orbitron',sans-serif;font-size:clamp(16px,3vw,22px);
+  padding:16px 52px;border-radius:50px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#0088ff,#aa44ff);
+  color:#fff;letter-spacing:3px;
+  box-shadow:0 6px 0 #002266,0 8px 40px rgba(0,136,255,0.5);
+  transition:all 0.15s;
+  animation:launchPulse 2s ease-in-out infinite;
+}
+.launch-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #002266;}
+@keyframes launchPulse{
+  0%,100%{box-shadow:0 6px 0 #002266,0 0 20px rgba(0,136,255,0.3);}
+  50%{box-shadow:0 6px 0 #002266,0 0 50px rgba(0,136,255,0.7);}
+}
+
+/* ── SOLAR MAP ── */
+#solarMap{
+  position:absolute;inset:0;display:none;
+  flex-direction:column;align-items:center;justify-content:center;z-index:15;padding:8px;
+}
+.map-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(11px,2.5vw,16px);
+  color:rgba(0,200,255,0.5);letter-spacing:4px;text-transform:uppercase;
+  margin-bottom:12px;
+}
+.orbit-system{
+  position:relative;
+  width:min(96vw,640px);height:min(96vw,640px);
+}
+.sun-wrap{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  cursor:pointer;z-index:5;
+  display:flex;align-items:center;justify-content:center;
+}
+.sun-wrap img{
+  width:clamp(44px,8vw,64px);height:clamp(44px,8vw,64px);
+  object-fit:contain;border-radius:50%;
+  box-shadow:0 0 20px #ffd700,0 0 50px #ff8800,0 0 100px rgba(255,140,0,0.3);
+  animation:sunPulse 2s ease-in-out infinite alternate;
+  transition:transform 0.2s;
+}
+.sun-wrap:hover img{transform:scale(1.2);}
+@keyframes sunPulse{
+  0%{box-shadow:0 0 20px #ffd700,0 0 40px #ff8800,0 0 70px rgba(255,140,0,0.2);}
+  100%{box-shadow:0 0 35px #ffd700,0 0 70px #ff8800,0 0 120px rgba(255,140,0,0.4);}
+}
+.orbit-ring{
+  position:absolute;top:50%;left:50%;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,0.07);
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.orbit-container{
+  position:absolute;top:50%;left:50%;
+  width:0;height:0;
+  animation:orbitSpin var(--ospeed) linear infinite;
+  transform-origin:0 0;
+}
+@keyframes orbitSpin{from{transform:rotate(var(--sa));}to{transform:rotate(calc(var(--sa) + 360deg));}}
+.planet-wrap{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;
+  z-index:4;
+}
+.planet-wrap:hover .planet-img{transform:scale(1.35);filter:brightness(1.2) drop-shadow(0 0 16px var(--glow));}
+.planet-img{
+  border-radius:50%;
+  object-fit:contain;
+  width:var(--psize);height:var(--psize);
+  filter:drop-shadow(0 0 8px var(--glow));
+  transition:transform 0.2s,filter 0.2s;
+  display:block;
+}
+.planet-wrap.visited .planet-img{opacity:0.55;}
+.planet-wrap.visited::after{
+  content:'✓';
+  position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  font-size:11px;color:#00ff88;font-weight:900;
+  background:rgba(0,20,0,0.9);border-radius:50%;
+  width:18px;height:18px;display:flex;align-items:center;justify-content:center;
+  font-size:9px;
+}
+.planet-name-label{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(7px,1.2vw,10px);
+  color:rgba(255,255,255,0.55);
+  white-space:nowrap;pointer-events:none;
+  margin-top:3px;letter-spacing:1px;
+  text-shadow:0 0 6px rgba(0,0,0,0.9);
+}
+
+/* ── TRAVEL ── */
+#travelScreen{
+  position:absolute;inset:0;z-index:30;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:20px;
+  background:rgba(0,0,20,0.97);
+}
+.travel-ship img{width:80px;height:80px;object-fit:contain;animation:traveling 1s ease-in-out infinite alternate;filter:drop-shadow(0 0 20px rgba(100,200,255,0.9));}
+@keyframes traveling{0%{transform:translateX(-30px) rotate(-8deg);}100%{transform:translateX(30px) rotate(8deg);}}
+.travel-msg{font-family:'Orbitron',sans-serif;font-size:16px;color:rgba(255,255,255,0.5);letter-spacing:3px;}
+.travel-planet img{width:90px;height:90px;object-fit:contain;animation:targetPulse 0.8s ease-in-out infinite alternate;filter:drop-shadow(0 0 20px var(--tglow,#fff));}
+@keyframes targetPulse{0%{transform:scale(0.85);}100%{transform:scale(1.15);}}
+.travel-name{font-family:'Orbitron',sans-serif;font-size:22px;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.8);letter-spacing:3px;}
+
+/* ── PLANET DETAIL ── */
+#planetDetail{
+  position:absolute;inset:0;display:none;z-index:25;
+  background:rgba(0,0,20,0.96);backdrop-filter:blur(20px);
+  overflow-y:auto;padding:16px;
+}
+.detail-wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:16px;padding-bottom:40px;}
+.back-btn{
+  align-self:flex-start;
+  font-family:'Orbitron',sans-serif;font-size:13px;
+  padding:9px 20px;border-radius:12px;border:none;cursor:pointer;
+  background:rgba(0,200,255,0.1);color:rgba(0,200,255,0.8);
+  border:1px solid rgba(0,200,255,0.25);transition:all 0.2s;letter-spacing:1px;
+}
+.back-btn:hover{background:rgba(0,200,255,0.2);color:#00cfff;}
+.planet-hero-img{
+  width:min(200px,50vw);height:min(200px,50vw);
+  object-fit:contain;border-radius:50%;
+  animation:heroFloat 3s ease-in-out infinite;
+  filter:drop-shadow(0 0 40px var(--hero-glow,#fff));
+}
+@keyframes heroFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-15px) scale(1.04);}}
+.planet-name{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(26px,6vw,44px);
+  color:var(--hero-glow,#fff);
+  text-shadow:0 0 30px var(--hero-glow,#fff);
+  text-align:center;letter-spacing:4px;
+}
+.planet-tagline{
+  font-size:clamp(14px,3vw,18px);
+  color:rgba(255,255,255,0.6);
+  text-align:center;font-style:italic;line-height:1.7;
+  font-weight:700;
+}
+.facts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+.fact-card{
+  background:rgba(0,200,255,0.05);
+  border:1px solid rgba(0,200,255,0.15);
+  border-radius:14px;padding:14px;
+}
+.fact-label{
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(0,200,255,0.5);margin-bottom:5px;
+}
+.fact-val{
+  font-family:'Exo 2',sans-serif;font-size:clamp(14px,3vw,18px);
+  color:#ffd700;font-weight:900;line-height:1.3;
+}
+.fun-fact{
+  background:rgba(170,68,255,0.08);border:2px solid rgba(170,68,255,0.25);
+  border-radius:16px;padding:16px 18px;
+  font-size:clamp(14px,3vw,17px);color:rgba(255,255,255,0.8);
+  line-height:1.8;text-align:center;width:100%;font-weight:700;
+}
+.fun-fact span{color:#aa44ff;font-weight:900;}
+
+/* ── QUIZ ── */
+.quiz-wrap{
+  width:100%;background:rgba(0,200,255,0.04);
+  border:2px solid rgba(0,200,255,0.2);border-radius:18px;padding:18px;
+}
+.quiz-q{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(14px,3vw,19px);
+  color:#00cfff;text-align:center;margin-bottom:16px;line-height:1.5;letter-spacing:1px;
+}
+.quiz-opts{display:flex;flex-direction:column;gap:10px;}
+.quiz-opt{
+  font-family:'Exo 2',sans-serif;font-size:clamp(14px,3vw,18px);font-weight:700;
+  padding:14px 18px;border-radius:14px;border:none;cursor:pointer;
+  background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.85);
+  border:2px solid rgba(255,255,255,0.1);text-align:left;transition:all 0.15s;
+}
+.quiz-opt:hover:not(:disabled){background:rgba(0,200,255,0.1);border-color:rgba(0,200,255,0.4);color:#fff;}
+.quiz-opt.correct{background:rgba(0,255,136,0.12);border-color:#00ff88;color:#00ff88;}
+.quiz-opt.wrong{background:rgba(255,68,68,0.12);border-color:#ff4444;color:#ff4444;}
+.quiz-feedback{
+  font-family:'Exo 2',sans-serif;font-size:clamp(14px,3vw,18px);font-weight:700;
+  text-align:center;margin-top:14px;min-height:30px;line-height:1.5;
+}
+.next-btn{
+  display:none;
+  font-family:'Orbitron',sans-serif;font-size:clamp(14px,3vw,18px);
+  padding:14px 36px;border-radius:50px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#0088ff,#aa44ff);
+  color:#fff;letter-spacing:2px;
+  box-shadow:0 5px 0 #002266,0 6px 25px rgba(0,136,255,0.3);
+  transition:all 0.15s;margin-top:10px;
+  animation:nextPulse 1.5s ease-in-out infinite;
+}
+@keyframes nextPulse{
+  0%,100%{box-shadow:0 5px 0 #002266,0 0 15px rgba(0,136,255,0.3);}
+  50%{box-shadow:0 5px 0 #002266,0 0 35px rgba(0,136,255,0.6);}
+}
+.next-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #002266;}
+
+/* ── WIN ── */
+#winScreen{
+  position:absolute;inset:0;z-index:35;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:18px;
+  background:rgba(0,0,20,0.96);text-align:center;padding:24px;
+}
+.win-title{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(26px,6vw,48px);
+  color:#ffd700;text-shadow:0 0 30px rgba(255,215,0,0.8);letter-spacing:4px;
+}
+.win-sub{font-size:clamp(15px,3vw,20px);color:rgba(255,255,255,0.6);line-height:1.8;font-weight:700;}
+.play-again-btn{
+  font-family:'Orbitron',sans-serif;font-size:clamp(14px,3vw,18px);
+  padding:14px 40px;border-radius:50px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#ffd700,#ff8c00);
+  color:#000;letter-spacing:2px;
+  box-shadow:0 6px 0 #8B4500;transition:all 0.15s;
+}
+.play-again-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #8B4500;}
+
+/* ── CONFETTI ── */
+.cp{position:fixed;pointer-events:none;z-index:200;animation:cFall var(--cd) ease-in forwards;}
+@keyframes cFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1;}100%{transform:translateY(105vh) rotate(720deg);opacity:0;}}
+
+@media(max-width:400px){
+  .facts-grid{grid-template-columns:1fr;}
+  .planet-hero-img{width:min(150px,45vw);height:min(150px,45vw);}
+}
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<header>
+  <div class="logo">🚀 GALAXY EXPLORER</div>
+  <div class="star-count">⭐ <span id="starCount">0</span> / 10</div>
+  <a href="/" class="home-btn">🏠 Home</a>
+</header>
+
+<div id="scene">
+
+  <!-- LAUNCH -->
+  <div id="launchScreen">
+    <img src="/sun.png" class="launch-img" alt="Sun" onerror="this.style.fontSize='80px';this.src='';this.alt='☀️';">
+    <div class="launch-title">GALAXY EXPLORER</div>
+    <div class="launch-sub">
+      Blast off and tour the entire solar system!<br>
+      Visit every planet, learn amazing facts<br>
+      and answer quiz questions to earn stars! ⭐
+    </div>
+    <button class="launch-btn" onclick="startJourney()">🚀 BLAST OFF!</button>
+  </div>
+
+  <!-- SOLAR MAP -->
+  <div id="solarMap">
+    <div class="map-title">🪐 Choose a planet to explore</div>
+    <div class="orbit-system" id="orbitSystem">
+      <div class="sun-wrap" onclick="travelTo(PLANETS[0])" title="The Sun">
+        <img src="/sun.png" alt="Sun">
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAVEL -->
+  <div id="travelScreen">
+    <div class="travel-ship"><img src="/sun.png" id="travelShipImg" alt="🚀"></div>
+    <div class="travel-msg">TRAVELLING TO...</div>
+    <div class="travel-planet" id="travelPlanetWrap"><img id="travelPlanetImg" alt="" src=""></div>
+    <div class="travel-name" id="travelName"></div>
+  </div>
+
+  <!-- PLANET DETAIL -->
+  <div id="planetDetail">
+    <div class="detail-wrap">
+      <button class="back-btn" onclick="backToMap()">← BACK TO MAP</button>
+      <img class="planet-hero-img" id="detailImg" src="" alt="">
+      <div class="planet-name" id="detailName"></div>
+      <div class="planet-tagline" id="detailTagline"></div>
+      <div class="facts-grid" id="factsGrid"></div>
+      <div class="fun-fact" id="funFact"></div>
+      <div class="quiz-wrap">
+        <div class="quiz-q" id="quizQ"></div>
+        <div class="quiz-opts" id="quizOpts"></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextPlanet()">NEXT PLANET →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIN -->
+  <div id="winScreen">
+    <img src="/sun.png" style="width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 0 30px #ffd700);" alt="🏆">
+    <div class="win-title">🏆 GALAXY MASTER!!</div>
+    <div class="win-sub">
+      You explored the entire solar system!<br>
+      You earned <span style="color:#ffd700;font-size:1.4em;" id="finalStars">0</span> stars out of 10! ⭐<br><br>
+      You're a true space explorer!! 🚀🌟
+    </div>
+    <button class="play-again-btn" onclick="resetGame()">🚀 EXPLORE AGAIN!</button>
+  </div>
+
+</div>
+
+<script>
+// ── PLANET DATA ─────────────────────────────────────
+const PLANETS = [
+  {
+    id:'sun', name:'THE SUN', img:'sun.png', glow:'#ffd700',
+    orbitR:0, speed:0, angle:0, pxSize:0,
+    tagline:'"I am the star at the centre of our solar system — the source of all light and life!"',
+    facts:[
+      {label:'Type', val:'Yellow Dwarf Star'},
+      {label:'Age', val:'4.6 Billion Years'},
+      {label:'Diameter', val:'1,392,700 km'},
+      {label:'Surface Temp', val:'5,500°C'},
+      {label:'Core Temp', val:'15 Million °C'},
+      {label:'Distance from Earth', val:'150 Million km'},
+    ],
+    funFact:'The Sun is so <span>enormous</span> that <span>1.3 million Earths</span> could fit inside it! The light hitting your face right now left the Sun <span>8 minutes ago</span>!',
+    quiz:{q:'How long does light from the Sun take to reach Earth?',opts:['1 second','8 minutes','1 hour','1 day'],ans:1,
+      right:'⭐ Correct!! Light travels at 300,000 km/s and still takes 8 minutes to cross 150 million km!',
+      wrong:'Not quite! Light from the Sun takes exactly 8 minutes to reach Earth!'}
+  },
+  {
+    id:'mercury', name:'MERCURY', img:'mercury.png', glow:'#c8b8a8',
+    orbitR:68, speed:8, angle:20, pxSize:14,
+    tagline:'"I am the smallest planet and closest to the Sun — but definitely NOT the hottest!"',
+    facts:[
+      {label:'Order from Sun', val:'1st Planet'},
+      {label:'Diameter', val:'4,879 km'},
+      {label:'Moons', val:'0 Moons'},
+      {label:'Day Length', val:'59 Earth days'},
+      {label:'Year Length', val:'88 Earth days'},
+      {label:'Temperature', val:'-180°C to 430°C'},
+    ],
+    funFact:'Mercury has <span>no atmosphere</span> so it cannot hold onto heat! The sunny side hits <span>430°C</span> but the dark side plunges to <span>-180°C</span> — more extreme than any other planet!',
+    quiz:{q:'How many moons does Mercury have?',opts:['0','1','2','4'],ans:0,
+      right:'⭐ Correct!! Mercury has absolutely NO moons at all!',
+      wrong:'Not quite! Mercury has zero moons — not a single one!'}
+  },
+  {
+    id:'venus', name:'VENUS', img:'venus.png', glow:'#ffdd88',
+    orbitR:98, speed:13, angle:80, pxSize:22,
+    tagline:'"I am the HOTTEST planet — hotter than Mercury even though I\'m further from the Sun!"',
+    facts:[
+      {label:'Order from Sun', val:'2nd Planet'},
+      {label:'Diameter', val:'12,104 km'},
+      {label:'Moons', val:'0 Moons'},
+      {label:'Day Length', val:'243 Earth days'},
+      {label:'Year Length', val:'225 Earth days'},
+      {label:'Temperature', val:'465°C Always'},
+    ],
+    funFact:'Venus spins <span>backwards and incredibly slowly</span> — a day on Venus is actually <span>longer than its year!</span> Its thick atmosphere of carbon dioxide traps heat like a pressure cooker!',
+    quiz:{q:'Which planet is the HOTTEST in our solar system?',opts:['Mercury','Venus','Mars','Jupiter'],ans:1,
+      right:'⭐ Brilliant!! Venus is the hottest at a constant 465°C thanks to its thick atmosphere!',
+      wrong:'Not quite! Venus is the hottest — its thick greenhouse atmosphere traps all the heat!'}
+  },
+  {
+    id:'earth', name:'EARTH', img:'earth.png', glow:'#4488ff',
+    orbitR:132, speed:18, angle:155, pxSize:24,
+    tagline:'"I am the only planet known to harbour life — perfectly placed in the Goldilocks zone!"',
+    facts:[
+      {label:'Order from Sun', val:'3rd Planet'},
+      {label:'Diameter', val:'12,742 km'},
+      {label:'Moons', val:'1 Moon'},
+      {label:'Day Length', val:'24 Hours'},
+      {label:'Year Length', val:'365.25 Days'},
+      {label:'Temperature', val:'-88°C to 58°C'},
+    ],
+    funFact:'Earth is the <span>densest planet</span> in the solar system! <span>71% of the surface</span> is covered in water — that\'s why it looks like a stunning blue marble from space!',
+    quiz:{q:'What percentage of Earth\'s surface is covered in water?',opts:['30%','50%','71%','90%'],ans:2,
+      right:'⭐ Perfect!! 71% of our beautiful blue Earth is covered in water!',
+      wrong:'Not quite! About 71% of Earth is covered in water — making it the Blue Planet!'}
+  },
+  {
+    id:'moon', name:'THE MOON', img:'moon.png', glow:'#ddddcc',
+    orbitR:160, speed:22, angle:200, pxSize:14,
+    tagline:'"I am Earth\'s only natural satellite — I control the tides and light up your night sky!"',
+    facts:[
+      {label:'Type', val:'Earth\'s Moon'},
+      {label:'Diameter', val:'3,474 km'},
+      {label:'Distance from Earth', val:'384,400 km'},
+      {label:'Day Length', val:'27.3 Earth days'},
+      {label:'Temperature', val:'-173°C to 127°C'},
+      {label:'First Landing', val:'July 20, 1969'},
+    ],
+    funFact:'The Moon is slowly <span>moving away from Earth</span> at about 3.8 cm per year! Humans first walked on the Moon in <span>1969</span> — only <span>12 people</span> have ever stood on its surface!',
+    quiz:{q:'How far is the Moon from Earth?',opts:['38,000 km','384,000 km','3.84 million km','384 million km'],ans:1,
+      right:'⭐ Correct!! The Moon orbits Earth at an average distance of 384,400 km!',
+      wrong:'Not quite! The Moon is about 384,400 km from Earth — that\'s roughly 30 Earths lined up!'}
+  },
+  {
+    id:'mars', name:'MARS', img:'mars' in ['blackhole','earth','jupiter','mercury','moon','neptune','saturn','sun','uranus','venus'] ? 'mars.png' : 'mars.png', glow:'#ff4422',
+    orbitR:192, speed:26, angle:225, pxSize:20,
+    tagline:'"I am the Red Planet! I have the tallest volcano and longest canyon in the entire solar system!"',
+    facts:[
+      {label:'Order from Sun', val:'4th Planet'},
+      {label:'Diameter', val:'6,779 km'},
+      {label:'Moons', val:'2 — Phobos & Deimos'},
+      {label:'Day Length', val:'24h 37 Minutes'},
+      {label:'Year Length', val:'687 Earth days'},
+      {label:'Temperature', val:'-125°C to 20°C'},
+    ],
+    funFact:'Mars has <span>Olympus Mons</span> — the tallest volcano in the solar system at <span>22km high</span> — that\'s nearly 3 times the height of Mount Everest! Mars gets its red colour from <span>iron oxide (rust)</span>!',
+    quiz:{q:'Why is Mars called the Red Planet?',opts:['It\'s on fire','Iron oxide (rust) on its surface','Red clouds','Red ice caps'],ans:1,
+      right:'⭐ Amazing!! Iron oxide — basically rust — gives Mars its famous red colour!',
+      wrong:'Not quite! Mars is red because its surface is covered in iron oxide — which is rust!'}
+  },
+  {
+    id:'jupiter', name:'JUPITER', img:'jupiter.png', glow:'#ff8844',
+    orbitR:228, speed:38, angle:305, pxSize:50,
+    tagline:'"I am the BIGGEST planet — so massive that all other planets could fit inside me twice over!"',
+    facts:[
+      {label:'Order from Sun', val:'5th Planet'},
+      {label:'Diameter', val:'139,820 km'},
+      {label:'Moons', val:'95 Known Moons!'},
+      {label:'Day Length', val:'10 Hours'},
+      {label:'Year Length', val:'12 Earth years'},
+      {label:'Great Red Spot', val:'Bigger than Earth'},
+    ],
+    funFact:'Jupiter\'s <span>Great Red Spot</span> is a storm that has been raging for over <span>350 years</span> and it\'s bigger than the entire Earth! Jupiter has <span>95 moons</span> — more than any other planet!',
+    quiz:{q:'How many Earths could fit inside Jupiter?',opts:['100','500','1,300','10,000'],ans:2,
+      right:'⭐ Incredible!! 1,300 Earths could fit inside the mighty Jupiter!',
+      wrong:'Not quite! A whopping 1,300 Earths could fit inside Jupiter — it\'s absolutely enormous!'}
+  },
+  {
+    id:'saturn', name:'SATURN', img:'saturn.png', glow:'#ddcc88',
+    orbitR:262, speed:52, angle:42, pxSize:44,
+    tagline:'"I am the RING PLANET — my stunning rings stretch 280,000 km wide and are made of billions of ice chunks!"',
+    facts:[
+      {label:'Order from Sun', val:'6th Planet'},
+      {label:'Diameter', val:'116,460 km'},
+      {label:'Moons', val:'146 Known Moons!'},
+      {label:'Day Length', val:'10.7 Hours'},
+      {label:'Year Length', val:'29 Earth years'},
+      {label:'Ring Width', val:'280,000 km wide'},
+    ],
+    funFact:'Saturn is the only planet that could <span>float on water</span> — it\'s less dense than water! Its rings are made of <span>billions of chunks of ice and rock</span> ranging from tiny grains to house-sized boulders!',
+    quiz:{q:'What are Saturn\'s rings made of?',opts:['Gas and smoke','Ice and rock','Clouds','Metal'],ans:1,
+      right:'⭐ Spot on!! Saturn\'s rings are made of billions of pieces of ice and rock!',
+      wrong:'Not quite! Saturn\'s stunning rings are made of billions of chunks of ice and rock!'}
+  },
+  {
+    id:'uranus', name:'URANUS', img:'uranus.png', glow:'#88ddff',
+    orbitR:292, speed:65, angle:135, pxSize:30,
+    tagline:'"I am the ICE GIANT that spins on my side — I basically ROLL around the Sun like a bowling ball!"',
+    facts:[
+      {label:'Order from Sun', val:'7th Planet'},
+      {label:'Diameter', val:'50,724 km'},
+      {label:'Moons', val:'28 Moons'},
+      {label:'Day Length', val:'17 Hours'},
+      {label:'Year Length', val:'84 Earth years'},
+      {label:'Temperature', val:'-224°C (Coldest!)'},
+    ],
+    funFact:'Uranus is the <span>coldest planet</span> in the solar system at -224°C — colder even than Neptune! It spins completely on its side with a tilt of <span>98 degrees</span> — scientists think a giant collision knocked it over billions of years ago!',
+    quiz:{q:'What makes Uranus unique compared to other planets?',opts:['It spins fastest','It spins on its side','It spins backwards','It doesn\'t spin'],ans:1,
+      right:'⭐ Excellent!! Uranus spins on its side at 98 degrees — it basically rolls around the Sun!',
+      wrong:'Not quite! Uranus spins on its side — it has a 98 degree tilt from a giant ancient collision!'}
+  },
+  {
+    id:'neptune', name:'NEPTUNE', img:'neptune.png', glow:'#4466ff',
+    orbitR:318, speed:78, angle:258, pxSize:28,
+    tagline:'"I am the WINDIEST and FARTHEST planet — my winds scream at 2,100 km per hour — supersonic speed!"',
+    facts:[
+      {label:'Order from Sun', val:'8th Planet'},
+      {label:'Diameter', val:'49,244 km'},
+      {label:'Moons', val:'16 Moons'},
+      {label:'Day Length', val:'16 Hours'},
+      {label:'Year Length', val:'165 Earth years'},
+      {label:'Wind Speed', val:'2,100 km/h!'},
+    ],
+    funFact:'Neptune has the <span>fastest winds</span> in the entire solar system at 2,100 km/h — that\'s <span>supersonic</span>! It takes <span>165 Earth years</span> to orbit the Sun once — a Neptunian year is longer than all of human recorded history!',
+    quiz:{q:'How long does Neptune take to orbit the Sun?',opts:['12 years','29 years','84 years','165 years'],ans:3,
+      right:'⭐ Fantastic!! Neptune takes 165 Earth years — longer than all of recorded human history!',
+      wrong:'Not quite! Neptune takes 165 Earth years to orbit the Sun just once!'}
+  },
+  {
+    id:'blackhole', name:'BLACK HOLE', img:'blackhole.png', glow:'#aa44ff',
+    orbitR:0, speed:0, angle:0, pxSize:0,
+    tagline:'"I am the most mysterious and powerful force in the universe — not even light can escape my gravity!"',
+    facts:[
+      {label:'Type', val:'Stellar Black Hole'},
+      {label:'Gravity', val:'Infinite at centre'},
+      {label:'Escape Velocity', val:'Faster than light'},
+      {label:'Event Horizon', val:'Point of no return'},
+      {label:'Nearest to Earth', val:'1,000 light years'},
+      {label:'First Photo', val:'April 10, 2019'},
+    ],
+    funFact:'A black hole is formed when a <span>massive star collapses</span> at the end of its life! The <span>first ever photo</span> of a black hole was taken in 2019 — it took a telescope the size of the entire Earth to capture it!',
+    quiz:{q:'What is the "Event Horizon" of a black hole?',opts:['Its colour','The point of no return','Its size','Its age'],ans:1,
+      right:'⭐ Brilliant!! The Event Horizon is the boundary beyond which nothing — not even light — can escape!',
+      wrong:'Not quite! The Event Horizon is the point of no return — cross it and nothing can escape, not even light!'}
+  },
+];
+
+// ── STATE ──────────────────────────────────────────────
+let stars=0, visited=new Set(), currentPlanet=null, quizAnswered=false;
+const TOTAL = PLANETS.filter(p=>p.id!=='blackhole').length; // 10 quizzable bodies
+
+// ── AUDIO ──────────────────────────────────────────────
+let actx=null;
+function ac(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx;}
+function tone(f,d=0.2,v=0.3,t='sine'){const a=ac(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+d);o.start();o.stop(a.currentTime+d+0.05);}
+function sndLaunch(){[200,300,450,650,900].forEach((f,i)=>setTimeout(()=>tone(f,0.15,0.3,'sawtooth'),i*80));}
+function sndTravel(){for(let i=0;i<12;i++)setTimeout(()=>tone(200+i*60,0.08,0.1,'sine'),i*60);}
+function sndLand(){[800,600,523,659,784].forEach((f,i)=>setTimeout(()=>tone(f,0.15,0.25,'triangle'),i*80));}
+function sndCorrect(){[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.2,0.3,'triangle'),i*90));}
+function sndWrong(){tone(300,0.3,0.3,'sawtooth');setTimeout(()=>tone(180,0.3,0.2,'sawtooth'),200);}
+function sndWin(){[[523,0],[659,0.1],[784,0.2],[1047,0.35],[1319,0.5],[1568,0.7],[2093,0.9],[1568,1.1],[2093,1.3],[2637,1.5]].forEach(([f,t])=>setTimeout(()=>tone(f,0.3,0.25,'triangle'),t*1000));}
+
+// ── STARFIELD ──────────────────────────────────────────
+function buildStars(){
+  const sf=document.getElementById('starfield');
+  for(let i=0;i<220;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2.5+0.4;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--op:${0.2+Math.random()*0.8};--td:${1.5+Math.random()*3}s;animation-delay:${Math.random()*3}s;`;
+    sf.appendChild(s);
+  }
+  for(let i=0;i<6;i++){
+    const ss=document.createElement('div');ss.className='shoot';
+    ss.style.cssText=`width:${60+Math.random()*120}px;left:${Math.random()*70}%;top:${Math.random()*60}%;--ang:${15+Math.random()*25}deg;--sd:${2+Math.random()*3}s;--delay:${Math.random()*8}s;`;
+    sf.appendChild(ss);
+  }
+}
+
+// ── BUILD MAP ──────────────────────────────────────────
+function buildMap(){
+  const sys=document.getElementById('orbitSystem');
+  const sz=sys.offsetWidth;
+  // Remove old
+  sys.querySelectorAll('.orbit-ring,.orbit-container').forEach(e=>e.remove());
+
+  PLANETS.filter(p=>p.orbitR>0).forEach(p=>{
+    const r=p.orbitR*(sz/660);
+    const pxSize=Math.max(10, p.pxSize*(sz/660));
+
+    // Orbit ring
+    const ring=document.createElement('div');
+    ring.className='orbit-ring';
+    ring.style.cssText=`width:${r*2}px;height:${r*2}px;margin-left:${-r}px;margin-top:${-r}px;`;
+    sys.appendChild(ring);
+
+    // Orbit container
+    const oc=document.createElement('div');
+    oc.className='orbit-container';
+    oc.style.cssText=`--ospeed:${p.speed}s;--sa:${p.angle}deg;`;
+    sys.appendChild(oc);
+
+    // Planet wrapper at radius
+    const pw=document.createElement('div');
+    pw.className='planet-wrap'+(visited.has(p.id)?' visited':'');
+    pw.style.cssText=`left:${r}px;top:0px;--glow:${p.glow};--psize:${pxSize}px;`;
+
+    const img=document.createElement('img');
+    img.className='planet-img';
+    img.src='/'+p.img;
+    img.alt=p.name;
+    img.onerror=()=>{img.style.display='none';};
+
+    const lbl=document.createElement('div');
+    lbl.className='planet-name-label';
+    lbl.textContent=p.name;
+
+    pw.appendChild(img);pw.appendChild(lbl);
+    (function(planet){pw.onclick=()=>travelTo(planet);})(p);
+    pw.title=p.name;
+    oc.appendChild(pw);
+  });
+
+  // Black hole as special clickable in corner
+  const bh=document.getElementById('blackholeBtn');
+  if(bh) bh.remove();
+  const bhBtn=document.createElement('div');
+  bhBtn.id='blackholeBtn';
+  bhBtn.style.cssText=`position:absolute;bottom:10px;right:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;z-index:6;`;
+  const bhImg=document.createElement('img');
+  const bhSz=Math.max(32,sz*0.1);
+  bhImg.src='/blackhole.png';bhImg.alt='Black Hole';
+  bhImg.style.cssText=`width:${bhSz}px;height:${bhSz}px;object-fit:contain;filter:drop-shadow(0 0 12px #aa44ff);transition:transform 0.2s;`;
+  bhImg.onerror=()=>{bhImg.alt='🕳️';};
+  const bhLbl=document.createElement('div');
+  bhLbl.className='planet-name-label';bhLbl.textContent='BLACK HOLE';
+  bhBtn.appendChild(bhImg);bhBtn.appendChild(bhLbl);
+  bhBtn.onclick=()=>travelTo(PLANETS.find(p=>p.id==='blackhole'));
+  bhBtn.onmouseenter=()=>bhImg.style.transform='scale(1.3)';
+  bhBtn.onmouseleave=()=>bhImg.style.transform='scale(1)';
+  sys.appendChild(bhBtn);
+}
+
+// ── TRAVEL ─────────────────────────────────────────────
+function travelTo(planet){
+  ac();sndTravel();currentPlanet=planet;
+  document.getElementById('solarMap').style.display='none';
+  document.getElementById('travelScreen').style.display='flex';
+  document.getElementById('travelPlanetImg').src='/'+planet.img;
+  document.getElementById('travelPlanetImg').style.setProperty('--tglow',planet.glow);
+  document.getElementById('travelName').textContent=planet.name;
+  setTimeout(()=>{
+    document.getElementById('travelScreen').style.display='none';
+    showPlanet(planet);sndLand();
+  },1800);
+}
+
+// ── SHOW PLANET ─────────────────────────────────────────
+function showPlanet(planet){
+  quizAnswered=false;
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('quizFeedback').textContent='';
+  document.querySelectorAll('.quiz-opt').forEach(b=>{b.disabled=false;b.className='quiz-opt';});
+  document.getElementById('planetDetail').style.display='block';
+  document.getElementById('planetDetail').scrollTop=0;
+
+  const img=document.getElementById('detailImg');
+  img.src='/'+planet.img;img.alt=planet.name;
+  img.style.setProperty('--hero-glow',planet.glow);
+  document.getElementById('detailName').textContent=planet.name;
+  document.getElementById('detailName').style.setProperty('--hero-glow',planet.glow);
+  document.getElementById('detailTagline').textContent=planet.tagline;
+
+  const grid=document.getElementById('factsGrid');grid.innerHTML='';
+  planet.facts.forEach(f=>{
+    const c=document.createElement('div');c.className='fact-card';
+    c.innerHTML=`<div class="fact-label">${f.label}</div><div class="fact-val">${f.val}</div>`;
+    grid.appendChild(c);
+  });
+
+  document.getElementById('funFact').innerHTML='💡 '+planet.funFact;
+  document.getElementById('quizQ').textContent='❓ '+planet.quiz.q;
+
+  const opts=document.getElementById('quizOpts');opts.innerHTML='';
+  planet.quiz.opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');btn.className='quiz-opt';
+    btn.textContent=['🅐','🅑','🅒','🅓'][i]+' '+opt;
+    btn.onclick=()=>answerQuiz(i,planet);
+    opts.appendChild(btn);
+  });
+}
+
+// ── QUIZ ───────────────────────────────────────────────
+function answerQuiz(idx,planet){
+  if(quizAnswered)return;
+  quizAnswered=true;ac();
+  const opts=document.querySelectorAll('.quiz-opt');
+  opts.forEach(b=>b.disabled=true);
+  opts[planet.quiz.ans].classList.add('correct');
+
+  if(idx===planet.quiz.ans){
+    opts[idx].classList.add('correct');
+    sndCorrect();
+    document.getElementById('quizFeedback').textContent=planet.quiz.right;
+    document.getElementById('quizFeedback').style.color='#00ff88';
+    if(!visited.has(planet.id)){stars++;visited.add(planet.id);document.getElementById('starCount').textContent=stars;starBurst();}
+  } else {
+    opts[idx].classList.add('wrong');sndWrong();
+    document.getElementById('quizFeedback').textContent=planet.quiz.wrong;
+    document.getElementById('quizFeedback').style.color='#ff6666';
+    if(!visited.has(planet.id)) visited.add(planet.id);
+  }
+
+  const nextBtn=document.getElementById('nextBtn');
+  nextBtn.style.display='block';
+  if(visited.size>=PLANETS.length){
+    nextBtn.textContent='🏆 SEE RESULTS!';
+    nextBtn.onclick=showWin;
+  } else {
+    nextBtn.textContent='NEXT PLANET →';
+    nextBtn.onclick=nextPlanet;
+  }
+}
+
+function backToMap(){document.getElementById('planetDetail').style.display='none';document.getElementById('solarMap').style.display='flex';buildMap();}
+function nextPlanet(){document.getElementById('planetDetail').style.display='none';document.getElementById('solarMap').style.display='flex';buildMap();}
+
+function showWin(){
+  document.getElementById('planetDetail').style.display='none';
+  document.getElementById('winScreen').style.display='flex';
+  document.getElementById('finalStars').textContent=stars;
+  sndWin();confetti();
+}
+
+function resetGame(){
+  stars=0;visited.clear();currentPlanet=null;
+  document.getElementById('starCount').textContent='0';
+  document.getElementById('winScreen').style.display='none';
+  document.getElementById('solarMap').style.display='flex';
+  buildMap();
+}
+
+function startJourney(){
+  ac();sndLaunch();
+  document.getElementById('launchScreen').style.display='none';
+  document.getElementById('solarMap').style.display='flex';
+  buildMap();
+  window.addEventListener('resize',()=>setTimeout(buildMap,100));
+}
+
+function starBurst(){
+  for(let i=0;i<12;i++) setTimeout(()=>{
+    const s=document.createElement('div');
+    s.style.cssText=`position:fixed;left:${45+Math.random()*20}%;top:${10+Math.random()*20}%;font-size:${18+Math.random()*18}px;pointer-events:none;z-index:200;transition:all 0.8s ease-out;`;
+    s.textContent='⭐';document.body.appendChild(s);
+    requestAnimationFrame(()=>{s.style.transform=`translate(${Math.random()*200-100}px,${-80-Math.random()*100}px) scale(2)`;s.style.opacity='0';});
+    setTimeout(()=>s.remove(),900);
+  },i*60);
+}
+
+function confetti(){
+  const cols=['#ffd700','#ff00aa','#00cfff','#00ff88','#aa44ff','#ff8c00'];
+  for(let i=0;i<120;i++) setTimeout(()=>{
+    const c=document.createElement('div');c.className='cp';
+    c.style.left=Math.random()*100+'vw';c.style.top='-15px';
+    c.style.width=(8+Math.random()*10)+'px';c.style.height=(8+Math.random()*10)+'px';
+    c.style.background=cols[Math.floor(Math.random()*cols.length)];
+    c.style.borderRadius=Math.random()>0.5?'50%':'3px';
+    const dur=(1.5+Math.random()*2.5).toFixed(2)+'s';
+    c.style.setProperty('--cd',dur);document.body.appendChild(c);
+    setTimeout(()=>c.remove(),parseFloat(dur)*1000+100);
+  },i*22);
+}
+
+buildStars();
+</script>
+</body>
+</html>
