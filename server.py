@@ -494,6 +494,10 @@ def mystery_phrase():
 def tic_tac_toe():
     return send_from_directory('.', 'tic-tac-toe.html')
 
+@app.route('/galaxy-explorer')
+def galaxy_explorer():
+    return send_from_directory('.', 'galaxy-explorer.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
