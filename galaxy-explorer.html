@@ -156,6 +156,7 @@ header{
   transform-origin:0 0;
 }
 @keyframes orbitSpin{from{transform:rotate(var(--sa));}to{transform:rotate(calc(var(--sa) + 360deg));}}
+@keyframes counterRotate{from{transform:rotate(calc(-1 * var(--sa)));}to{transform:rotate(calc(-1 * (var(--sa) + 360deg)));}}
 .planet-wrap{
   position:absolute;
   transform:translate(-50%,-50%);
@@ -183,11 +184,12 @@ header{
 }
 .planet-name-label{
   font-family:'Orbitron',sans-serif;
-  font-size:clamp(7px,1.2vw,10px);
-  color:rgba(255,255,255,0.55);
+  font-size:clamp(9px,1.5vw,13px);
+  color:rgba(255,255,255,0.7);
   white-space:nowrap;pointer-events:none;
-  margin-top:3px;letter-spacing:1px;
-  text-shadow:0 0 6px rgba(0,0,0,0.9);
+  margin-top:5px;letter-spacing:1px;
+  text-shadow:0 0 8px rgba(0,0,0,1);
+  font-weight:700;
 }
 
 /* ── TRAVEL ── */
@@ -427,7 +429,7 @@ const PLANETS = [
   },
   {
     id:'mercury', name:'MERCURY', img:'mercury.png', glow:'#c8b8a8',
-    orbitR:90, speed:8, angle:20, pxSize:42,
+    orbitR:200, speed:8, angle:20, pxSize:126,
     tagline:'"I am the smallest planet and closest to the Sun — but definitely NOT the hottest!"',
     facts:[
       {label:'Order from Sun', val:'1st Planet'},
@@ -444,7 +446,7 @@ const PLANETS = [
   },
   {
     id:'venus', name:'VENUS', img:'venus.png', glow:'#ffdd88',
-    orbitR:130, speed:13, angle:80, pxSize:66,
+    orbitR:280, speed:13, angle:80, pxSize:198,
     tagline:'"I am the HOTTEST planet — hotter than Mercury even though I\'m further from the Sun!"',
     facts:[
       {label:'Order from Sun', val:'2nd Planet'},
@@ -461,7 +463,7 @@ const PLANETS = [
   },
   {
     id:'earth', name:'EARTH', img:'earth.png', glow:'#4488ff',
-    orbitR:175, speed:18, angle:155, pxSize:72,
+    orbitR:370, speed:18, angle:155, pxSize:216,
     tagline:'"I am the only planet known to harbour life — perfectly placed in the Goldilocks zone!"',
     facts:[
       {label:'Order from Sun', val:'3rd Planet'},
@@ -478,7 +480,7 @@ const PLANETS = [
   },
   {
     id:'moon', name:'THE MOON', img:'moon.png', glow:'#ddddcc',
-    orbitR:210, speed:22, angle:200, pxSize:42,
+    orbitR:440, speed:22, angle:200, pxSize:126,
     tagline:'"I am Earth\'s only natural satellite — I control the tides and light up your night sky!"',
     facts:[
       {label:'Type', val:'Earth\'s Moon'},
@@ -494,8 +496,8 @@ const PLANETS = [
       wrong:'Not quite! The Moon is about 384,400 km from Earth — that\'s roughly 30 Earths lined up!'}
   },
   {
-    id:'mars', name:'MARS', img:'mars' in ['blackhole','earth','jupiter','mercury','moon','neptune','saturn','sun','uranus','venus'] ? 'mars.png' : 'mars.png', glow:'#ff4422',
-    orbitR:248, speed:26, angle:225, pxSize:60,
+    id:'mars', name:'MARS', img:'mars.png', glow:'#ff4422',
+    orbitR:520, speed:26, angle:225, pxSize:180,
     tagline:'"I am the Red Planet! I have the tallest volcano and longest canyon in the entire solar system!"',
     facts:[
       {label:'Order from Sun', val:'4th Planet'},
@@ -512,7 +514,7 @@ const PLANETS = [
   },
   {
     id:'jupiter', name:'JUPITER', img:'jupiter.png', glow:'#ff8844',
-    orbitR:300, speed:38, angle:305, pxSize:150,
+    orbitR:620, speed:38, angle:305, pxSize:450,
     tagline:'"I am the BIGGEST planet — so massive that all other planets could fit inside me twice over!"',
     facts:[
       {label:'Order from Sun', val:'5th Planet'},
@@ -529,7 +531,7 @@ const PLANETS = [
   },
   {
     id:'saturn', name:'SATURN', img:'saturn.png', glow:'#ddcc88',
-    orbitR:360, speed:52, angle:42, pxSize:132,
+    orbitR:720, speed:52, angle:42, pxSize:396,
     tagline:'"I am the RING PLANET — my stunning rings stretch 280,000 km wide and are made of billions of ice chunks!"',
     facts:[
       {label:'Order from Sun', val:'6th Planet'},
@@ -546,7 +548,7 @@ const PLANETS = [
   },
   {
     id:'uranus', name:'URANUS', img:'uranus.png', glow:'#88ddff',
-    orbitR:415, speed:65, angle:135, pxSize:90,
+    orbitR:820, speed:65, angle:135, pxSize:270,
     tagline:'"I am the ICE GIANT that spins on my side — I basically ROLL around the Sun like a bowling ball!"',
     facts:[
       {label:'Order from Sun', val:'7th Planet'},
@@ -563,7 +565,7 @@ const PLANETS = [
   },
   {
     id:'neptune', name:'NEPTUNE', img:'neptune.png', glow:'#4466ff',
-    orbitR:468, speed:78, angle:258, pxSize:84,
+    orbitR:920, speed:78, angle:258, pxSize:252,
     tagline:'"I am the WINDIEST and FARTHEST planet — my winds scream at 2,100 km per hour — supersonic speed!"',
     facts:[
       {label:'Order from Sun', val:'8th Planet'},
@@ -636,8 +638,8 @@ function buildMap(){
   sys.querySelectorAll('.orbit-ring,.orbit-container').forEach(e=>e.remove());
 
   PLANETS.filter(p=>p.orbitR>0).forEach(p=>{
-    const r=p.orbitR*(sz/960);
-    const pxSize=Math.max(10, p.pxSize*(sz/960));
+    const r=p.orbitR*(sz/1800);
+    const pxSize=Math.max(10, p.pxSize*(sz/1800));
 
     // Orbit ring
     const ring=document.createElement('div');
@@ -665,6 +667,9 @@ function buildMap(){
     const lbl=document.createElement('div');
     lbl.className='planet-name-label';
     lbl.textContent=p.name;
+    // Counter-rotate label to stay horizontal as planet orbits
+    lbl.style.animation=`counterRotate ${p.speed}s linear infinite`;
+    lbl.style.setProperty('--sa', p.angle+'deg');
 
     pw.appendChild(img);pw.appendChild(lbl);
     (function(planet){pw.onclick=()=>travelTo(planet);})(p);
@@ -679,7 +684,7 @@ function buildMap(){
   bhBtn.id='blackholeBtn';
   bhBtn.style.cssText=`position:absolute;bottom:10px;right:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;z-index:6;`;
   const bhImg=document.createElement('img');
-  const bhSz=Math.max(48,sz*0.1);
+  const bhSz=Math.max(80,sz*0.12);
   bhImg.src='/blackhole.png';bhImg.alt='Black Hole';
   bhImg.style.cssText=`width:${bhSz}px;height:${bhSz}px;object-fit:contain;filter:drop-shadow(0 0 12px #aa44ff);transition:transform 0.2s;`;
   bhImg.onerror=()=>{bhImg.alt='🕳️';};
