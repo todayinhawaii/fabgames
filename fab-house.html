@@ -104,13 +104,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 #gizmoPanel{
   position:fixed;bottom:64px;left:50%;transform:translateX(-50%);
   display:none;z-index:150;
-  background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);
+  background:rgba(0,0,0,0.95);backdrop-filter:blur(14px);
   border:2px solid rgba(255,215,0,0.5);border-radius:18px;
-  padding:10px 16px;align-items:center;gap:8px;flex-wrap:wrap;
-  justify-content:center;box-shadow:0 0 30px rgba(255,215,0,0.2);
-  min-width:320px;
+  padding:12px 16px;align-items:flex-start;gap:12px;flex-wrap:nowrap;
+  justify-content:center;box-shadow:0 0 40px rgba(255,215,0,0.2);
+  min-width:min(98vw,720px);overflow-x:auto;
 }
 #gizmoPanel.show{display:flex;}
+@media(max-width:700px){
+  #gizmoPanel{flex-wrap:wrap;min-width:calc(100vw - 20px);bottom:60px;}
+}
 .gizmo-title{font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,215,0,0.6);
   width:100%;text-align:center;letter-spacing:1px;margin-bottom:2px;}
 .gz-btn{font-family:'Fredoka One',cursive;font-size:13px;padding:8px 14px;border-radius:10px;
@@ -130,6 +133,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 .gz-arrow:active{transform:scale(0.92);}
 .gz-center{background:rgba(255,100,100,0.2);color:#ffaaaa;border-color:rgba(255,100,100,0.4);}
 .gz-center:hover{background:rgba(255,100,100,0.4);}
+.gz-rot{
+  font-family:'Fredoka One',cursive;font-size:11px;padding:6px 8px;border-radius:8px;
+  border:none;cursor:pointer;background:rgba(255,140,0,0.15);color:#ffaa44;
+  border:1px solid rgba(255,140,0,0.35);transition:all 0.12s;white-space:nowrap;
+}
+.gz-rot:hover{background:rgba(255,140,0,0.35);color:#fff;transform:scale(1.08);}
+.gz-rot:active{transform:scale(0.9);}
 
 /* ── TOAST ── */
 #toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);
@@ -234,16 +244,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   <div class="gz-divider"></div>
 
   <!-- ROTATE -->
-  <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
     <div style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-bottom:2px;">ROTATE</div>
-    <div style="display:flex;gap:4px;">
-      <button class="gz-btn" onclick="gizmoRotate('y',90)" title="R key">↺ 90°</button>
-      <button class="gz-btn" onclick="gizmoRotate('y',-90)">↻ -90°</button>
+    <div style="display:flex;gap:3px;align-items:center;">
+      <span style="font-size:9px;color:rgba(255,200,0,0.6);width:16px;">Y</span>
+      <button class="gz-rot" onclick="gizmoRotate('y',-90)">↺ -90</button>
+      <button class="gz-rot" onclick="gizmoRotate('y',-45)">↺ -45</button>
+      <button class="gz-rot" onclick="gizmoRotate('y',45)">↻ 45</button>
+      <button class="gz-rot" onclick="gizmoRotate('y',90)">↻ 90</button>
     </div>
-    <div style="display:flex;gap:4px;">
-      <button class="gz-btn" onclick="gizmoRotate('y',45)">↺ 45°</button>
-      <button class="gz-btn" onclick="gizmoRotate('x',45)">↺ X</button>
-      <button class="gz-btn" onclick="gizmoRotate('z',45)">↺ Z</button>
+    <div style="display:flex;gap:3px;align-items:center;">
+      <span style="font-size:9px;color:rgba(255,100,100,0.6);width:16px;">X</span>
+      <button class="gz-rot" onclick="gizmoRotate('x',-90)">↺ -90</button>
+      <button class="gz-rot" onclick="gizmoRotate('x',-45)">↺ -45</button>
+      <button class="gz-rot" onclick="gizmoRotate('x',45)">↻ 45</button>
+      <button class="gz-rot" onclick="gizmoRotate('x',90)">↻ 90</button>
+    </div>
+    <div style="display:flex;gap:3px;align-items:center;">
+      <span style="font-size:9px;color:rgba(100,100,255,0.6);width:16px;">Z</span>
+      <button class="gz-rot" onclick="gizmoRotate('z',-90)">↺ -90</button>
+      <button class="gz-rot" onclick="gizmoRotate('z',-45)">↺ -45</button>
+      <button class="gz-rot" onclick="gizmoRotate('z',45)">↻ 45</button>
+      <button class="gz-rot" onclick="gizmoRotate('z',90)">↻ 90</button>
     </div>
   </div>
 
@@ -1121,13 +1143,14 @@ function deselect(){
 
 // ── GIZMO ACTIONS ─────────────────────────────────────
 function gizmoRotate(axis,deg){
-  if(!selectedObj){toast('Select something first!');return;}
+  if(!selectedObj){toast('Switch to ✋ SELECT mode first, then click a block!');return;}
   const rad=deg*Math.PI/180;
-  if(axis==='y')selectedObj.mesh.rotation.y+=rad;
-  else if(axis==='x')selectedObj.mesh.rotation.x+=rad;
-  else selectedObj.mesh.rotation.z+=rad;
+  const mesh=selectedObj.mesh;
+  if(axis==='y') mesh.rotation.y+=rad;
+  else if(axis==='x') mesh.rotation.x+=rad;
+  else mesh.rotation.z+=rad;
   buildGizmo(selectedObj);
-  toast(`Rotated ${axis.toUpperCase()} ${deg}°`);
+  toast(`Rotated ${axis.toUpperCase()} ${deg>0?'+':''}${deg}°`);
 }
 
 function gizmoScale(factor){
@@ -1415,9 +1438,9 @@ document.addEventListener('keydown',e=>{
   if(e.code==='KeyB')setMode('build');
   if(e.code==='KeyS')setMode('select');
   if(e.code==='KeyE')setMode('erase');
-  if(e.code==='KeyR'&&selectedObj)gizmoRotate('y',45);
-  if(e.code==='KeyT'&&selectedObj)gizmoRotate('x',45);
-  if(e.code==='KeyF'&&selectedObj)gizmoRotate('z',45);
+  if(e.code==='KeyR'){if(selectedObj)gizmoRotate('y',90);else toast('Select a block first (✋ mode), then press R to rotate!');}
+  if(e.code==='KeyT'){if(selectedObj)gizmoRotate('x',90);else toast('Select a block first (✋ mode), then press T to tilt!');}
+  if(e.code==='KeyF'){if(selectedObj)gizmoRotate('z',90);else toast('Select a block first (✋ mode), then press F to flip!');}
   if((e.code==='Delete'||e.code==='Backspace')&&selectedObj){e.preventDefault();gizmoDelete();}
   if((e.code==='KeyZ')&&(e.ctrlKey||e.metaKey)){e.preventDefault();undo();}
   if(e.code==='KeyG')toggleGrid();
@@ -1520,7 +1543,7 @@ function setMode(m){
   toast(hints[m]||m);
   const modeHints={
     build:'🧱 <b style="color:#FFD700;">BUILD MODE</b><br>Click to place selected block<br>Right-drag or Space+drag to orbit<br>Scroll/pinch to zoom in/out<br><span style="color:#FF8888;">Alt+click = delete anything</span>',
-    select:'✋ <b style="color:#FFD700;">SELECT MODE</b><br>Click any block to select<br>Drag coloured arrows to move<br>Drag rings to rotate<br>Drag gold cubes to scale<br>R=rotate · Del=delete<br><span style="color:#FF8888;">Alt+click = quick delete</span>',
+    select:'✋ <b style="color:#FFD700;">SELECT MODE</b><br>Click any block to select it<br>Use MOVE arrows to reposition<br>Use ROTATE Y/X/Z buttons below<br>R=rotY · T=rotX · F=rotZ<br><span style="color:#FF8888;">Alt+click = quick delete</span>',
     erase:'🗑️ <b style="color:#FFD700;">ERASE MODE</b><br>Click any block to delete it<br>Drag to erase many at once<br><span style="color:#FF8888;">Alt+click works in any mode!</span>'
   };
   document.getElementById('modeHint').innerHTML=modeHints[m]||'';
