@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Fab House! 🏠</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:'Nunito',sans-serif;}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:'Nunito',sans-serif;
+  touch-action:none; /* prevent browser zoom/scroll */
+  -webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;}
 
 #threeCanvas{position:fixed;top:50px;left:220px;right:76px;bottom:56px;z-index:0;display:block;}
 
@@ -1245,6 +1248,10 @@ canvas.addEventListener('pointermove',e=>{
       if(bd)ghostMesh.material.color.set(new THREE.Color(bd.c));
       ghostMesh.position.set(pos.x+0.5,pos.y+0.5,pos.z+0.5);
     } else ghostMesh.visible=false;
+  } else if(!isOrbiting&&!activeHandle&&mode==='erase'&&isDown&&hasMoved){
+    // Drag erase!
+    const hits=getHits(e);
+    if(hits.length>0) eraseAtHit(hits[0]);
   }
 
   prevMouse={x:e.clientX,y:e.clientY};
@@ -1259,6 +1266,18 @@ canvas.addEventListener('pointerup',e=>{
   if(isDown&&!hasMoved){
     const hits=getHits(e);
     if(hits.length>0){
+      // Alt/Option + click = DELETE regardless of mode
+      if(e.altKey){
+        let t=hits[0].object;
+        let limit=10;
+        while(t&&!placed[t.userData.key]&&limit-->0) t=t.parent;
+        if(t&&placed[t.userData.key]){
+          const{x,y,z}=t.userData;
+          removeBlock(x,y,z,true);sndErase();
+          toast('🗑️ Deleted! (Alt+click)');
+        }
+        isDown=false;return;
+      }
       if(mode==='build'){
         const pos=getPlacePos(hits[0]);
         placeBlock(pos.x,pos.y,pos.z,currentBlock);
@@ -1270,17 +1289,7 @@ canvas.addEventListener('pointerup',e=>{
         if(t&&placed[t.userData.key])selectObject(t);
         else deselect();
       } else if(mode==='erase'){
-        // Walk up through parent chain to find placed mesh
-        let t=hits[0].object;
-        let safetyLimit=10;
-        while(t && !placed[t.userData.key] && safetyLimit-->0){
-          t=t.parent;
-        }
-        if(t&&t.userData&&placed[t.userData.key]){
-          const{x,y,z}=t.userData;
-          removeBlock(x,y,z,true);sndErase();
-          toast('🗑️ Block removed!');
-        }
+        eraseAtHit(hits[0]);
       }
     } else {
       if(mode==='select')deselect();
@@ -1317,6 +1326,18 @@ canvas.addEventListener('touchmove',e=>{
 },{passive:true});
 
 // ── KEYBOARD ──────────────────────────────────────────
+// Prevent browser pinch zoom on whole page
+document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});
+document.addEventListener('touchmove',e=>{
+  if(e.touches.length>1) e.preventDefault(); // block multi-touch zoom
+},{passive:false});
+// Prevent ctrl+wheel zoom
+document.addEventListener('wheel',e=>{
+  if(e.ctrlKey) e.preventDefault();
+},{passive:false});
+
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT')return;
   if(e.code==='Space'){e.preventDefault();spaceDown=true;}
@@ -1405,6 +1426,25 @@ function buildPalette(){
 }
 
 // ── CONTROLS ──────────────────────────────────────────
+function eraseAtHit(hit){
+  if(!hit) return;
+  // Try direct object first
+  let t = hit.object;
+  // Walk up parent chain to find a placed mesh
+  let limit = 15;
+  while(t && limit-- > 0){
+    if(t.userData && t.userData.key && placed[t.userData.key]){
+      const{x,y,z} = t.userData;
+      removeBlock(x,y,z,true);
+      sndErase();
+      toast('🗑️ Removed!');
+      return;
+    }
+    t = t.parent;
+  }
+  toast('Nothing to erase here');
+}
+
 function setMode(m){
   mode=m;
   if(m!=='select')deselect();
@@ -1422,9 +1462,9 @@ function setMode(m){
   };
   toast(hints[m]||m);
   const modeHints={
-    build:'🧱 <b style="color:#FFD700;">BUILD MODE</b><br>Click to place selected block<br>Right-drag or Space+drag to orbit<br>Scroll/pinch to zoom in/out',
-    select:'✋ <b style="color:#FFD700;">SELECT MODE</b><br>Click any block to select<br>Drag coloured arrows to move<br>Drag rings to rotate<br>Drag gold cubes to scale<br>R = rotate Y · Del = delete',
-    erase:'🗑️ <b style="color:#FFD700;">ERASE MODE</b><br>Click any block to delete it<br>Click and drag to erase many'
+    build:'🧱 <b style="color:#FFD700;">BUILD MODE</b><br>Click to place selected block<br>Right-drag or Space+drag to orbit<br>Scroll/pinch to zoom in/out<br><span style="color:#FF8888;">Alt+click = delete anything</span>',
+    select:'✋ <b style="color:#FFD700;">SELECT MODE</b><br>Click any block to select<br>Drag coloured arrows to move<br>Drag rings to rotate<br>Drag gold cubes to scale<br>R=rotate · Del=delete<br><span style="color:#FF8888;">Alt+click = quick delete</span>',
+    erase:'🗑️ <b style="color:#FFD700;">ERASE MODE</b><br>Click any block to delete it<br>Drag to erase many at once<br><span style="color:#FF8888;">Alt+click works in any mode!</span>'
   };
   document.getElementById('modeHint').innerHTML=modeHints[m]||'';
 }
