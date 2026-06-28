@@ -849,11 +849,6 @@ function buildFurniture(type){
       P(g,B(0.94,0.78,0.06,0xCCCCCC,0.4,0.2),0,0.39,0);
       [0.1,0.3,0.5,0.68].forEach(dy=>P(g,B(0.9,0.01,0.04,0xAAAAAA,0.3),0,dy,0.04));
       P(g,B(0.08,0.06,0.04,0xFFD700,0.3,0.5),-0.02,0.39,0.06);
-    }"
-  else if(type==='pillar'){
-      P(g,CYL(0.18,0.22,0.96,16,0.5),0,0.48,0);
-      P(g,CYL(0.24,0.24,0.06,16,0.5),0,0.97,0);
-      P(g,CYL(0.24,0.24,0.06,16,0.5),0,0.03,0);
     }
   }catch(err){
     console.error('buildFurniture',type,err.message);
