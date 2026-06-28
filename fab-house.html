@@ -104,6 +104,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 #gizmoPanel{
   position:fixed;bottom:64px;left:50%;transform:translateX(-50%);
   display:none;z-index:150;
+  pointer-events:all;
   background:rgba(0,0,0,0.95);backdrop-filter:blur(14px);
   border:2px solid rgba(255,215,0,0.5);border-radius:18px;
   padding:12px 16px;align-items:flex-start;gap:12px;flex-wrap:nowrap;
@@ -196,9 +197,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
     border:1px solid rgba(255,255,255,0.15);text-decoration:none;">🏠</a>
 </div>
 
-<div id="palette"></div>
+<div id="palette" onpointerdown="event.stopPropagation()"></div>
 
-<div id="rightPanel">
+<div id="rightPanel" onpointerdown="event.stopPropagation()">
   <div class="r-btn active" id="rBuild" onclick="setMode('build')">
     <div class="r-icon">🧱</div><div class="r-label">BUILD</div>
   </div>
@@ -220,7 +221,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   </div>
 </div>
 
-<div id="bottomBar">
+<div id="bottomBar" onpointerdown="event.stopPropagation()">
   <button class="b-btn blue" onclick="setFloor(-1)">▼ Floor</button>
   <div style="font-family:'Fredoka One',cursive;color:#FFD700;font-size:13px;white-space:nowrap;">
     Floor <span id="floorNum">1</span>
@@ -232,7 +233,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 </div>
 
 <!-- TRANSFORM PANEL — shows when block selected -->
-<div id="gizmoPanel">
+<div id="gizmoPanel" onpointerdown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
   <div class="gizmo-title">✋ <span id="gizmoName">Block</span> — Selected</div>
 
   <!-- MOVE ARROWS -->
@@ -298,7 +299,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 <div id="toast"></div>
 
 <!-- MOBILE JOYSTICK (bottom left, above bottom bar) -->
-<div id="joystick" style="position:fixed;bottom:64px;left:226px;z-index:85;display:grid;
+<div id="joystick" onpointerdown="event.stopPropagation()" style="position:fixed;bottom:64px;left:226px;z-index:85;display:grid;
   grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:3px;">
   <div></div>
   <button class="joy-btn" id="jFwd"
@@ -1165,7 +1166,7 @@ function selectObject(mesh){
   const bd=BLOCKS[selectedObj.type];
   document.getElementById('gizmoName').textContent=(bd?bd.e+' '+bd.l:'Block');
   document.getElementById('gizmoPanel').classList.add('show');
-  toast('✋ Selected! Use handles to move/rotate/scale');
+  toast('✋ Selected! Use ROTATE buttons below or press T for X rotation');
 }
 
 function deselect(){
@@ -1288,9 +1289,10 @@ updateCamera();
 let activeHandle=null,dragStartMouse=null,dragStartRot=null,dragStartPos=null,dragStartScale=null;
 
 // ── POINTER EVENTS ────────────────────────────────────
-let isDown=false,hasMoved=false;
+let isDown=false,hasMoved=false,downOnCanvas=false;
 
 canvas.addEventListener('pointerdown',e=>{
+  downOnCanvas=true;
   canvas.setPointerCapture(e.pointerId);
   prevMouse={x:e.clientX,y:e.clientY};
   isDown=true;hasMoved=false;
@@ -1376,9 +1378,11 @@ canvas.addEventListener('pointermove',e=>{
 });
 
 canvas.addEventListener('pointerup',e=>{
+  if(!downOnCanvas){isDown=false;return;} // ignore if didn't start on canvas
+  downOnCanvas=false;
   if(e.button===2||e.button===1||spaceDown){isOrbiting=false;activeHandle=null;return;}
   
-  if(activeHandle){activeHandle=null;buildGizmo(selectedObj);isDown=false;return;}
+  if(activeHandle){activeHandle=null;if(selectedObj)buildGizmo(selectedObj);isDown=false;return;}
   isOrbiting=false;
 
   if(isDown&&!hasMoved){
@@ -1417,7 +1421,10 @@ canvas.addEventListener('pointerup',e=>{
         eraseAtHit(hits[0]);
       }
     } else {
-      if(mode==='select')deselect();
+      // Only deselect if clicking empty space in select mode
+      if(mode==='select'){
+        deselect();
+      }
     }
   }
   isDown=false;
