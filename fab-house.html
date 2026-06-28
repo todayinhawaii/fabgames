@@ -335,8 +335,8 @@ sun.shadow.camera.near=0.1;sun.shadow.camera.far=200;
   sun.shadow.camera.top=40;sun.shadow.camera.bottom=-40;});
 sun.shadow.bias=-0.001;
 scene.add(sun);
-scene.add(Object.assign(new THREE.DirectionalLight(0xaaddff,0.4),{position:{x:-10,y:10,z:-10}}));
-scene.add(Object.assign(new THREE.DirectionalLight(0xffffee,0.3),{position:{x:10,y:5,z:10}}));
+const fill1=new THREE.DirectionalLight(0xaaddff,0.4);fill1.position.set(-10,10,-10);scene.add(fill1);
+const fill2=new THREE.DirectionalLight(0xffffee,0.3);fill2.position.set(10,5,10);scene.add(fill2);
 
 // ── GROUND ────────────────────────────────────────────
 const ground=new THREE.Mesh(
@@ -351,10 +351,7 @@ gridHelper.material.opacity=0.1;gridHelper.material.transparent=true;
 gridHelper.position.y=0.01;scene.add(gridHelper);
 
 // ── SKY ───────────────────────────────────────────────
-scene.add(Object.assign(new THREE.Mesh(
-  new THREE.SphereGeometry(300,16,8),
-  new THREE.MeshBasicMaterial({color:0x87CEEB,side:THREE.BackSide})
-)));
+const sky=new THREE.Mesh(new THREE.SphereGeometry(300,16,8),new THREE.MeshBasicMaterial({color:0x87CEEB,side:THREE.BackSide}));scene.add(sky);
 
 // Clouds
 const clouds=[];
