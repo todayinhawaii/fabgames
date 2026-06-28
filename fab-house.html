@@ -119,8 +119,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 .gz-btn:hover{background:rgba(255,215,0,0.15);border-color:#FFD700;color:#FFD700;}
 .gz-btn.accent{background:linear-gradient(135deg,#FFD700,#FF8C00);color:#000;border:none;}
 .gz-btn.danger{background:rgba(200,50,50,0.3);border-color:rgba(255,100,100,0.4);color:#ff8888;}
-.gz-divider{width:1px;height:32px;background:rgba(255,255,255,0.1);}
+.gz-divider{width:1px;min-height:80px;background:rgba(255,255,255,0.1);}
 .gz-info{font-family:'Fredoka One',cursive;font-size:12px;color:#FFD700;white-space:nowrap;}
+.gz-arrow{
+  font-family:'Fredoka One',cursive;font-size:12px;padding:8px 10px;border-radius:10px;
+  border:none;cursor:pointer;background:rgba(0,150,255,0.2);color:#88ddff;
+  border:1px solid rgba(0,150,255,0.4);transition:all 0.15s;white-space:nowrap;min-width:44px;
+}
+.gz-arrow:hover{background:rgba(0,150,255,0.4);color:#fff;transform:scale(1.05);}
+.gz-arrow:active{transform:scale(0.92);}
+.gz-center{background:rgba(255,100,100,0.2);color:#ffaaaa;border-color:rgba(255,100,100,0.4);}
+.gz-center:hover{background:rgba(255,100,100,0.4);}
 
 /* ── TOAST ── */
 #toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);
@@ -203,22 +212,56 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   <button class="b-btn gold" onclick="addRoof()">+ Roof</button>
 </div>
 
-<!-- TRANSFORM GIZMO PANEL -->
+<!-- TRANSFORM PANEL — shows when block selected -->
 <div id="gizmoPanel">
-  <div class="gizmo-title">🔧 TRANSFORM — <span id="gizmoName">Block</span></div>
-  <button class="gz-btn" onclick="gizmoRotate('y', 45)" title="Rotate Left (R)">↺ Y 45°</button>
-  <button class="gz-btn" onclick="gizmoRotate('y', 90)" title="Rotate 90°">↺ Y 90°</button>
-  <button class="gz-btn" onclick="gizmoRotate('y', -45)">↻ Y -45°</button>
+  <div class="gizmo-title">✋ <span id="gizmoName">Block</span> — Selected</div>
+
+  <!-- MOVE ARROWS -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+    <div style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-bottom:2px;">MOVE</div>
+    <button class="gz-arrow" onclick="moveSelected(0,1,0)" title="Up">▲ UP</button>
+    <div style="display:flex;gap:3px;">
+      <button class="gz-arrow" onclick="moveSelected(-1,0,0)" title="Left">◀</button>
+      <button class="gz-arrow gz-center" onclick="moveSelected(0,-1,0)" title="Down">▼</button>
+      <button class="gz-arrow" onclick="moveSelected(1,0,0)" title="Right">▶</button>
+    </div>
+    <div style="display:flex;gap:3px;">
+      <button class="gz-arrow" onclick="moveSelected(0,0,-1)" title="Forward">↑ FWD</button>
+      <button class="gz-arrow" onclick="moveSelected(0,0,1)" title="Back">↓ BCK</button>
+    </div>
+  </div>
+
   <div class="gz-divider"></div>
-  <button class="gz-btn" onclick="gizmoRotate('x', 45)">↺ X</button>
-  <button class="gz-btn" onclick="gizmoRotate('z', 45)">↺ Z</button>
+
+  <!-- ROTATE -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+    <div style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-bottom:2px;">ROTATE</div>
+    <div style="display:flex;gap:4px;">
+      <button class="gz-btn" onclick="gizmoRotate('y',90)" title="R key">↺ 90°</button>
+      <button class="gz-btn" onclick="gizmoRotate('y',-90)">↻ -90°</button>
+    </div>
+    <div style="display:flex;gap:4px;">
+      <button class="gz-btn" onclick="gizmoRotate('y',45)">↺ 45°</button>
+      <button class="gz-btn" onclick="gizmoRotate('x',45)">↺ X</button>
+      <button class="gz-btn" onclick="gizmoRotate('z',45)">↺ Z</button>
+    </div>
+  </div>
+
   <div class="gz-divider"></div>
-  <button class="gz-btn" onclick="gizmoScale(1.2)">⊕ Bigger</button>
-  <button class="gz-btn" onclick="gizmoScale(0.8)">⊖ Smaller</button>
-  <div class="gz-divider"></div>
-  <button class="gz-btn accent" onclick="gizmoDuplicate()">⧉ Copy</button>
-  <button class="gz-btn danger" onclick="gizmoDelete()">🗑 Delete</button>
-  <button class="gz-btn" onclick="deselect()">✕ Done</button>
+
+  <!-- SCALE + ACTIONS -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+    <div style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-bottom:2px;">SIZE & ACTIONS</div>
+    <div style="display:flex;gap:4px;">
+      <button class="gz-btn" onclick="gizmoScale(1.25)">⊕ Bigger</button>
+      <button class="gz-btn" onclick="gizmoScale(0.75)">⊖ Smaller</button>
+    </div>
+    <div style="display:flex;gap:4px;">
+      <button class="gz-btn accent" onclick="gizmoDuplicate()">⧉ Copy</button>
+      <button class="gz-btn danger" onclick="gizmoDelete()">🗑 Delete</button>
+      <button class="gz-btn" onclick="deselect()">✕ Done</button>
+    </div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -1114,6 +1157,26 @@ function gizmoDelete(){
   sndErase();toast('Deleted!');
 }
 
+function moveSelected(dx,dy,dz){
+  if(!selectedObj){toast('Select a block first!');return;}
+  const{x,y,z,type}=selectedObj.mesh.userData;
+  const rot=selectedObj.mesh.rotation.clone();
+  const scl=selectedObj.mesh.scale.clone();
+  const nx=x+dx, ny=Math.max(0,y+dy), nz=z+dz;
+  removeBlock(x,y,z,false);
+  placeBlock(nx,ny,nz,type,true);
+  const newKey=bk(nx,ny,nz);
+  if(placed[newKey]){
+    placed[newKey].mesh.rotation.copy(rot);
+    placed[newKey].mesh.scale.copy(scl);
+    selectedObj=placed[newKey];
+    buildGizmo(selectedObj);
+    document.getElementById('gizmoName').textContent=
+      (BLOCKS[type]?BLOCKS[type].e+' '+BLOCKS[type].l:'Block');
+  }
+  sndPlace();
+}
+
 // ── RAYCASTING ────────────────────────────────────────
 const raycaster=new THREE.Raycaster();
 const mouse2=new THREE.Vector2();
@@ -1280,8 +1343,15 @@ canvas.addEventListener('pointerup',e=>{
       }
       if(mode==='build'){
         const pos=getPlacePos(hits[0]);
-        placeBlock(pos.x,pos.y,pos.z,currentBlock);
-        sndPlace();
+        // If clicking an existing placed block in build mode, select it instead
+        const existingKey=bk(pos.x,pos.y,pos.z);
+        if(placed[existingKey]){
+          setMode('select');
+          selectObject(placed[existingKey].mesh);
+        } else {
+          placeBlock(pos.x,pos.y,pos.z,currentBlock);
+          sndPlace();
+        }
       } else if(mode==='select'){
         const hit=hits[0];
         let t=hit.object;
@@ -1352,27 +1422,14 @@ document.addEventListener('keydown',e=>{
   if((e.code==='KeyZ')&&(e.ctrlKey||e.metaKey)){e.preventDefault();undo();}
   if(e.code==='KeyG')toggleGrid();
   if(selectedObj){
-    const m=selectedObj.mesh,s=1;
     const cam=new THREE.Vector3();camera.getWorldDirection(cam);cam.y=0;cam.normalize();
     const right=new THREE.Vector3(-cam.z,0,cam.x);
-    const{x,y,z}=m.userData;
-    const rot=m.rotation.clone(),scl=m.scale.clone(),type=selectedObj.type;
-    let nx=x,ny=y,nz=z;
-    if(e.code==='ArrowLeft'){nx=x+Math.round(-right.x);nz=z+Math.round(-right.z);}
-    if(e.code==='ArrowRight'){nx=x+Math.round(right.x);nz=z+Math.round(right.z);}
-    if(e.code==='ArrowUp'){nx=x+Math.round(cam.x);nz=z+Math.round(cam.z);}
-    if(e.code==='ArrowDown'){nx=x-Math.round(cam.x);nz=z-Math.round(cam.z);}
-    if(e.code==='PageUp')ny=y+1;
-    if(e.code==='PageDown')ny=Math.max(0,y-1);
-    if(nx!==x||ny!==y||nz!==z){
-      e.preventDefault();
-      removeBlock(x,y,z,false);placeBlock(nx,ny,nz,type,false);
-      if(placed[bk(nx,ny,nz)]){
-        placed[bk(nx,ny,nz)].mesh.rotation.copy(rot);
-        placed[bk(nx,ny,nz)].mesh.scale.copy(scl);
-        selectedObj=placed[bk(nx,ny,nz)];buildGizmo(selectedObj);
-      }
-    }
+    if(e.code==='ArrowLeft'){e.preventDefault();moveSelected(Math.round(-right.x),0,Math.round(-right.z));}
+    if(e.code==='ArrowRight'){e.preventDefault();moveSelected(Math.round(right.x),0,Math.round(right.z));}
+    if(e.code==='ArrowUp'){e.preventDefault();moveSelected(Math.round(cam.x),0,Math.round(cam.z));}
+    if(e.code==='ArrowDown'){e.preventDefault();moveSelected(-Math.round(cam.x),0,-Math.round(cam.z));}
+    if(e.code==='PageUp'){e.preventDefault();moveSelected(0,1,0);}
+    if(e.code==='PageDown'){e.preventDefault();moveSelected(0,-1,0);}
   }
 });
 document.addEventListener('keyup',e=>{if(e.code==='Space')spaceDown=false;});
