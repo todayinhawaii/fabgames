@@ -146,6 +146,10 @@ const GAMES=[
    desc:'Watch the ball... or lose it all! 5 cups, 1 ball, NYC back alley vibes. Can you beat the hustler? Easy to Hustler difficulty — the ultimate shell game!!',
    color:'rgba(255,50,0,0.15)',href:'/street-hustler'},
 
+  {id:'fab-house',emoji:'🏠',cat:'Creative · Building',title:'Fab House',
+   desc:'Build your dream home in full 3D! Place walls, windows, roofs, furniture and more. Drag, rotate and move anything you place. The ultimate creative building experience!!',
+   color:'rgba(255,150,50,0.15)',href:'/fab-house'},
+
   {id:'galaxy-explorer',emoji:'🚀',cat:'Educational · Space',title:'Galaxy Explorer',
    desc:'Blast off and tour the solar system! Visit the Sun, all 8 planets, the Moon and a Black Hole! Learn amazing facts and answer quiz questions to earn stars!!',
    color:'rgba(0,100,255,0.15)',href:'/galaxy-explorer'},
