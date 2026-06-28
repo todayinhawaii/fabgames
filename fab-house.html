@@ -1467,31 +1467,35 @@ function updateCameraMovement(){
   const speed = 0.18;
   const rotSpeed = 0.025;
 
-  // Get forward and right vectors from current camera angle
+  // Forward = direction camera is LOOKING (from camera toward target)
   const forward = new THREE.Vector3(
-    Math.sin(camPhi) * Math.sin(camTheta),
+    Math.sin(camTheta),
     0,
-    Math.sin(camPhi) * Math.cos(camTheta)
+    Math.cos(camTheta)
   ).normalize();
 
+  // Right = 90 degrees from forward
   const right = new THREE.Vector3(
-    Math.sin(camTheta + Math.PI/2),
+    Math.cos(camTheta),
     0,
-    Math.cos(camTheta + Math.PI/2)
+    -Math.sin(camTheta)
   ).normalize();
 
-  // Arrow keys / WASD = move camera target (walk around)
+  // UP arrow = go FORWARD (into the scene where you're looking)
   if(keysHeld['ArrowUp']    || keysHeld['KeyW']){
-    camTarget.addScaledVector(forward, speed);
-  }
-  if(keysHeld['ArrowDown']  || keysHeld['KeyS']){
     camTarget.addScaledVector(forward, -speed);
   }
-  if(keysHeld['ArrowLeft']  || keysHeld['KeyA']){
-    camTarget.addScaledVector(right, -speed);
+  // DOWN arrow = go BACKWARD
+  if(keysHeld['ArrowDown']  || keysHeld['KeyS']){
+    camTarget.addScaledVector(forward, speed);
   }
-  if(keysHeld['ArrowRight'] || keysHeld['KeyQ']){
+  // LEFT arrow = strafe left
+  if(keysHeld['ArrowLeft']  || keysHeld['KeyA']){
     camTarget.addScaledVector(right, speed);
+  }
+  // RIGHT arrow = strafe right
+  if(keysHeld['ArrowRight'] || keysHeld['KeyQ']){
+    camTarget.addScaledVector(right, -speed);
   }
   // E = up, C = down (fly up/down)
   if(keysHeld['KeyE']){ camTarget.y += speed; }
