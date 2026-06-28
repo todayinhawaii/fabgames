@@ -155,6 +155,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 .load-sub{font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:30px;}
 .load-bar-wrap{width:200px;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;}
 .load-bar{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);border-radius:4px;width:0%;transition:width 0.3s;}
+.joy-btn{
+  width:44px;height:44px;border-radius:10px;border:none;cursor:pointer;
+  background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);font-size:18px;
+  backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.1s;user-select:none;-webkit-user-select:none;
+}
+.joy-btn:active,.joy-btn:hover{background:rgba(255,215,0,0.35);color:#FFD700;border-color:#FFD700;}
+.joy-mid{background:rgba(0,200,255,0.15);color:#00cfff;border-color:rgba(0,200,255,0.3);font-size:14px;}
 
 @media(max-width:700px){
   #palette{width:0;overflow:hidden;}
@@ -288,16 +297,39 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 <div id="toast"></div>
 
+<!-- MOBILE JOYSTICK (bottom left, above bottom bar) -->
+<div id="joystick" style="position:fixed;bottom:64px;left:226px;z-index:85;display:grid;
+  grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:3px;">
+  <div></div>
+  <button class="joy-btn" id="jFwd"
+    ontouchstart="keysHeld['ArrowUp']=true" ontouchend="keysHeld['ArrowUp']=false"
+    onmousedown="keysHeld['ArrowUp']=true" onmouseup="keysHeld['ArrowUp']=false">▲</button>
+  <div></div>
+  <button class="joy-btn" id="jLeft"
+    ontouchstart="keysHeld['ArrowLeft']=true" ontouchend="keysHeld['ArrowLeft']=false"
+    onmousedown="keysHeld['ArrowLeft']=true" onmouseup="keysHeld['ArrowLeft']=false">◀</button>
+  <button class="joy-btn joy-mid" onclick="resetCamera()">🎥</button>
+  <button class="joy-btn" id="jRight"
+    ontouchstart="keysHeld['ArrowRight']=true" ontouchend="keysHeld['ArrowRight']=false"
+    onmousedown="keysHeld['ArrowRight']=true" onmouseup="keysHeld['ArrowRight']=false">▶</button>
+  <div></div>
+  <button class="joy-btn" id="jBack"
+    ontouchstart="keysHeld['ArrowDown']=true" ontouchend="keysHeld['ArrowDown']=false"
+    onmousedown="keysHeld['ArrowDown']=true" onmouseup="keysHeld['ArrowDown']=false">▼</button>
+  <div></div>
+</div>
+
 <!-- HUD OVERLAY -->
 <div id="hud" style="position:fixed;bottom:64px;right:82px;z-index:80;pointer-events:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
   <!-- NAV HINT -->
   <div id="navHint" style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,215,0,0.3);border-radius:14px;padding:10px 14px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,215,0,0.8);text-align:center;backdrop-filter:blur(8px);line-height:1.8;max-width:180px;">
     <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;letter-spacing:1px;">NAVIGATE</div>
-    🖱️ Right-drag <b style="color:#FFD700;">or</b><br>
-    ⌨️ Hold <b style="color:#FFD700;">SPACE</b> + drag<br>
-    to orbit 360°<br>
-    🖱️ Scroll = zoom in/out<br>
-    📱 Pinch = zoom
+    ⬆⬇⬅➡ <b style="color:#FFD700;">Arrow keys</b> = walk<br>
+    <b style="color:#FFD700;">W A S Q</b> = also walk<br>
+    <b style="color:#FFD700;">E</b>=fly up · <b style="color:#FFD700;">C</b>=fly down<br>
+    🖱️ Right-drag = orbit<br>
+    ⌨️ <b style="color:#FFD700;">SPACE</b>+drag = orbit<br>
+    🖱️ Scroll / 📱 Pinch = zoom
   </div>
   <!-- COMPASS ARROWS -->
   <div style="display:grid;grid-template-columns:repeat(3,36px);grid-template-rows:repeat(3,36px);gap:3px;opacity:0.75;">
@@ -1419,6 +1451,64 @@ canvas.addEventListener('touchmove',e=>{
 },{passive:true});
 
 // ── KEYBOARD ──────────────────────────────────────────
+// ── CAMERA MOVEMENT KEYS ─────────────────────────────
+const keysHeld = {};
+document.addEventListener('keydown', e => {
+  keysHeld[e.code] = true;
+});
+document.addEventListener('keyup', e => {
+  keysHeld[e.code] = false;
+});
+
+function updateCameraMovement(){
+  // Only move camera if NO block is selected (arrows move camera, not block)
+  if(selectedObj) return;
+
+  const speed = 0.18;
+  const rotSpeed = 0.025;
+
+  // Get forward and right vectors from current camera angle
+  const forward = new THREE.Vector3(
+    Math.sin(camPhi) * Math.sin(camTheta),
+    0,
+    Math.sin(camPhi) * Math.cos(camTheta)
+  ).normalize();
+
+  const right = new THREE.Vector3(
+    Math.sin(camTheta + Math.PI/2),
+    0,
+    Math.cos(camTheta + Math.PI/2)
+  ).normalize();
+
+  // Arrow keys / WASD = move camera target (walk around)
+  if(keysHeld['ArrowUp']    || keysHeld['KeyW']){
+    camTarget.addScaledVector(forward, speed);
+  }
+  if(keysHeld['ArrowDown']  || keysHeld['KeyS']){
+    camTarget.addScaledVector(forward, -speed);
+  }
+  if(keysHeld['ArrowLeft']  || keysHeld['KeyA']){
+    camTarget.addScaledVector(right, -speed);
+  }
+  if(keysHeld['ArrowRight'] || keysHeld['KeyQ']){
+    camTarget.addScaledVector(right, speed);
+  }
+  // E = up, C = down (fly up/down)
+  if(keysHeld['KeyE']){ camTarget.y += speed; }
+  if(keysHeld['KeyC']){ camTarget.y = Math.max(0, camTarget.y - speed); }
+
+  // Orbit with < > keys (rotate view left/right without WASD)
+  if(keysHeld['Comma'])  camTheta -= rotSpeed;
+  if(keysHeld['Period']) camTheta += rotSpeed;
+
+  // If any movement key held, update camera
+  const moving = keysHeld['ArrowUp']||keysHeld['ArrowDown']||
+    keysHeld['ArrowLeft']||keysHeld['ArrowRight']||
+    keysHeld['KeyW']||keysHeld['KeyS']||keysHeld['KeyA']||keysHeld['KeyQ']||
+    keysHeld['KeyE']||keysHeld['KeyC']||keysHeld['Comma']||keysHeld['Period'];
+  if(moving) updateCamera();
+}
+
 // Prevent browser pinch zoom on whole page
 document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
 document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
@@ -1433,11 +1523,13 @@ document.addEventListener('wheel',e=>{
 
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT')return;
-  if(e.code==='Space'){e.preventDefault();spaceDown=true;}
-  if(e.code==='Escape'){e.preventDefault();deselect();}
+  // Prevent page scroll on arrow/space keys
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
+  if(e.code==='Space'){spaceDown=true;}
+  if(e.code==='Escape'){deselect();}
   if(e.code==='KeyB')setMode('build');
-  if(e.code==='KeyS')setMode('select');
-  if(e.code==='KeyE')setMode('erase');
+  // Don't intercept S/E/W/A/Q when no modifier — used for camera movement
+  // Only use them for mode switching with no selection
   if(e.code==='KeyR'){if(selectedObj)gizmoRotate('y',90);else toast('Select a block first (✋ mode), then press R to rotate!');}
   if(e.code==='KeyT'){if(selectedObj)gizmoRotate('x',90);else toast('Select a block first (✋ mode), then press T to tilt!');}
   if(e.code==='KeyF'){if(selectedObj)gizmoRotate('z',90);else toast('Select a block first (✋ mode), then press F to flip!');}
@@ -1630,6 +1722,7 @@ window.addEventListener('resize',onResize);onResize();
 let frame=0;
 function animate(){
   requestAnimationFrame(animate);frame++;
+  updateCameraMovement(); // smooth camera movement every frame
   if(frame%3===0)clouds.forEach((c,i)=>{
     c.position.x+=0.01*(i%2?1:-1);
     if(c.position.x>100)c.position.x=-100;
