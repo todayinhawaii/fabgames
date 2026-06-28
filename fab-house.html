@@ -1140,7 +1140,8 @@ function placeBlock(x,y,z,blockType,record=true){
   if(FURNITURE_TYPES.has(blockType)){
     // Build detailed 3D furniture group
     mesh = buildFurniture(blockType);
-    mesh.position.set(x+0.5, y, z+0.5); // y=floor level, furniture sits on top
+    mesh.position.set(x+0.5, y, z+0.5);
+    mesh.scale.set(1.8, 1.8, 1.8); // Scale up so furniture fills the grid cell
   } else if(bd.shape==='wedge'){
     const geo = getGeo('wedge').clone();
     mesh = new THREE.Mesh(geo, getMat(blockType));
@@ -1268,17 +1269,12 @@ let lastTouchDist=0;
 canvas3d.addEventListener('pointerdown',e=>{
   prevMouse={x:e.clientX,y:e.clientY};
   canvas3d.setPointerCapture(e.pointerId);
-  // Right click OR space+click = orbit scene
   if(e.button===2||e.button===1||spaceDown){
     isOrbiting=true;
     return;
   }
   isPointerDown=true; pointerMoved=false; pointerDownTime=Date.now();
-  // If in select mode and we have a selected block, start drag
-  if(mode==='select' && selectedBlock){
-    isDraggingSelected=true;
-    dragPlane=null;
-  }
+  isDraggingSelected=false; dragPlane=null; // reset drag state on every new click
 });
 
 canvas3d.addEventListener('pointermove',e=>{
@@ -1289,23 +1285,24 @@ canvas3d.addEventListener('pointermove',e=>{
     camTheta -= dx*0.008;
     camPhi = Math.max(0.05, Math.min(Math.PI*0.48, camPhi-dy*0.008));
     updateCamera();
-  } else if(isDraggingSelected && selectedBlock && isPointerDown){
-    // DRAG SELECTED BLOCK directly in the world
+  } else if(isPointerDown && selectedBlock && mode==='select'){
+    // Only start dragging after significant movement (8px threshold)
     if(Math.abs(dx)+Math.abs(dy)>3) pointerMoved=true;
-    const hits=raycast(e);
-    if(hits.length>0){
-      const pos=getPlacePos(hits[0]);
-      if(pos.y>=0 && pos.y<30){
-        dragPlane=pos;
-        // Show ghost at target position
-        if(ghostMesh){
-          ghostMesh.visible=true;
-          const bd=BLOCKS[selectedBlock.blockType];
-          if(bd) ghostMesh.material.color.set(new THREE.Color(bd.color));
-          ghostMesh.position.set(pos.x+0.5,pos.y+0.5,pos.z+0.5);
+    if(pointerMoved && Math.abs(e.clientX-prevMouse.x+e.clientY-prevMouse.y)>0){
+      isDraggingSelected=true;
+      const hits=raycast(e);
+      if(hits.length>0){
+        const pos=getPlacePos(hits[0]);
+        if(pos.y>=0 && pos.y<30){
+          dragPlane=pos;
+          if(ghostMesh){
+            ghostMesh.visible=true;
+            const bd=BLOCKS[selectedBlock.blockType];
+            if(bd) ghostMesh.material.color.set(new THREE.Color(bd.color));
+            ghostMesh.position.set(pos.x+0.5,pos.y+0.5,pos.z+0.5);
+          }
+          if(selectionOutline) selectionOutline.position.set(pos.x+0.5,pos.y+0.5,pos.z+0.5);
         }
-        // Move selection outline live as we drag
-        if(selectionOutline) selectionOutline.position.set(pos.x+0.5,pos.y+0.5,pos.z+0.5);
       }
     }
   } else if(isPointerDown){
@@ -1329,12 +1326,13 @@ canvas3d.addEventListener('pointerup',e=>{
 
   // Finish dragging a selected block
   if(isDraggingSelected && pointerMoved && dragPlane && selectedBlock){
-    moveSelectedTo(dragPlane.x, dragPlane.y, dragPlane.z);
     if(ghostMesh) ghostMesh.visible=false;
+    moveSelectedTo(dragPlane.x, dragPlane.y, dragPlane.z);
     isDraggingSelected=false; dragPlane=null;
     isPointerDown=false; return;
   }
   isDraggingSelected=false;
+  dragPlane=null;
 
   if(isPointerDown && !pointerMoved){
     // Simple click
@@ -1584,11 +1582,16 @@ function selectMesh(mesh){
   if(!placed[bk]) return;
   selectedBlock={bk,mesh,blockType:placed[bk].blockType,x:parts[0],y:parts[1],z:parts[2]};
 
-  // Outline
-  const geo=new THREE.BoxGeometry(1.08,1.08,1.08);
-  const mat=new THREE.MeshBasicMaterial({color:0xFFD700,wireframe:true});
-  selectionOutline=new THREE.Mesh(geo,mat);
-  selectionOutline.position.copy(mesh.position);
+  // Outline — compute bounding box for furniture groups
+  const bbox = new THREE.Box3().setFromObject(mesh);
+  const size = new THREE.Vector3();
+  bbox.getSize(size);
+  const center = new THREE.Vector3();
+  bbox.getCenter(center);
+  const geo = new THREE.BoxGeometry(size.x+0.1, size.y+0.1, size.z+0.1);
+  const mat = new THREE.MeshBasicMaterial({color:0xFFD700, wireframe:true});
+  selectionOutline = new THREE.Mesh(geo, mat);
+  selectionOutline.position.copy(center);
   selectionOutline.rotation.copy(mesh.rotation);
   scene.add(selectionOutline);
 
@@ -1795,9 +1798,10 @@ function buildStarterScene(){
   // Tree — trunk at ground, leaves on top
   placeBlock(9,0,4,'trunk',false);
   placeBlock(9,1,4,'leaves-green',false);
-  // Some furniture inside
-  placeBlock(1,1,3,'sofa-red',false);
+  // Furniture inside the house
+  placeBlock(1,1,3,'sofa-blue',false);
   placeBlock(4,1,4,'tv-unit',false);
+  placeBlock(2,1,1,'coffee-table',false);
 }
 
 setLoad(90);
