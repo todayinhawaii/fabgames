@@ -151,7 +151,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
 </div>
 
-<canvas id="threeCanvas"></canvas>
+<canvas id="threeCanvas" style="touch-action:none;"></canvas>
 
 <div id="topbar">
   <div class="logo">🏠 FAB HOUSE</div>
@@ -219,6 +219,43 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 </div>
 
 <div id="toast"></div>
+
+<!-- HUD OVERLAY -->
+<div id="hud" style="position:fixed;bottom:64px;right:82px;z-index:80;pointer-events:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+  <!-- NAV HINT -->
+  <div id="navHint" style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,215,0,0.3);border-radius:14px;padding:10px 14px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,215,0,0.8);text-align:center;backdrop-filter:blur(8px);line-height:1.8;max-width:180px;">
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;letter-spacing:1px;">NAVIGATE</div>
+    🖱️ Right-drag <b style="color:#FFD700;">or</b><br>
+    ⌨️ Hold <b style="color:#FFD700;">SPACE</b> + drag<br>
+    to orbit 360°<br>
+    🖱️ Scroll = zoom in/out<br>
+    📱 Pinch = zoom
+  </div>
+  <!-- COMPASS ARROWS -->
+  <div style="display:grid;grid-template-columns:repeat(3,36px);grid-template-rows:repeat(3,36px);gap:3px;opacity:0.75;">
+    <div></div>
+    <div style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFD700;">▲</div>
+    <div></div>
+    <div style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFD700;">◀</div>
+    <div style="background:rgba(255,215,0,0.2);border:1px solid rgba(255,215,0,0.5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#FFD700;">🎥</div>
+    <div style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFD700;">▶</div>
+    <div></div>
+    <div style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFD700;">▼</div>
+    <div></div>
+  </div>
+</div>
+
+<!-- MODE HINT (changes per mode) -->
+<div id="modeHint" style="position:fixed;bottom:64px;left:226px;z-index:80;pointer-events:none;
+  background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:12px;
+  padding:8px 14px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,255,255,0.6);
+  backdrop-filter:blur(8px);line-height:1.9;max-width:200px;">
+  🧱 <b style="color:#FFD700;">BUILD MODE</b><br>
+  Click ground or block to place<br>
+  Right-drag to orbit view<br>
+  Switch to ✋ SELECT<br>
+  to move & rotate blocks
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -288,6 +325,38 @@ const BLOCKS={
   'palm':         {l:'Palm Tree',    e:'🌴',c:0x228B22,r:0.95,f:true},
   'wardrobe':     {l:'Wardrobe',     e:'🪞',c:0xD4A855,r:0.8,f:true},
   'bathrm-vanity':{l:'Vanity',       e:'🪞',c:0xD4A855,r:0.8,f:true},
+  // More living room
+  'coffee-table': {l:'Coffee Table', e:'☕',c:0xD4A855,r:0.7,f:true},
+  'lamp-floor':   {l:'Floor Lamp',   e:'💡',c:0xFFD700,r:0.5,f:true},
+  'plant-pot':    {l:'Plant Pot',    e:'🪴',c:0x228B22,r:0.9,f:true},
+  'rug':          {l:'Rug',          e:'🟥',c:0xCC3333,r:0.98,f:true},
+  'curtains':     {l:'Curtains',     e:'🎭',c:0x8844AA,r:0.95,f:true},
+  'clock':        {l:'Wall Clock',   e:'🕐',c:0x444444,r:0.5,f:true},
+  // More kitchen
+  'microwave':    {l:'Microwave',    e:'📦',c:0x888888,r:0.3,f:true},
+  'kitchen-sink': {l:'Kitchen Sink', e:'🚰',c:0xCCDDEE,r:0.2,f:true},
+  'bar-stool':    {l:'Bar Stool',    e:'🪑',c:0x888888,r:0.5,f:true},
+  // More bedroom
+  'bedside-lamp': {l:'Bedside Lamp', e:'🕯️',c:0xFFD700,r:0.5,f:true},
+  'dresser':      {l:'Dresser',      e:'🗄️',c:0xC4945A,r:0.8,f:true},
+  'mirror-wall':  {l:'Wall Mirror',  e:'🪞',c:0xAADDFF,r:0.0,f:true},
+  // More bathroom
+  'towel-rail':   {l:'Towel Rail',   e:'🧴',c:0xCCCCCC,r:0.2,f:true},
+  'bathroom-cab': {l:'Bath Cabinet', e:'🗄️',c:0xDDDDEE,r:0.3,f:true},
+  // More outdoor
+  'bbq':          {l:'BBQ Grill',    e:'🔥',c:0x333333,r:0.4,f:true},
+  'garden-chair': {l:'Garden Chair', e:'🪑',c:0x228B22,r:0.8,f:true},
+  'garden-table': {l:'Garden Table', e:'⛺',c:0x228B22,r:0.8,f:true},
+  'umbrella':     {l:'Sun Umbrella', e:'⛱️',c:0xFF6622,r:0.9,f:true},
+  'flower-pot':   {l:'Flower Pot',   e:'🌹',c:0xFF4455,r:0.9,f:true},
+  'gate':         {l:'Gate',         e:'🚪',c:0x8B5E3C,r:0.8,f:true},
+  'letterbox':    {l:'Letterbox',    e:'📮',c:0xCC3333,r:0.8,f:true},
+  // More structure
+  'stairs':       {l:'Stairs',       e:'🪜',c:0xD4A855,r:0.8,f:true},
+  'pillar':       {l:'Stone Pillar', e:'🏛️',c:0xDDDDCC,r:0.7,f:true},
+  'arch-stone':   {l:'Stone Arch',   e:'🌉',c:0xAA9988,r:0.9,f:true},
+  'balcony-rail': {l:'Balcony Rail', e:'🏗️',c:0xAAAAAA,r:0.4,f:true},
+  'garage-door':  {l:'Garage Door',  e:'🚗',c:0xCCCCCC,r:0.4,f:true},
 };
 
 const PALETTE_CATS=[
@@ -302,6 +371,12 @@ const PALETTE_CATS=[
   {t:'🌳 Nature',   k:['grass','dirt','sand','water','stone-path','gravel','decking','tree','palm','hedge']},
   {t:'🏡 Outdoor',  k:['fence-wood','fence-iron']},
   {t:'✨ Special',  k:['gold-trim','metal']},
+  {t:'🛋️ Living+',  k:['coffee-table','lamp-floor','plant-pot','rug','curtains','clock']},
+  {t:'🍳 Kitchen+', k:['microwave','kitchen-sink','bar-stool']},
+  {t:'🛏️ Bedroom+', k:['bedside-lamp','dresser','mirror-wall']},
+  {t:'🚿 Bathroom+',k:['towel-rail','bathroom-cab']},
+  {t:'🏡 Garden',   k:['bbq','garden-chair','garden-table','umbrella','flower-pot','gate','letterbox']},
+  {t:'🏗️ Structure',k:['stairs','pillar','arch-stone','balcony-rail','garage-door']},
 ];
 
 function initApp(){
@@ -581,6 +656,204 @@ function buildFurniture(type){
     else if(type==='hedge'){
       P(g,B(0.92,0.78,0.44,0x2D6A2D,0.95),0,0.39,0);
       [-0.32,-0.1,0.12,0.32].forEach(hx=>P(g,SPH(0.18,0x337733,0.95),hx,0.82,0));
+    }
+  else if(type==='coffee-table'){
+      P(g,B(0.82,0.05,0.44,0xD4A855,0.6),0,0.28,0);
+      [[-0.34,-0.18],[0.34,-0.18],[-0.34,0.18],[0.34,0.18]].forEach(([lx,lz])=>P(g,B(0.06,0.26,0.06,0xAA7733,0.7),lx,0.13,lz));
+    }
+  else if(type==='lamp-floor'){
+      P(g,B(0.22,0.04,0.22,0x555544,0.7),0,0.02,0);
+      P(g,CYL(0.03,0.03,0.9,0xAAAA88,8,0.4),0,0.47,0);
+      const shade=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,0.26,16,1,true),
+        new THREE.MeshStandardMaterial({color:0xFFEE99,roughness:0.8,side:THREE.DoubleSide}));
+      shade.position.set(0,0.96,0);g.add(shade);
+      const bulb=new THREE.Mesh(new THREE.SphereGeometry(0.05,8,8),
+        new THREE.MeshStandardMaterial({color:0xFFFFDD,emissive:0xFFFF88,emissiveIntensity:1}));
+      bulb.position.set(0,0.94,0);g.add(bulb);
+    }
+  else if(type==='plant-pot'){
+      P(g,CYL(0.16,0.12,0.22,12,0.8),0,0.11,0);
+      P(g,SPH(0.22,0x228B22,0.95),0,0.38,0);
+      P(g,SPH(0.16,0x1A6A1A,0.95),0.1,0.46,0.08);
+      P(g,SPH(0.14,0x2E8B22,0.95),-0.08,0.44,-0.06);
+    }
+  else if(type==='rug'){
+      P(g,B(0.92,0.03,0.62,0xCC3333,0.98),0,0.015,0);
+      P(g,B(0.88,0.02,0.58,0xFF5555,0.98),0,0.025,0);
+      // Pattern lines
+      [[-0.3,0],[0,0],[0.3,0]].forEach(([rx])=>{
+        const line=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.01,0.5),
+          new THREE.MeshStandardMaterial({color:0xFFD700,roughness:0.98}));
+        line.position.set(rx,0.036,0);g.add(line);
+      });
+    }
+  else if(type==='curtains'){
+      // Two curtain panels
+      [-0.28,0.28].forEach(cx=>{
+        const panel=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.9,0.06),
+          new THREE.MeshStandardMaterial({color:0x8844AA,roughness:0.95,side:THREE.DoubleSide}));
+        panel.position.set(cx,0.45,0);g.add(panel);
+        // Folds
+        for(let i=0;i<3;i++){
+          const fold=new THREE.Mesh(new THREE.BoxGeometry(0.04,0.88,0.03),
+            new THREE.MeshStandardMaterial({color:0x6633AA,roughness:0.95}));
+          fold.position.set(cx-0.08+i*0.08,0.44,0.04);g.add(fold);
+        }
+      });
+      P(g,B(0.72,0.04,0.06,0x888866,0.4,0.5),0,0.92,0);
+    }
+  else if(type==='dresser'){
+      P(g,B(0.82,0.72,0.42,0xC4945A,0.8),0,0.36,0);
+      P(g,B(0.84,0.04,0.44,0xD4A855,0.6),0,0.74,0);
+      [0.08,0.26,0.48,0.64].forEach(dy=>{
+        P(g,B(0.74,0.14,0.03,0xD4A855,0.7),0,dy,0.225);
+        P(g,B(0.08,0.02,0.02,0xFFD700,0.3,0.8),0,dy,0.235);
+      });
+    }
+  else if(type==='mirror-wall'){
+      P(g,B(0.7,0.92,0.04,0xC4945A,0.7),0,0.46,0);
+      P(g,B(0.62,0.84,0.03,0xAADDFF,0.0,0.3),0,0.46,0.025);
+      const shine=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.6,0.01),
+        new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:0.25}));
+      shine.position.set(-0.14,0.52,0.03);g.add(shine);
+    }
+  else if(type==='bedside-lamp'){
+      P(g,B(0.28,0.28,0.26,0xD4A855,0.8),0,0.14,0);
+      P(g,CYL(0.015,0.015,0.22,8,0.4,0.6),0,0.39,0);
+      const sh=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.13,0.14,12,1,true),
+        new THREE.MeshStandardMaterial({color:0xFFEE88,roughness:0.8,side:THREE.DoubleSide}));
+      sh.position.set(0,0.57,0);g.add(sh);
+    }
+  else if(type==='clock'){
+      P(g,CYL(0.22,0.22,0.06,0x444444,16,0.3,0.3),0,0.3,0);
+      P(g,CYL(0.19,0.19,0.02,0xFFFFFF,16,0.2),0,0.34,0);
+      // Hands
+      const hand1=new THREE.Mesh(new THREE.BoxGeometry(0.02,0.14,0.01),
+        new THREE.MeshStandardMaterial({color:0x111111}));
+      hand1.position.set(0,0.41,0);g.add(hand1);
+      const hand2=new THREE.Mesh(new THREE.BoxGeometry(0.015,0.1,0.01),
+        new THREE.MeshStandardMaterial({color:0x333333}));
+      hand2.rotation.z=Math.PI/3;hand2.position.set(-0.04,0.39,0);g.add(hand2);
+    }
+  else if(type==='microwave'){
+      P(g,B(0.58,0.34,0.38,0x888888,0.3,0.2),0,0.17,0);
+      P(g,B(0.38,0.28,0.03,0x444444,0.3),0.08,0.17,0.205);
+      P(g,B(0.34,0.22,0.02,0x001133,0.0),0.08,0.17,0.215);
+      P(g,B(0.14,0.28,0.03,0x888888,0.3),-0.2,0.17,0.205);
+      P(g,B(0.02,0.14,0.02,0x444444,0.3),-0.14,0.17,0.22);
+    }
+  else if(type==='kitchen-sink'){
+      P(g,B(0.72,0.18,0.52,0xBBCCDD,0.2,0.3),0,0.09,0);
+      P(g,B(0.68,0.08,0.48,0x8899AA,0.1,0.2),0,0.2,0);
+      P(g,CYL(0.02,0.02,0.14,8,0.1,0.9),0,0.28,0);
+      P(g,CYL(0.03,0.03,0.04,8,0.1,0.8),0.05,0.36,0);
+      P(g,CYL(0.03,0.03,0.04,8,0.1,0.8),-0.05,0.36,0);
+    }
+  else if(type==='bar-stool'){
+      P(g,CYL(0.14,0.14,0.04,12,0.7),0,0.56,0);
+      P(g,CYL(0.03,0.03,0.52,8,0.4,0.5),0,0.3,0);
+      P(g,CYL(0.18,0.18,0.02,4,0.5),0,0.04,0);
+    }
+  else if(type==='towel-rail'){
+      P(g,B(0.02,0.52,0.06,0xCCCCCC,0.2,0.8),-0.3,0.26,0);
+      P(g,B(0.02,0.52,0.06,0xCCCCCC,0.2,0.8),0.3,0.26,0);
+      P(g,B(0.62,0.02,0.06,0xCCCCCC,0.2,0.8),0,0.5,0);
+      P(g,B(0.62,0.02,0.06,0xCCCCCC,0.2,0.8),0,0.2,0);
+      // Towel
+      P(g,B(0.5,0.24,0.04,0xFF6677,0.95),0,0.35,0.03);
+    }
+  else if(type==='bathroom-cab'){
+      P(g,B(0.72,0.52,0.18,0xDDDDEE,0.3,0.1),0,0.26,0);
+      P(g,B(0.68,0.48,0.14,0xEEEEFF,0.1,0.3),0,0.26,0.02);
+      P(g,B(0.68,0.02,0.02,0xAAAAAA,0.2,0.6),0,0.5,0.09);
+    }
+  else if(type==='bbq'){
+      P(g,CYL(0.28,0.28,0.18,16,0.4),0,0.52,0);
+      P(g,CYL(0.3,0.3,0.02,16,0.3),0,0.62,0);
+      P(g,B(0.46,0.02,0.46,0x333333,0.5,0.3),0,0.54,0);
+      [[-0.18,-0.18],[0.18,-0.18],[-0.18,0.18],[0.18,0.18]].forEach(([lx,lz])=>{
+        P(g,CYL(0.03,0.03,0.48,6,0.4,0.5),lx,0.24,lz);
+        P(g,B(0.04,0.04,0.32,0x333333,0.5),0,0.08,lz);
+      });
+    }
+  else if(type==='garden-chair'){
+      P(g,B(0.52,0.06,0.48,0x228B22,0.8),0,0.28,0);
+      P(g,B(0.52,0.42,0.06,0x228B22,0.8),0,0.49,-0.21);
+      [[-0.22,-0.2],[0.22,-0.2],[-0.22,0.2],[0.22,0.2]].forEach(([lx,lz])=>P(g,B(0.04,0.26,0.04,0x1A6A1A,0.8),lx,0.13,lz));
+    }
+  else if(type==='garden-table'){
+      P(g,CYL(0.38,0.38,0.04,16,0.6),0,0.44,0);
+      P(g,CYL(0.04,0.04,0.42,8,0.5),0,0.21,0);
+      P(g,CYL(0.24,0.24,0.04,8,0.5),0,0.02,0);
+    }
+  else if(type==='umbrella'){
+      P(g,CYL(0.02,0.02,0.9,8,0.4,0.5),0,0.45,0);
+      // Canopy
+      const canopy=new THREE.Mesh(new THREE.ConeGeometry(0.52,0.28,12,1,true),
+        new THREE.MeshStandardMaterial({color:0xFF6622,roughness:0.9,side:THREE.DoubleSide}));
+      canopy.position.set(0,0.94,0);canopy.rotation.y=Math.PI;g.add(canopy);
+      P(g,CYL(0.02,0.08,0.06,6,0.5),0,0.06,0);
+    }
+  else if(type==='flower-pot'){
+      P(g,CYL(0.18,0.13,0.24,12,0.8),0,0.12,0);
+      P(g,CYL(0.2,0.2,0.02,12,0.7),0,0.25,0);
+      P(g,SPH(0.16,0x228B22,0.95),0,0.38,0);
+      P(g,SPH(0.1,0xFF4455,0.9),-0.06,0.46,-0.04);
+      P(g,SPH(0.1,0xFF8800,0.9),0.06,0.46,0.04);
+      P(g,SPH(0.08,0xFFDD00,0.9),0,0.48,0.08);
+    }
+  else if(type==='stairs'){
+      for(let s=0;s<4;s++){
+        P(g,B(0.92,0.12,0.22,0xD4A855,0.7),0,s*0.24+0.06,-0.33+s*0.22);
+      }
+    }
+  else if(type==='pillar'){
+      P(g,CYL(0.18,0.22,0.96,16,0.5),0,0.48,0);
+      P(g,CYL(0.24,0.24,0.06,16,0.5),0,0.97,0);
+      P(g,CYL(0.24,0.24,0.06,16,0.5),0,0.03,0);
+    }
+  else if(type==='arch-stone'){
+      P(g,B(0.14,0.92,0.22,0xAA9988,0.9),-0.38,0.46,0);
+      P(g,B(0.14,0.92,0.22,0xAA9988,0.9),0.38,0.46,0);
+      // Arch top
+      const pts=[];
+      for(let i=0;i<=12;i++){const a=i/12*Math.PI;pts.push(new THREE.Vector2(Math.cos(a)*0.38,Math.sin(a)*0.28));}
+      pts.push(new THREE.Vector2(-0.38,0));pts.push(new THREE.Vector2(-0.52,0));
+      for(let i=12;i>=0;i--){const a=i/12*Math.PI;pts.push(new THREE.Vector2(Math.cos(a)*0.52,Math.sin(a)*0.38));}
+      const archShape=new THREE.Shape(pts);
+      const archGeo=new THREE.ExtrudeGeometry(archShape,{depth:0.22,bevelEnabled:false});
+      const archM=new THREE.Mesh(archGeo,new THREE.MeshStandardMaterial({color:0xAA9988,roughness:0.9}));
+      archM.position.set(0,0.92,-0.11);archM.rotation.x=Math.PI/2;g.add(archM);
+    }
+  else if(type==='balcony-rail'){
+      P(g,B(0.96,0.04,0.06,0xCCCCCC,0.3,0.5),0,0.62,0);
+      P(g,B(0.96,0.04,0.06,0xCCCCCC,0.3,0.5),0,0.32,0);
+      for(let i=0;i<7;i++) P(g,B(0.04,0.62,0.04,0xAAAAAA,0.3,0.5),-0.42+i*0.14,0.31,0);
+    }
+  else if(type==='gate'){
+      [[-0.36,0],[0.36,0]].forEach(([px])=>{
+        P(g,B(0.08,0.82,0.06,0x8B5E3C,0.7),px,0.41,0);
+      });
+      P(g,B(0.56,0.04,0.06,0xAA7733,0.7),0,0.68,0);
+      P(g,B(0.56,0.04,0.06,0xAA7733,0.7),0,0.36,0);
+      P(g,B(0.56,0.04,0.06,0xAA7733,0.7),0,0.12,0);
+      P(g,B(0.04,0.14,0.04,0xFFD700,0.3,0.8),0.2,0.5,0.04);
+    }
+  else if(type==='letterbox'){
+      P(g,B(0.36,0.3,0.22,0xCC3333,0.7),0,0.55,0);
+      P(g,B(0.38,0.32,0.24,0xAA2222,0.7),0,0.55,0);
+      P(g,B(0.24,0.04,0.06,0x222222,0.5),0,0.54,0.12);
+      P(g,CYL(0.03,0.03,0.38,6,0.4,0.4),0,0.19,0);
+    }
+  else if(type==='garage-door'){
+      P(g,B(0.94,0.78,0.06,0xCCCCCC,0.4,0.2),0,0.39,0);
+      [0.1,0.3,0.5,0.68].forEach(dy=>P(g,B(0.9,0.01,0.04,0xAAAAAA,0.3),0,dy,0.04));
+      P(g,B(0.08,0.06,0.04,0xFFD700,0.3,0.5),-0.02,0.39,0.06);
+    }"
+  else if(type==='pillar'){
+      P(g,CYL(0.18,0.22,0.96,16,0.5),0,0.48,0);
+      P(g,CYL(0.24,0.24,0.06,16,0.5),0,0.97,0);
+      P(g,CYL(0.24,0.24,0.06,16,0.5),0,0.03,0);
     }
   }catch(err){
     console.error('buildFurniture',type,err.message);
@@ -1002,10 +1275,16 @@ canvas.addEventListener('pointerup',e=>{
         if(t&&placed[t.userData.key])selectObject(t);
         else deselect();
       } else if(mode==='erase'){
+        // Walk up through parent chain to find placed mesh
         let t=hits[0].object;
-        while(t&&!placed[t.userData.key])t=t.parent;
-        if(t&&placed[t.userData.key]){
-          const{x,y,z}=t.userData;removeBlock(x,y,z);sndErase();
+        let safetyLimit=10;
+        while(t && !placed[t.userData.key] && safetyLimit-->0){
+          t=t.parent;
+        }
+        if(t&&t.userData&&placed[t.userData.key]){
+          const{x,y,z}=t.userData;
+          removeBlock(x,y,z,true);sndErase();
+          toast('🗑️ Block removed!');
         }
       }
     } else {
@@ -1019,6 +1298,27 @@ canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{
   camRadius=Math.max(2,Math.min(80,camRadius+e.deltaY*0.04));
   updateCamera();
+},{passive:true});
+
+// Mobile pinch zoom — canvas only
+let lastPinchDist=0;
+canvas.addEventListener('touchstart',e=>{
+  if(e.touches.length===2){
+    lastPinchDist=Math.hypot(
+      e.touches[0].clientX-e.touches[1].clientX,
+      e.touches[0].clientY-e.touches[1].clientY
+    );
+  }
+},{passive:true});
+canvas.addEventListener('touchmove',e=>{
+  if(e.touches.length===2){
+    const dist=Math.hypot(
+      e.touches[0].clientX-e.touches[1].clientX,
+      e.touches[0].clientY-e.touches[1].clientY
+    );
+    camRadius=Math.max(2,Math.min(80,camRadius-(dist-lastPinchDist)*0.05));
+    updateCamera();lastPinchDist=dist;
+  }
 },{passive:true});
 
 // ── KEYBOARD ──────────────────────────────────────────
@@ -1123,9 +1423,15 @@ function setMode(m){
   const hints={
     build:'Left-click: place · Right-drag: orbit · Scroll: zoom',
     select:'Click object → drag handles · R: rotate · Arrows: move · Del: delete',
-    erase:'Click blocks to remove them'
+    erase:'Click any block to remove it'
   };
   toast(hints[m]||m);
+  const modeHints={
+    build:'🧱 <b style="color:#FFD700;">BUILD MODE</b><br>Click to place selected block<br>Right-drag or Space+drag to orbit<br>Scroll/pinch to zoom in/out',
+    select:'✋ <b style="color:#FFD700;">SELECT MODE</b><br>Click any block to select<br>Drag coloured arrows to move<br>Drag rings to rotate<br>Drag gold cubes to scale<br>R = rotate Y · Del = delete',
+    erase:'🗑️ <b style="color:#FFD700;">ERASE MODE</b><br>Click any block to delete it<br>Click and drag to erase many'
+  };
+  document.getElementById('modeHint').innerHTML=modeHints[m]||'';
 }
 
 function undo(){
