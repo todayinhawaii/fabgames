@@ -559,9 +559,17 @@ sunLight.shadow.camera.bottom = -40;
 sunLight.shadow.bias = -0.001;
 scene.add(sunLight);
 
-const fillLight = new THREE.DirectionalLight(0xaaddff, 0.4);
+const fillLight = new THREE.DirectionalLight(0xaaddff, 0.5);
 fillLight.position.set(-10, 10, -10);
 scene.add(fillLight);
+
+const fillLight2 = new THREE.DirectionalLight(0xffffee, 0.3);
+fillLight2.position.set(10, 5, 10);
+scene.add(fillLight2);
+
+const fillLight3 = new THREE.DirectionalLight(0xeeeeff, 0.2);
+fillLight3.position.set(0, -5, 10);
+scene.add(fillLight3);
 
 setLoad(45);
 
@@ -589,8 +597,10 @@ const skyMat = new THREE.MeshBasicMaterial({
 scene.add(new THREE.Mesh(skyGeo, skyMat));
 
 // Clouds
+const clouds = []; // track clouds separately!
 function makeCloud(x,y,z){
   const g = new THREE.Group();
+  g.userData.isCloud = true; // tag as cloud
   [[0,0,0,2],[2,0.5,0,1.5],[-2,0.3,0,1.3],[1,-0.3,1.5,1.2],[-1,-0.2,-1.5,1.1]].forEach(([cx,cy,cz,r])=>{
     const m = new THREE.Mesh(
       new THREE.SphereGeometry(r,8,6),
@@ -601,6 +611,7 @@ function makeCloud(x,y,z){
   });
   g.position.set(x,y,z);
   scene.add(g);
+  clouds.push(g); // track it!
   return g;
 }
 [[-20,30,-30],[-40,35,10],[20,28,40],[50,32,-20],[-10,40,60]].forEach(([x,y,z])=>makeCloud(x,y,z));
@@ -1138,10 +1149,11 @@ function placeBlock(x,y,z,blockType,record=true){
   let mesh;
 
   if(FURNITURE_TYPES.has(blockType)){
-    // Build detailed 3D furniture group
     mesh = buildFurniture(blockType);
+    // Snap furniture to floor: always use y as the floor level
+    // furniture geometry starts at local y=0 so it sits correctly
     mesh.position.set(x+0.5, y, z+0.5);
-    mesh.scale.set(1.8, 1.8, 1.8); // Scale up so furniture fills the grid cell
+    mesh.scale.setScalar(0.88); // Slightly smaller so it fits nicely in cell
   } else if(bd.shape==='wedge'){
     const geo = getGeo('wedge').clone();
     mesh = new THREE.Mesh(geo, getMat(blockType));
@@ -1168,6 +1180,9 @@ function placeBlock(x,y,z,blockType,record=true){
   });
   scene.add(mesh);
   placed[bk] = {mesh, blockType};
+  if(FURNITURE_TYPES.has(blockType)){
+    console.log('Placed',blockType,'at grid(',x,y,z,') world y=',mesh.position.y);
+  }
 
   if(record){
     undoStack.push({action:'place',bk,blockType,x,y,z});
@@ -1215,7 +1230,10 @@ function updateGhost(pos){
   if(!bd || mode !== 'build'){ ghostMesh.visible=false; return; }
   ghostMesh.visible = true;
   ghostMesh.material.color.set(new THREE.Color(bd.color));
-  ghostMesh.position.set(pos.x+0.5, pos.y+0.5, pos.z+0.5);
+  // Furniture sits at floor level (y), regular blocks at center (y+0.5)
+  const isFurn = FURNITURE_TYPES.has(currentBlock);
+  ghostMesh.position.set(pos.x+0.5, isFurn ? pos.y+0.3 : pos.y+0.5, pos.z+0.5);
+  ghostMesh.scale.set(isFurn?0.9:1, isFurn?0.6:1, isFurn?0.9:1);
   ghostPos = pos;
 }
 
@@ -1242,9 +1260,23 @@ function raycast(event){
 
 function getPlacePos(hit){
   const n = hit.face.normal.clone();
-  // Snap to grid
   const p = hit.point.clone().add(n.multiplyScalar(0.5));
-  return new THREE.Vector3(Math.floor(p.x), Math.floor(p.y), Math.floor(p.z));
+  const pos = new THREE.Vector3(Math.floor(p.x), Math.floor(p.y), Math.floor(p.z));
+
+  // For furniture: snap to lowest available floor in this column
+  if(FURNITURE_TYPES.has(currentBlock)){
+    // Find the topmost solid block in this column to place furniture on top of
+    let floorY = 0; // default = ground level
+    for(let testY = -1; testY <= 20; testY++){
+      const testKey = blockKey(pos.x, testY, pos.z);
+      if(placed[testKey] && !FURNITURE_TYPES.has(placed[testKey].blockType)){
+        floorY = testY + 1; // place furniture on top of this block
+      }
+    }
+    return new THREE.Vector3(pos.x, floorY, pos.z);
+  }
+
+  return pos;
 }
 
 // ── ORBIT CONTROLS (manual) ────────────────────────────
@@ -1764,10 +1796,10 @@ let frameCount=0;
 function animate(){
   requestAnimationFrame(animate);
   frameCount++;
-  // Animate clouds slowly
+  // Animate ONLY clouds (not furniture!)
   if(frameCount%2===0){
-    scene.children.filter(c=>c.isGroup).forEach((g,i)=>{
-      g.position.x+=0.005*(i%2===0?1:-1);
+    clouds.forEach((g,i)=>{
+      g.position.x += 0.008*(i%2===0?1:-1);
       if(g.position.x>80) g.position.x=-80;
       if(g.position.x<-80) g.position.x=80;
     });
