@@ -498,6 +498,10 @@ def tic_tac_toe():
 def galaxy_explorer():
     return send_from_directory('.', 'galaxy-explorer.html')
 
+@app.route('/fab-house')
+def fab_house():
+    return send_from_directory('.', 'fab-house.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
