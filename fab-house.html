@@ -2226,6 +2226,7 @@ function gizmoScale(factor){
 }
 
 function gizmoDuplicate(){
+  if(selectedWall){ toast('Use Copy: select wall, Ctrl+D not yet supported');return; }
   if(!selectedObj){toast('Select something first!');return;}
   const{x,y,z,type}=selectedObj.mesh.userData;
   const rot=selectedObj.mesh.rotation.clone();
@@ -2239,6 +2240,7 @@ function gizmoDuplicate(){
 }
 
 function gizmoDelete(){
+  if(selectedWall){ deleteSelectedWall(); return; }
   if(!selectedObj){return;}
   const{x,y,z}=selectedObj.mesh.userData;
   deselect();removeBlock(x,y,z);
@@ -2331,9 +2333,10 @@ canvas.addEventListener('pointerdown',e=>{
   prevMouse={x:e.clientX,y:e.clientY};
   isDown=true;hasMoved=false;
 
+  // RIGHT click or space = orbit always (even in wall mode)
   if(e.button===2||e.button===1||spaceDown){isOrbiting=true;return;}
 
-  // WALL DRAW — intercept left click drag
+  // WALL DRAW — intercept LEFT click only
   if(wallActive && e.button===0){
     const hits=getHits(e);
     if(hits.length>0){
@@ -2365,19 +2368,19 @@ canvas.addEventListener('pointermove',e=>{
   const dist=Math.abs(dx)+Math.abs(dy);
   if(dist>3) hasMoved=true;
 
-  // WALL DRAW — update preview while dragging
-  if(wallActive && wallDragging && wallDragStart && isDown){
+  // WALL DRAW — preview only while actively dragging a wall
+  if(wallActive && wallDragging && wallDragStart){
     const hits=getHits(e);
     if(hits.length>0){
       const p=hits[0].point;
       updateWallPreview(wallDragStart, {x:p.x,z:p.z});
     }
     prevMouse={x:e.clientX,y:e.clientY};
-    return; // don't orbit while drawing
+    return; // block orbit only during actual wall drag
   }
 
-  // If left button dragged and no active handle = ORBIT freely
-  if(isDown && hasMoved && !activeHandle && e.buttons===1){
+  // Orbit freely when: dragging with left button, no handle, not drawing wall
+  if(isDown && hasMoved && !activeHandle && e.buttons===1 && !wallDragging){
     isOrbiting=true;
   }
 
@@ -2535,23 +2538,23 @@ canvas.addEventListener('pointerup',e=>{
         }
       } else if(mode==='select'){
         const hit=hits[0];
-        // Check if hit a wall
-        let hitWall=null;
-        let checkObj=hit.object;
-        while(checkObj){
-          if(checkObj.userData&&checkObj.userData.isWall){
-            hitWall=walls[checkObj.userData.wallIdx];
-            break;
+        // Walk up to find wall or placed block
+        let foundWall=null, foundBlock=null;
+        let node=hit.object;
+        while(node){
+          if(node.userData){
+            if(node.userData.isWall && walls[node.userData.wallIdx]){
+              foundWall=walls[node.userData.wallIdx]; break;
+            }
+            if(node.userData.key && placed[node.userData.key]){
+              foundBlock=node; break;
+            }
           }
-          checkObj=checkObj.parent;
+          node=node.parent;
         }
-        if(hitWall){ selectWall(hitWall); }
-        else {
-          let t=hit.object;
-          while(t&&!placed[t.userData.key])t=t.parent;
-          if(t&&placed[t.userData.key])selectObject(t);
-          else deselect();
-        }
+        if(foundWall) selectWall(foundWall);
+        else if(foundBlock) selectObject(foundBlock);
+        else deselect();
       } else if(mode==='erase'){
         // Check if erasing a wall
         let chkE=hits[0].object;
@@ -3365,7 +3368,10 @@ setTimeout(()=>{
     // Store wall data for selection/editing
     const wallData={mesh,len,h,thick,cx,cz,fy,angle,
       matKey:document.getElementById('wallBarMat')?.value||'brick-white'};
-    mesh.userData={isWall:true, wallIdx:walls.length};
+    const wallIdx = walls.length;
+    mesh.userData={isWall:true, wallIdx:wallIdx};
+    // Tag children so clicking any part selects the wall
+    mesh.traverse(c=>{if(c!==mesh) c.userData={isWall:true, wallIdx:wallIdx};});
     walls.push(wallData);
     scene.add(mesh);
     sndPlace();
