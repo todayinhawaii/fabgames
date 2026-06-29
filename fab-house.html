@@ -2329,6 +2329,19 @@ canvas.addEventListener('pointerdown',e=>{
 
   if(e.button===2||e.button===1||spaceDown){isOrbiting=true;return;}
 
+  // WALL DRAW — intercept left click drag
+  if(wallActive && e.button===0){
+    const hits=getHits(e);
+    if(hits.length>0){
+      const p=hits[0].point;
+      wallDragStart={x:p.x, z:p.z};
+      wallDragging=true;
+    } else {
+      toast('Click on the floor/ground to start wall!');
+    }
+    return;
+  }
+
   // Check gizmo handles first
   if(mode==='select'&&gizmoGroup){
     const gh=getHitsGizmo(e);
@@ -2347,6 +2360,17 @@ canvas.addEventListener('pointermove',e=>{
   const dx=e.clientX-prevMouse.x,dy=e.clientY-prevMouse.y;
   const dist=Math.abs(dx)+Math.abs(dy);
   if(dist>3) hasMoved=true;
+
+  // WALL DRAW — update preview while dragging
+  if(wallActive && wallDragging && wallDragStart && isDown){
+    const hits=getHits(e);
+    if(hits.length>0){
+      const p=hits[0].point;
+      updateWallPreview(wallDragStart, {x:p.x,z:p.z});
+    }
+    prevMouse={x:e.clientX,y:e.clientY};
+    return; // don't orbit while drawing
+  }
 
   // If left button dragged and no active handle = ORBIT freely
   if(isDown && hasMoved && !activeHandle && e.buttons===1){
@@ -2416,6 +2440,18 @@ canvas.addEventListener('pointermove',e=>{
 canvas.addEventListener('pointerup',e=>{
   if(!downOnCanvas){isDown=false;return;}
   downOnCanvas=false;
+
+  // WALL DRAW — place wall on release
+  if(wallActive && wallDragging && wallDragStart){
+    const hits=getHits(e);
+    if(hits.length>0){
+      const p=hits[0].point;
+      placeRealWall(wallDragStart,{x:p.x,z:p.z});
+    }
+    wallDragging=false; wallDragStart=null;
+    if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
+    isDown=false; return;
+  }
 
   if(activeHandle){
     activeHandle=null;
