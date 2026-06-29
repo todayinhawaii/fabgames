@@ -75,22 +75,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   border-left:2px solid rgba(255,215,0,0.15);
   display:flex;flex-direction:column;align-items:center;padding:10px 6px;gap:7px;overflow-y:auto;
 }
-.r-btn{width:60px;height:58px;border-radius:12px;display:flex;flex-direction:column;
+.r-btn{width:62px;height:54px;border-radius:12px;display:flex;flex-direction:column;
   align-items:center;justify-content:center;cursor:pointer;
-  border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);
+  border:2px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);
   transition:all 0.15s;gap:3px;flex-shrink:0;}
-.r-btn:hover{border-color:rgba(255,215,0,0.5);background:rgba(255,215,0,0.1);transform:scale(1.05);}
-.r-btn.active{border-color:#FFD700;background:rgba(255,215,0,0.18);box-shadow:0 0 14px rgba(255,215,0,0.3);}
+.r-btn:hover{border-color:rgba(255,215,0,0.6);background:rgba(255,215,0,0.12);
+  transform:scale(1.06);box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+.r-btn.active{border-color:#FFD700;background:rgba(255,215,0,0.2);
+  box-shadow:0 0 16px rgba(255,215,0,0.35);}
 .r-icon{font-size:22px;line-height:1;}
-.r-label{font-size:8px;color:rgba(255,255,255,0.5);font-weight:700;text-align:center;}
-.r-divider{width:50px;height:1px;background:rgba(255,255,255,0.08);flex-shrink:0;}
+.r-label{font-size:8px;color:rgba(255,255,255,0.6);font-weight:700;text-align:center;
+  font-family:'Fredoka One',cursive;letter-spacing:0.5px;}
+.r-divider{width:52px;height:1px;background:rgba(255,255,255,0.1);flex-shrink:0;margin:2px 0;}
 
 /* ── BOTTOM BAR ── */
 #bottomBar{
-  position:fixed;bottom:0;left:220px;right:76px;z-index:90;height:56px;
+  position:fixed;bottom:0;left:220px;right:76px;z-index:90;height:52px;
   display:flex;align-items:center;justify-content:center;gap:8px;
   background:rgba(8,8,18,0.97);backdrop-filter:blur(14px);
-  border-top:2px solid rgba(255,215,0,0.15);padding:0 10px;
+  border-top:2px solid rgba(255,215,0,0.15);padding:0 12px;
 }
 .b-btn{font-family:'Fredoka One',cursive;font-size:13px;padding:9px 14px;border-radius:12px;
   border:none;cursor:pointer;transition:all 0.15s;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,0.4);}
@@ -99,6 +102,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 .b-btn.green{background:linear-gradient(135deg,#00aa44,#007722);color:#fff;}
 .b-btn.orange{background:linear-gradient(135deg,#ff8800,#cc5500);color:#fff;}
 .b-btn.gold{background:linear-gradient(135deg,#FFD700,#FF8C00);color:#000;}
+.b-btn.danger{background:linear-gradient(135deg,#CC2200,#881100);color:#fff;}
 
 /* ── TRANSFORM GIZMO PANEL ── */
 #gizmoPanel{
@@ -221,15 +225,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 <div id="topbar">
   <div class="logo">🏠 FAB HOUSE</div>
-  <button class="top-btn" onclick="undo()">↩ Undo</button>
-  <button class="top-btn" onclick="clearAll()">✕ Clear</button>
   <div class="spacer"></div>
-  <div id="modeLabel">🧱 BUILD</div>
-  <button class="top-btn gold" onclick="saveScreenshot()">📸 Save</button>
-  <button onclick="showCredits()" class="top-btn" style="font-size:11px;">📜 Credits</button>
-  <a href="/" style="font-family:'Fredoka One',cursive;font-size:12px;padding:5px 11px;
-    border-radius:10px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);
-    border:1px solid rgba(255,255,255,0.15);text-decoration:none;">🏠</a>
+  <div id="modeLabel" style="cursor:default;">🧱 BUILD</div>
+  <div class="spacer"></div>
+  <button class="top-btn gold" onclick="saveScreenshot()" title="Save screenshot">📸 Save</button>
+  <button onclick="showCredits()" class="top-btn" title="View model credits">📜 Credits</button>
+  <a href="/" title="Back to fab.games" style="font-family:'Fredoka One',cursive;font-size:12px;
+    padding:5px 11px;border-radius:10px;background:rgba(255,255,255,0.08);
+    color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);text-decoration:none;">← Home</a>
 </div>
 
 <div id="palette" onpointerdown="event.stopPropagation()"></div>
@@ -2668,6 +2671,14 @@ function setMode(m){
   });
   const labels={build:'🧱 BUILD',select:'✋ SELECT',erase:'🗑️ ERASE',room:'🏠 ROOM BUILDER'};
   document.getElementById('modeLabel').textContent=labels[m]||m;
+  const hints2={
+    build:'🧱 Click to place · Drag to orbit · Scroll to zoom · Alt+Click to delete',
+    select:'✋ Click block to select · Arrow keys move it · E=up C=down · Rotate panel below',
+    erase:'🗑️ Click blocks to erase · Drag to erase many · Alt+Click works in any mode',
+    room:'🏠 Set room size & materials · Click Build Room!'
+  };
+  const bh=document.getElementById('bottomHint');
+  if(bh) bh.textContent=hints2[m]||'';
   // Show/hide room panel
   const rp=document.getElementById('roomPanel');
   if(m==='room'){ rp.classList.add('show'); initRoomBuilder(); }
@@ -2927,6 +2938,27 @@ function buildRoom(){
 
   setMode('build');
   toast(`🏠 Room built! ${count} blocks placed · Walk inside with W key!`);
+}
+
+function quickFloor(){
+  const y=currentFloor;
+  for(let x=0;x<8;x++) for(let z=0;z<8;z++) placeBlock(x,y,z,'floor-wood');
+  toast('🟫 Floor plate added at level '+(currentFloor+1)+'!');
+}
+function quickWalls(){
+  const y=currentFloor;
+  for(let x=0;x<8;x++){
+    placeBlock(x,y+1,0,currentBlock);placeBlock(x,y+1,7,currentBlock);
+  }
+  for(let z=1;z<7;z++){
+    placeBlock(0,y+1,z,currentBlock);placeBlock(7,y+1,z,currentBlock);
+  }
+  toast('🧱 Walls added at level '+(currentFloor+1)+'!');
+}
+function quickRoof(){
+  const y=currentFloor+5;
+  for(let x=0;x<8;x++) for(let z=0;z<8;z++) placeBlock(x,y,z,'roof-red');
+  toast('🔺 Roof added!');
 }
 
 function saveScreenshot(){
