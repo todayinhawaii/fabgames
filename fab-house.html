@@ -161,33 +161,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 .load-bar-wrap{width:200px;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;}
 .load-bar{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);border-radius:4px;width:0%;transition:width 0.3s;}
 
-/* ── WALL DRAW PANEL ── */
-#wallPanel{
-  position:fixed;inset:0;z-index:1000;
-  display:none;align-items:center;justify-content:center;
-  background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
-}
-#wallPanel.show{display:flex;}
-#wallPanelInner{
-  background:#0d1117;border:2px solid rgba(100,200,255,0.6);border-radius:22px;
-  padding:24px 28px;display:flex;flex-direction:column;align-items:center;gap:14px;
-  box-shadow:0 0 60px rgba(100,200,255,0.3);max-width:460px;width:92vw;
-}
-.wp-title{font-family:'Fredoka One',cursive;font-size:20px;color:#88DDFF;letter-spacing:1px;}
-.wp-row{display:flex;align-items:center;gap:10px;width:100%;}
-.wp-label{font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,255,255,0.6);width:80px;}
-.wp-val{font-family:'Fredoka One',cursive;font-size:14px;color:#88DDFF;width:32px;text-align:center;}
-.wp-slider{flex:1;accent-color:#88DDFF;cursor:pointer;}
-.wp-swatch{width:32px;height:32px;border-radius:8px;border:2px solid rgba(255,255,255,0.15);cursor:pointer;transition:transform 0.15s;}
-.wp-swatch:hover{transform:scale(1.15);border-color:#88DDFF;}
-.wp-swatch.active{border-color:#88DDFF;box-shadow:0 0 10px rgba(100,200,255,0.5);}
-.wp-swatches{display:flex;gap:6px;flex-wrap:wrap;}
-.wp-btn{font-family:'Fredoka One',cursive;font-size:14px;padding:10px 20px;border-radius:12px;
-  border:none;cursor:pointer;transition:all 0.15s;box-shadow:0 3px 0 rgba(0,0,0,0.4);}
-.wp-btn.go{background:linear-gradient(135deg,#00AAFF,#0066CC);color:#fff;}
-.wp-btn.cancel{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);}
-.wall-hint{font-size:12px;color:rgba(255,255,255,0.4);text-align:center;font-family:'Nunito',sans-serif;line-height:1.6;}
-
 /* ── ROOM BUILDER ── */
 #roomPanel{
   position:fixed;inset:0;z-index:1000;
@@ -283,11 +256,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
     <div class="r-icon">🏠</div>
     <div class="r-label">ROOM</div>
   </div>
-  <div class="r-btn" id="rWall" title="Draw Walls — click and drag to draw walls"
-    onclick="event.stopPropagation();setMode('wall');">
-    <div class="r-icon">📐</div>
-    <div class="r-label">WALLS</div>
-  </div>
+
   <div class="r-divider"></div>
   <div style="font-size:9px;color:rgba(255,215,0,0.5);letter-spacing:1px;font-family:'Fredoka One',cursive;padding:4px 0 2px;">VIEW</div>
   <div class="r-btn" onclick="resetCamera()" title="Reset camera view">
@@ -460,71 +429,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
   <div class="rp-preview" id="rpPreview">7 × 7 × 4 = ~196 blocks</div>
 
-  <div style="display:flex;gap:10px;margin-top:4px;">
+  <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;justify-content:center;">
     <button class="rp-btn build" onclick="buildRoom()">🏗️ Build Room!</button>
+    <button class="rp-btn" style="background:linear-gradient(135deg,#0088ff,#0044cc);color:#fff;" 
+      onclick="startWallClickMode()">📐 Draw Walls</button>
     <button class="rp-btn cancel" onclick="setMode('build')">✕ Cancel</button>
   </div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center;font-family:'Nunito',sans-serif;">
+    Draw Walls: click 1st corner → click 2nd corner → wall appears!
+  </div>
 </div><!-- end roomPanelInner -->
-</div>
-
-<!-- WALL DRAW PANEL -->
-<div id="wallPanel" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()">
-<div id="wallPanelInner">
-  <div class="wp-title">📐 DRAW WALLS</div>
-  <div class="wall-hint">
-    Click and drag on the floor to draw walls!<br>
-    Walls snap to the grid automatically.
-  </div>
-
-  <!-- WALL MATERIAL -->
-  <div class="wp-row">
-    <div class="wp-label">Material</div>
-    <div class="wp-swatches" id="wpMatSwatches"></div>
-  </div>
-  <div class="wp-row" style="justify-content:center;">
-    <div id="wpMatName" style="font-family:'Fredoka One',cursive;font-size:13px;color:#88DDFF;"></div>
-  </div>
-
-  <!-- WALL HEIGHT -->
-  <div class="wp-row">
-    <div class="wp-label">Height</div>
-    <input type="range" class="wp-slider" id="wpHeight" min="1" max="8" value="3"
-      oninput="document.getElementById('wpHeightVal').textContent=this.value">
-    <div class="wp-val" id="wpHeightVal">3</div>
-    <div style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.3);">blocks</div>
-  </div>
-
-  <!-- FLOOR Y -->
-  <div class="wp-row">
-    <div class="wp-label">Floor</div>
-    <input type="range" class="wp-slider" id="wpFloorY" min="0" max="10" value="0"
-      oninput="document.getElementById('wpFloorYVal').textContent=parseInt(this.value)+1">
-    <div class="wp-val" id="wpFloorYVal">1</div>
-  </div>
-
-  <!-- ADD WINDOWS OPTION -->
-  <div class="wp-row" style="gap:16px;">
-    <label style="display:flex;align-items:center;gap:6px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,255,255,0.7);cursor:pointer;">
-      <input type="checkbox" id="wpAddWindows" style="accent-color:#88DDFF;width:16px;height:16px;">
-      Add windows every 3 blocks
-    </label>
-    <label style="display:flex;align-items:center;gap:6px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,255,255,0.7);cursor:pointer;">
-      <input type="checkbox" id="wpDouble" style="accent-color:#88DDFF;width:16px;height:16px;">
-      Double thickness
-    </label>
-  </div>
-
-  <div style="display:flex;gap:10px;margin-top:4px;">
-    <button class="wp-btn go" onclick="startWallDraw()">✏️ Start Drawing!</button>
-    <button class="wp-btn cancel" onclick="setMode('build')">✕ Cancel</button>
-  </div>
-
-  <div class="wall-hint" style="color:rgba(100,200,255,0.5);">
-    After clicking Start Drawing:<br>
-    🖱️ Click floor = start wall · Drag = draw · Release = place!<br>
-    Press <b style="color:#88DDFF;">Esc</b> to stop drawing
-  </div>
-</div>
 </div>
 
 <!-- CREDITS PANEL -->
@@ -2370,21 +2284,6 @@ canvas.addEventListener('pointerdown',e=>{
 
   if(e.button===2||e.button===1||spaceDown){isOrbiting=true;return;}
 
-  // ── WALL DRAW: capture start on click ──
-  if(mode==='wall' && e.button===0){
-    const hits=getHits(e);
-    if(hits.length>0){
-      const pos=getPlacePos(hits[0]);
-      wallDragStart={x:pos.x,y:pos.y,z:pos.z};
-      wallDragCurrent=null;
-      isDown=true; hasMoved=false;
-      toast('📐 Drag to draw wall · Release to place!');
-    } else {
-      toast('📐 Click on the ground or floor to start!');
-    }
-    return;
-  }
-
   // Check gizmo handles first
   if(mode==='select'&&gizmoGroup){
     const gh=getHitsGizmo(e);
@@ -2403,20 +2302,6 @@ canvas.addEventListener('pointermove',e=>{
   const dx=e.clientX-prevMouse.x,dy=e.clientY-prevMouse.y;
   const dist=Math.abs(dx)+Math.abs(dy);
   if(dist>3) hasMoved=true;
-
-  // Wall draw mode — show live preview, BLOCK orbit
-  if(mode==='wall'){
-    if(wallDragStart && isDown){
-      const hits=getHits(e);
-      if(hits.length>0){
-        const pos=getPlacePos(hits[0]);
-        wallDragCurrent={x:pos.x,y:pos.y,z:pos.z};
-        showWallPreview(wallDragStart, wallDragCurrent);
-      }
-    }
-    prevMouse={x:e.clientX,y:e.clientY};
-    return; // never orbit in wall mode
-  }
 
   // If left button dragged and no active handle = ORBIT freely
   if(isDown && hasMoved && !activeHandle && e.buttons===1){
@@ -2490,26 +2375,6 @@ canvas.addEventListener('pointerup',e=>{
   if(activeHandle){
     activeHandle=null;
     if(selectedObj) buildGizmo(selectedObj);
-    isDown=false; isOrbiting=false; return;
-  }
-
-  // Wall draw — place on mouse release
-  if(mode==='wall'){
-    if(wallDragStart){
-      clearWallPreview();
-      if(wallDragCurrent &&
-        (wallDragCurrent.x!==wallDragStart.x || wallDragCurrent.z!==wallDragStart.z)){
-        placeWall(wallDragStart, wallDragCurrent);
-      } else {
-        // Single click = place single column
-        const h=parseInt(document.getElementById('wpHeight')?.value||3);
-        const fy=parseInt(document.getElementById('wpFloorY')?.value||0);
-        for(let y=1;y<=h;y++) placeBlock(wallDragStart.x,fy+y,wallDragStart.z,wallMat,true);
-        sndPlace();
-        toast('📐 Single wall column placed! Drag for longer walls.');
-      }
-      wallDragStart=null; wallDragCurrent=null;
-    }
     isDown=false; isOrbiting=false; return;
   }
 
@@ -2736,10 +2601,17 @@ document.addEventListener('keydown',e=>{
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
   if(e.code==='Space'){ spaceDown=true; }
   if(e.code==='Escape'){
+    // Cancel wall draw
+    if(wallClickState>0){
+      wallClickState=0; wallClickStart=null;
+      if(wallClickPreview){scene.remove(wallClickPreview);wallClickPreview=null;}
+      document.getElementById('modeLabel').textContent='🧱 BUILD';
+      const bh=document.getElementById('bottomHint');
+      if(bh) bh.textContent='🧱 Click to place · Drag to orbit · Scroll to zoom';
+      toast('Wall draw cancelled');
+    }
     deselect();
-    clearWallPreview();
-    wallDragStart=null; wallDragCurrent=null;
-    if(mode==='wall') setMode('build');
+
   }
   // Mode switching with number keys
   if(e.code==='Digit1') setMode('build');
@@ -2844,7 +2716,7 @@ function setMode(m){
   if(m!=='build' && ghostMesh) ghostMesh.visible=false;
 
   // Highlight correct mode button
-  ['build','select','erase','room','wall'].forEach(mm=>{
+  ['build','select','erase','room'].forEach(mm=>{
     const el=document.getElementById('r'+mm[0].toUpperCase()+mm.slice(1));
     if(el) el.classList.toggle('active', mm===m);
   });
@@ -2852,19 +2724,6 @@ function setMode(m){
   // Top bar mode label
   const labels={build:'🧱 BUILD',select:'✋ SELECT',erase:'🗑️ ERASE',room:'🏠 ROOM BUILDER'};
   document.getElementById('modeLabel').textContent=labels[m]||m;
-
-  // Wall panel show/hide
-  const wallPanelEl=document.getElementById('wallPanel');
-  if(wallPanelEl){
-    if(m==='wall'){
-      wallPanelEl.style.display='flex';
-      wallPanelEl.classList.add('show');
-      try{ initWallPanel(); }catch(e2){ console.error(e2); }
-    } else {
-      wallPanelEl.style.display='none';
-      wallPanelEl.classList.remove('show');
-    }
-  }
 
   // Room builder panel show/hide
   const roomPanelEl=document.getElementById('roomPanel');
@@ -2898,7 +2757,7 @@ function setMode(m){
       build:'🧱 <b style="color:#FFD700;">BUILD MODE</b><br>Click to place block<br><b style="color:#aef;">W S ⬆⬇</b> walk · <b style="color:#aef;">A D</b> strafe<br><b style="color:#aef;">Q E</b> orbit · <b style="color:#aef;">R F</b> tilt<br><b style="color:#aef;">Z X</b> fly · <b style="color:#aef;">+-</b> zoom<br><span style="color:#FF8888;">Alt+click = delete</span>',
       select:'✋ <b style="color:#FFD700;">SELECT MODE</b><br>Click block to select<br><b style="color:#aef;">Arrows</b> = move · <b style="color:#aef;">E</b>=up · <b style="color:#aef;">C</b>=down<br>Rotate buttons appear below<br><span style="color:#FF8888;">Alt+click = quick delete</span>',
       erase:'🗑️ <b style="color:#FFD700;">ERASE MODE</b><br>Click any block to delete<br>Drag to erase many at once<br><span style="color:#FF8888;">Alt+click works in any mode!</span>',
-      wall:'📐 <b style="color:#88DDFF;">DRAW WALLS</b><br>Click to start wall<br>Drag to extend along floor<br>Release to place!<br>Press Esc to stop',
+
       room:'🏠 <b style="color:#FFD700;">ROOM BUILDER</b><br>Set size + pick materials<br>Then click Build Room!<br>Room places at camera centre'
     };
     modeHintEl.innerHTML=modeHints[m]||'';
@@ -3246,166 +3105,87 @@ setTimeout(()=>{
   animate();
 },200);
 
-  // ── WALL DRAW SYSTEM ─────────────────────────────────
-  const WALL_MATERIALS = [
-    {key:'brick-white',  label:'White Plaster',  color:'#F5F0E8'},
-    {key:'brick-red',    label:'Red Brick',       color:'#CC4422'},
-    {key:'brick-grey',   label:'Grey Stone',      color:'#888888'},
-    {key:'wood-light',   label:'Light Wood',      color:'#D4A855'},
-    {key:'wood-dark',    label:'Dark Wood',       color:'#7B4F2E'},
-    {key:'concrete',     label:'Concrete',        color:'#AAAAAA'},
-    {key:'brick-blue',   label:'Blue Wall',       color:'#4488CC'},
-    {key:'brick-green',  label:'Green Wall',      color:'#449944'},
-    {key:'brick-dark',   label:'Dark Stone',      color:'#333333'},
-    {key:'glass-wall',   label:'Glass',           color:'#88CCFF'},
-  ];
-  let wallMat = 'brick-white';
-  let wallDrawing = false;
-  let wallStart = null; // {x,y,z} grid position
-  let wallPreviewMeshes = []; // ghost preview blocks
+  // ── SIMPLE WALL DRAW (2-click: start then end) ──────
+  let wallClickState = 0; // 0=idle, 1=waiting for end point
+  let wallClickStart = null;
+  let wallClickMat = 'brick-white';
+  let wallClickHeight = 3;
+  let wallClickFloorY = 0;
+  let wallClickPreview = null;
 
-  function initWallPanel(){
-    const el = document.getElementById('wpMatSwatches');
-    if(!el) return;
-    el.innerHTML = '';
-    WALL_MATERIALS.forEach(mat => {
-      const sw = document.createElement('div');
-      sw.className = 'wp-swatch' + (mat.key===wallMat?' active':'');
-      sw.style.background = mat.color;
-      sw.title = mat.label;
-      sw.onclick = () => {
-        wallMat = mat.key;
-        el.querySelectorAll('.wp-swatch').forEach(s=>s.classList.remove('active'));
-        sw.classList.add('active');
-        document.getElementById('wpMatName').textContent = mat.label;
-      };
-      el.appendChild(sw);
-    });
-    const active = WALL_MATERIALS.find(m=>m.key===wallMat);
-    if(active) document.getElementById('wpMatName').textContent = active.label;
-  }
+  function startWallClickMode(){
+    // Close room panel
+    const rp=document.getElementById('roomPanel');
+    if(rp){rp.style.display='none';rp.classList.remove('show');}
 
-  function startWallDraw(){
-    // Close panel and enter wall drawing mode
-    const wp = document.getElementById('wallPanel');
-    if(wp){ wp.style.display='none'; wp.classList.remove('show'); }
-    wallDrawing = true;
-    wallStart = null;
-    mode = 'wall';
-    // Update button highlight
-    ['build','select','erase','room','wall'].forEach(mm=>{
+    // Get settings from room panel sliders
+    wallClickMat = roomWall || 'brick-white';
+    wallClickHeight = parseInt(document.getElementById('rpHeight')?.value||3);
+    wallClickFloorY = parseInt(document.getElementById('rpFloorY')?.value||0);
+
+    wallClickState = 1;
+    wallClickStart = null;
+    if(wallClickPreview){scene.remove(wallClickPreview);wallClickPreview=null;}
+
+    // Switch to build mode so orbit/controls still work normally
+    mode = 'build';
+    ['build','select','erase','room'].forEach(mm=>{
       const el=document.getElementById('r'+mm[0].toUpperCase()+mm.slice(1));
-      if(el) el.classList.toggle('active',mm==='wall');
+      if(el) el.classList.toggle('active',mm==='build');
     });
-    document.getElementById('modeLabel').textContent = '📐 DRAW WALLS';
+    document.getElementById('modeLabel').textContent='📐 WALL DRAW — Click 1st corner';
     const bh=document.getElementById('bottomHint');
-    if(bh) bh.textContent='📐 WALL DRAW: Click ground to start · Drag to extend · Release to place · Esc to stop drawing';
-    toast('📐 Wall Draw active! Click on the ground or floor, then drag to build a wall!');
+    if(bh) bh.textContent='📐 WALL DRAW: Click 1st corner of wall · Then click 2nd corner to place! · Esc to cancel';
+
+    toast('📐 Wall Draw: Click the FIRST corner of your wall!');
   }
 
-  // Single reusable wall preview mesh — avoids creating hundreds of objects per frame
-  let wallPreviewMesh = null;
+  function updateWallClickPreview(endPos){
+    if(wallClickPreview){scene.remove(wallClickPreview);wallClickPreview=null;}
+    if(!wallClickStart||!endPos) return;
 
-  function clearWallPreview(){
-    if(wallPreviewMesh){ scene.remove(wallPreviewMesh); wallPreviewMesh=null; }
-    wallPreviewMeshes.forEach(m=>scene.remove(m));
-    wallPreviewMeshes=[];
-  }
-
-  function getWallPositions(start, end, floorY, height){
-    const dx = Math.abs(end.x - start.x);
-    const dz = Math.abs(end.z - start.z);
-    const positions = [];
-    if(dx >= dz){
-      const minX=Math.min(start.x,end.x), maxX=Math.max(start.x,end.x);
-      for(let x=minX;x<=maxX;x++)
-        for(let y=1;y<=height;y++)
-          positions.push({x,y:floorY+y,z:start.z});
-    } else {
-      const minZ=Math.min(start.z,end.z), maxZ=Math.max(start.z,end.z);
-      for(let z=minZ;z<=maxZ;z++)
-        for(let y=1;y<=height;y++)
-          positions.push({x:start.x,y:floorY+y,z});
-    }
-    return positions;
-  }
-
-  function showWallPreview(start, end){
-    // Remove old preview
-    if(wallPreviewMesh){ scene.remove(wallPreviewMesh); wallPreviewMesh=null; }
-
-    const height = parseInt(document.getElementById('wpHeight')?.value||3);
-    const floorY = parseInt(document.getElementById('wpFloorY')?.value||0);
-
-    // Calculate wall dimensions
-    const dx = Math.abs(end.x - start.x);
-    const dz = Math.abs(end.z - start.z);
-    const isHoriz = dx >= dz;
-
-    // Build ONE box covering the whole wall
-    const len = isHoriz ? dx+1 : dz+1;
-    const cx = isHoriz ? (Math.min(start.x,end.x) + len/2) : start.x+0.5;
-    const cz = isHoriz ? start.z+0.5 : (Math.min(start.z,end.z) + len/2);
-    const cy = floorY + height/2 + 0.5;
-
-    const geo = new THREE.BoxGeometry(
-      isHoriz ? len : 1.02,
-      height,
-      isHoriz ? 1.02 : len
-    );
-    const bd = BLOCKS[wallMat];
-    const mat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(bd?bd.c:0xFFFFFF),
-      transparent:true, opacity:0.45
+    const dx=Math.abs(endPos.x-wallClickStart.x);
+    const dz=Math.abs(endPos.z-wallClickStart.z);
+    const isH=dx>=dz;
+    const len=isH?dx+1:dz+1;
+    const cx=isH?(Math.min(wallClickStart.x,endPos.x)+len/2):wallClickStart.x+0.5;
+    const cz=isH?wallClickStart.z+0.5:(Math.min(wallClickStart.z,endPos.z)+len/2);
+    const cy=wallClickFloorY+wallClickHeight/2+0.5;
+    const bd=BLOCKS[wallClickMat];
+    const geo=new THREE.BoxGeometry(isH?len:1,wallClickHeight,isH?1:len);
+    const mat=new THREE.MeshBasicMaterial({
+      color:new THREE.Color(bd?bd.c:0xffffff),transparent:true,opacity:0.4
     });
-    wallPreviewMesh = new THREE.Mesh(geo, mat);
-    wallPreviewMesh.position.set(cx, cy, cz);
-
-    // Wire outline
-    const wire = new THREE.LineSegments(
+    wallClickPreview=new THREE.Mesh(geo,mat);
+    wallClickPreview.position.set(cx,cy,cz);
+    wallClickPreview.add(new THREE.LineSegments(
       new THREE.EdgesGeometry(geo),
-      new THREE.LineBasicMaterial({color:0x44DDFF, transparent:true, opacity:0.9})
-    );
-    wallPreviewMesh.add(wire);
-
-    // Length label via toast (throttled)
-    scene.add(wallPreviewMesh);
-
-    // Show live length in bottom hint
+      new THREE.LineBasicMaterial({color:0x44DDFF,transparent:true,opacity:0.9})
+    ));
+    scene.add(wallClickPreview);
     const bh=document.getElementById('bottomHint');
-    if(bh) bh.textContent=`📐 Wall: ${len} blocks long × ${height} high · Release to place!`;
+    if(bh) bh.textContent=`📐 Wall: ${len} long × ${wallClickHeight} high · Click 2nd corner to place!`;
   }
 
-  function placeWall(start, end){
-    const height = parseInt(document.getElementById('wpHeight')?.value||3);
-    const floorY = parseInt(document.getElementById('wpFloorY')?.value||0);
-    const addWindows = document.getElementById('wpAddWindows')?.checked;
-    const doubleThick = document.getElementById('wpDouble')?.checked;
-    const positions = getWallPositions(start, end, floorY, height);
-
-    let count = 0;
-    positions.forEach(p=>{
-      // Add windows every 3 blocks at height 2 if option checked
-      const isWindowPos = addWindows && (p.x % 3 === 0 || p.z % 3 === 0) &&
-        p.y === floorY + 2;
-      const blockType = isWindowPos ? 'win-clear' : wallMat;
-      placeBlock(p.x, p.y, p.z, blockType, true);
-      count++;
-
-      // Double thickness - add block behind
-      if(doubleThick){
-        const dx = Math.abs(end.x-start.x) >= Math.abs(end.z-start.z);
-        if(dx) placeBlock(p.x, p.y, p.z+1, blockType, true);
-        else    placeBlock(p.x+1, p.y, p.z, blockType, true);
-      }
-    });
+  function placeWallFromPoints(start,end){
+    const dx=Math.abs(end.x-start.x);
+    const dz=Math.abs(end.z-start.z);
+    const isH=dx>=dz;
+    let count=0;
+    if(isH){
+      const mn=Math.min(start.x,end.x),mx=Math.max(start.x,end.x);
+      for(let x=mn;x<=mx;x++)
+        for(let y=1;y<=wallClickHeight;y++)
+          {placeBlock(x,wallClickFloorY+y,start.z,wallClickMat,true);count++;}
+    } else {
+      const mn=Math.min(start.z,end.z),mx=Math.max(start.z,end.z);
+      for(let z=mn;z<=mx;z++)
+        for(let y=1;y<=wallClickHeight;y++)
+          {placeBlock(start.x,wallClickFloorY+y,z,wallClickMat,true);count++;}
+    }
     sndPlace();
-    toast(`✅ Wall placed! ${count} blocks · Draw another or press Esc`);
+    toast(`✅ Wall placed! ${count} blocks · Click again for next wall or Esc to finish`);
   }
-
-  // Wall draw pointer events - integrated into main pointer handlers
-  let wallDragStart = null;
-  let wallDragCurrent = null;
 
   // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
   window.setMode       = setMode;
@@ -3431,9 +3211,9 @@ setTimeout(()=>{
   window.addFloorPlate = addFloorPlate;
   window.addWalls      = addWalls;
   window.addRoof       = addRoof;
-  window.eraseAtHit    = eraseAtHit;
-  window.startWallDraw  = startWallDraw;
-  window.initWallPanel  = initWallPanel;
+  window.eraseAtHit      = eraseAtHit;
+  window.startWallClickMode = startWallClickMode;
+
   window.keysHeld      = keysHeld;
 
 } // end initApp
