@@ -2208,13 +2208,13 @@ function deselect(){
 
 // ── GIZMO ACTIONS ─────────────────────────────────────
 function gizmoRotate(axis,deg){
-  if(!selectedObj){toast('Switch to ✋ SELECT mode first, then click a block!');return;}
+  const target = selectedWall ? {mesh:selectedWall.mesh} : selectedObj;
+  if(!target){toast('Select something first!');return;}
   const rad=deg*Math.PI/180;
-  const mesh=selectedObj.mesh;
-  if(axis==='y') mesh.rotation.y+=rad;
-  else if(axis==='x') mesh.rotation.x+=rad;
-  else mesh.rotation.z+=rad;
-  buildGizmo(selectedObj);
+  if(axis==='y') target.mesh.rotation.y+=rad;
+  else if(axis==='x') target.mesh.rotation.x+=rad;
+  else target.mesh.rotation.z+=rad;
+  buildGizmo(target);
   toast(`Rotated ${axis.toUpperCase()} ${deg>0?'+':''}${deg}°`);
 }
 
@@ -2226,7 +2226,29 @@ function gizmoScale(factor){
 }
 
 function gizmoDuplicate(){
-  if(selectedWall){ toast('Use Copy: select wall, Ctrl+D not yet supported');return; }
+  if(selectedWall){
+    // Duplicate wall by cloning its mesh
+    const w=selectedWall;
+    const geo=w.mesh.geometry.clone();
+    const mat=w.mesh.material.clone();
+    const clone=new THREE.Mesh(geo,mat);
+    clone.position.copy(w.mesh.position);
+    clone.position.x+=1;
+    clone.rotation.copy(w.mesh.rotation);
+    clone.scale.copy(w.mesh.scale);
+    clone.castShadow=true;clone.receiveShadow=true;
+    clone.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:0.15})));
+    const wallIdx=walls.length;
+    clone.userData={isWall:true,wallIdx};
+    clone.traverse(c=>{if(c!==clone)c.userData={isWall:true,wallIdx};});
+    const newWall={mesh:clone,matKey:w.matKey};
+    walls.push(newWall);
+    scene.add(clone);
+    selectWall(newWall);
+    toast('Wall duplicated!');
+    return;
+  }
   if(!selectedObj){toast('Select something first!');return;}
   const{x,y,z,type}=selectedObj.mesh.userData;
   const rot=selectedObj.mesh.rotation.clone();
@@ -2248,6 +2270,13 @@ function gizmoDelete(){
 }
 
 function moveSelected(dx,dy,dz){
+  if(selectedWall){
+    selectedWall.mesh.position.x+=dx;
+    selectedWall.mesh.position.y+=dy;
+    selectedWall.mesh.position.z+=dz;
+    buildGizmo({mesh:selectedWall.mesh});
+    return;
+  }
   if(!selectedObj){toast('Select a block first!');return;}
   const{x,y,z,type}=selectedObj.mesh.userData;
   const rot=selectedObj.mesh.rotation.clone();
@@ -2355,9 +2384,12 @@ canvas.addEventListener('pointerdown',e=>{
     if(gh.length>0){
       activeHandle=gh[0].object.userData;
       dragStartMouse={x:e.clientX,y:e.clientY};
-      dragStartRot=selectedObj.mesh.rotation.clone();
-      dragStartPos=selectedObj.mesh.position.clone();
-      dragStartScale=selectedObj.mesh.scale.clone();
+      const _dragSrc = selectedWall ? selectedWall.mesh : (selectedObj ? selectedObj.mesh : null);
+      if(_dragSrc){
+        dragStartRot=_dragSrc.rotation.clone();
+        dragStartPos=_dragSrc.position.clone();
+        dragStartScale=_dragSrc.scale.clone();
+      }
       return;
     }
   }
@@ -2391,17 +2423,19 @@ canvas.addEventListener('pointermove',e=>{
   } else if(activeHandle&&isDown&&hasMoved){
     const mdx=e.clientX-dragStartMouse.x;
     const mdy=e.clientY-dragStartMouse.y;
+    const dragTarget = selectedWall ? {mesh:selectedWall.mesh} : selectedObj;
+    if(!dragTarget) return;
     if(activeHandle.handle==='rotate'){
       const sensitivity=0.012;
-      if(activeHandle.axis==='y')selectedObj.mesh.rotation.y=dragStartRot.y+mdx*sensitivity;
-      else if(activeHandle.axis==='x')selectedObj.mesh.rotation.x=dragStartRot.x+mdy*sensitivity;
-      else selectedObj.mesh.rotation.z=dragStartRot.z+mdx*sensitivity;
-      buildGizmo(selectedObj);
+      if(activeHandle.axis==='y')dragTarget.mesh.rotation.y=dragStartRot.y+mdx*sensitivity;
+      else if(activeHandle.axis==='x')dragTarget.mesh.rotation.x=dragStartRot.x+mdy*sensitivity;
+      else dragTarget.mesh.rotation.z=dragStartRot.z+mdx*sensitivity;
+      buildGizmo(dragTarget);
     } else if(activeHandle.handle==='scale'){
       const factor=1+(mdx-mdy)*0.008;
-      const s=Math.max(0.2,dragStartScale.x*factor);
-      selectedObj.mesh.scale.setScalar(s);
-      buildGizmo(selectedObj);
+      const s=Math.max(0.1,dragStartScale.x*factor);
+      dragTarget.mesh.scale.setScalar(s);
+      buildGizmo(dragTarget);
     } else if(activeHandle.handle==='move'){
       // Move along axis by dragging
       const hits=getHits(e);
@@ -2465,7 +2499,8 @@ canvas.addEventListener('pointerup',e=>{
 
   if(activeHandle){
     activeHandle=null;
-    if(selectedObj) buildGizmo(selectedObj);
+    if(selectedWall) buildGizmo({mesh:selectedWall.mesh});
+    else if(selectedObj) buildGizmo(selectedObj);
     isDown=false; isOrbiting=false; return;
   }
 
