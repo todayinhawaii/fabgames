@@ -269,14 +269,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
     <div class="r-icon">👁</div><div class="r-label">X-RAY</div>
   </div>
   <div class="r-divider"></div>
-  <div style="font-size:9px;color:rgba(255,215,0,0.5);letter-spacing:1px;font-family:'Fredoka One',cursive;padding:4px 0 2px;">ADD</div>
-  <div class="r-btn" onclick="quickFloor()" title="Add 8x8 floor at current level">
+  <div style="font-size:9px;color:rgba(255,215,0,0.5);letter-spacing:1px;font-family:'Fredoka One',cursive;padding:4px 0 2px;">DRAW</div>
+  <div class="r-btn" id="rWall" onclick="toggleWallDraw()" title="Click 2 points to draw a wall">
+    <div class="r-icon">📐</div><div class="r-label">WALL</div>
+  </div>
+  <div class="r-btn" onclick="quickFloor()" title="Add floor plate at current level">
     <div class="r-icon">🟫</div><div class="r-label">FLOOR</div>
   </div>
-  <div class="r-btn" onclick="quickWalls()" title="Add walls around floor">
-    <div class="r-icon">🔲</div><div class="r-label">WALLS</div>
-  </div>
-  <div class="r-btn" onclick="quickRoof()" title="Add roof">
+  <div class="r-btn" onclick="quickRoof()" title="Add roof at current level">
     <div class="r-icon">🔺</div><div class="r-label">ROOF</div>
   </div>
 </div>
@@ -364,6 +364,47 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 <div id="toast"></div>
 
+<!-- WALL DRAW BAR - appears at top when drawing walls -->
+<div id="wallBar" style="display:none;position:fixed;top:58px;left:50%;transform:translateX(-50%);
+  z-index:400;background:rgba(0,10,30,0.97);backdrop-filter:blur(12px);
+  border:2px solid rgba(0,180,255,0.6);border-radius:16px;
+  padding:10px 20px;display:none;align-items:center;gap:14px;flex-wrap:wrap;
+  box-shadow:0 0 40px rgba(0,180,255,0.3);">
+  <div style="font-family:'Fredoka One',cursive;font-size:14px;color:#44DDFF;">📐 DRAW WALL</div>
+  
+  <!-- Material picker -->
+  <select id="wallBarMat" style="font-family:'Fredoka One',cursive;font-size:12px;
+    background:rgba(0,0,0,0.6);color:#fff;border:1px solid rgba(0,180,255,0.4);
+    border-radius:8px;padding:5px 8px;cursor:pointer;">
+    <option value="brick-white">⬜ White Plaster</option>
+    <option value="brick-red">🧱 Red Brick</option>
+    <option value="brick-grey">🪨 Grey Stone</option>
+    <option value="brick-dark">⬛ Dark Stone</option>
+    <option value="wood-light">🪵 Light Wood</option>
+    <option value="wood-dark">🌰 Dark Wood</option>
+    <option value="concrete">🔲 Concrete</option>
+    <option value="brick-blue">🟦 Blue Wall</option>
+    <option value="brick-green">🟩 Green Wall</option>
+    <option value="glass-wall">🪟 Glass</option>
+  </select>
+  
+  <!-- Height -->
+  <div style="display:flex;align-items:center;gap:6px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.5);">Height</span>
+    <input type="range" id="wallBarH" min="1" max="8" value="3" style="width:70px;accent-color:#44DDFF;"
+      oninput="document.getElementById('wallBarHVal').textContent=this.value">
+    <span id="wallBarHVal" style="font-family:'Fredoka One',cursive;font-size:13px;color:#44DDFF;min-width:16px;">3</span>
+  </div>
+
+  <!-- Status -->
+  <div id="wallBarStatus" style="font-family:'Fredoka One',cursive;font-size:13px;
+    color:#FFD700;white-space:nowrap;">Click 1st point on ground</div>
+
+  <button onclick="cancelWallDraw()" style="font-family:'Fredoka One',cursive;font-size:12px;
+    padding:6px 12px;border-radius:10px;border:none;cursor:pointer;
+    background:rgba(255,255,255,0.1);color:#fff;">✕ Done</button>
+</div>
+
 <!-- ROOM BUILDER PANEL -->
 <div id="roomPanel" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()">
 <div id="roomPanelInner">
@@ -431,13 +472,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
   <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;justify-content:center;">
     <button class="rp-btn build" onclick="buildRoom()">🏗️ Build Room!</button>
-    <button class="rp-btn" style="background:linear-gradient(135deg,#0088ff,#0044cc);color:#fff;" 
-      onclick="startWallClickMode()">📐 Draw Walls</button>
+
     <button class="rp-btn cancel" onclick="setMode('build')">✕ Cancel</button>
   </div>
-  <div style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center;font-family:'Nunito',sans-serif;">
-    Draw Walls: click 1st corner → click 2nd corner → wall appears!
-  </div>
+
 </div><!-- end roomPanelInner -->
 </div>
 
@@ -2601,15 +2639,7 @@ document.addEventListener('keydown',e=>{
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
   if(e.code==='Space'){ spaceDown=true; }
   if(e.code==='Escape'){
-    // Cancel wall draw
-    if(wallClickState>0){
-      wallClickState=0; wallClickStart=null;
-      if(wallClickPreview){scene.remove(wallClickPreview);wallClickPreview=null;}
-      document.getElementById('modeLabel').textContent='🧱 BUILD';
-      const bh=document.getElementById('bottomHint');
-      if(bh) bh.textContent='🧱 Click to place · Drag to orbit · Scroll to zoom';
-      toast('Wall draw cancelled');
-    }
+    if(wallActive) cancelWallDraw();
     deselect();
 
   }
@@ -3105,86 +3135,86 @@ setTimeout(()=>{
   animate();
 },200);
 
-  // ── SIMPLE WALL DRAW (2-click: start then end) ──────
-  let wallClickState = 0; // 0=idle, 1=waiting for end point
-  let wallClickStart = null;
-  let wallClickMat = 'brick-white';
-  let wallClickHeight = 3;
-  let wallClickFloorY = 0;
-  let wallClickPreview = null;
+  // ── WALL DRAW SYSTEM (click point 1, then point 2) ──
+  let wallActive = false;
+  let wallPt1 = null;
+  let wallPreviewMesh = null;
 
-  function startWallClickMode(){
-    // Close room panel
-    const rp=document.getElementById('roomPanel');
-    if(rp){rp.style.display='none';rp.classList.remove('show');}
-
-    // Get settings from room panel sliders
-    wallClickMat = roomWall || 'brick-white';
-    wallClickHeight = parseInt(document.getElementById('rpHeight')?.value||3);
-    wallClickFloorY = parseInt(document.getElementById('rpFloorY')?.value||0);
-
-    wallClickState = 1;
-    wallClickStart = null;
-    if(wallClickPreview){scene.remove(wallClickPreview);wallClickPreview=null;}
-
-    // Switch to build mode so orbit/controls still work normally
-    mode = 'build';
-    ['build','select','erase','room'].forEach(mm=>{
-      const el=document.getElementById('r'+mm[0].toUpperCase()+mm.slice(1));
-      if(el) el.classList.toggle('active',mm==='build');
-    });
-    document.getElementById('modeLabel').textContent='📐 WALL DRAW — Click 1st corner';
+  function toggleWallDraw(){
+    if(wallActive){ cancelWallDraw(); return; }
+    wallActive = true;
+    wallPt1 = null;
+    // Show the wall bar
+    const wb=document.getElementById('wallBar');
+    if(wb) wb.style.display='flex';
+    // Highlight button
+    const btn=document.getElementById('rWall');
+    if(btn) btn.classList.add('active');
+    document.getElementById('modeLabel').textContent='📐 WALL DRAW';
     const bh=document.getElementById('bottomHint');
-    if(bh) bh.textContent='📐 WALL DRAW: Click 1st corner of wall · Then click 2nd corner to place! · Esc to cancel';
-
-    toast('📐 Wall Draw: Click the FIRST corner of your wall!');
+    if(bh) bh.textContent='📐 Click anywhere on the ground for point 1 of your wall';
+    toast('📐 Wall Draw ON — click the ground for point 1!');
   }
 
-  function updateWallClickPreview(endPos){
-    if(wallClickPreview){scene.remove(wallClickPreview);wallClickPreview=null;}
-    if(!wallClickStart||!endPos) return;
+  function cancelWallDraw(){
+    wallActive=false; wallPt1=null;
+    if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
+    const wb=document.getElementById('wallBar');
+    if(wb) wb.style.display='none';
+    const btn=document.getElementById('rWall');
+    if(btn) btn.classList.remove('active');
+    document.getElementById('modeLabel').textContent='🧱 BUILD';
+    const bh=document.getElementById('bottomHint');
+    if(bh) bh.textContent='🧱 Click to place · Drag to orbit · Scroll to zoom';
+    toast('Wall draw off');
+  }
 
-    const dx=Math.abs(endPos.x-wallClickStart.x);
-    const dz=Math.abs(endPos.z-wallClickStart.z);
+  function updateWallPreview(pt2){
+    if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
+    if(!wallPt1||!pt2) return;
+    const h=parseInt(document.getElementById('wallBarH')?.value||3);
+    const fy=currentFloor;
+    const dx=Math.abs(pt2.x-wallPt1.x), dz=Math.abs(pt2.z-wallPt1.z);
     const isH=dx>=dz;
-    const len=isH?dx+1:dz+1;
-    const cx=isH?(Math.min(wallClickStart.x,endPos.x)+len/2):wallClickStart.x+0.5;
-    const cz=isH?wallClickStart.z+0.5:(Math.min(wallClickStart.z,endPos.z)+len/2);
-    const cy=wallClickFloorY+wallClickHeight/2+0.5;
-    const bd=BLOCKS[wallClickMat];
-    const geo=new THREE.BoxGeometry(isH?len:1,wallClickHeight,isH?1:len);
-    const mat=new THREE.MeshBasicMaterial({
-      color:new THREE.Color(bd?bd.c:0xffffff),transparent:true,opacity:0.4
-    });
-    wallClickPreview=new THREE.Mesh(geo,mat);
-    wallClickPreview.position.set(cx,cy,cz);
-    wallClickPreview.add(new THREE.LineSegments(
-      new THREE.EdgesGeometry(geo),
-      new THREE.LineBasicMaterial({color:0x44DDFF,transparent:true,opacity:0.9})
-    ));
-    scene.add(wallClickPreview);
-    const bh=document.getElementById('bottomHint');
-    if(bh) bh.textContent=`📐 Wall: ${len} long × ${wallClickHeight} high · Click 2nd corner to place!`;
+    const len=Math.max(1,isH?dx+1:dz+1);
+    const cx=isH?(Math.min(wallPt1.x,pt2.x)+len/2):wallPt1.x+0.5;
+    const cz=isH?wallPt1.z+0.5:(Math.min(wallPt1.z,pt2.z)+len/2);
+    const bd=BLOCKS[document.getElementById('wallBarMat')?.value||'brick-white'];
+    const geo=new THREE.BoxGeometry(isH?len:1,h,isH?1:len);
+    const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({
+      color:new THREE.Color(bd?bd.c:0xffffff),transparent:true,opacity:0.45}));
+    mesh.position.set(cx,fy+h/2+0.5,cz);
+    mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({color:0x44DDFF,transparent:true,opacity:1})));
+    scene.add(mesh);
+    wallPreviewMesh=mesh;
+    const ws=document.getElementById('wallBarStatus');
+    if(ws) ws.textContent=`Wall: ${len} × ${h} blocks — click to place!`;
   }
 
-  function placeWallFromPoints(start,end){
-    const dx=Math.abs(end.x-start.x);
-    const dz=Math.abs(end.z-start.z);
+  function placeWallBetween(pt1,pt2){
+    const mat=document.getElementById('wallBarMat')?.value||'brick-white';
+    const h=parseInt(document.getElementById('wallBarH')?.value||3);
+    const fy=currentFloor;
+    const dx=Math.abs(pt2.x-pt1.x), dz=Math.abs(pt2.z-pt1.z);
     const isH=dx>=dz;
     let count=0;
     if(isH){
-      const mn=Math.min(start.x,end.x),mx=Math.max(start.x,end.x);
+      const mn=Math.min(pt1.x,pt2.x),mx=Math.max(pt1.x,pt2.x);
       for(let x=mn;x<=mx;x++)
-        for(let y=1;y<=wallClickHeight;y++)
-          {placeBlock(x,wallClickFloorY+y,start.z,wallClickMat,true);count++;}
+        for(let y=1;y<=h;y++){placeBlock(x,fy+y,pt1.z,mat,true);count++;}
     } else {
-      const mn=Math.min(start.z,end.z),mx=Math.max(start.z,end.z);
+      const mn=Math.min(pt1.z,pt2.z),mx=Math.max(pt1.z,pt2.z);
       for(let z=mn;z<=mx;z++)
-        for(let y=1;y<=wallClickHeight;y++)
-          {placeBlock(start.x,wallClickFloorY+y,z,wallClickMat,true);count++;}
+        for(let y=1;y<=h;y++){placeBlock(pt1.x,fy+y,z,mat,true);count++;}
     }
     sndPlace();
-    toast(`✅ Wall placed! ${count} blocks · Click again for next wall or Esc to finish`);
+    // Chain — pt2 becomes new pt1
+    wallPt1={x:pt2.x,y:pt2.y,z:pt2.z};
+    if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
+    const ws=document.getElementById('wallBarStatus');
+    if(ws) ws.textContent=`✅ ${count} blocks placed! Click next corner`;
+    toast(`✅ Wall placed! ${count} blocks — click next corner to chain walls!`);
   }
 
   // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
@@ -3212,7 +3242,8 @@ setTimeout(()=>{
   window.addWalls      = addWalls;
   window.addRoof       = addRoof;
   window.eraseAtHit      = eraseAtHit;
-  window.startWallClickMode = startWallClickMode;
+  window.toggleWallDraw  = toggleWallDraw;
+  window.cancelWallDraw  = cancelWallDraw;
 
   window.keysHeld      = keysHeld;
 
