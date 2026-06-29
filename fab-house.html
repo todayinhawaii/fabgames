@@ -2365,8 +2365,8 @@ canvas.addEventListener('pointerdown',e=>{
   // RIGHT click or space = orbit always (even in wall mode)
   if(e.button===2||e.button===1||spaceDown){isOrbiting=true;return;}
 
-  // WALL DRAW — intercept LEFT click only
-  if(wallActive && e.button===0){
+  // WALL DRAW — only intercept in build mode (not select/erase)
+  if(wallActive && mode==='build' && e.button===0){
     const hits=getHits(e);
     if(hits.length>0){
       const p=hits[0].point;
@@ -2400,15 +2400,15 @@ canvas.addEventListener('pointermove',e=>{
   const dist=Math.abs(dx)+Math.abs(dy);
   if(dist>3) hasMoved=true;
 
-  // WALL DRAW — preview only while actively dragging a wall
-  if(wallActive && wallDragging && wallDragStart){
+  // WALL DRAW — preview only while actively dragging in build mode
+  if(wallActive && wallDragging && wallDragStart && mode==='build'){
     const hits=getHits(e);
     if(hits.length>0){
       const p=hits[0].point;
       updateWallPreview(wallDragStart, {x:p.x,z:p.z});
     }
     prevMouse={x:e.clientX,y:e.clientY};
-    return; // block orbit only during actual wall drag
+    return;
   }
 
   // Orbit freely when: dragging with left button, no handle, not drawing wall
@@ -2482,8 +2482,8 @@ canvas.addEventListener('pointerup',e=>{
   if(!downOnCanvas){isDown=false;return;}
   downOnCanvas=false;
 
-  // WALL DRAW — place wall on release
-  if(wallActive && wallDragging){
+  // WALL DRAW — place wall on release (build mode only)
+  if(wallActive && wallDragging && mode==='build'){
     if(wallDragStart){
       const hits=getHits(e);
       if(hits.length>0){
@@ -2922,7 +2922,11 @@ function setMode(m){
 
   // Top bar mode label
   const labels={build:'🧱 BUILD',select:'✋ SELECT',erase:'🗑️ ERASE',room:'🏠 ROOM BUILDER'};
-  document.getElementById('modeLabel').textContent=labels[m]||m;
+  // If wall tool active, add context to label
+  const modeLabel = wallActive && m==='select' ? '✋ SELECT WALL — click a wall!'
+    : wallActive && m==='build' ? '📐 DRAW WALLS — drag on floor'
+    : labels[m]||m;
+  document.getElementById('modeLabel').textContent=modeLabel;
 
   // Room builder panel show/hide
   const roomPanelEl=document.getElementById('roomPanel');
@@ -3330,13 +3334,16 @@ setTimeout(()=>{
     if(wallActive){ cancelWallDraw(); return; }
     wallActive=true; wallDragging=false; wallDragStart=null;
     if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
+    // Must be in BUILD mode to draw walls
+    // User can switch to SELECT to pick walls, ERASE to delete them
+    if(mode!=='build') setMode('build');
     const wb=document.getElementById('wallBar');
     if(wb) wb.style.display='flex';
     document.getElementById('rWall')?.classList.add('active');
-    document.getElementById('modeLabel').textContent='📐 WALL DRAW';
+    document.getElementById('modeLabel').textContent='📐 DRAW WALLS — BUILD mode active';
     const bh=document.getElementById('bottomHint');
-    if(bh) bh.textContent='📐 Click and DRAG on the floor to draw a wall — release to place!';
-    toast('📐 Wall Draw ON — click and drag on the floor!');
+    if(bh) bh.textContent='📐 BUILD=draw walls by dragging · SELECT=click wall to move/rotate · ERASE=click wall to delete';
+    toast('📐 Wall Draw ON! Drag on floor to draw · Switch to ✋ SELECT to move walls!');
   }
 
   function cancelWallDraw(){
