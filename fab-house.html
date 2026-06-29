@@ -3288,57 +3288,77 @@ setTimeout(()=>{
     toast('📐 Wall Draw active! Click on the ground or floor, then drag to build a wall!');
   }
 
+  // Single reusable wall preview mesh — avoids creating hundreds of objects per frame
+  let wallPreviewMesh = null;
+
   function clearWallPreview(){
+    if(wallPreviewMesh){ scene.remove(wallPreviewMesh); wallPreviewMesh=null; }
     wallPreviewMeshes.forEach(m=>scene.remove(m));
     wallPreviewMeshes=[];
   }
 
   function getWallPositions(start, end, floorY, height){
-    // Get all grid positions between start and end
-    // Snap to either horizontal or vertical line (whichever is longer)
     const dx = Math.abs(end.x - start.x);
     const dz = Math.abs(end.z - start.z);
     const positions = [];
     if(dx >= dz){
-      // Horizontal wall along X axis
-      const minX = Math.min(start.x, end.x);
-      const maxX = Math.max(start.x, end.x);
-      for(let x=minX; x<=maxX; x++){
-        for(let y=1; y<=height; y++){
-          positions.push({x, y:floorY+y, z:start.z});
-        }
-      }
+      const minX=Math.min(start.x,end.x), maxX=Math.max(start.x,end.x);
+      for(let x=minX;x<=maxX;x++)
+        for(let y=1;y<=height;y++)
+          positions.push({x,y:floorY+y,z:start.z});
     } else {
-      // Vertical wall along Z axis
-      const minZ = Math.min(start.z, end.z);
-      const maxZ = Math.max(start.z, end.z);
-      for(let z=minZ; z<=maxZ; z++){
-        for(let y=1; y<=height; y++){
-          positions.push({x:start.x, y:floorY+y, z});
-        }
-      }
+      const minZ=Math.min(start.z,end.z), maxZ=Math.max(start.z,end.z);
+      for(let z=minZ;z<=maxZ;z++)
+        for(let y=1;y<=height;y++)
+          positions.push({x:start.x,y:floorY+y,z});
     }
     return positions;
   }
 
   function showWallPreview(start, end){
-    clearWallPreview();
+    // Remove old preview
+    if(wallPreviewMesh){ scene.remove(wallPreviewMesh); wallPreviewMesh=null; }
+
     const height = parseInt(document.getElementById('wpHeight')?.value||3);
     const floorY = parseInt(document.getElementById('wpFloorY')?.value||0);
-    const positions = getWallPositions(start, end, floorY, height);
+
+    // Calculate wall dimensions
+    const dx = Math.abs(end.x - start.x);
+    const dz = Math.abs(end.z - start.z);
+    const isHoriz = dx >= dz;
+
+    // Build ONE box covering the whole wall
+    const len = isHoriz ? dx+1 : dz+1;
+    const cx = isHoriz ? (Math.min(start.x,end.x) + len/2) : start.x+0.5;
+    const cz = isHoriz ? start.z+0.5 : (Math.min(start.z,end.z) + len/2);
+    const cy = floorY + height/2 + 0.5;
+
+    const geo = new THREE.BoxGeometry(
+      isHoriz ? len : 1.02,
+      height,
+      isHoriz ? 1.02 : len
+    );
+    const bd = BLOCKS[wallMat];
     const mat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(BLOCKS[wallMat]?.c||0xFFFFFF),
-      transparent:true, opacity:0.5, wireframe:false
+      color: new THREE.Color(bd?bd.c:0xFFFFFF),
+      transparent:true, opacity:0.45
     });
-    const wireMat = new THREE.MeshBasicMaterial({color:0x88DDFF,wireframe:true,transparent:true,opacity:0.8});
-    positions.forEach(p=>{
-      const mesh = new THREE.Mesh(new THREE.BoxGeometry(1.02,1.02,1.02), mat);
-      mesh.position.set(p.x+0.5, p.y+0.5, p.z+0.5);
-      const wire = new THREE.Mesh(new THREE.BoxGeometry(1.04,1.04,1.04), wireMat);
-      mesh.add(wire);
-      scene.add(mesh);
-      wallPreviewMeshes.push(mesh);
-    });
+    wallPreviewMesh = new THREE.Mesh(geo, mat);
+    wallPreviewMesh.position.set(cx, cy, cz);
+
+    // Wire outline
+    const wire = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({color:0x44DDFF, transparent:true, opacity:0.9})
+    );
+    wallPreviewMesh.add(wire);
+
+    // Length label via toast (throttled)
+    scene.add(wallPreviewMesh);
+
+    // Show live length in bottom hint
+    const bh=document.getElementById('bottomHint');
+    if(bh) bh.textContent=`📐 Wall: ${len} blocks long × ${height} high · Release to place!`;
   }
 
   function placeWall(start, end){
