@@ -3084,6 +3084,33 @@ setTimeout(()=>{
   animate();
 },200);
 
+  // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
+  window.setMode       = setMode;
+  window.undo          = undo;
+  window.clearAll      = clearAll;
+  window.resetCamera   = resetCamera;
+  window.toggleGrid    = toggleGrid;
+  window.toggleXray    = toggleXray;
+  window.setFloor      = setFloor;
+  window.saveScreenshot= saveScreenshot;
+  window.showCredits   = showCredits;
+  window.buildRoom     = buildRoom;
+  window.initRoomBuilder=initRoomBuilder;
+  window.quickFloor    = quickFloor;
+  window.quickWalls    = quickWalls;
+  window.quickRoof     = quickRoof;
+  window.gizmoRotate   = gizmoRotate;
+  window.gizmoScale    = gizmoScale;
+  window.gizmoDuplicate= gizmoDuplicate;
+  window.gizmoDelete   = gizmoDelete;
+  window.moveSelected  = moveSelected;
+  window.deselect      = deselect;
+  window.addFloorPlate = addFloorPlate;
+  window.addWalls      = addWalls;
+  window.addRoof       = addRoof;
+  window.eraseAtHit    = eraseAtHit;
+  window.keysHeld      = keysHeld;
+
 } // end initApp
 
 // Start the app
