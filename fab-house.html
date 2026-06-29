@@ -165,6 +165,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 }
 .joy-btn:active,.joy-btn:hover{background:rgba(255,215,0,0.35);color:#FFD700;border-color:#FFD700;}
 .joy-mid{background:rgba(0,200,255,0.15);color:#00cfff;border-color:rgba(0,200,255,0.3);font-size:14px;}
+.joy-orbit{background:rgba(255,150,0,0.15);color:#ffaa44;border-color:rgba(255,150,0,0.3);font-size:13px;}
+.joy-orbit:active{background:rgba(255,150,0,0.4);}
+.joy-fly{background:rgba(100,200,100,0.15);color:#88ee88;border-color:rgba(100,200,100,0.3);font-size:13px;}
+.joy-fly:active{background:rgba(100,200,100,0.4);}
+.joy-zoom{background:rgba(150,100,255,0.15);color:#bb88ff;border-color:rgba(150,100,255,0.3);font-size:12px;width:40px;height:40px;}
+.joy-zoom:active{background:rgba(150,100,255,0.4);}
 
 @media(max-width:700px){
   #palette{width:0;overflow:hidden;}
@@ -322,26 +328,38 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   </button>
 </div>
 
-<!-- MOBILE JOYSTICK (bottom left, above bottom bar) -->
-<div id="joystick" onpointerdown="event.stopPropagation()" style="position:fixed;bottom:64px;left:226px;z-index:85;display:grid;
-  grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:3px;">
-  <div></div>
-  <button class="joy-btn" id="jFwd"
-    ontouchstart="keysHeld['ArrowUp']=true" ontouchend="keysHeld['ArrowUp']=false"
-    onmousedown="keysHeld['ArrowUp']=true" onmouseup="keysHeld['ArrowUp']=false">▲</button>
-  <div></div>
-  <button class="joy-btn" id="jLeft"
-    ontouchstart="keysHeld['ArrowLeft']=true" ontouchend="keysHeld['ArrowLeft']=false"
-    onmousedown="keysHeld['ArrowLeft']=true" onmouseup="keysHeld['ArrowLeft']=false">◀</button>
-  <button class="joy-btn joy-mid" onclick="resetCamera()">🎥</button>
-  <button class="joy-btn" id="jRight"
-    ontouchstart="keysHeld['ArrowRight']=true" ontouchend="keysHeld['ArrowRight']=false"
-    onmousedown="keysHeld['ArrowRight']=true" onmouseup="keysHeld['ArrowRight']=false">▶</button>
-  <div></div>
-  <button class="joy-btn" id="jBack"
-    ontouchstart="keysHeld['ArrowDown']=true" ontouchend="keysHeld['ArrowDown']=false"
-    onmousedown="keysHeld['ArrowDown']=true" onmouseup="keysHeld['ArrowDown']=false">▼</button>
-  <div></div>
+<!-- MOBILE CONTROLS (bottom left) -->
+<div id="joystick" onpointerdown="event.stopPropagation()" 
+  style="position:fixed;bottom:64px;left:226px;z-index:85;display:flex;gap:6px;align-items:flex-end;">
+  
+  <!-- WALK D-PAD -->
+  <div style="display:grid;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px);gap:2px;">
+    <div></div>
+    <button class="joy-btn" ontouchstart="keysHeld['KeyW']=true;event.preventDefault()" ontouchend="keysHeld['KeyW']=false" onmousedown="keysHeld['KeyW']=true" onmouseup="keysHeld['KeyW']=false">▲</button>
+    <div></div>
+    <button class="joy-btn" ontouchstart="keysHeld['KeyA']=true;event.preventDefault()" ontouchend="keysHeld['KeyA']=false" onmousedown="keysHeld['KeyA']=true" onmouseup="keysHeld['KeyA']=false">◀</button>
+    <button class="joy-btn joy-mid" onclick="resetCamera()">🎥</button>
+    <button class="joy-btn" ontouchstart="keysHeld['KeyD']=true;event.preventDefault()" ontouchend="keysHeld['KeyD']=false" onmousedown="keysHeld['KeyD']=true" onmouseup="keysHeld['KeyD']=false">▶</button>
+    <div></div>
+    <button class="joy-btn" ontouchstart="keysHeld['KeyS']=true;event.preventDefault()" ontouchend="keysHeld['KeyS']=false" onmousedown="keysHeld['KeyS']=true" onmouseup="keysHeld['KeyS']=false">▼</button>
+    <div></div>
+  </div>
+
+  <!-- ORBIT + FLY BUTTONS -->
+  <div style="display:grid;grid-template-columns:repeat(2,40px);grid-template-rows:repeat(3,40px);gap:2px;">
+    <button class="joy-btn joy-orbit" title="Orbit Up" ontouchstart="keysHeld['KeyR']=true;event.preventDefault()" ontouchend="keysHeld['KeyR']=false" onmousedown="keysHeld['KeyR']=true" onmouseup="keysHeld['KeyR']=false">↑🎥</button>
+    <button class="joy-btn joy-fly" title="Fly Up" ontouchstart="keysHeld['KeyZ']=true;event.preventDefault()" ontouchend="keysHeld['KeyZ']=false" onmousedown="keysHeld['KeyZ']=true" onmouseup="keysHeld['KeyZ']=false">⬆️</button>
+    <button class="joy-btn joy-orbit" title="Orbit Left" ontouchstart="keysHeld['KeyQ']=true;event.preventDefault()" ontouchend="keysHeld['KeyQ']=false" onmousedown="keysHeld['KeyQ']=true" onmouseup="keysHeld['KeyQ']=false">↺</button>
+    <button class="joy-btn joy-orbit" title="Orbit Right" ontouchstart="keysHeld['KeyE']=true;event.preventDefault()" ontouchend="keysHeld['KeyE']=false" onmousedown="keysHeld['KeyE']=true" onmouseup="keysHeld['KeyE']=false">↻</button>
+    <button class="joy-btn joy-orbit" title="Orbit Down" ontouchstart="keysHeld['KeyF']=true;event.preventDefault()" ontouchend="keysHeld['KeyF']=false" onmousedown="keysHeld['KeyF']=true" onmouseup="keysHeld['KeyF']=false">↓🎥</button>
+    <button class="joy-btn joy-fly" title="Fly Down" ontouchstart="keysHeld['KeyX']=true;event.preventDefault()" ontouchend="keysHeld['KeyX']=false" onmousedown="keysHeld['KeyX']=true" onmouseup="keysHeld['KeyX']=false">⬇️</button>
+  </div>
+
+  <!-- ZOOM BUTTONS -->
+  <div style="display:flex;flex-direction:column;gap:2px;justify-content:center;">
+    <button class="joy-btn joy-zoom" ontouchstart="keysHeld['Equal']=true;event.preventDefault()" ontouchend="keysHeld['Equal']=false" onmousedown="keysHeld['Equal']=true" onmouseup="keysHeld['Equal']=false">🔍+</button>
+    <button class="joy-btn joy-zoom" ontouchstart="keysHeld['Minus']=true;event.preventDefault()" ontouchend="keysHeld['Minus']=false" onmousedown="keysHeld['Minus']=true" onmouseup="keysHeld['Minus']=false">🔍-</button>
+  </div>
 </div>
 
 <!-- HUD OVERLAY -->
@@ -349,12 +367,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   <!-- NAV HINT -->
   <div id="navHint" style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,215,0,0.3);border-radius:14px;padding:10px 14px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,215,0,0.8);text-align:center;backdrop-filter:blur(8px);line-height:1.8;max-width:180px;">
     <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;letter-spacing:1px;">NAVIGATE</div>
-    ⬆⬇⬅➡ <b style="color:#FFD700;">Arrow keys</b> = walk<br>
-    <b style="color:#FFD700;">W A S Q</b> = also walk<br>
-    <b style="color:#FFD700;">E</b>=fly up · <b style="color:#FFD700;">C</b>=fly down<br>
+    <b style="color:#FFD700;">W S</b> or ⬆⬇ = walk fwd/back<br>
+    <b style="color:#FFD700;">A D</b> = strafe left/right<br>
+    <b style="color:#FFD700;">Q E</b> or ⬅➡ = orbit left/right<br>
+    <b style="color:#FFD700;">R F</b> = orbit up/down<br>
+    <b style="color:#FFD700;">Z X</b> = fly up/down<br>
+    <b style="color:#FFD700;">+ -</b> = zoom in/out<br>
     🖱️ Right-drag = orbit<br>
-    ⌨️ <b style="color:#FFD700;">SPACE</b>+drag = orbit<br>
-    🖱️ Scroll / 📱 Pinch = zoom
+    ⌨️ SPACE+drag = orbit<br>
+    📱 Pinch = zoom
   </div>
   <!-- COMPASS ARROWS -->
   <div style="display:grid;grid-template-columns:repeat(3,36px);grid-template-rows:repeat(3,36px);gap:3px;opacity:0.75;">
@@ -2362,23 +2383,25 @@ document.addEventListener('wheel',e=>{
 },{passive:false});
 
 document.addEventListener('keydown',e=>{
-  if(e.target.tagName==='INPUT')return;
-  // Prevent page scroll on arrow/space keys
+  if(e.target.tagName==='INPUT') return;
+  keysHeld[e.code] = true;
+  // Prevent page scroll
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
-  if(e.code==='Space'){spaceDown=true;}
-  if(e.code==='Escape'){deselect();}
-  if(e.code==='KeyB')setMode('build');
-  // Don't intercept S/E/W/A/Q when no modifier — used for camera movement
-  // Only use them for mode switching with no selection
-  if(e.code==='KeyR'){if(selectedObj)gizmoRotate('y',90);else toast('Select a block first (✋ mode), then press R to rotate!');}
-  if(e.code==='KeyT'){if(selectedObj)gizmoRotate('x',90);else toast('Select a block first (✋ mode), then press T to tilt!');}
-  if(e.code==='KeyF'){if(selectedObj)gizmoRotate('z',90);else toast('Select a block first (✋ mode), then press F to flip!');}
+  if(e.code==='Space'){ spaceDown=true; }
+  if(e.code==='Escape'){ deselect(); }
+  // Mode switching with number keys
+  if(e.code==='Digit1') setMode('build');
+  if(e.code==='Digit2') setMode('select');
+  if(e.code==='Digit3') setMode('erase');
+  // T = tilt selected block X axis
+  if(e.code==='KeyT' && selectedObj) gizmoRotate('x',90);
   if((e.code==='Delete'||e.code==='Backspace')&&selectedObj){e.preventDefault();gizmoDelete();}
   if((e.code==='KeyZ')&&(e.ctrlKey||e.metaKey)){e.preventDefault();undo();}
   if(e.code==='KeyG')toggleGrid();
   if(selectedObj){
     const cam=new THREE.Vector3();camera.getWorldDirection(cam);cam.y=0;cam.normalize();
     const right=new THREE.Vector3(-cam.z,0,cam.x);
+    // Arrow keys move SELECTED BLOCK when something is selected
     if(e.code==='ArrowLeft'){e.preventDefault();moveSelected(Math.round(-right.x),0,Math.round(-right.z));}
     if(e.code==='ArrowRight'){e.preventDefault();moveSelected(Math.round(right.x),0,Math.round(right.z));}
     if(e.code==='ArrowUp'){e.preventDefault();moveSelected(Math.round(cam.x),0,Math.round(cam.z));}
@@ -2387,7 +2410,10 @@ document.addEventListener('keydown',e=>{
     if(e.code==='PageDown'){e.preventDefault();moveSelected(0,-1,0);}
   }
 });
-document.addEventListener('keyup',e=>{if(e.code==='Space')spaceDown=false;});
+document.addEventListener('keyup',e=>{
+  keysHeld[e.code] = false;
+  if(e.code==='Space') spaceDown=false;
+});
 
 // ── AUDIO ─────────────────────────────────────────────
 let actx=null;
@@ -2474,9 +2500,9 @@ function setMode(m){
   };
   toast(hints[m]||m);
   const modeHints={
-    build:'🧱 <b style="color:#FFD700;">BUILD MODE</b><br>Click to place selected block<br>Right-drag or Space+drag to orbit<br>Scroll/pinch to zoom in/out<br><span style="color:#FF8888;">Alt+click = delete anything</span>',
-    select:'✋ <b style="color:#FFD700;">SELECT MODE</b><br>Click any block to select it<br>Use MOVE arrows to reposition<br>Use ROTATE Y/X/Z buttons below<br>R=rotY · T=rotX · F=rotZ<br><span style="color:#FF8888;">Alt+click = quick delete</span>',
-    erase:'🗑️ <b style="color:#FFD700;">ERASE MODE</b><br>Click any block to delete it<br>Drag to erase many at once<br><span style="color:#FF8888;">Alt+click works in any mode!</span>'
+    build:'🧱 <b style="color:#FFD700;">BUILD MODE</b><br>Click to place block<br><b style="color:#aef;">W S ⬆⬇</b> walk · <b style="color:#aef;">A D</b> strafe<br><b style="color:#aef;">Q E ⬅➡</b> orbit · <b style="color:#aef;">R F</b> tilt<br><b style="color:#aef;">Z X</b> fly · <b style="color:#aef;">+-</b> zoom<br><span style="color:#FF8888;">Alt+click = delete</span>',
+    select:'✋ <b style="color:#FFD700;">SELECT MODE</b><br>Click block to select<br>Arrow keys move selected block<br>Use panel buttons to rotate/scale<br><b style="color:#aef;">T</b>=tilt X · PageUp/Dn=up/down<br><span style="color:#FF8888;">Alt+click = quick delete</span>',
+    erase:'🗑️ <b style="color:#FFD700;">ERASE MODE</b><br>Click any block to delete<br>Drag to erase many at once<br><span style="color:#FF8888;">Alt+click works in any mode!</span>'
   };
   document.getElementById('modeHint').innerHTML=modeHints[m]||'';
 }
