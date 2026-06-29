@@ -395,10 +395,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
       oninput="document.getElementById('wallBarHVal').textContent=this.value">
     <span id="wallBarHVal" style="font-family:'Fredoka One',cursive;font-size:13px;color:#44DDFF;min-width:16px;">3</span>
   </div>
+  <!-- Thickness -->
+  <div style="display:flex;align-items:center;gap:6px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.5);">Thick</span>
+    <input type="range" id="wallBarThick" min="0.1" max="1" step="0.05" value="0.2" style="width:60px;accent-color:#44DDFF;"
+      oninput="document.getElementById('wallBarThickVal').textContent=parseFloat(this.value).toFixed(2)">
+    <span id="wallBarThickVal" style="font-family:'Fredoka One',cursive;font-size:12px;color:#44DDFF;min-width:28px;">0.20</span>
+  </div>
 
   <!-- Status -->
   <div id="wallBarStatus" style="font-family:'Fredoka One',cursive;font-size:13px;
-    color:#FFD700;white-space:nowrap;">Click 1st point on ground</div>
+    color:#FFD700;white-space:nowrap;">Click & drag on floor to draw!</div>
 
   <button onclick="cancelWallDraw()" style="font-family:'Fredoka One',cursive;font-size:12px;
     padding:6px 12px;border-radius:10px;border:none;cursor:pointer;
@@ -2441,21 +2448,7 @@ canvas.addEventListener('pointerup',e=>{
       if(mode==='build'){
         const pos=getPlacePos(hits[0]);
 
-        // ── WALL DRAW: intercept clicks when wall tool active ──
-        if(wallActive){
-          if(!wallPt1){
-            // First point
-            wallPt1={x:pos.x,y:pos.y,z:pos.z};
-            const ws=document.getElementById('wallBarStatus');
-            if(ws) ws.textContent='✅ Point 1 set! Now click the other end';
-            toast('📐 Point 1 set! Click the OTHER end of your wall');
-            isDown=false; return;
-          } else {
-            // Second point — place wall!
-            placeWallBetween(wallPt1,{x:pos.x,y:pos.y,z:pos.z});
-            isDown=false; return;
-          }
-        }
+        // wall intercept handled in pointerdown now
 
         // Alt+click = delete
         if(e.altKey){
@@ -3163,86 +3156,120 @@ setTimeout(()=>{
   animate();
 },200);
 
-  // ── WALL DRAW SYSTEM (click point 1, then point 2) ──
+  // ── REAL WALL SYSTEM ─────────────────────────────────
+  // Walls are proper 3D panels, not blocks
+  // Each wall: {mesh, w, h, d, x, z, rotY, material}
+  const walls = [];
   let wallActive = false;
-  let wallPt1 = null;
+  let wallDragging = false;
+  let wallDragStart = null;  // {x,z} world start
   let wallPreviewMesh = null;
+  let wallPt1 = null; // keep for compat
+
+  // ── WALL MATERIAL ────────────────────────────────────
+  function getWallMat(){
+    const key=document.getElementById('wallBarMat')?.value||'brick-white';
+    const bd=BLOCKS[key];
+    return new THREE.MeshStandardMaterial({
+      color:new THREE.Color(bd?bd.c:0xF5F0E8),
+      roughness:bd?bd.r:0.85, metalness:0
+    });
+  }
+  function getWallH(){ return parseFloat(document.getElementById('wallBarH')?.value||3); }
+  function getWallThick(){ return parseFloat(document.getElementById('wallBarThick')?.value||0.2); }
 
   function toggleWallDraw(){
     if(wallActive){ cancelWallDraw(); return; }
-    wallActive = true;
-    wallPt1 = null;
-    // Show the wall bar
+    wallActive=true; wallDragging=false; wallDragStart=null;
+    if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
     const wb=document.getElementById('wallBar');
     if(wb) wb.style.display='flex';
-    // Highlight button
-    const btn=document.getElementById('rWall');
-    if(btn) btn.classList.add('active');
+    document.getElementById('rWall')?.classList.add('active');
     document.getElementById('modeLabel').textContent='📐 WALL DRAW';
     const bh=document.getElementById('bottomHint');
-    if(bh) bh.textContent='📐 Click anywhere on the ground for point 1 of your wall';
-    toast('📐 Wall Draw ON — click the ground for point 1!');
+    if(bh) bh.textContent='📐 Click and DRAG on the floor to draw a wall — release to place!';
+    toast('📐 Wall Draw ON — click and drag on the floor!');
   }
 
   function cancelWallDraw(){
-    wallActive=false; wallPt1=null;
+    wallActive=false; wallDragging=false; wallDragStart=null;
     if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
-    const wb=document.getElementById('wallBar');
-    if(wb) wb.style.display='none';
-    const btn=document.getElementById('rWall');
-    if(btn) btn.classList.remove('active');
+    document.getElementById('wallBar').style.display='none';
+    document.getElementById('rWall')?.classList.remove('active');
     document.getElementById('modeLabel').textContent='🧱 BUILD';
-    const bh=document.getElementById('bottomHint');
-    if(bh) bh.textContent='🧱 Click to place · Drag to orbit · Scroll to zoom';
+    document.getElementById('bottomHint').textContent='🧱 Click to place · Drag to orbit · Scroll to zoom';
     toast('Wall draw off');
   }
 
-  function updateWallPreview(pt2){
+  // Show live preview while dragging
+  function updateWallPreview(startWorld, endWorld){
     if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
-    if(!wallPt1||!pt2) return;
-    const h=parseInt(document.getElementById('wallBarH')?.value||3);
+    const h=getWallH(), thick=getWallThick();
+    const dx=endWorld.x-startWorld.x, dz=endWorld.z-startWorld.z;
+    const len=Math.sqrt(dx*dx+dz*dz);
+    if(len<0.2) return;
+    const angle=Math.atan2(dx,dz);
+    const cx=(startWorld.x+endWorld.x)/2;
+    const cz=(startWorld.z+endWorld.z)/2;
     const fy=currentFloor;
-    const dx=Math.abs(pt2.x-wallPt1.x), dz=Math.abs(pt2.z-wallPt1.z);
-    const isH=dx>=dz;
-    const len=Math.max(1,isH?dx+1:dz+1);
-    const cx=isH?(Math.min(wallPt1.x,pt2.x)+len/2):wallPt1.x+0.5;
-    const cz=isH?wallPt1.z+0.5:(Math.min(wallPt1.z,pt2.z)+len/2);
-    const bd=BLOCKS[document.getElementById('wallBarMat')?.value||'brick-white'];
-    const geo=new THREE.BoxGeometry(isH?len:1,h,isH?1:len);
-    const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({
-      color:new THREE.Color(bd?bd.c:0xffffff),transparent:true,opacity:0.45}));
-    mesh.position.set(cx,fy+h/2+0.5,cz);
-    mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),
-      new THREE.LineBasicMaterial({color:0x44DDFF,transparent:true,opacity:1})));
-    scene.add(mesh);
-    wallPreviewMesh=mesh;
+    const geo=new THREE.BoxGeometry(thick, h, len);
+    const mat=new THREE.MeshBasicMaterial({color:0x44DDFF,transparent:true,opacity:0.4});
+    wallPreviewMesh=new THREE.Mesh(geo,mat);
+    wallPreviewMesh.position.set(cx, fy+h/2, cz);
+    wallPreviewMesh.rotation.y=angle;
+    wallPreviewMesh.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({color:0x00EEFF,transparent:true,opacity:1})
+    ));
+    scene.add(wallPreviewMesh);
     const ws=document.getElementById('wallBarStatus');
-    if(ws) ws.textContent=`Wall: ${len} × ${h} blocks — click to place!`;
+    const m=document.getElementById('wallBarMat')?.value||'brick-white';
+    const bd=BLOCKS[m];
+    if(ws) ws.textContent=`${bd?bd.l:'Wall'}: ${len.toFixed(1)}m long × ${h}m high · Release to place!`;
   }
 
-  function placeWallBetween(pt1,pt2){
-    const mat=document.getElementById('wallBarMat')?.value||'brick-white';
-    const h=parseInt(document.getElementById('wallBarH')?.value||3);
-    const fy=currentFloor;
-    const dx=Math.abs(pt2.x-pt1.x), dz=Math.abs(pt2.z-pt1.z);
-    const isH=dx>=dz;
-    let count=0;
-    if(isH){
-      const mn=Math.min(pt1.x,pt2.x),mx=Math.max(pt1.x,pt2.x);
-      for(let x=mn;x<=mx;x++)
-        for(let y=1;y<=h;y++){placeBlock(x,fy+y,pt1.z,mat,true);count++;}
-    } else {
-      const mn=Math.min(pt1.z,pt2.z),mx=Math.max(pt1.z,pt2.z);
-      for(let z=mn;z<=mx;z++)
-        for(let y=1;y<=h;y++){placeBlock(pt1.x,fy+y,z,mat,true);count++;}
-    }
-    sndPlace();
-    // Chain — pt2 becomes new pt1
-    wallPt1={x:pt2.x,y:pt2.y,z:pt2.z};
+  // Place the real wall mesh
+  function placeRealWall(startWorld, endWorld){
     if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
+    const h=getWallH(), thick=getWallThick();
+    const dx=endWorld.x-startWorld.x, dz=endWorld.z-startWorld.z;
+    const len=Math.sqrt(dx*dx+dz*dz);
+    if(len<0.3){ toast('Wall too short! Drag further.'); return; }
+    const angle=Math.atan2(dx,dz);
+    const cx=(startWorld.x+endWorld.x)/2;
+    const cz=(startWorld.z+endWorld.z)/2;
+    const fy=currentFloor;
+
+    const geo=new THREE.BoxGeometry(thick,h,len);
+    const mesh=new THREE.Mesh(geo, getWallMat());
+    mesh.position.set(cx, fy+h/2, cz);
+    mesh.rotation.y=angle;
+    mesh.castShadow=true; mesh.receiveShadow=true;
+
+    // Edge lines for definition
+    mesh.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:0.15})
+    ));
+
+    // Store wall data for selection/editing
+    const wallData={mesh,len,h,thick,cx,cz,fy,angle,
+      matKey:document.getElementById('wallBarMat')?.value||'brick-white'};
+    mesh.userData={isWall:true, wallIdx:walls.length};
+    walls.push(wallData);
+    scene.add(mesh);
+    sndPlace();
+
     const ws=document.getElementById('wallBarStatus');
-    if(ws) ws.textContent=`✅ ${count} blocks placed! Click next corner`;
-    toast(`✅ Wall placed! ${count} blocks — click next corner to chain walls!`);
+    if(ws) ws.textContent='✅ Wall placed! Drag again for next wall';
+    toast(`✅ Wall placed! ${len.toFixed(1)}m long — drag for next wall!`);
+  }
+
+  // Get world position from hit point (flat ground level)
+  function hitToWorld(hit){
+    // Return the actual world hit point at floor level
+    const p=hit.point;
+    return {x:p.x, z:p.z};
   }
 
   // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
@@ -3272,6 +3299,7 @@ setTimeout(()=>{
   window.eraseAtHit      = eraseAtHit;
   window.toggleWallDraw  = toggleWallDraw;
   window.cancelWallDraw  = cancelWallDraw;
+  window.placeRealWall   = placeRealWall;
 
   window.keysHeld      = keysHeld;
 
