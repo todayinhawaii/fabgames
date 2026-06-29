@@ -2370,6 +2370,21 @@ canvas.addEventListener('pointerdown',e=>{
 
   if(e.button===2||e.button===1||spaceDown){isOrbiting=true;return;}
 
+  // ── WALL DRAW: capture start on click ──
+  if(mode==='wall' && e.button===0){
+    const hits=getHits(e);
+    if(hits.length>0){
+      const pos=getPlacePos(hits[0]);
+      wallDragStart={x:pos.x,y:pos.y,z:pos.z};
+      wallDragCurrent=null;
+      isDown=true; hasMoved=false;
+      toast('📐 Drag to draw wall · Release to place!');
+    } else {
+      toast('📐 Click on the ground or floor to start!');
+    }
+    return;
+  }
+
   // Check gizmo handles first
   if(mode==='select'&&gizmoGroup){
     const gh=getHitsGizmo(e);
