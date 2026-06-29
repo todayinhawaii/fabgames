@@ -2440,7 +2440,35 @@ canvas.addEventListener('pointerup',e=>{
       }
       if(mode==='build'){
         const pos=getPlacePos(hits[0]);
-        // If clicking an existing placed block in build mode, select it instead
+
+        // ── WALL DRAW: intercept clicks when wall tool active ──
+        if(wallActive){
+          if(!wallPt1){
+            // First point
+            wallPt1={x:pos.x,y:pos.y,z:pos.z};
+            const ws=document.getElementById('wallBarStatus');
+            if(ws) ws.textContent='✅ Point 1 set! Now click the other end';
+            toast('📐 Point 1 set! Click the OTHER end of your wall');
+            isDown=false; return;
+          } else {
+            // Second point — place wall!
+            placeWallBetween(wallPt1,{x:pos.x,y:pos.y,z:pos.z});
+            isDown=false; return;
+          }
+        }
+
+        // Alt+click = delete
+        if(e.altKey){
+          let t=hits[0].object;let lim=10;
+          while(t&&!placed[t.userData.key]&&lim-->0)t=t.parent;
+          if(t&&placed[t.userData.key]){
+            removeBlock(t.userData.x,t.userData.y,t.userData.z,true);
+            sndErase();toast('🗑️ Deleted!');
+          }
+          isDown=false;return;
+        }
+
+        // Normal build — place or select
         const existingKey=bk(pos.x,pos.y,pos.z);
         if(placed[existingKey]){
           setMode('select');
