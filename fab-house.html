@@ -163,14 +163,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 /* ── ROOM BUILDER ── */
 #roomPanel{
-  position:fixed;top:58px;left:50%;transform:translateX(-50%);
-  z-index:200;display:none;
-  background:rgba(0,0,0,0.95);backdrop-filter:blur(14px);
-  border:2px solid rgba(255,215,0,0.5);border-radius:18px;
-  padding:16px 22px;gap:12px;flex-direction:column;align-items:center;
-  box-shadow:0 0 40px rgba(255,215,0,0.25);min-width:340px;
+  position:fixed;inset:0;z-index:1000;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
 }
 #roomPanel.show{display:flex;}
+#roomPanelInner{
+  background:#0d1117;
+  border:2px solid rgba(255,215,0,0.6);border-radius:22px;
+  padding:24px 28px;display:flex;flex-direction:column;
+  align-items:center;gap:14px;
+  box-shadow:0 0 60px rgba(255,215,0,0.3);
+  max-width:480px;width:92vw;max-height:90vh;overflow-y:auto;
+}
 .rp-title{font-family:'Fredoka One',cursive;font-size:16px;color:#FFD700;letter-spacing:1px;}
 .rp-row{display:flex;align-items:center;gap:10px;width:100%;}
 .rp-label{font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,255,255,0.6);width:70px;}
@@ -246,8 +251,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   <div class="r-btn" id="rErase" onclick="setMode('erase')" title="Erase blocks (3)">
     <div class="r-icon">🗑️</div><div class="r-label">ERASE</div>
   </div>
-  <div class="r-btn" id="rRoom" onclick="setMode('room')" title="Room Builder">
-    <div class="r-icon">🏠</div><div class="r-label">ROOM</div>
+  <div class="r-btn" id="rRoom" title="Room Builder — build a complete room instantly!"
+    onclick="event.stopPropagation();setMode('room');console.log('ROOM clicked, mode=',mode);">
+    <div class="r-icon">🏠</div>
+    <div class="r-label">ROOM</div>
   </div>
   <div class="r-divider"></div>
   <div style="font-size:9px;color:rgba(255,215,0,0.5);letter-spacing:1px;font-family:'Fredoka One',cursive;padding:4px 0 2px;">VIEW</div>
@@ -358,7 +365,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 <!-- ROOM BUILDER PANEL -->
 <div id="roomPanel" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()">
-  <div class="rp-title">🏠 ROOM BUILDER</div>
+<div id="roomPanelInner">
+  <div class="rp-title" style="font-size:22px;">🏠 ROOM BUILDER</div>
 
   <div class="rp-row">
     <div class="rp-label">Width</div>
@@ -420,10 +428,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
   <div class="rp-preview" id="rpPreview">7 × 7 × 4 = ~196 blocks</div>
 
-  <div style="display:flex;gap:10px;">
+  <div style="display:flex;gap:10px;margin-top:4px;">
     <button class="rp-btn build" onclick="buildRoom()">🏗️ Build Room!</button>
     <button class="rp-btn cancel" onclick="setMode('build')">✕ Cancel</button>
   </div>
+</div><!-- end roomPanelInner -->
 </div>
 
 <!-- CREDITS PANEL -->
@@ -2699,8 +2708,14 @@ function setMode(m){
   // Room builder panel show/hide
   const roomPanelEl=document.getElementById('roomPanel');
   if(roomPanelEl){
-    if(m==='room'){ roomPanelEl.classList.add('show'); initRoomBuilder(); }
-    else roomPanelEl.classList.remove('show');
+    if(m==='room'){
+      roomPanelEl.style.display='flex';
+      roomPanelEl.classList.add('show');
+      try{ initRoomBuilder(); }catch(e){ console.error('initRoomBuilder error:',e); }
+    } else {
+      roomPanelEl.style.display='none';
+      roomPanelEl.classList.remove('show');
+    }
   }
 
   // Bottom hint text
