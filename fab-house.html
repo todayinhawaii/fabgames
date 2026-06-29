@@ -367,15 +367,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   <!-- NAV HINT -->
   <div id="navHint" style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,215,0,0.3);border-radius:14px;padding:10px 14px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,215,0,0.8);text-align:center;backdrop-filter:blur(8px);line-height:1.8;max-width:180px;">
     <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;letter-spacing:1px;">NAVIGATE</div>
-    <b style="color:#FFD700;">W S</b> or ⬆⬇ = walk fwd/back<br>
-    <b style="color:#FFD700;">A D</b> = strafe left/right<br>
-    <b style="color:#FFD700;">Q E</b> or ⬅➡ = orbit left/right<br>
-    <b style="color:#FFD700;">R F</b> = orbit up/down<br>
-    <b style="color:#FFD700;">Z X</b> = fly up/down<br>
-    <b style="color:#FFD700;">+ -</b> = zoom in/out<br>
-    🖱️ Right-drag = orbit<br>
-    ⌨️ SPACE+drag = orbit<br>
-    📱 Pinch = zoom
+    🖱️ <b style="color:#FFD700;">Drag anywhere</b> = orbit<br>
+    📱 <b style="color:#FFD700;">1 finger drag</b> = orbit<br>
+    📱 <b style="color:#FFD700;">2 finger pinch</b> = zoom<br>
+    🖱️ Scroll = zoom<br>
+    <b style="color:#FFD700;">W S ⬆⬇</b> = walk fwd/back<br>
+    <b style="color:#FFD700;">A D</b> = strafe · <b style="color:#FFD700;">Q E</b> = orbit<br>
+    <b style="color:#FFD700;">R F</b> = tilt · <b style="color:#FFD700;">Z X</b> = fly
   </div>
   <!-- COMPASS ARROWS -->
   <div style="display:grid;grid-template-columns:repeat(3,36px);grid-template-rows:repeat(3,36px);gap:3px;opacity:0.75;">
@@ -2165,11 +2163,17 @@ canvas.addEventListener('pointerdown',e=>{
 
 canvas.addEventListener('pointermove',e=>{
   const dx=e.clientX-prevMouse.x,dy=e.clientY-prevMouse.y;
-  if(Math.abs(dx)+Math.abs(dy)>3)hasMoved=true;
+  const dist=Math.abs(dx)+Math.abs(dy);
+  if(dist>3) hasMoved=true;
+
+  // If left button dragged and no active handle = ORBIT freely
+  if(isDown && hasMoved && !activeHandle && e.buttons===1){
+    isOrbiting=true;
+  }
 
   if(isOrbiting){
-    camTheta-=dx*0.008;
-    camPhi=Math.max(0.05,Math.min(Math.PI*0.48,camPhi-dy*0.008));
+    camTheta -= dx*0.008;
+    camPhi = Math.max(0.05, Math.min(Math.PI*0.48, camPhi - dy*0.008));
     updateCamera();
   } else if(activeHandle&&isDown&&hasMoved){
     const mdx=e.clientX-dragStartMouse.x;
@@ -2228,13 +2232,22 @@ canvas.addEventListener('pointermove',e=>{
 });
 
 canvas.addEventListener('pointerup',e=>{
-  if(!downOnCanvas){isDown=false;return;} // ignore if didn't start on canvas
+  if(!downOnCanvas){isDown=false;return;}
   downOnCanvas=false;
-  if(e.button===2||e.button===1||spaceDown){isOrbiting=false;activeHandle=null;return;}
-  
-  if(activeHandle){activeHandle=null;if(selectedObj)buildGizmo(selectedObj);isDown=false;return;}
+
+  if(activeHandle){
+    activeHandle=null;
+    if(selectedObj) buildGizmo(selectedObj);
+    isDown=false; isOrbiting=false; return;
+  }
+
+  // Was orbiting - stop, don't trigger action
+  if(isOrbiting && hasMoved){
+    isOrbiting=false; isDown=false; return;
+  }
   isOrbiting=false;
 
+  // Clean click (no drag) = place/select/erase
   if(isDown&&!hasMoved){
     const hits=getHits(e);
     if(hits.length>0){
@@ -2286,25 +2299,85 @@ canvas.addEventListener('wheel',e=>{
   updateCamera();
 },{passive:true});
 
-// Mobile pinch zoom — canvas only
+// ── TOUCH CONTROLS ────────────────────────────────────
 let lastPinchDist=0;
+let lastTouchX=0, lastTouchY=0;
+let touchOrbiting=false;
+
 canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    // Single finger = potential orbit
+    lastTouchX=e.touches[0].clientX;
+    lastTouchY=e.touches[0].clientY;
+    touchOrbiting=false;
+  }
   if(e.touches.length===2){
+    // Two fingers = pinch zoom
     lastPinchDist=Math.hypot(
       e.touches[0].clientX-e.touches[1].clientX,
       e.touches[0].clientY-e.touches[1].clientY
     );
+    touchOrbiting=false;
   }
-},{passive:true});
+},{passive:false});
+
 canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    const tx=e.touches[0].clientX;
+    const ty=e.touches[0].clientY;
+    const dx=tx-lastTouchX;
+    const dy=ty-lastTouchY;
+    if(Math.abs(dx)+Math.abs(dy)>4) touchOrbiting=true;
+    if(touchOrbiting){
+      camTheta -= dx*0.01;
+      camPhi = Math.max(0.05, Math.min(Math.PI*0.48, camPhi - dy*0.01));
+      updateCamera();
+    }
+    lastTouchX=tx; lastTouchY=ty;
+  }
   if(e.touches.length===2){
     const dist=Math.hypot(
       e.touches[0].clientX-e.touches[1].clientX,
       e.touches[0].clientY-e.touches[1].clientY
     );
     camRadius=Math.max(2,Math.min(80,camRadius-(dist-lastPinchDist)*0.05));
-    updateCamera();lastPinchDist=dist;
+    updateCamera();
+    lastPinchDist=dist;
   }
+},{passive:false});
+
+canvas.addEventListener('touchend',e=>{
+  if(!touchOrbiting && e.changedTouches.length===1){
+    // Quick tap = place/select/erase (simulate click)
+    const touch=e.changedTouches[0];
+    const fakeEvent={
+      clientX:touch.clientX, clientY:touch.clientY,
+      button:0, altKey:false, buttons:0
+    };
+    // Trigger the click action
+    const hits=getHits(fakeEvent);
+    if(hits.length>0){
+      if(mode==='build'){
+        if(fakeEvent.altKey){ eraseAtHit(hits[0]); }
+        else {
+          const pos=getPlacePos(hits[0]);
+          const existingKey=bk(pos.x,pos.y,pos.z);
+          if(placed[existingKey]){ setMode('select'); selectObject(placed[existingKey].mesh); }
+          else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
+        }
+      } else if(mode==='select'){
+        let t=hits[0].object;
+        while(t&&!placed[t.userData.key])t=t.parent;
+        if(t&&placed[t.userData.key]) selectObject(t);
+        else deselect();
+      } else if(mode==='erase'){
+        eraseAtHit(hits[0]);
+      }
+    } else { if(mode==='select') deselect(); }
+  }
+  touchOrbiting=false;
 },{passive:true});
 
 // ── KEYBOARD ──────────────────────────────────────────
