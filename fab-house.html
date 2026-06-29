@@ -1985,7 +1985,7 @@ setLoad(65);
 
 // ── STATE ─────────────────────────────────────────────
 let currentBlock='brick-red',mode='build',currentFloor=0;
-let placed={},undoStack=[],selectedObj=null;
+let placed={},undoStack=[],selectedObj=null,selectedWall=null;
 let ghostMesh=null,xrayMode=false,showGrid=true;
 
 // ── GHOST ─────────────────────────────────────────────
@@ -2200,7 +2200,9 @@ function selectObject(mesh){
 }
 
 function deselect(){
-  clearGizmo();selectedObj=null;
+  clearGizmo();
+  selectedObj=null;
+  selectedWall=null;
   document.getElementById('gizmoPanel').classList.remove('show');
 }
 
@@ -2274,7 +2276,9 @@ function getHits(e){
   mouse2.x=((cx-rect.left)/rect.width)*2-1;
   mouse2.y=-((cy-rect.top)/rect.height)*2+1;
   raycaster.setFromCamera(mouse2,camera);
-  const targets=[ground,...Object.values(placed).map(p=>p.mesh)];
+  // Include wall meshes in raycast targets
+  const wallMeshes=walls.map(w=>w.mesh);
+  const targets=[ground,...Object.values(placed).map(p=>p.mesh),...wallMeshes];
   const flat=[];
   targets.forEach(t=>t.traverse(c=>{if(c.isMesh)flat.push(c);}));
   return raycaster.intersectObjects(flat,false);
@@ -2442,13 +2446,16 @@ canvas.addEventListener('pointerup',e=>{
   downOnCanvas=false;
 
   // WALL DRAW — place wall on release
-  if(wallActive && wallDragging && wallDragStart){
-    const hits=getHits(e);
-    if(hits.length>0){
-      const p=hits[0].point;
-      placeRealWall(wallDragStart,{x:p.x,z:p.z});
+  if(wallActive && wallDragging){
+    if(wallDragStart){
+      const hits=getHits(e);
+      if(hits.length>0){
+        const p=hits[0].point;
+        placeRealWall(wallDragStart,{x:p.x,z:p.z});
+      }
     }
     wallDragging=false; wallDragStart=null;
+    isOrbiting=false;
     if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
     isDown=false; return;
   }
@@ -2488,6 +2495,16 @@ canvas.addEventListener('pointerup',e=>{
 
         // Alt+click = delete
         if(e.altKey){
+          // Check wall first
+          let chkW=hits[0].object;
+          while(chkW){
+            if(chkW.userData&&chkW.userData.isWall){
+              const wd=walls[chkW.userData.wallIdx];
+              if(wd){scene.remove(wd.mesh);walls.splice(chkW.userData.wallIdx,1);sndErase();toast('🗑️ Wall deleted!');}
+              isDown=false;return;
+            }
+            chkW=chkW.parent;
+          }
           let t=hits[0].object;let lim=10;
           while(t&&!placed[t.userData.key]&&lim-->0)t=t.parent;
           if(t&&placed[t.userData.key]){
@@ -2497,22 +2514,55 @@ canvas.addEventListener('pointerup',e=>{
           isDown=false;return;
         }
 
-        // Normal build — place or select
-        const existingKey=bk(pos.x,pos.y,pos.z);
-        if(placed[existingKey]){
-          setMode('select');
-          selectObject(placed[existingKey].mesh);
-        } else {
-          placeBlock(pos.x,pos.y,pos.z,currentBlock);
-          sndPlace();
+        // Check if clicking an existing wall
+        let hitWall2=null;
+        let chk2=hits[0].object;
+        while(chk2){
+          if(chk2.userData&&chk2.userData.isWall){hitWall2=walls[chk2.userData.wallIdx];break;}
+          chk2=chk2.parent;
+        }
+        if(hitWall2){ setMode('select'); selectWall(hitWall2); }
+        // Check if clicking placed block
+        else {
+          const existingKey=bk(pos.x,pos.y,pos.z);
+          if(placed[existingKey]){
+            setMode('select');
+            selectObject(placed[existingKey].mesh);
+          } else {
+            placeBlock(pos.x,pos.y,pos.z,currentBlock);
+            sndPlace();
+          }
         }
       } else if(mode==='select'){
         const hit=hits[0];
-        let t=hit.object;
-        while(t&&!placed[t.userData.key])t=t.parent;
-        if(t&&placed[t.userData.key])selectObject(t);
-        else deselect();
+        // Check if hit a wall
+        let hitWall=null;
+        let checkObj=hit.object;
+        while(checkObj){
+          if(checkObj.userData&&checkObj.userData.isWall){
+            hitWall=walls[checkObj.userData.wallIdx];
+            break;
+          }
+          checkObj=checkObj.parent;
+        }
+        if(hitWall){ selectWall(hitWall); }
+        else {
+          let t=hit.object;
+          while(t&&!placed[t.userData.key])t=t.parent;
+          if(t&&placed[t.userData.key])selectObject(t);
+          else deselect();
+        }
       } else if(mode==='erase'){
+        // Check if erasing a wall
+        let chkE=hits[0].object;
+        while(chkE){
+          if(chkE.userData&&chkE.userData.isWall){
+            const wd=walls[chkE.userData.wallIdx];
+            if(wd){scene.remove(wd.mesh);walls.splice(chkE.userData.wallIdx,1);sndErase();toast('🗑️ Wall erased!');}
+            isDown=false;return;
+          }
+          chkE=chkE.parent;
+        }
         eraseAtHit(hits[0]);
       }
     } else {
@@ -2607,6 +2657,16 @@ canvas.addEventListener('touchend',e=>{
         if(t&&placed[t.userData.key]) selectObject(t);
         else deselect();
       } else if(mode==='erase'){
+        // Check if erasing a wall
+        let chkE=hits[0].object;
+        while(chkE){
+          if(chkE.userData&&chkE.userData.isWall){
+            const wd=walls[chkE.userData.wallIdx];
+            if(wd){scene.remove(wd.mesh);walls.splice(chkE.userData.wallIdx,1);sndErase();toast('🗑️ Wall erased!');}
+            isDown=false;return;
+          }
+          chkE=chkE.parent;
+        }
         eraseAtHit(hits[0]);
       }
     } else { if(mode==='select') deselect(); }
@@ -2706,22 +2766,36 @@ document.addEventListener('keydown',e=>{
   if(e.code==='Digit3') setMode('erase');
   // T = tilt selected block X axis
   if(e.code==='KeyT' && selectedObj) gizmoRotate('x',90);
-  if((e.code==='Delete'||e.code==='Backspace')&&selectedObj){e.preventDefault();gizmoDelete();}
+  if(e.code==='Delete'||e.code==='Backspace'){
+    e.preventDefault();
+    if(selectedWall) deleteSelectedWall();
+    else if(selectedObj) gizmoDelete();
+  }
   if((e.code==='KeyZ')&&(e.ctrlKey||e.metaKey)){e.preventDefault();undo();}
   if(e.code==='KeyG')toggleGrid();
   if(selectedObj){
     const cam=new THREE.Vector3();camera.getWorldDirection(cam);cam.y=0;cam.normalize();
     const right=new THREE.Vector3(-cam.z,0,cam.x);
     // Arrow keys move SELECTED BLOCK when something is selected
-    if(e.code==='ArrowLeft'){e.preventDefault();moveSelected(Math.round(-right.x),0,Math.round(-right.z));}
-    if(e.code==='ArrowRight'){e.preventDefault();moveSelected(Math.round(right.x),0,Math.round(right.z));}
-    if(e.code==='ArrowUp'){e.preventDefault();moveSelected(Math.round(cam.x),0,Math.round(cam.z));}
-    if(e.code==='ArrowDown'){e.preventDefault();moveSelected(-Math.round(cam.x),0,-Math.round(cam.z));}
-    // E = move block UP, C = move block DOWN (only when block selected)
-    if(e.code==='KeyE'){e.preventDefault();moveSelected(0,1,0);toast('⬆️ Block moved up');}
-    if(e.code==='KeyC'){e.preventDefault();moveSelected(0,-1,0);toast('⬇️ Block moved down');}
-    if(e.code==='PageUp'){e.preventDefault();moveSelected(0,1,0);}
-    if(e.code==='PageDown'){e.preventDefault();moveSelected(0,-1,0);}
+    if(selectedWall){
+      // Arrow keys move WALL
+      const step=0.5;
+      if(e.code==='ArrowLeft'){e.preventDefault();moveSelectedWall(-right.x*step,0,-right.z*step);}
+      if(e.code==='ArrowRight'){e.preventDefault();moveSelectedWall(right.x*step,0,right.z*step);}
+      if(e.code==='ArrowUp'){e.preventDefault();moveSelectedWall(cam.x*step,0,cam.z*step);}
+      if(e.code==='ArrowDown'){e.preventDefault();moveSelectedWall(-cam.x*step,0,-cam.z*step);}
+      if(e.code==='KeyE'){e.preventDefault();moveSelectedWall(0,step,0);}
+      if(e.code==='KeyC'){e.preventDefault();moveSelectedWall(0,-step,0);}
+    } else {
+      if(e.code==='ArrowLeft'){e.preventDefault();moveSelected(Math.round(-right.x),0,Math.round(-right.z));}
+      if(e.code==='ArrowRight'){e.preventDefault();moveSelected(Math.round(right.x),0,Math.round(right.z));}
+      if(e.code==='ArrowUp'){e.preventDefault();moveSelected(Math.round(cam.x),0,Math.round(cam.z));}
+      if(e.code==='ArrowDown'){e.preventDefault();moveSelected(-Math.round(cam.x),0,-Math.round(cam.z));}
+      if(e.code==='KeyE'){e.preventDefault();moveSelected(0,1,0);}
+      if(e.code==='KeyC'){e.preventDefault();moveSelected(0,-1,0);}
+      if(e.code==='PageUp'){e.preventDefault();moveSelected(0,1,0);}
+      if(e.code==='PageDown'){e.preventDefault();moveSelected(0,-1,0);}
+    }
   }
 });
 document.addEventListener('keyup',e=>{
@@ -3308,6 +3382,53 @@ setTimeout(()=>{
     return {x:p.x, z:p.z};
   }
 
+  // ── WALL SELECTION & TRANSFORM ──────────────────────
+  function selectWall(wallData){
+    deselect();
+    selectedWall = wallData;
+    // Build gizmo around wall mesh
+    buildGizmo({mesh: wallData.mesh, type:'wall'});
+    document.getElementById('gizmoName').textContent = '🧱 ' + (BLOCKS[wallData.matKey]?.l||'Wall');
+    document.getElementById('gizmoPanel').classList.add('show');
+    toast('✋ Wall selected! Use arrows/E/C to move · Rotate buttons to spin · Delete to remove');
+  }
+
+  function deleteSelectedWall(){
+    if(!selectedWall) return;
+    scene.remove(selectedWall.mesh);
+    const idx=walls.indexOf(selectedWall);
+    if(idx>-1) walls.splice(idx,1);
+    deselect();
+    sndErase();
+    toast('🗑️ Wall deleted!');
+  }
+
+  function moveSelectedWall(dx,dy,dz){
+    if(!selectedWall) return;
+    selectedWall.mesh.position.x += dx;
+    selectedWall.mesh.position.y += dy;
+    selectedWall.mesh.position.z += dz;
+    buildGizmo({mesh:selectedWall.mesh,type:'wall'});
+    toast(`Moved wall`);
+  }
+
+  function rotateSelectedWall(axis,deg){
+    if(!selectedWall) return;
+    const rad=deg*Math.PI/180;
+    if(axis==='y') selectedWall.mesh.rotation.y+=rad;
+    else if(axis==='x') selectedWall.mesh.rotation.x+=rad;
+    else selectedWall.mesh.rotation.z+=rad;
+    buildGizmo({mesh:selectedWall.mesh,type:'wall'});
+    toast(`Rotated wall ${axis.toUpperCase()} ${deg}°`);
+  }
+
+  function scaleSelectedWall(factor){
+    if(!selectedWall) return;
+    selectedWall.mesh.scale.multiplyScalar(factor);
+    buildGizmo({mesh:selectedWall.mesh,type:'wall'});
+    toast(`Wall ${factor>1?'bigger':'smaller'}`);
+  }
+
   // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
   window.setMode       = setMode;
   window.undo          = undo;
@@ -3334,8 +3455,13 @@ setTimeout(()=>{
   window.addRoof       = addRoof;
   window.eraseAtHit      = eraseAtHit;
   window.toggleWallDraw  = toggleWallDraw;
-  window.cancelWallDraw  = cancelWallDraw;
-  window.placeRealWall   = placeRealWall;
+  window.cancelWallDraw    = cancelWallDraw;
+  window.placeRealWall     = placeRealWall;
+  window.selectWall        = selectWall;
+  window.deleteSelectedWall= deleteSelectedWall;
+  window.rotateSelectedWall= rotateSelectedWall;
+  window.scaleSelectedWall = scaleSelectedWall;
+  window.moveSelectedWall  = moveSelectedWall;
 
   window.keysHeld      = keysHeld;
 
