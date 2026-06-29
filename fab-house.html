@@ -156,6 +156,34 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 .load-sub{font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:30px;}
 .load-bar-wrap{width:200px;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;}
 .load-bar{height:100%;background:linear-gradient(90deg,#FFD700,#FF8C00);border-radius:4px;width:0%;transition:width 0.3s;}
+
+/* ── ROOM BUILDER ── */
+#roomPanel{
+  position:fixed;top:58px;left:50%;transform:translateX(-50%);
+  z-index:200;display:none;
+  background:rgba(0,0,0,0.95);backdrop-filter:blur(14px);
+  border:2px solid rgba(255,215,0,0.5);border-radius:18px;
+  padding:16px 22px;gap:12px;flex-direction:column;align-items:center;
+  box-shadow:0 0 40px rgba(255,215,0,0.25);min-width:340px;
+}
+#roomPanel.show{display:flex;}
+.rp-title{font-family:'Fredoka One',cursive;font-size:16px;color:#FFD700;letter-spacing:1px;}
+.rp-row{display:flex;align-items:center;gap:10px;width:100%;}
+.rp-label{font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,255,255,0.6);width:70px;}
+.rp-val{font-family:'Fredoka One',cursive;font-size:15px;color:#FFD700;width:32px;text-align:center;}
+.rp-slider{flex:1;accent-color:#FFD700;cursor:pointer;}
+.rp-swatch{width:28px;height:28px;border-radius:6px;border:2px solid rgba(255,255,255,0.2);cursor:pointer;transition:transform 0.15s;}
+.rp-swatch:hover{transform:scale(1.15);border-color:#FFD700;}
+.rp-swatch.active{border-color:#FFD700;box-shadow:0 0 10px rgba(255,215,0,0.5);}
+.rp-swatches{display:flex;gap:6px;flex-wrap:wrap;}
+.rp-check{display:flex;align-items:center;gap:6px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,255,255,0.7);cursor:pointer;}
+.rp-check input{accent-color:#FFD700;width:16px;height:16px;}
+.rp-btn{font-family:'Fredoka One',cursive;font-size:14px;padding:10px 20px;border-radius:12px;
+  border:none;cursor:pointer;transition:all 0.15s;box-shadow:0 3px 0 rgba(0,0,0,0.4);}
+.rp-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.3);}
+.rp-btn.build{background:linear-gradient(135deg,#FFD700,#FF8C00);color:#000;}
+.rp-btn.cancel{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);}
+.rp-preview{font-size:11px;color:rgba(255,255,255,0.35);text-align:center;font-family:'Nunito',sans-serif;}
 .joy-btn{
   width:44px;height:44px;border-radius:10px;border:none;cursor:pointer;
   background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);font-size:18px;
@@ -304,6 +332,76 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 </div>
 
 <div id="toast"></div>
+
+<!-- ROOM BUILDER PANEL -->
+<div id="roomPanel">
+  <div class="rp-title">🏠 ROOM BUILDER</div>
+
+  <div class="rp-row">
+    <div class="rp-label">Width</div>
+    <input type="range" class="rp-slider" id="rpWidth" min="3" max="16" value="7"
+      oninput="document.getElementById('rpWidthVal').textContent=this.value;updateRoomPreview()">
+    <div class="rp-val" id="rpWidthVal">7</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.3);">blocks</div>
+  </div>
+
+  <div class="rp-row">
+    <div class="rp-label">Depth</div>
+    <input type="range" class="rp-slider" id="rpDepth" min="3" max="16" value="7"
+      oninput="document.getElementById('rpDepthVal').textContent=this.value;updateRoomPreview()">
+    <div class="rp-val" id="rpDepthVal">7</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.3);">blocks</div>
+  </div>
+
+  <div class="rp-row">
+    <div class="rp-label">Height</div>
+    <input type="range" class="rp-slider" id="rpHeight" min="2" max="8" value="4"
+      oninput="document.getElementById('rpHeightVal').textContent=this.value;updateRoomPreview()">
+    <div class="rp-val" id="rpHeightVal">4</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.3);">blocks</div>
+  </div>
+
+  <!-- WALL MATERIAL -->
+  <div class="rp-row">
+    <div class="rp-label">Walls</div>
+    <div class="rp-swatches" id="rpWallSwatches"></div>
+  </div>
+
+  <!-- FLOOR MATERIAL -->
+  <div class="rp-row">
+    <div class="rp-label">Floor</div>
+    <div class="rp-swatches" id="rpFloorSwatches"></div>
+  </div>
+
+  <!-- ROOF MATERIAL -->
+  <div class="rp-row">
+    <div class="rp-label">Roof</div>
+    <div class="rp-swatches" id="rpRoofSwatches"></div>
+  </div>
+
+  <!-- OPTIONS -->
+  <div class="rp-row" style="gap:16px;flex-wrap:wrap;">
+    <label class="rp-check"><input type="checkbox" id="rpAddFloor" checked> Floor</label>
+    <label class="rp-check"><input type="checkbox" id="rpAddRoof" checked> Roof</label>
+    <label class="rp-check"><input type="checkbox" id="rpAddDoor" checked> Door gap</label>
+    <label class="rp-check"><input type="checkbox" id="rpAddWindows" checked> Windows</label>
+  </div>
+
+  <!-- FLOOR LEVEL -->
+  <div class="rp-row">
+    <div class="rp-label">Floor Y</div>
+    <input type="range" class="rp-slider" id="rpFloorY" min="0" max="10" value="0"
+      oninput="document.getElementById('rpFloorYVal').textContent=this.value">
+    <div class="rp-val" id="rpFloorYVal">0</div>
+  </div>
+
+  <div class="rp-preview" id="rpPreview">7 × 7 × 4 = ~196 blocks</div>
+
+  <div style="display:flex;gap:10px;">
+    <button class="rp-btn build" onclick="buildRoom()">🏗️ Build Room!</button>
+    <button class="rp-btn cancel" onclick="setMode('build')">✕ Cancel</button>
+  </div>
+</div>
 
 <!-- CREDITS PANEL -->
 <div id="creditsPanel" style="display:none;position:fixed;inset:0;z-index:500;
@@ -2568,8 +2666,15 @@ function setMode(m){
     const el=document.getElementById('r'+mm[0].toUpperCase()+mm.slice(1));
     if(el)el.classList.toggle('active',mm===m);
   });
-  const labels={build:'🧱 BUILD',select:'✋ SELECT',erase:'🗑️ ERASE'};
+  const labels={build:'🧱 BUILD',select:'✋ SELECT',erase:'🗑️ ERASE',room:'🏠 ROOM BUILDER'};
   document.getElementById('modeLabel').textContent=labels[m]||m;
+  // Show/hide room panel
+  const rp=document.getElementById('roomPanel');
+  if(m==='room'){ rp.classList.add('show'); initRoomBuilder(); }
+  else rp.classList.remove('show');
+  // Highlight room button
+  const rRoom=document.getElementById('rRoom');
+  if(rRoom) rRoom.classList.toggle('active',m==='room');
   const hints={
     build:'Left-click: place · Right-drag: orbit · Scroll: zoom',
     select:'Click object → drag handles · R: rotate · Arrows: move · Del: delete',
@@ -2579,7 +2684,8 @@ function setMode(m){
   const modeHints={
     build:'🧱 <b style="color:#FFD700;">BUILD MODE</b><br>Click to place block<br><b style="color:#aef;">W S ⬆⬇</b> walk · <b style="color:#aef;">A D</b> strafe<br><b style="color:#aef;">Q E ⬅➡</b> orbit · <b style="color:#aef;">R F</b> tilt<br><b style="color:#aef;">Z X</b> fly · <b style="color:#aef;">+-</b> zoom<br><span style="color:#FF8888;">Alt+click = delete</span>',
     select:'✋ <b style="color:#FFD700;">SELECT MODE</b><br>Click block to select<br><b style="color:#aef;">Arrows</b> = move forward/back/sides<br><b style="color:#aef;">E</b> = move block UP · <b style="color:#aef;">C</b> = move block DOWN<br><b style="color:#aef;">T</b> = tilt · Del = delete<br><span style="color:#FF8888;">Alt+click = quick delete</span>',
-    erase:'🗑️ <b style="color:#FFD700;">ERASE MODE</b><br>Click any block to delete<br>Drag to erase many at once<br><span style="color:#FF8888;">Alt+click works in any mode!</span>'
+    erase:'🗑️ <b style="color:#FFD700;">ERASE MODE</b><br>Click any block to delete<br>Drag to erase many at once<br><span style="color:#FF8888;">Alt+click works in any mode!</span>',
+    room:'🏠 <b style="color:#FFD700;">ROOM BUILDER</b><br>Set size, materials & options<br>Click Build Room to place it<br>Room appears centred on view'
   };
   document.getElementById('modeHint').innerHTML=modeHints[m]||'';
 }
@@ -2663,6 +2769,166 @@ function addGLBModel(key, file, scale, yOffset, credit, label, emoji, color){
   toast('✅ Model registered: ' + label);
 }
 
+// ── ROOM BUILDER ─────────────────────────────────────
+const ROOM_WALL_OPTIONS = [
+  {key:'brick-red',    color:'#CC4422'},
+  {key:'brick-white',  color:'#F5F0E8'},
+  {key:'brick-grey',   color:'#888888'},
+  {key:'brick-dark',   color:'#333333'},
+  {key:'wood-light',   color:'#D4A855'},
+  {key:'wood-dark',    color:'#7B4F2E'},
+  {key:'brick-blue',   color:'#4488CC'},
+  {key:'brick-green',  color:'#449944'},
+  {key:'concrete',     color:'#AAAAAA'},
+  {key:'brick-pink',   color:'#DD88AA'},
+];
+const ROOM_FLOOR_OPTIONS = [
+  {key:'floor-wood',    color:'#C4845A'},
+  {key:'floor-marble',  color:'#F0F0F8'},
+  {key:'floor-tile',    color:'#DDDDDD'},
+  {key:'floor-carpet-r',color:'#CC3333'},
+  {key:'floor-carpet-b',color:'#3355AA'},
+  {key:'grass',         color:'#4CAF50'},
+  {key:'stone-path',    color:'#AA9988'},
+  {key:'concrete',      color:'#AAAAAA'},
+];
+const ROOM_ROOF_OPTIONS = [
+  {key:'roof-red',    color:'#CC3322'},
+  {key:'roof-grey',   color:'#778899'},
+  {key:'roof-green',  color:'#337733'},
+  {key:'roof-orange', color:'#CC7722'},
+  {key:'roof-black',  color:'#222222'},
+  {key:'roof-tiles',  color:'#AA6644'},
+  {key:'floor-wood',  color:'#C4845A'},
+  {key:'concrete',    color:'#AAAAAA'},
+];
+
+let roomWall   = 'brick-white';
+let roomFloor  = 'floor-wood';
+let roomRoof   = 'roof-red';
+
+function initRoomBuilder(){
+  function makeSwatches(containerId, options, currentRef, setter){
+    const el = document.getElementById(containerId);
+    if(!el) return;
+    el.innerHTML = '';
+    options.forEach(opt=>{
+      const sw = document.createElement('div');
+      sw.className = 'rp-swatch' + (opt.key===currentRef?' active':'');
+      sw.style.background = opt.color;
+      sw.title = BLOCKS[opt.key]?BLOCKS[opt.key].l:opt.key;
+      sw.onclick = ()=>{
+        setter(opt.key);
+        el.querySelectorAll('.rp-swatch').forEach(s=>s.classList.remove('active'));
+        sw.classList.add('active');
+      };
+      el.appendChild(sw);
+    });
+  }
+  makeSwatches('rpWallSwatches',  ROOM_WALL_OPTIONS,  roomWall,  v=>{roomWall=v;});
+  makeSwatches('rpFloorSwatches', ROOM_FLOOR_OPTIONS, roomFloor, v=>{roomFloor=v;});
+  makeSwatches('rpRoofSwatches',  ROOM_ROOF_OPTIONS,  roomRoof,  v=>{roomRoof=v;});
+  updateRoomPreview();
+}
+
+function updateRoomPreview(){
+  const w = parseInt(document.getElementById('rpWidth').value);
+  const d = parseInt(document.getElementById('rpDepth').value);
+  const h = parseInt(document.getElementById('rpHeight').value);
+  // Estimate block count
+  const walls  = 2*(w+d)*h - 4*h; // perimeter * height - corners
+  const floor  = w*d;
+  const roof   = w*d;
+  const total  = walls + floor + roof;
+  document.getElementById('rpPreview').textContent =
+    `${w} wide × ${d} deep × ${h} tall — approx ${total} blocks`;
+}
+
+function buildRoom(){
+  const w   = parseInt(document.getElementById('rpWidth').value);
+  const d   = parseInt(document.getElementById('rpDepth').value);
+  const h   = parseInt(document.getElementById('rpHeight').value);
+  const fy  = parseInt(document.getElementById('rpFloorY').value);
+  const addFloor   = document.getElementById('rpAddFloor').checked;
+  const addRoof    = document.getElementById('rpAddRoof').checked;
+  const addDoor    = document.getElementById('rpAddDoor').checked;
+  const addWindows = document.getElementById('rpAddWindows').checked;
+
+  // Centre room at camera target
+  const ox = Math.floor(camTarget.x - w/2);
+  const oz = Math.floor(camTarget.z - d/2);
+  const oy = fy;
+
+  let count = 0;
+
+  // ── FLOOR ──
+  if(addFloor){
+    for(let x=0;x<w;x++) for(let z=0;z<d;z++){
+      placeBlock(ox+x, oy, oz+z, roomFloor, false);
+      count++;
+    }
+  }
+
+  // ── WALLS ──
+  for(let y=1;y<=h;y++){
+    for(let x=0;x<w;x++){
+      // Front wall (z=0)
+      let skipFront = false;
+      if(addDoor && y<=2 && x===Math.floor(w/2)) skipFront=true;
+      if(addWindows && y===2 && (x===1||x===w-2)) skipFront=true;
+      if(!skipFront){ placeBlock(ox+x, oy+y, oz, roomWall, false); count++; }
+
+      // Back wall
+      let skipBack = false;
+      if(addWindows && y===2 && (x===1||x===w-2)) skipBack=true;
+      if(!skipBack){ placeBlock(ox+x, oy+y, oz+d-1, roomWall, false); count++; }
+    }
+    for(let z=1;z<d-1;z++){
+      // Left wall
+      let skipLeft = false;
+      if(addWindows && y===2 && z===Math.floor(d/2)) skipLeft=true;
+      if(!skipLeft){ placeBlock(ox, oy+y, oz+z, roomWall, false); count++; }
+
+      // Right wall
+      let skipRight = false;
+      if(addWindows && y===2 && z===Math.floor(d/2)) skipRight=true;
+      if(!skipRight){ placeBlock(ox+w-1, oy+y, oz+z, roomWall, false); count++; }
+    }
+  }
+
+  // ── WINDOWS (glass in wall gaps) ──
+  if(addWindows){
+    // Front windows
+    placeBlock(ox+1,       oy+2, oz, 'win-clear', false);
+    placeBlock(ox+w-2,     oy+2, oz, 'win-clear', false);
+    // Back windows
+    placeBlock(ox+1,       oy+2, oz+d-1, 'win-clear', false);
+    placeBlock(ox+w-2,     oy+2, oz+d-1, 'win-clear', false);
+    // Side windows
+    placeBlock(ox,         oy+2, oz+Math.floor(d/2), 'win-clear', false);
+    placeBlock(ox+w-1,     oy+2, oz+Math.floor(d/2), 'win-clear', false);
+  }
+
+  // ── ROOF ──
+  if(addRoof){
+    for(let x=0;x<w;x++) for(let z=0;z<d;z++){
+      placeBlock(ox+x, oy+h+1, oz+z, roomRoof, false);
+      count++;
+    }
+  }
+
+  // Record as single undo action
+  undoStack.push({action:'room', count});
+
+  // Move camera to look at the room
+  camTarget.set(ox+w/2, oy+h/2, oz+d/2);
+  camRadius = Math.max(w,d) * 1.8;
+  updateCamera();
+
+  setMode('build');
+  toast(`🏠 Room built! ${count} blocks placed · Walk inside with W key!`);
+}
+
 function saveScreenshot(){
   renderer.render(scene,camera);
   const a=document.createElement('a');a.download='fab-house.png';
@@ -2728,6 +2994,7 @@ function buildStarter(){
 
 setLoad(85);
 buildPalette();
+initRoomBuilder();
 setLoad(95);
 buildStarter();
 setLoad(100);
