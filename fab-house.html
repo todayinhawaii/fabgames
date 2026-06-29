@@ -2389,16 +2389,18 @@ canvas.addEventListener('pointermove',e=>{
   const dist=Math.abs(dx)+Math.abs(dy);
   if(dist>3) hasMoved=true;
 
-  // Wall draw mode - show preview
-  if(mode==='wall' && wallDragStart && isDown){
-    const hits=getHits(e);
-    if(hits.length>0){
-      const pos=getPlacePos(hits[0]);
-      wallDragCurrent={x:pos.x,y:pos.y,z:pos.z};
-      showWallPreview(wallDragStart, wallDragCurrent);
+  // Wall draw mode — show live preview, BLOCK orbit
+  if(mode==='wall'){
+    if(wallDragStart && isDown){
+      const hits=getHits(e);
+      if(hits.length>0){
+        const pos=getPlacePos(hits[0]);
+        wallDragCurrent={x:pos.x,y:pos.y,z:pos.z};
+        showWallPreview(wallDragStart, wallDragCurrent);
+      }
     }
     prevMouse={x:e.clientX,y:e.clientY};
-    return;
+    return; // never orbit in wall mode
   }
 
   // If left button dragged and no active handle = ORBIT freely
@@ -2476,21 +2478,24 @@ canvas.addEventListener('pointerup',e=>{
     isDown=false; isOrbiting=false; return;
   }
 
-  // Wall draw - place wall on release
-  if(mode==='wall' && wallDragStart){
-    clearWallPreview();
-    if(wallDragCurrent && (wallDragCurrent.x!==wallDragStart.x || wallDragCurrent.z!==wallDragStart.z)){
-      placeWall(wallDragStart, wallDragCurrent);
-    } else if(wallDragStart){
-      // Single click = single column wall
-      const h=parseInt(document.getElementById('wpHeight')?.value||3);
-      const fy=parseInt(document.getElementById('wpFloorY')?.value||0);
-      for(let y=1;y<=h;y++) placeBlock(wallDragStart.x,fy+y,wallDragStart.z,wallMat,true);
-      sndPlace();
-      toast('Wall column placed!');
+  // Wall draw — place on mouse release
+  if(mode==='wall'){
+    if(wallDragStart){
+      clearWallPreview();
+      if(wallDragCurrent &&
+        (wallDragCurrent.x!==wallDragStart.x || wallDragCurrent.z!==wallDragStart.z)){
+        placeWall(wallDragStart, wallDragCurrent);
+      } else {
+        // Single click = place single column
+        const h=parseInt(document.getElementById('wpHeight')?.value||3);
+        const fy=parseInt(document.getElementById('wpFloorY')?.value||0);
+        for(let y=1;y<=h;y++) placeBlock(wallDragStart.x,fy+y,wallDragStart.z,wallMat,true);
+        sndPlace();
+        toast('📐 Single wall column placed! Drag for longer walls.');
+      }
+      wallDragStart=null; wallDragCurrent=null;
     }
-    wallDragStart=null; wallDragCurrent=null;
-    isDown=false; return;
+    isDown=false; isOrbiting=false; return;
   }
 
   // Was orbiting - stop, don't trigger action
@@ -3279,8 +3284,8 @@ setTimeout(()=>{
     });
     document.getElementById('modeLabel').textContent = '📐 DRAW WALLS';
     const bh=document.getElementById('bottomHint');
-    if(bh) bh.textContent='📐 Click floor to start wall · Drag to extend · Release to place! · Esc to stop';
-    toast('📐 Wall Draw ON! Click and drag on the floor to draw walls!');
+    if(bh) bh.textContent='📐 WALL DRAW: Click ground to start · Drag to extend · Release to place · Esc to stop drawing';
+    toast('📐 Wall Draw active! Click on the ground or floor, then drag to build a wall!');
   }
 
   function clearWallPreview(){
