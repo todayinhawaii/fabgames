@@ -3052,52 +3052,50 @@ canvas.addEventListener('pointerup',e=>{
   isDown=false;
 });
 
-// ── BULLETPROOF DESELECT-ON-EMPTY-CLICK ───────────────
-// A completely independent, minimal safety net: regardless of what the
-// complex pointerdown/pointerup branching above decided, if the user is
-// in SELECT mode, didn't drag, and the click did NOT land on a currently
-// selected object's own mesh or its gizmo handles, force a deselect.
-// This guarantees "click anywhere else to deselect" always works, even
-// if some other code path intercepts the event first.
-let simpleClickStart=null;
+// ── SIMPLE, ISOLATED DESELECT-ON-EMPTY-CLICK ──────────
+// Completely standalone toggle system, independent of all the complex
+// build/erase/wall logic above. Tracks its own click state and does
+// its own raycast directly against whatever is currently selected.
+let toggleDownPos=null;
+
 canvas.addEventListener('pointerdown',e=>{
-  if(e.button===0) simpleClickStart={x:e.clientX,y:e.clientY,time:Date.now()};
-},{capture:true});
+  toggleDownPos={x:e.clientX,y:e.clientY};
+},{capture:false});
 
 canvas.addEventListener('pointerup',e=>{
-  if(mode!=='select') { simpleClickStart=null; return; }
-  if(!simpleClickStart){ dbg('BULLETPROOF: no simpleClickStart recorded'); return; }
-  const dx=e.clientX-simpleClickStart.x, dy=e.clientY-simpleClickStart.y;
-  const moved=Math.abs(dx)+Math.abs(dy)>5;
-  const quick=(Date.now()-simpleClickStart.time)<600;
-  simpleClickStart=null;
-  if(moved || !quick){
-    dbg('BULLETPROOF: ignored, moved='+moved+' quick='+quick);
-    return;
-  }
+  if(mode!=='select'){ toggleDownPos=null; return; }
+  if(!toggleDownPos){ return; }
 
+  const dx=e.clientX-toggleDownPos.x, dy=e.clientY-toggleDownPos.y;
+  const wasClick=(Math.abs(dx)+Math.abs(dy))<6; // genuine click, not a drag
+  toggleDownPos=null;
+  if(!wasClick) return;
+
+  // Run on the next tick, after any selection-handling code above has
+  // already had a chance to run and possibly select something new.
   setTimeout(()=>{
-    if(!selectedObj && !selectedWall){
-      dbg('BULLETPROOF: nothing selected after timeout, nothing to do');
-      return;
-    }
+    if(!selectedObj && !selectedWall) return; // nothing to deselect
 
     const rect=canvas.getBoundingClientRect();
-    mouse2.x=((e.clientX-rect.left)/rect.width)*2-1;
-    mouse2.y=-((e.clientY-rect.top)/rect.height)*2+1;
-    raycaster.setFromCamera(mouse2,camera);
+    const rc=new THREE.Raycaster();
+    const m=new THREE.Vector2(
+      ((e.clientX-rect.left)/rect.width)*2-1,
+      -((e.clientY-rect.top)/rect.height)*2+1
+    );
+    rc.setFromCamera(m,camera);
 
-    const currentMesh = selectedWall ? selectedWall.mesh : selectedObj.mesh;
-    const hits=raycaster.intersectObject(currentMesh,true);
+    const targetMesh = selectedWall ? selectedWall.mesh : selectedObj.mesh;
+    const hitsOnTarget = rc.intersectObject(targetMesh,true);
 
-    dbg('BULLETPROOF check ran. selectedObj='+!!selectedObj+' selectedWall='+!!selectedWall+
-      ' hits on current mesh='+hits.length+' -> '+(hits.length===0?'WILL DESELECT':'click was ON the object, leaving selected'));
+    dbg('TOGGLE check: selected='+(selectedWall?'wall':'obj')+
+      ' hitsOnTarget='+hitsOnTarget.length+
+      ' -> '+(hitsOnTarget.length===0?'DESELECTING NOW':'click was on the object, keeping selection'));
 
-    if(hits.length===0){
+    if(hitsOnTarget.length===0){
       deselect();
     }
-  },0);
-},{capture:true});
+  },50);
+});
 
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{
