@@ -3069,12 +3069,17 @@ canvas.addEventListener('pointerup',e=>{
 
         if(foundWall) selectWall(foundWall);
         else if(foundBlock) selectObject(foundBlock);
-        else if(foundStructural && e.detail>=2){
+        else if(foundStructural && (Date.now()-lastClickTime)<400 && lastClickTarget===foundStructural){
           // Double-click on structural block — select it for editing
           selectObject(foundStructural);
-          toast('🧱 Structural block selected! Adjust colour & size in panel →');
+          toast('🧱 Double-clicked! Adjust colour & size in the panel →');
+          lastClickTime=0; // reset so triple-click doesn't re-trigger
+        } else if(foundStructural){
+          // First click on structural — record it for potential double-click
+          lastClickTime=Date.now();
+          lastClickTarget=foundStructural;
         }
-        // else: single click on structural or terrain = just deselect, done!
+        // else: clicked terrain = just deselect, done!
       } else if(mode==='erase'){
         // Check if erasing a wall
         let chkE=hits[0].object;
