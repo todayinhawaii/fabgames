@@ -3023,37 +3023,32 @@ canvas.addEventListener('pointerup',e=>{
         }
       } else if(mode==='select'){
         const hit=hits[0];
-        // Always deselect first — then re-select whatever was actually clicked
+        // Always deselect first
         deselect();
 
-        // NON-FURNITURE blocks — clicking these deselects without selecting them.
-        // They can still be erased in ERASE mode. Only furniture/trees/decorations
-        // get selected in SELECT mode.
-        const NON_SELECTABLE = new Set([
-          // Ground cover
-          'grass','water','sand','pool-water','stone-path','decking',
-          'fence-wood','fence-iron','hedge','pool-steps',
-          // Structural walls
+        // Ground-only blocks — pure terrain, never selectable even on double-click
+        const TERRAIN_ONLY = new Set([
+          'grass','water','sand','pool-water','stone-path',
+          'decking','fence-wood','fence-iron','hedge','pool-steps',
+        ]);
+
+        // Structural blocks — single click deselects (acts as empty space),
+        // but DOUBLE-CLICK selects them so you can recolour/resize them too.
+        const STRUCTURAL = new Set([
           'brick-red','brick-white','brick-grey','brick-dark','brick-blue',
           'brick-green','brick-pink','brick-black','brick-yellow',
           'wood-light','wood-dark','concrete','marble-white','marble-black',
-          // Floors
           'floor-wood','floor-marble','floor-tile',
           'floor-carpet-r','floor-carpet-b','floor-carpet-g',
-          // Roofs
           'roof-red','roof-grey','roof-green','roof-orange',
           'roof-black','roof-tiles',
-          // Windows & doors
           'win-clear','win-tinted','win-arched',
           'door-wood','door-glass',
-          // Columns/pillars
-          'column','pillar','chimney',
-          // Stairs
-          'stairs','stairs-spiral',
+          'column','pillar','chimney','stairs','stairs-spiral',
         ]);
 
         // Walk up to find wall or placed block
-        let foundWall=null, foundBlock=null;
+        let foundWall=null, foundBlock=null, foundStructural=null;
         let node=hit.object;
         while(node){
           if(node.userData){
@@ -3061,18 +3056,25 @@ canvas.addEventListener('pointerup',e=>{
               foundWall=walls[node.userData.wallIdx]; break;
             }
             if(node.userData.key && placed[node.userData.key]){
-              // Only select if it's not a background/terrain block
-              if(!NON_SELECTABLE.has(placed[node.userData.key].type)){
-                foundBlock=node;
+              const t=placed[node.userData.key].type;
+              if(!TERRAIN_ONLY.has(t)){
+                if(STRUCTURAL.has(t)) foundStructural=node;
+                else foundBlock=node;
               }
               break;
             }
           }
           node=node.parent;
         }
+
         if(foundWall) selectWall(foundWall);
         else if(foundBlock) selectObject(foundBlock);
-        // else: clicked background or empty — stays deselected!
+        else if(foundStructural && e.detail>=2){
+          // Double-click on structural block — select it for editing
+          selectObject(foundStructural);
+          toast('🧱 Structural block selected! Adjust colour & size in panel →');
+        }
+        // else: single click on structural or terrain = just deselect, done!
       } else if(mode==='erase'){
         // Check if erasing a wall
         let chkE=hits[0].object;
