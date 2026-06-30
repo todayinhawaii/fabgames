@@ -3054,12 +3054,19 @@ canvas.addEventListener('pointerup',e=>{
 
 // ── SIMPLE, ISOLATED DESELECT-ON-EMPTY-CLICK ──────────
 // Completely standalone toggle system, independent of all the complex
-// build/erase/wall logic above. Tracks its own click state and does
-// its own raycast directly against whatever is currently selected.
+// build/erase/wall logic above. Records what WAS selected before the
+// click, then after the main click-handling logic has run, compares:
+// if the selection is unchanged (still the exact same object), the
+// main logic did NOT pick a deliberate new target — meaning this was
+// a click on empty space / something irrelevant — so we deselect.
+// If the selection DID change (different object, or newly selected
+// from nothing), we leave it alone since that was a real selection.
 let toggleDownPos=null;
+let preClickSelection=null;
 
 canvas.addEventListener('pointerdown',e=>{
   toggleDownPos={x:e.clientX,y:e.clientY};
+  preClickSelection = selectedWall || selectedObj || null;
 },{capture:false});
 
 canvas.addEventListener('pointerup',e=>{
@@ -3071,27 +3078,20 @@ canvas.addEventListener('pointerup',e=>{
   toggleDownPos=null;
   if(!wasClick) return;
 
-  // Run on the next tick, after any selection-handling code above has
-  // already had a chance to run and possibly select something new.
+  const wasSelectedBefore = preClickSelection;
+
+  // Run after the main click-handling logic above has fully finished
   setTimeout(()=>{
-    if(!selectedObj && !selectedWall) return; // nothing to deselect
+    const nowSelected = selectedWall || selectedObj || null;
 
-    const rect=canvas.getBoundingClientRect();
-    const rc=new THREE.Raycaster();
-    const m=new THREE.Vector2(
-      ((e.clientX-rect.left)/rect.width)*2-1,
-      -((e.clientY-rect.top)/rect.height)*2+1
-    );
-    rc.setFromCamera(m,camera);
+    dbg('TOGGLE check: before='+(wasSelectedBefore?wasSelectedBefore.mesh.uuid.slice(0,6):'none')+
+      ' after='+(nowSelected?nowSelected.mesh.uuid.slice(0,6):'none')+
+      ' sameObject='+(wasSelectedBefore===nowSelected));
 
-    const targetMesh = selectedWall ? selectedWall.mesh : selectedObj.mesh;
-    const hitsOnTarget = rc.intersectObject(targetMesh,true);
-
-    dbg('TOGGLE check: selected='+(selectedWall?'wall':'obj')+
-      ' hitsOnTarget='+hitsOnTarget.length+
-      ' -> '+(hitsOnTarget.length===0?'DESELECTING NOW':'click was on the object, keeping selection'));
-
-    if(hitsOnTarget.length===0){
+    // If something was selected before the click, and it's STILL the
+    // exact same object after the click, the main logic didn't treat
+    // this as a deliberate new selection — so deselect it now.
+    if(wasSelectedBefore && nowSelected===wasSelectedBefore){
       deselect();
     }
   },50);
