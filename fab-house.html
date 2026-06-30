@@ -2426,8 +2426,22 @@ function applyObjTint(obj, hex){
   obj.tintHex = hex;
   obj.mesh.traverse(c=>{
     if(!c.isMesh || !c.material) return;
-    // Skip glowing/emissive bits (fire, lamp bulbs etc) so they keep their glow
-    if(c.material.emissiveIntensity && c.material.emissiveIntensity>0.3) return;
+    // Skip glowing/emissive bits (fire, lamp bulbs etc) so they keep their glow.
+    // NOTE: emissiveIntensity defaults to 1.0 on EVERY MeshStandardMaterial even
+    // when not explicitly set — so we must check the actual emissive COLOR too.
+    // Only skip if there's a genuinely non-black emissive colour set (real glow),
+    // not just the default emissiveIntensity value with emissive=black (no glow).
+    const em = c.material.emissive;
+    const hasRealGlow = em && (em.r>0.05 || em.g>0.05 || em.b>0.05);
+    if(hasRealGlow) return;
+
+    // IMPORTANT: materials can be shared/cached between multiple block instances
+    // (e.g. all bricks of the same colour use one cached material). Cloning here
+    // ensures tinting THIS object never affects every other block sharing it.
+    if(!c.userData.tintedMaterial){
+      c.material = c.material.clone();
+      c.userData.tintedMaterial = true;
+    }
 
     if(!c.userData.origColor) c.userData.origColor = c.material.color.clone();
 
