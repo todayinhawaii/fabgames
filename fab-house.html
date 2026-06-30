@@ -2298,9 +2298,12 @@ function buildGizmo(obj){
     torus.renderOrder=999;
     gizmoGroup.add(torus);
 
-    // Invisible bigger torus for easier grabbing
+    // Invisible bigger torus for easier grabbing — kept modest so it
+    // doesn't swallow clicks far away from the visible ring (was 0.22,
+    // which on a large/stretched object could intercept deselect clicks
+    // well outside what looks like empty space to the user).
     const hit=new THREE.Mesh(
-      new THREE.TorusGeometry(r,0.22,8,48),
+      new THREE.TorusGeometry(r,0.12,8,48),
       new THREE.MeshBasicMaterial({transparent:true,opacity:0.01,depthTest:false})
     );
     hit.position.copy(center);
@@ -2737,8 +2740,10 @@ canvas.addEventListener('pointerdown',e=>{
     return;
   }
 
-  // Check gizmo handles first
-  if(mode==='select'&&gizmoGroup){
+  // Check gizmo handles first — only intercept if something is actually
+  // selected right now. (Defensive: stops a stale/oversized invisible grab
+  // ring from a previous selection silently swallowing a deselect click.)
+  if(mode==='select' && gizmoGroup && (selectedObj || selectedWall)){
     const gh=getHitsGizmo(e);
     if(gh.length>0){
       activeHandle=gh[0].object.userData;
