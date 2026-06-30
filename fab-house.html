@@ -655,6 +655,8 @@ const BLOCKS={
   'column':       {l:'Column',       e:'🏛️',c:0xEEEEDD,r:0.5,s:'cyl'},
   'floor-wood':   {l:'Wood Floor',   e:'🟫',c:0xC4845A,r:0.7},
   'floor-marble': {l:'Marble',       e:'⬜',c:0xF0F0F8,r:0.2,m:0.1},
+  'marble-white': {l:'White Marble', e:'⬜',c:0xF8F8F8,r:0.2,m:0.15},
+  'marble-black': {l:'Black Marble', e:'⬛',c:0x222222,r:0.2,m:0.15},
   'floor-tile':   {l:'Floor Tile',   e:'🔲',c:0xDDDDDD,r:0.4},
   'floor-carpet-r':{l:'Red Carpet',  e:'🟥',c:0xCC3333,r:0.98},
   'floor-carpet-b':{l:'Blue Carpet', e:'🟦',c:0x3355AA,r:0.98},
@@ -1509,6 +1511,36 @@ function buildFurniture(type){
     // Headlights
     P(g,new THREE.Mesh(new THREE.BoxGeometry(0.08,0.06,0.02),new THREE.MeshStandardMaterial({color:0xFFFF88,emissive:0xFFFF00,emissiveIntensity:0.5})),0.28,0.2,0.22);
     P(g,new THREE.Mesh(new THREE.BoxGeometry(0.08,0.06,0.02),new THREE.MeshStandardMaterial({color:0xFFFF88,emissive:0xFFFF00,emissiveIntensity:0.5})),-0.28,0.2,0.22);
+  }
+  else if(type==='motorbike'){
+    // Main body/tank
+    P(g,B(0.5,0.14,0.2,0x222222,0.3,0.4),0,0.32,0);
+    P(g,B(0.22,0.1,0.16,0xCC2222,0.3,0.3),-0.06,0.4,0);
+    // Seat
+    P(g,B(0.3,0.05,0.16,0x111111,0.6),-0.22,0.4,0);
+    // Front fork + headlight
+    const fork=new THREE.Mesh(new THREE.CylinderGeometry(0.015,0.015,0.34,8),
+      new THREE.MeshStandardMaterial({color:0x888888,roughness:0.3,metalness:0.7}));
+    fork.rotation.z=0.35; fork.position.set(0.32,0.28,0); g.add(fork);
+    P(g,new THREE.Mesh(new THREE.SphereGeometry(0.05,8,8),
+      new THREE.MeshStandardMaterial({color:0xFFFFCC,emissive:0xFFFF00,emissiveIntensity:0.5})),0.42,0.36,0);
+    // Handlebars
+    P(g,B(0.22,0.02,0.02,0x333333,0.4,0.4),0.36,0.46,0);
+    // Exhaust pipe
+    const exhaust=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.03,0.3,8),
+      new THREE.MeshStandardMaterial({color:0xCCCCCC,roughness:0.2,metalness:0.8}));
+    exhaust.rotation.z=Math.PI/2; exhaust.position.set(-0.3,0.18,0.08); g.add(exhaust);
+    // Wheels
+    [[0.32,0],[-0.3,0]].forEach(([wx,wz])=>{
+      const wh=new THREE.Mesh(new THREE.TorusGeometry(0.11,0.035,8,16),
+        new THREE.MeshStandardMaterial({color:0x111111,roughness:0.9}));
+      wh.rotation.y=Math.PI/2; wh.position.set(wx,0.11,wz); g.add(wh);
+      const hub=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.04,8),
+        new THREE.MeshStandardMaterial({color:0xAAAAAA,roughness:0.3,metalness:0.6}));
+      hub.rotation.z=Math.PI/2; hub.position.set(wx,0.11,wz); g.add(hub);
+    });
+    // Kickstand
+    P(g,B(0.02,0.18,0.02,0x444444,0.4,0.5),0.05,0.1,0.12);
   }
   else if(type==='bicycle'){
     // Frame
