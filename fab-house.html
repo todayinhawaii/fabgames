@@ -182,6 +182,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   <div class="logo">🏠 FAB HOUSE <span style="font-size:9px;opacity:0.4;">v3.1</span></div>
   <div class="spacer"></div>
   <div id="modeLabel">🧱 BUILD</div>
+  <button id="deselectBtn" onclick="deselect()" style="display:none;font-family:'Fredoka One',cursive;
+    font-size:12px;padding:6px 14px;border-radius:10px;border:none;cursor:pointer;
+    background:rgba(255,80,80,0.25);color:#ff9999;border:1px solid rgba(255,80,80,0.4);
+    margin-left:8px;white-space:nowrap;" title="Deselect current object">✕ Deselect</button>
   <div class="spacer"></div>
   <button class="top-btn gold" onclick="saveScreenshot()" title="Save screenshot">📸 Save</button>
   <button class="top-btn" onclick="showCredits()" title="Model credits">📜 Credits</button>
@@ -2358,6 +2362,8 @@ function selectObject(mesh){
   while(target&&!placed[target.userData.key])target=target.parent;
   if(!target||!placed[target.userData.key])return;
   deselect();
+  const db0=document.getElementById('deselectBtn');
+  if(db0) db0.style.display='inline-block';
   // Make sure the wall editor panel isn't showing at the same time
   const wp0=document.getElementById('wallPropPanel');
   if(wp0) wp0.style.display='none';
@@ -2378,6 +2384,8 @@ function deselect(){
   if(wp) wp.style.display='none';
   const op=document.getElementById('objPropPanel');
   if(op) op.style.display='none';
+  const db1=document.getElementById('deselectBtn');
+  if(db1) db1.style.display='none';
 }
 
 // ── UNIVERSAL OBJECT EDITOR ───────────────────────────
@@ -4139,6 +4147,8 @@ setTimeout(()=>{
     clearGizmo();
     selectedObj=null;
     selectedWall=null;
+    const db2=document.getElementById('deselectBtn');
+    if(db2) db2.style.display='inline-block';
     // Make sure the universal object panel isn't showing at the same time
     const op=document.getElementById('objPropPanel');
     if(op) op.style.display='none';
