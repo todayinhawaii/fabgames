@@ -335,11 +335,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 
 <!-- WALL DRAW BAR - appears at top when drawing walls -->
-<div id="wallBar" style="display:none;position:fixed;top:58px;left:50%;transform:translateX(-50%);
-  z-index:400;background:rgba(0,10,30,0.97);backdrop-filter:blur(12px);
-  border:2px solid rgba(0,180,255,0.6);border-radius:16px;
-  padding:10px 20px;display:none;align-items:center;gap:14px;flex-wrap:wrap;
-  box-shadow:0 0 40px rgba(0,180,255,0.3);">
+<div id="wallBar" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"
+  style="display:none;position:fixed;top:58px;left:50%;transform:translateX(-50%);
+  z-index:600;background:rgba(0,10,30,0.98);backdrop-filter:blur(14px);
+  border:2px solid rgba(0,180,255,0.7);border-radius:16px;
+  padding:12px 22px;align-items:center;gap:14px;flex-wrap:wrap;
+  box-shadow:0 0 50px rgba(0,180,255,0.4);max-width:94vw;">
   <div style="font-family:'Fredoka One',cursive;font-size:14px;color:#44DDFF;">📐 DRAW WALL</div>
   
   <!-- Material picker -->
@@ -542,15 +543,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 </div>
 
 <!-- MODE HINT (changes per mode) -->
-<div id="modeHint" style="position:fixed;bottom:64px;left:226px;z-index:80;pointer-events:none;
-  background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:12px;
-  padding:8px 14px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,255,255,0.6);
-  backdrop-filter:blur(8px);line-height:1.9;max-width:200px;">
+<div id="modeHint" style="position:fixed;bottom:118px;left:226px;z-index:70;pointer-events:none;
+  background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.1);border-radius:12px;
+  padding:7px 12px;font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.55);
+  backdrop-filter:blur(8px);line-height:1.7;max-width:190px;display:none;">
   🧱 <b style="color:#FFD700;">BUILD MODE</b><br>
   Click ground or block to place<br>
-  Right-drag to orbit view<br>
-  Switch to ✋ SELECT<br>
-  to move & rotate blocks
+  Right-drag to orbit view
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -3389,11 +3388,12 @@ setTimeout(()=>{
     if(wallActive){ cancelWallDraw(); return; }
     wallActive=true; wallDragging=false; wallDragStart=null;
     if(wallPreviewMesh){scene.remove(wallPreviewMesh);wallPreviewMesh=null;}
-    // Must be in BUILD mode to draw walls
-    // User can switch to SELECT to pick walls, ERASE to delete them
     if(mode!=='build') setMode('build');
     const wb=document.getElementById('wallBar');
     if(wb) wb.style.display='flex';
+    // Hide the old build-mode hint box so it doesn't overlap
+    const mh=document.getElementById('modeHint');
+    if(mh) mh.style.display='none';
     document.getElementById('rWall')?.classList.add('active');
     document.getElementById('modeLabel').textContent='📐 DRAW WALLS — BUILD mode active';
     const bh=document.getElementById('bottomHint');
