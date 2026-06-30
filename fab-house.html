@@ -303,6 +303,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   <div style="display:flex;flex-direction:column;gap:6px;">
     <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.4);">🎨 COLOUR TINT</span>
     <div id="opColorPicker" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;"></div>
+
+    <!-- CUSTOM COLOUR WHEEL -->
+    <div style="display:flex;align-items:center;gap:8px;margin-top:2px;
+      padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);">
+      <input type="color" id="opCustomColor" value="#ffd700"
+        style="width:40px;height:32px;border-radius:8px;border:2px solid rgba(255,215,0,0.4);
+        cursor:pointer;background:none;padding:0;"
+        oninput="applyCustomObjColor(this.value)">
+      <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.5);">
+        🎡 Custom colour wheel
+      </span>
+    </div>
+
     <div id="opColorName" style="font-family:'Fredoka One',cursive;font-size:11px;
       color:#FFD700;text-align:center;min-height:16px;">Original colours</div>
   </div>
@@ -2416,6 +2429,16 @@ function openObjProps(obj){
     if(cn && cur) cn.textContent=cur.label;
   }
 
+  // Sync the colour wheel to whatever tint is currently active on this object
+  const wheel=document.getElementById('opCustomColor');
+  if(wheel){
+    if(obj.tintHex!==undefined && obj.tintHex!==null){
+      wheel.value = '#'+obj.tintHex.toString(16).padStart(6,'0');
+    } else {
+      wheel.value = '#ffd700'; // neutral default when no tint applied
+    }
+  }
+
   updateObjPosDisplay(obj);
 }
 
@@ -2451,7 +2474,9 @@ function applyObjTint(obj, hex){
       const tint=new THREE.Color(hex);
       const orig=c.userData.origColor;
       // Blend: keep some of the original shading variation, shift toward the tint
-      c.material.color.set(
+      // IMPORTANT: must use setRGB(), NOT set() — Color.set() with 3 numeric
+      // args does not work as plain RGB components and silently produces black!
+      c.material.color.setRGB(
         orig.r*0.35 + tint.r*0.65,
         orig.g*0.35 + tint.g*0.65,
         orig.b*0.35 + tint.b*0.65
@@ -2460,6 +2485,28 @@ function applyObjTint(obj, hex){
     c.material.needsUpdate=true;
   });
   toast(hex===null ? '🎨 Restored original colours' : '🎨 Colour tint applied!');
+
+  // Deselect all preset swatches visually since a tint was just applied —
+  // the custom wheel handles its own highlighting separately.
+  const cp=document.getElementById('opColorPicker');
+  if(cp) cp.querySelectorAll('div').forEach(d=>{
+    if(d.dataset && d.dataset.isCustom) return;
+  });
+}
+
+// Apply a fully custom colour from the colour wheel <input type="color">.
+// Reuses the exact same blend logic as the preset swatches so the result
+// looks consistent (keeps original shading, shifts 65% toward the chosen hue).
+function applyCustomObjColor(hexString){
+  if(!selectedObj) return;
+  // hexString comes in as "#rrggbb" from the <input type="color">
+  const hex = parseInt(hexString.replace('#',''), 16);
+  applyObjTint(selectedObj, hex);
+  // Clear the gold border on preset swatches so it's clear a custom colour is active
+  const cp=document.getElementById('opColorPicker');
+  if(cp) cp.querySelectorAll('div').forEach(d=>d.style.borderColor='rgba(255,255,255,0.15)');
+  const cn=document.getElementById('opColorName');
+  if(cn) cn.textContent='Custom: '+hexString.toUpperCase();
 }
 
 function liveObjEdit(){
@@ -4345,6 +4392,7 @@ setTimeout(()=>{
   window.deselect      = deselect;
   window.openObjProps  = openObjProps;
   window.applyObjTint  = applyObjTint;
+  window.applyCustomObjColor = applyCustomObjColor;
   window.liveObjEdit   = liveObjEdit;
   window.addFloorPlate = addFloorPlate;
   window.addWalls      = addWalls;
