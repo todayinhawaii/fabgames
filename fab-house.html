@@ -3025,6 +3025,20 @@ canvas.addEventListener('pointerup',e=>{
         const hit=hits[0];
         // Always deselect first — then re-select whatever was actually clicked
         deselect();
+
+        // Background/terrain blocks that should NOT be selectable —
+        // clicking these counts as "clicking empty space" and just deselects.
+        const BACKGROUND_BLOCKS = new Set([
+          'grass','water','sand','stone-path','floor-wood','floor-marble',
+          'floor-tile','floor-carpet-r','floor-carpet-b','floor-carpet-g',
+          'fence-wood','fence-iron','hedge','decking','concrete',
+          'brick-red','brick-white','brick-grey','brick-dark','brick-blue',
+          'brick-green','brick-pink','brick-black','wood-light','wood-dark',
+          'pool-water','pool-steps','roof-red','roof-grey','roof-green',
+          'roof-orange','roof-black','roof-tiles','win-clear','win-tinted',
+          'win-arched','marble-white','marble-black',
+        ]);
+
         // Walk up to find wall or placed block
         let foundWall=null, foundBlock=null;
         let node=hit.object;
@@ -3034,14 +3048,18 @@ canvas.addEventListener('pointerup',e=>{
               foundWall=walls[node.userData.wallIdx]; break;
             }
             if(node.userData.key && placed[node.userData.key]){
-              foundBlock=node; break;
+              // Only select if it's not a background/terrain block
+              if(!BACKGROUND_BLOCKS.has(placed[node.userData.key].type)){
+                foundBlock=node;
+              }
+              break;
             }
           }
           node=node.parent;
         }
         if(foundWall) selectWall(foundWall);
         else if(foundBlock) selectObject(foundBlock);
-        // else: nothing meaningful was clicked — deselect already called above, done!
+        // else: clicked background or empty — stays deselected!
       } else if(mode==='erase'){
         // Check if erasing a wall
         let chkE=hits[0].object;
