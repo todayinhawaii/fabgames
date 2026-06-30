@@ -2082,100 +2082,119 @@ const HANDLE_COLORS={x:0xFF3333,y:0x33FF33,z:0x3333FF,scale:0xFFD700,rot:0xFF88F
 
 function buildGizmo(obj){
   clearGizmo();
+  if(!obj||!obj.mesh) return;
   gizmoGroup=new THREE.Group();
 
-  // Bounding box of selected object
   const bbox=new THREE.Box3().setFromObject(obj.mesh);
-  const size=new THREE.Vector3();bbox.getSize(size);
-  const center=new THREE.Vector3();bbox.getCenter(center);
+  const size=new THREE.Vector3(); bbox.getSize(size);
+  const center=new THREE.Vector3(); bbox.getCenter(center);
+  const maxS=Math.max(size.x,size.y,size.z);
 
-  // Selection box outline
-  const boxGeo=new THREE.BoxGeometry(size.x+0.12,size.y+0.12,size.z+0.12);
+  // ── SELECTION BOX ─────────────────────────────────
+  const boxGeo=new THREE.BoxGeometry(size.x+0.15,size.y+0.15,size.z+0.15);
   const boxWire=new THREE.LineSegments(
     new THREE.EdgesGeometry(boxGeo),
-    new THREE.LineBasicMaterial({color:0xFFD700,linewidth:2})
+    new THREE.LineBasicMaterial({color:0xFFD700,linewidth:3})
   );
   boxWire.position.copy(center);
   gizmoGroup.add(boxWire);
 
-  // ── MOVE ARROWS (X,Y,Z) ──
-  function makeArrow(dir,col,label){
+  // ── MOVE ARROWS (big fat arrows) ──────────────────
+  function makeArrow(axis,col){
     const g=new THREE.Group();
+    g.userData={handle:'move',axis,isHandle:true};
+
+    // Thick shaft
     const shaft=new THREE.Mesh(
-      new THREE.CylinderGeometry(0.04,0.04,0.6,8),
+      new THREE.CylinderGeometry(0.06,0.06,0.8,12),
       new THREE.MeshBasicMaterial({color:col,depthTest:false})
     );
+    shaft.userData={handle:'move',axis,isHandle:true};
+
+    // Big arrowhead cone
     const head=new THREE.Mesh(
-      new THREE.ConeGeometry(0.1,0.22,8),
+      new THREE.ConeGeometry(0.16,0.36,12),
       new THREE.MeshBasicMaterial({color:col,depthTest:false})
     );
-    shaft.position.y=0.3;head.position.y=0.72;
-    g.add(shaft);g.add(head);
-    if(dir==='x'){g.rotation.z=-Math.PI/2;}
-    else if(dir==='z'){g.rotation.x=Math.PI/2;}
-    g.position.copy(center);
-    if(dir==='x')g.position.x+=size.x/2+0.5;
-    else if(dir==='y')g.position.y+=size.y/2+0.5;
-    else g.position.z+=size.z/2+0.5;
-    g.userData={handle:'move',axis:dir};
-    g.traverse(c=>{if(c.isMesh)c.userData={handle:'move',axis:dir,isHandle:true};});
+    head.userData={handle:'move',axis,isHandle:true};
+
+    shaft.position.y=0.4;
+    head.position.y=0.98;
+    g.add(shaft); g.add(head);
+
+    // Orient along axis
+    if(axis==='x'){ g.rotation.z=-Math.PI/2; }
+    else if(axis==='z'){ g.rotation.x=Math.PI/2; }
+
+    // Position at edge of bbox
+    const offset=maxS/2+0.7;
+    if(axis==='x') g.position.set(center.x+offset, center.y, center.z);
+    else if(axis==='y') g.position.set(center.x, center.y+offset, center.z);
+    else g.position.set(center.x, center.y, center.z+offset);
+
+    g.renderOrder=999;
     return g;
   }
-  gizmoGroup.add(makeArrow('x',0xFF4444,'X'));
-  gizmoGroup.add(makeArrow('y',0x44FF44,'Y'));
-  gizmoGroup.add(makeArrow('z',0x4444FF,'Z'));
+  gizmoGroup.add(makeArrow('x',0xFF3333));
+  gizmoGroup.add(makeArrow('y',0x33FF33));
+  gizmoGroup.add(makeArrow('z',0x3399FF));
 
-  // ── ROTATION RINGS ──
+  // ── ROTATION RINGS (thicker tubes) ────────────────
   function makeRotRing(axis,col){
-    const pts=[];const segs=48;
-    const r=Math.max(size.x,size.y,size.z)/2+0.6;
-    for(let i=0;i<=segs;i++){
-      const a=i/segs*Math.PI*2;
+    const r=maxS/2+1.1;
+    // Visible ring line
+    const pts=[];
+    for(let i=0;i<=64;i++){
+      const a=i/64*Math.PI*2;
       pts.push(new THREE.Vector3(Math.cos(a)*r,0,Math.sin(a)*r));
     }
-    const geo=new THREE.BufferGeometry().setFromPoints(pts);
-    const ring=new THREE.Line(geo,new THREE.LineBasicMaterial({color:col,depthTest:false,linewidth:3}));
+    const ring=new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(pts),
+      new THREE.LineBasicMaterial({color:col,depthTest:false,linewidth:4})
+    );
     ring.position.copy(center);
-    if(axis==='x')ring.rotation.z=Math.PI/2;
-    else if(axis==='z')ring.rotation.x=Math.PI/2;
-    // Invisible hit tube around ring
-    const tube=new THREE.Mesh(
-      new THREE.TorusGeometry(r,0.08,8,48),
+    if(axis==='x') ring.rotation.z=Math.PI/2;
+    else if(axis==='z') ring.rotation.x=Math.PI/2;
+    gizmoGroup.add(ring);
+
+    // Invisible fat torus for easy clicking
+    const torus=new THREE.Mesh(
+      new THREE.TorusGeometry(r,0.14,8,48),
       new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.01,depthTest:false})
     );
-    tube.position.copy(center);
-    if(axis==='x')tube.rotation.z=Math.PI/2;
-    else if(axis==='z')tube.rotation.x=Math.PI/2;
-    tube.userData={handle:'rotate',axis,isHandle:true};
-    gizmoGroup.add(ring);
-    gizmoGroup.add(tube);
+    torus.position.copy(center);
+    if(axis==='x') torus.rotation.z=Math.PI/2;
+    else if(axis==='z') torus.rotation.x=Math.PI/2;
+    torus.userData={handle:'rotate',axis,isHandle:true};
+    torus.renderOrder=999;
+    gizmoGroup.add(torus);
   }
-  makeRotRing('y',0xFF88FF);
-  makeRotRing('x',0xFF8888);
-  makeRotRing('z',0x8888FF);
+  makeRotRing('y',0xFFDD00);  // yellow = Y spin
+  makeRotRing('x',0xFF6666);  // red = X tilt
+  makeRotRing('z',0x6699FF);  // blue = Z roll
 
-  // ── SCALE CORNERS ──
-  const corners=[
-    [1,1,1],[-1,1,1],[1,1,-1],[-1,1,-1],
-    [1,-1,1],[-1,-1,1],[1,-1,-1],[-1,-1,-1]
-  ];
+  // ── SCALE HANDLES (big corner cubes) ──────────────
+  const corners=[[1,1,1],[-1,1,1],[1,1,-1],[-1,1,-1],
+                 [1,-1,1],[-1,-1,1],[1,-1,-1],[-1,-1,-1]];
   corners.forEach(([cx,cy,cz])=>{
     const cube=new THREE.Mesh(
-      new THREE.BoxGeometry(0.16,0.16,0.16),
+      new THREE.BoxGeometry(0.24,0.24,0.24),
       new THREE.MeshBasicMaterial({color:0xFFD700,depthTest:false})
     );
     cube.position.set(
-      center.x+cx*(size.x/2+0.2),
-      center.y+cy*(size.y/2+0.2),
-      center.z+cz*(size.z/2+0.2)
+      center.x+cx*(size.x/2+0.28),
+      center.y+cy*(size.y/2+0.28),
+      center.z+cz*(size.z/2+0.28)
     );
     cube.userData={handle:'scale',isHandle:true};
+    cube.renderOrder=999;
     gizmoGroup.add(cube);
   });
 
   gizmoGroup.renderOrder=999;
   scene.add(gizmoGroup);
 }
+
 
 function clearGizmo(){
   if(gizmoGroup){
@@ -2437,26 +2456,39 @@ canvas.addEventListener('pointermove',e=>{
       dragTarget.mesh.scale.setScalar(s);
       buildGizmo(dragTarget);
     } else if(activeHandle.handle==='move'){
-      // Move along axis by dragging
-      const hits=getHits(e);
-      if(hits.length>0){
-        const pos=getPlacePos(hits[0]);
-        const{x,y,z}=selectedObj.mesh.userData;
-        const nx=activeHandle.axis==='x'?pos.x:x;
-        const ny=activeHandle.axis==='y'?pos.y:y;
-        const nz=activeHandle.axis==='z'?pos.z:z;
-        if(bk(nx,ny,nz)!==bk(x,y,z)){
-          const rot=selectedObj.mesh.rotation.clone();
-          const scl=selectedObj.mesh.scale.clone();
-          const type=selectedObj.type;
-          removeBlock(x,y,z,false);
-          placeBlock(nx,ny,nz,type,false);
-          if(placed[bk(nx,ny,nz)]){
-            placed[bk(nx,ny,nz)].mesh.rotation.copy(rot);
-            placed[bk(nx,ny,nz)].mesh.scale.copy(scl);
-            selectedObj=placed[bk(nx,ny,nz)];
+      // Move along axis — works for BOTH walls and blocks
+      const sensitivity=0.05;
+      const mdx2=e.clientX-dragStartMouse.x;
+      const mdy2=e.clientY-dragStartMouse.y;
+      if(selectedWall){
+        // Move wall mesh directly along axis
+        const base=dragStartPos.clone();
+        if(activeHandle.axis==='x') selectedWall.mesh.position.x=base.x+mdx2*sensitivity;
+        else if(activeHandle.axis==='y') selectedWall.mesh.position.y=base.y-mdy2*sensitivity;
+        else selectedWall.mesh.position.z=base.z+mdx2*sensitivity;
+        buildGizmo({mesh:selectedWall.mesh});
+      } else if(selectedObj){
+        // Move block to hit position
+        const hits=getHits(e);
+        if(hits.length>0){
+          const pos=getPlacePos(hits[0]);
+          const{x,y,z}=selectedObj.mesh.userData;
+          const nx=activeHandle.axis==='x'?pos.x:x;
+          const ny=activeHandle.axis==='y'?pos.y:y;
+          const nz=activeHandle.axis==='z'?pos.z:z;
+          if(bk(nx,ny,nz)!==bk(x,y,z)){
+            const rot=selectedObj.mesh.rotation.clone();
+            const scl=selectedObj.mesh.scale.clone();
+            const type=selectedObj.type;
+            removeBlock(x,y,z,false);
+            placeBlock(nx,ny,nz,type,false);
+            if(placed[bk(nx,ny,nz)]){
+              placed[bk(nx,ny,nz)].mesh.rotation.copy(rot);
+              placed[bk(nx,ny,nz)].mesh.scale.copy(scl);
+              selectedObj=placed[bk(nx,ny,nz)];
+            }
+            buildGizmo(selectedObj);
           }
-          buildGizmo(selectedObj);
         }
       }
     }
