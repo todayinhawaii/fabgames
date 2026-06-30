@@ -192,10 +192,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 <div id="rightPanel" onpointerdown="event.stopPropagation()">
   <div style="font-size:9px;color:rgba(255,215,0,0.5);letter-spacing:1px;font-family:'Fredoka One',cursive;padding:4px 0 2px;">MODE</div>
-  <div class="r-btn active" id="rBuild" onclick="setMode('build')" title="Build blocks (1)">
+  <div class="r-btn" id="rBuild" onclick="setMode('build')" title="Build blocks (1)">
     <div class="r-icon">🧱</div><div class="r-label">BUILD</div>
   </div>
-  <div class="r-btn" id="rSelect" onclick="setMode('select')" title="Select & transform (2)">
+  <div class="r-btn active" id="rSelect" onclick="setMode('select')" title="Select & transform (2)">
     <div class="r-icon">✋</div><div class="r-label">SELECT</div>
   </div>
   <div class="r-btn" id="rErase" onclick="setMode('erase')" title="Erase blocks (3)">
@@ -2082,7 +2082,7 @@ function buildFurniture(type){
 setLoad(65);
 
 // ── STATE ─────────────────────────────────────────────
-let currentBlock='brick-red',mode='build',currentFloor=0;
+let currentBlock='brick-red',mode='select',currentFloor=0;
 let placed={},undoStack=[],selectedObj=null,selectedWall=null;
 let ghostMesh=null,xrayMode=false,showGrid=true;
 
@@ -4411,6 +4411,13 @@ setTimeout(()=>{
   window.moveSelectedWall  = moveSelectedWall;
 
   window.keysHeld      = keysHeld;
+
+  // Default to SELECT mode on load — feels more natural for first-time users
+  // who want to click around and inspect/move the showcase villa immediately,
+  // rather than accidentally placing new blocks everywhere. Placed here at the
+  // very end of initApp so every variable setMode() touches (wallActive etc)
+  // is guaranteed to already be declared.
+  setMode('select');
 
 } // end initApp
 
