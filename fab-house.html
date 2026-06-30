@@ -3547,13 +3547,16 @@ setTimeout(()=>{
 
   // ── WALL SELECTION & TRANSFORM ──────────────────────
   function selectWall(wallData){
-    deselect();
+    // Clear previous selection without hiding wallPropPanel
+    clearGizmo();
+    selectedObj=null;
+    selectedWall=null;
+    // Now set new selection
     selectedWall = wallData;
     buildGizmo({mesh: wallData.mesh, type:'wall'});
-    // Wall selected - just open props panel
-    // Open live properties panel
+    // Show properties panel
     openWallProps(wallData);
-    toast('✋ Wall selected! Edit size & material in panel · Drag arrows to move!');
+    toast('✋ Wall selected! Edit size/material in panel · Drag arrows to move!');
   }
 
   function deleteSelectedWall(){
@@ -3704,7 +3707,7 @@ setTimeout(()=>{
 
   function openWallProps(wallData){
     const panel=document.getElementById('wallPropPanel');
-    if(!panel) return;
+    if(!panel || !wallData) return;
     panel.style.display='flex';
 
     // Set sliders to current wall dimensions
