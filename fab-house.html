@@ -250,8 +250,96 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 
 <!-- Hidden stubs for JS compatibility -->
-<div id="gizmoPanel" style="display:none;"></div>
-<div id="gizmoName" style="display:none;"></div>
+<!-- UNIVERSAL OBJECT EDITOR — appears for ANY selected block/furniture/tree -->
+<div id="objPropPanel" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"
+  style="display:none;position:fixed;top:58px;right:82px;z-index:400;
+  background:rgba(0,8,20,0.97);backdrop-filter:blur(16px);
+  border:2px solid rgba(255,215,0,0.5);border-radius:20px;
+  padding:16px 18px;flex-direction:column;gap:11px;width:250px;
+  box-shadow:0 0 40px rgba(255,215,0,0.25);max-height:88vh;overflow-y:auto;">
+
+  <div id="gizmoName" style="font-family:'Fredoka One',cursive;font-size:15px;color:#FFD700;
+    text-align:center;letter-spacing:1px;border-bottom:1px solid rgba(255,215,0,0.2);
+    padding-bottom:8px;">✋ OBJECT EDITOR</div>
+
+  <!-- WIDTH -->
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <div style="display:flex;justify-content:space-between;">
+      <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.4);">↔ WIDTH</span>
+      <span id="opWVal" style="font-family:'Fredoka One',cursive;font-size:13px;color:#FFD700;">100%</span>
+    </div>
+    <input type="range" id="opW" min="20" max="300" step="5" value="100"
+      style="width:100%;accent-color:#FFD700;" oninput="liveObjEdit()">
+  </div>
+
+  <!-- HEIGHT -->
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <div style="display:flex;justify-content:space-between;">
+      <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.4);">↕ HEIGHT</span>
+      <span id="opHVal" style="font-family:'Fredoka One',cursive;font-size:13px;color:#FFD700;">100%</span>
+    </div>
+    <input type="range" id="opH" min="20" max="300" step="5" value="100"
+      style="width:100%;accent-color:#FFD700;" oninput="liveObjEdit()">
+  </div>
+
+  <!-- DEPTH -->
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <div style="display:flex;justify-content:space-between;">
+      <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.4);">⬛ DEPTH</span>
+      <span id="opDVal" style="font-family:'Fredoka One',cursive;font-size:13px;color:#FFD700;">100%</span>
+    </div>
+    <input type="range" id="opD" min="20" max="300" step="5" value="100"
+      style="width:100%;accent-color:#FFD700;" oninput="liveObjEdit()">
+  </div>
+
+  <!-- LINK SCALE TOGGLE -->
+  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;
+    font-family:'Fredoka One',cursive;font-size:10px;color:rgba(255,255,255,0.45);">
+    <input type="checkbox" id="opLinkScale" style="accent-color:#FFD700;width:14px;height:14px;">
+    🔗 Link all sizes together (scale evenly)
+  </label>
+
+  <!-- COLOUR / TINT -->
+  <div style="display:flex;flex-direction:column;gap:6px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.4);">🎨 COLOUR TINT</span>
+    <div id="opColorPicker" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;"></div>
+    <div id="opColorName" style="font-family:'Fredoka One',cursive;font-size:11px;
+      color:#FFD700;text-align:center;min-height:16px;">Original colours</div>
+  </div>
+
+  <!-- ROTATE -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.4);">↻ ROTATE</span>
+    <div style="display:flex;gap:4px;">
+      <button onclick="gizmoRotate('y',-90)" style="flex:1;font-family:'Fredoka One',cursive;font-size:11px;padding:5px;border-radius:7px;border:none;cursor:pointer;background:rgba(255,140,0,0.15);color:#ffaa44;border:1px solid rgba(255,140,0,0.3);">↺ -90°</button>
+      <button onclick="gizmoRotate('y',-45)" style="flex:1;font-family:'Fredoka One',cursive;font-size:11px;padding:5px;border-radius:7px;border:none;cursor:pointer;background:rgba(255,140,0,0.15);color:#ffaa44;border:1px solid rgba(255,140,0,0.3);">↺ -45°</button>
+      <button onclick="gizmoRotate('y',45)" style="flex:1;font-family:'Fredoka One',cursive;font-size:11px;padding:5px;border-radius:7px;border:none;cursor:pointer;background:rgba(255,140,0,0.15);color:#ffaa44;border:1px solid rgba(255,140,0,0.3);">↻ 45°</button>
+      <button onclick="gizmoRotate('y',90)" style="flex:1;font-family:'Fredoka One',cursive;font-size:11px;padding:5px;border-radius:7px;border:none;cursor:pointer;background:rgba(255,140,0,0.15);color:#ffaa44;border:1px solid rgba(255,140,0,0.3);">↻ 90°</button>
+    </div>
+    <div style="display:flex;gap:4px;">
+      <button onclick="gizmoRotate('x',90)" style="flex:1;font-family:'Fredoka One',cursive;font-size:10px;padding:5px;border-radius:7px;border:none;cursor:pointer;background:rgba(255,100,100,0.12);color:#ff9999;border:1px solid rgba(255,100,100,0.25);">↺ Tilt X</button>
+      <button onclick="gizmoRotate('z',90)" style="flex:1;font-family:'Fredoka One',cursive;font-size:10px;padding:5px;border-radius:7px;border:none;cursor:pointer;background:rgba(100,100,255,0.12);color:#9999ff;border:1px solid rgba(100,100,255,0.25);">↺ Roll Z</button>
+    </div>
+  </div>
+
+  <!-- POSITION DISPLAY -->
+  <div style="font-family:'Nunito',sans-serif;font-size:10px;color:rgba(255,255,255,0.2);
+    text-align:center;"><span id="opPosDisplay">—</span></div>
+
+  <!-- ACTIONS -->
+  <div style="display:flex;gap:6px;justify-content:center;padding-top:2px;
+    border-top:1px solid rgba(255,255,255,0.08);">
+    <button onclick="gizmoDuplicate()" style="font-family:'Fredoka One',cursive;font-size:11px;
+      padding:7px 12px;border-radius:9px;border:none;cursor:pointer;
+      background:rgba(255,215,0,0.15);color:#FFD700;border:1px solid rgba(255,215,0,0.3);">⧉ Copy</button>
+    <button onclick="gizmoDelete()" style="font-family:'Fredoka One',cursive;font-size:11px;
+      padding:7px 12px;border-radius:9px;border:none;cursor:pointer;
+      background:rgba(255,50,50,0.15);color:#ff8888;border:1px solid rgba(255,50,50,0.3);">🗑 Delete</button>
+    <button onclick="deselect()" style="font-family:'Fredoka One',cursive;font-size:11px;
+      padding:7px 12px;border-radius:9px;border:none;cursor:pointer;
+      background:rgba(255,255,255,0.08);color:#aaa;border:1px solid rgba(255,255,255,0.15);">✕ Done</button>
+  </div>
+</div>
 <div id="toast" style="position:fixed;top:60px;left:50%;transform:translateX(-50%);
   font-family:'Fredoka One',cursive;font-size:15px;background:rgba(0,0,0,0.85);
   color:#FFD700;padding:9px 22px;border-radius:18px;border:1px solid rgba(255,215,0,0.3);
@@ -1104,7 +1192,7 @@ function buildFurniture(type){
     water.position.set(0,0.32,0);g.add(water);
     // Jets
     [[-0.3,-0.3],[0.3,-0.3],[-0.3,0.3],[0.3,0.3]].forEach(([jx,jz])=>{
-      P(g,CYL(0.04,0.04,0.06,8,0.4,0.6),jx,0.34,jz);
+      P(g,CYL(0.04,0.04,0.06,0x888888,8,0.6),jx,0.34,jz);
     });
     // Steps
     P(g,B(0.22,0.12,0.92,0xBBCCDD,0.4),-0.57,0.06,0);
@@ -1116,11 +1204,11 @@ function buildFurniture(type){
     });
   }
   else if(type==='fountain'){
-    P(g,CYL(0.44,0.48,0.12,16,0.4),0,0.06,0);
-    P(g,CYL(0.38,0.38,0.06,16,0.15,0.1),0,0.14,0);
-    P(g,CYL(0.04,0.04,0.44,8,0.4,0.6),0,0.38,0);
-    P(g,CYL(0.2,0.22,0.08,16,0.4),0,0.64,0);
-    P(g,CYL(0.18,0.18,0.04,16,0.1,0.1),0,0.7,0);
+    P(g,CYL(0.44,0.48,0.12,0x888888,16,0.4),0,0.06,0);
+    P(g,CYL(0.38,0.38,0.06,0x888888,16,0.1),0,0.14,0);
+    P(g,CYL(0.04,0.04,0.44,0x888888,8,0.6),0,0.38,0);
+    P(g,CYL(0.2,0.22,0.08,0x888888,16,0.4),0,0.64,0);
+    P(g,CYL(0.18,0.18,0.04,0x888888,16,0.1),0,0.7,0);
     // Water streams
     for(let i=0;i<6;i++){
       const a=i/6*Math.PI*2;
@@ -1136,10 +1224,10 @@ function buildFurniture(type){
     P(g,B(0.46,0.32,0.04,0x111133,0.2),0,0.62,0.22);
     P(g,B(0.38,0.24,0.03,0x0033AA,0.0),0,0.62,0.225);
     // Joystick
-    P(g,CYL(0.04,0.04,0.1,8,0.3,0.5),-0.08,0.36,0.22);
+    P(g,CYL(0.04,0.04,0.1,0x888888,8,0.5),-0.08,0.36,0.22);
     P(g,SPH(0.06,0xFF3333,0.4),-0.08,0.47,0.22);
     // Buttons
-    [0.06,0.1,0.14].forEach(bx=>P(g,CYL(0.03,0.03,0.02,8,0.4),bx,0.38,0.22));
+    [0.06,0.1,0.14].forEach(bx=>P(g,CYL(0.03,0.03,0.02,0x888888,8,0.4),bx,0.38,0.22));
     // Screen glow
     const scr=new THREE.Mesh(new THREE.BoxGeometry(0.38,0.24,0.01),
       new THREE.MeshStandardMaterial({color:0x0044FF,emissive:0x0022AA,emissiveIntensity:0.8}));
@@ -1174,7 +1262,7 @@ function buildFurniture(type){
     P(g,B(0.12,0.32,0.1,0x111111,0.4),-0.54,0.38,0);
     P(g,B(0.12,0.32,0.1,0x111111,0.4),0.54,0.38,0);
     [-0.54,0.54].forEach(sx=>[0.22,0.3,0.38,0.46].forEach(sy=>{
-      P(g,CYL(0.02,0.02,0.02,6,0.6),sx,sy,0.06);
+      P(g,CYL(0.02,0.02,0.02,0x888888,6,0.6),sx,sy,0.06);
     }));
   }
   else if(type==='bar-cabinet'){
@@ -1337,10 +1425,10 @@ function buildFurniture(type){
     roll.rotation.z=Math.PI/2;roll.position.set(0,0.06,0.4);g.add(roll);
   }
   else if(type==='punching-bag'){
-    P(g,CYL(0.14,0.12,0.56,12,0.7),0,0.38,0);
-    P(g,CYL(0.12,0.12,0.04,12,0.6),0,0.68,0);
+    P(g,CYL(0.14,0.12,0.56,0x888888,12,0.7),0,0.38,0);
+    P(g,CYL(0.12,0.12,0.04,0x888888,12,0.6),0,0.68,0);
     // Chain
-    for(let i=0;i<4;i++) P(g,CYL(0.01,0.01,0.1,6,0.3,0.8),0,0.76+i*0.08,0);
+    for(let i=0;i<4;i++) P(g,CYL(0.01,0.01,0.1,0x888888,6,0.8),0,0.76+i*0.08,0);
     // Stripes
     P(g,B(0.3,0.04,0.3,0xFF4400,0.7),0,0.28,0);
     P(g,B(0.3,0.04,0.3,0xFF4400,0.7),0,0.48,0);
@@ -1377,14 +1465,14 @@ function buildFurniture(type){
     P(g,B(0.04,0.22,0.38,0x333333,0.4,0.2),-0.26,0.55,0);
     P(g,B(0.04,0.22,0.38,0x333333,0.4,0.2),0.26,0.55,0);
     // Pedestal
-    P(g,CYL(0.06,0.06,0.38,8,0.3,0.4),0,0.25,0);
+    P(g,CYL(0.06,0.06,0.38,0x888888,8,0.4),0,0.25,0);
     // Base star
     for(let i=0;i<5;i++){
       const a=i/5*Math.PI*2;
       const arm=B(0.28,0.04,0.04,0x222222,0.4,0.3);
       arm.position.set(Math.cos(a)*0.14,0.04,Math.sin(a)*0.14);
       arm.rotation.y=-a;g.add(arm);
-      P(g,CYL(0.04,0.05,0.06,8,0.3),Math.cos(a)*0.26,0.03,Math.sin(a)*0.26);
+      P(g,CYL(0.04,0.05,0.06,0x888888,8,0.3),Math.cos(a)*0.26,0.03,Math.sin(a)*0.26);
     }
   }
   else if(type==='filing-cab'){
@@ -1421,8 +1509,8 @@ function buildFurniture(type){
     P(g,B(0.52,0.52,0.44,0x444433,0.4,0.2),0,0.26,0);
     P(g,B(0.48,0.48,0.04,0x555544,0.3,0.3),0,0.26,0.23);
     // Dial
-    P(g,CYL(0.08,0.08,0.03,16,0.3,0.5),0.1,0.3,0.25);
-    P(g,CYL(0.02,0.02,0.04,8,0.3,0.6),0.1,0.3,0.27);
+    P(g,CYL(0.08,0.08,0.03,0x888888,16,0.5),0.1,0.3,0.25);
+    P(g,CYL(0.02,0.02,0.04,0x888888,8,0.6),0.1,0.3,0.27);
     // Handle
     P(g,B(0.04,0.14,0.04,0xBBBB88,0.3,0.5),-0.12,0.26,0.25);
   }
@@ -1441,12 +1529,12 @@ function buildFurniture(type){
       stone.scale.set(1,0.6,1);g.add(stone);
     }
     // Lily pad
-    P(g,CYL(0.1,0.1,0.01,12,0.95),0.1,0.12,-0.1);
+    P(g,CYL(0.1,0.1,0.01,0x888888,12,0.95),0.1,0.12,-0.1);
     P(g,SPH(0.04,0xFF3366,0.7),0.1,0.16,-0.1);
   }
   else if(type==='fire-pit'){
-    P(g,CYL(0.32,0.36,0.18,16,0.7),0,0.09,0);
-    P(g,CYL(0.28,0.28,0.04,16,0.5),0,0.2,0);
+    P(g,CYL(0.32,0.36,0.18,0x888888,16,0.7),0,0.09,0);
+    P(g,CYL(0.28,0.28,0.04,0x888888,16,0.5),0,0.2,0);
     // Fire
     const flame1=new THREE.Mesh(new THREE.ConeGeometry(0.14,0.28,8),
       new THREE.MeshStandardMaterial({color:0xFF4400,emissive:0xFF2200,emissiveIntensity:0.8,transparent:true,opacity:0.85}));
@@ -1464,16 +1552,16 @@ function buildFurniture(type){
   }
   else if(type==='statue'){
     P(g,B(0.28,0.08,0.28,0xAAAAAA,0.6),0,0.04,0);
-    P(g,CYL(0.12,0.14,0.38,12,0.5),0,0.27,0);
-    P(g,CYL(0.1,0.1,0.24,12,0.5),0,0.58,0);
+    P(g,CYL(0.12,0.14,0.38,0x888888,12,0.5),0,0.27,0);
+    P(g,CYL(0.1,0.1,0.24,0x888888,12,0.5),0,0.58,0);
     P(g,SPH(0.12,0xBBBBBB,0.5),0,0.76,0);
     P(g,B(0.04,0.16,0.04,0xAAAAAA,0.5),-0.12,0.56,0.06);
     P(g,B(0.04,0.16,0.04,0xAAAAAA,0.5),0.12,0.56,0.06);
   }
   else if(type==='bird-bath'){
-    P(g,CYL(0.04,0.06,0.54,8,0.5),0,0.27,0);
-    P(g,CYL(0.26,0.3,0.06,16,0.3),0,0.56,0);
-    P(g,CYL(0.24,0.24,0.04,16,0.1,0.05),0,0.6,0);
+    P(g,CYL(0.04,0.06,0.54,0x888888,8,0.5),0,0.27,0);
+    P(g,CYL(0.26,0.3,0.06,0x888888,16,0.3),0,0.56,0);
+    P(g,CYL(0.24,0.24,0.04,0x888888,16,0.05),0,0.6,0);
     // Water
     const bw=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.22,0.02,16),
       new THREE.MeshStandardMaterial({color:0x88BBCC,transparent:true,opacity:0.7,roughness:0}));
@@ -1571,8 +1659,8 @@ function buildFurniture(type){
   }
   // ── HAWAIIAN ─────────────────────────────────────────
   else if(type==='tiki-torch'){
-    P(g,CYL(0.03,0.03,0.78,8,0.8),0,0.39,0);
-    P(g,CYL(0.08,0.06,0.18,8,0.8),0,0.87,0);
+    P(g,CYL(0.03,0.03,0.78,0x888888,8,0.8),0,0.39,0);
+    P(g,CYL(0.08,0.06,0.18,0x888888,8,0.8),0,0.87,0);
     const flame=new THREE.Mesh(new THREE.ConeGeometry(0.06,0.16,8),
       new THREE.MeshStandardMaterial({color:0xFF6600,emissive:0xFF3300,emissiveIntensity:0.9,transparent:true,opacity:0.85}));
     flame.position.set(0,1.04,0);g.add(flame);
@@ -1582,8 +1670,8 @@ function buildFurniture(type){
   }
   else if(type==='hammock'){
     // Posts
-    P(g,CYL(0.05,0.06,0.72,8,0.8),-0.42,0.36,0);
-    P(g,CYL(0.05,0.06,0.72,8,0.8),0.42,0.36,0);
+    P(g,CYL(0.05,0.06,0.72,0x888888,8,0.8),-0.42,0.36,0);
+    P(g,CYL(0.05,0.06,0.72,0x888888,8,0.8),0.42,0.36,0);
     // Hammock body
     const hmk=new THREE.Mesh(
       new THREE.BoxGeometry(0.72,0.04,0.38),
@@ -1614,7 +1702,7 @@ function buildFurniture(type){
   }
   else if(type==='lei'){
     // Stand
-    P(g,CYL(0.04,0.04,0.44,8,0.7),0,0.22,0);
+    P(g,CYL(0.04,0.04,0.44,0x888888,8,0.7),0,0.22,0);
     P(g,B(0.24,0.04,0.24,0x8B5E3C,0.8),0,0.02,0);
     // Lei flowers
     const colors=[0xFF3366,0xFF6600,0xFFDD00,0xFF44AA,0xFF8833];
@@ -1628,9 +1716,9 @@ function buildFurniture(type){
   }
   // ── DINING+ ──────────────────────────────────────────
   else if(type==='round-table'){
-    P(g,CYL(0.44,0.44,0.05,24,0.6),0,0.47,0);
-    P(g,CYL(0.04,0.04,0.44,8,0.5),0,0.22,0);
-    P(g,CYL(0.22,0.22,0.04,12,0.5),0,0.02,0);
+    P(g,CYL(0.44,0.44,0.05,0x888888,24,0.6),0,0.47,0);
+    P(g,CYL(0.04,0.04,0.44,0x888888,8,0.5),0,0.22,0);
+    P(g,CYL(0.22,0.22,0.04,0x888888,12,0.5),0,0.02,0);
     // Place settings
     for(let i=0;i<4;i++){
       const a=i/4*Math.PI*2;const r=0.28;
@@ -1644,8 +1732,8 @@ function buildFurniture(type){
     P(g,B(0.94,0.04,0.5,0xAA8855,0.4),0,0.58,0);
     P(g,B(0.92,0.56,0.02,0x4A2A08,0.7),0,0.28,0.22);
     [-0.32,-0.1,0.12,0.32].forEach(bx=>{
-      P(g,CYL(0.06,0.08,0.44,8,0.4),bx,0.22,-0.3);
-      P(g,CYL(0.12,0.12,0.04,12,0.6),bx,0.46,-0.3);
+      P(g,CYL(0.06,0.08,0.44,0x888888,8,0.4),bx,0.22,-0.3);
+      P(g,CYL(0.12,0.12,0.04,0x888888,12,0.6),bx,0.46,-0.3);
     });
   }
   // ── DECOR+ ───────────────────────────────────────────
@@ -1662,10 +1750,10 @@ function buildFurniture(type){
     P(g,SPH(0.05,0xFFDD88,0.3),0.16,0.46,0.04);
   }
   else if(type==='vase'){
-    P(g,CYL(0.06,0.12,0.14,16,0.4),0,0.07,0);
-    P(g,CYL(0.12,0.08,0.24,16,0.35),0,0.26,0);
-    P(g,CYL(0.08,0.12,0.08,16,0.4),0,0.42,0);
-    P(g,CYL(0.12,0.12,0.02,16,0.4),0,0.47,0);
+    P(g,CYL(0.06,0.12,0.14,0x888888,16,0.4),0,0.07,0);
+    P(g,CYL(0.12,0.08,0.24,0x888888,16,0.35),0,0.26,0);
+    P(g,CYL(0.08,0.12,0.08,0x888888,16,0.4),0,0.42,0);
+    P(g,CYL(0.12,0.12,0.02,0x888888,16,0.4),0,0.47,0);
     // Flowers
     [0,1.2,2.4].forEach(fa=>{
       const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.01,0.01,0.32,6),
@@ -1679,7 +1767,7 @@ function buildFurniture(type){
   }
   else if(type==='candles'){
     [[-0.16,0.2],[0,0.32],[0.16,0.18]].forEach(([cx,ch])=>{
-      P(g,CYL(0.05,0.05,ch,12,0.7),cx,ch/2,0);
+      P(g,CYL(0.05,0.05,ch,0x888888,12,0.7),cx,ch/2,0);
       const flame=new THREE.Mesh(new THREE.ConeGeometry(0.02,0.06,8),
         new THREE.MeshStandardMaterial({color:0xFF8800,emissive:0xFF4400,emissiveIntensity:0.8,transparent:true,opacity:0.9}));
       flame.position.set(cx,ch+0.04,0);g.add(flame);
@@ -1690,11 +1778,11 @@ function buildFurniture(type){
     P(g,B(0.46,0.02,0.2,0xD4A855,0.6),0,0.01,0);
   }
   else if(type==='trophy'){
-    P(g,CYL(0.12,0.16,0.06,12,0.3,0.6),0,0.03,0);
-    P(g,CYL(0.04,0.12,0.12,12,0.3,0.5),0,0.12,0);
-    P(g,CYL(0.14,0.1,0.32,16,0.2,0.7),0,0.34,0);
-    P(g,CYL(0.1,0.14,0.06,12,0.2,0.7),0,0.53,0);
-    P(g,CYL(0.02,0.02,0.16,8,0.3,0.6),0,0.64,0);
+    P(g,CYL(0.12,0.16,0.06,0x888888,12,0.6),0,0.03,0);
+    P(g,CYL(0.04,0.12,0.12,0x888888,12,0.5),0,0.12,0);
+    P(g,CYL(0.14,0.1,0.32,0x888888,16,0.7),0,0.34,0);
+    P(g,CYL(0.1,0.14,0.06,0x888888,12,0.7),0,0.53,0);
+    P(g,CYL(0.02,0.02,0.16,0x888888,8,0.6),0,0.64,0);
     P(g,SPH(0.1,0xFFD700,0.2,0.7),0,0.82,0);
     // Handles
     [-0.14,0.14].forEach(hx=>{
@@ -1734,7 +1822,7 @@ function buildFurniture(type){
       step.position.set(Math.cos(a)*0.22,s*0.15+0.04,Math.sin(a)*0.22);
       step.rotation.y=-a;g.add(step);
     }
-    P(g,CYL(0.04,0.04,0.96,8,0.4,0.4),0,0.48,0);
+    P(g,CYL(0.04,0.04,0.96,0x888888,8,0.4),0,0.48,0);
   }
   else if(type==='pergola'){
     // Posts
@@ -1758,9 +1846,9 @@ function buildFurniture(type){
     P(g,B(0.92,0.04,0.04,0xAA8855,0.7),0,0.66,0);
   }
   else if(type==='wine-glass'){
-    P(g,CYL(0.07,0.03,0.28,12,0.1,0.05),0,0.14,0);
-    P(g,CYL(0.01,0.01,0.2,8,0.1,0.3),0,0.38,0);
-    P(g,CYL(0.09,0.09,0.02,12,0.1,0.1),0,0.02,0);
+    P(g,CYL(0.07,0.03,0.28,0x888888,12,0.05),0,0.14,0);
+    P(g,CYL(0.01,0.01,0.2,0x888888,8,0.3),0,0.38,0);
+    P(g,CYL(0.09,0.09,0.02,0x888888,12,0.1),0,0.02,0);
     const wine=new THREE.Mesh(new THREE.CylinderGeometry(0.055,0.02,0.2,12),
       new THREE.MeshStandardMaterial({color:0x880000,transparent:true,opacity:0.75,roughness:0}));
     wine.position.set(0,0.11,0);g.add(wine);
@@ -1780,7 +1868,7 @@ function buildFurniture(type){
       bulb.position.set(0,0.94,0);g.add(bulb);
     }
   else if(type==='plant-pot'){
-      P(g,CYL(0.16,0.12,0.22,12,0.8),0,0.11,0);
+      P(g,CYL(0.16,0.12,0.22,0x888888,12,0.8),0,0.11,0);
       P(g,SPH(0.22,0x228B22,0.95),0,0.38,0);
       P(g,SPH(0.16,0x1A6A1A,0.95),0.1,0.46,0.08);
       P(g,SPH(0.14,0x2E8B22,0.95),-0.08,0.44,-0.06);
@@ -1827,7 +1915,7 @@ function buildFurniture(type){
     }
   else if(type==='bedside-lamp'){
       P(g,B(0.28,0.28,0.26,0xD4A855,0.8),0,0.14,0);
-      P(g,CYL(0.015,0.015,0.22,8,0.4,0.6),0,0.39,0);
+      P(g,CYL(0.015,0.015,0.22,0x888888,8,0.6),0,0.39,0);
       const sh=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.13,0.14,12,1,true),
         new THREE.MeshStandardMaterial({color:0xFFEE88,roughness:0.8,side:THREE.DoubleSide}));
       sh.position.set(0,0.57,0);g.add(sh);
@@ -1853,14 +1941,14 @@ function buildFurniture(type){
   else if(type==='kitchen-sink'){
       P(g,B(0.72,0.18,0.52,0xBBCCDD,0.2,0.3),0,0.09,0);
       P(g,B(0.68,0.08,0.48,0x8899AA,0.1,0.2),0,0.2,0);
-      P(g,CYL(0.02,0.02,0.14,8,0.1,0.9),0,0.28,0);
-      P(g,CYL(0.03,0.03,0.04,8,0.1,0.8),0.05,0.36,0);
-      P(g,CYL(0.03,0.03,0.04,8,0.1,0.8),-0.05,0.36,0);
+      P(g,CYL(0.02,0.02,0.14,0x888888,8,0.9),0,0.28,0);
+      P(g,CYL(0.03,0.03,0.04,0x888888,8,0.8),0.05,0.36,0);
+      P(g,CYL(0.03,0.03,0.04,0x888888,8,0.8),-0.05,0.36,0);
     }
   else if(type==='bar-stool'){
-      P(g,CYL(0.14,0.14,0.04,12,0.7),0,0.56,0);
-      P(g,CYL(0.03,0.03,0.52,8,0.4,0.5),0,0.3,0);
-      P(g,CYL(0.18,0.18,0.02,4,0.5),0,0.04,0);
+      P(g,CYL(0.14,0.14,0.04,0x888888,12,0.7),0,0.56,0);
+      P(g,CYL(0.03,0.03,0.52,0x888888,8,0.5),0,0.3,0);
+      P(g,CYL(0.18,0.18,0.02,0x888888,4,0.5),0,0.04,0);
     }
   else if(type==='towel-rail'){
       P(g,B(0.02,0.52,0.06,0xCCCCCC,0.2,0.8),-0.3,0.26,0);
@@ -1876,11 +1964,11 @@ function buildFurniture(type){
       P(g,B(0.68,0.02,0.02,0xAAAAAA,0.2,0.6),0,0.5,0.09);
     }
   else if(type==='bbq'){
-      P(g,CYL(0.28,0.28,0.18,16,0.4),0,0.52,0);
-      P(g,CYL(0.3,0.3,0.02,16,0.3),0,0.62,0);
+      P(g,CYL(0.28,0.28,0.18,0x888888,16,0.4),0,0.52,0);
+      P(g,CYL(0.3,0.3,0.02,0x888888,16,0.3),0,0.62,0);
       P(g,B(0.46,0.02,0.46,0x333333,0.5,0.3),0,0.54,0);
       [[-0.18,-0.18],[0.18,-0.18],[-0.18,0.18],[0.18,0.18]].forEach(([lx,lz])=>{
-        P(g,CYL(0.03,0.03,0.48,6,0.4,0.5),lx,0.24,lz);
+        P(g,CYL(0.03,0.03,0.48,0x888888,6,0.5),lx,0.24,lz);
         P(g,B(0.04,0.04,0.32,0x333333,0.5),0,0.08,lz);
       });
     }
@@ -1890,21 +1978,21 @@ function buildFurniture(type){
       [[-0.22,-0.2],[0.22,-0.2],[-0.22,0.2],[0.22,0.2]].forEach(([lx,lz])=>P(g,B(0.04,0.26,0.04,0x1A6A1A,0.8),lx,0.13,lz));
     }
   else if(type==='garden-table'){
-      P(g,CYL(0.38,0.38,0.04,16,0.6),0,0.44,0);
-      P(g,CYL(0.04,0.04,0.42,8,0.5),0,0.21,0);
-      P(g,CYL(0.24,0.24,0.04,8,0.5),0,0.02,0);
+      P(g,CYL(0.38,0.38,0.04,0x888888,16,0.6),0,0.44,0);
+      P(g,CYL(0.04,0.04,0.42,0x888888,8,0.5),0,0.21,0);
+      P(g,CYL(0.24,0.24,0.04,0x888888,8,0.5),0,0.02,0);
     }
   else if(type==='umbrella'){
-      P(g,CYL(0.02,0.02,0.9,8,0.4,0.5),0,0.45,0);
+      P(g,CYL(0.02,0.02,0.9,0x888888,8,0.5),0,0.45,0);
       // Canopy
       const canopy=new THREE.Mesh(new THREE.ConeGeometry(0.52,0.28,12,1,true),
         new THREE.MeshStandardMaterial({color:0xFF6622,roughness:0.9,side:THREE.DoubleSide}));
       canopy.position.set(0,0.94,0);canopy.rotation.y=Math.PI;g.add(canopy);
-      P(g,CYL(0.02,0.08,0.06,6,0.5),0,0.06,0);
+      P(g,CYL(0.02,0.08,0.06,0x888888,6,0.5),0,0.06,0);
     }
   else if(type==='flower-pot'){
-      P(g,CYL(0.18,0.13,0.24,12,0.8),0,0.12,0);
-      P(g,CYL(0.2,0.2,0.02,12,0.7),0,0.25,0);
+      P(g,CYL(0.18,0.13,0.24,0x888888,12,0.8),0,0.12,0);
+      P(g,CYL(0.2,0.2,0.02,0x888888,12,0.7),0,0.25,0);
       P(g,SPH(0.16,0x228B22,0.95),0,0.38,0);
       P(g,SPH(0.1,0xFF4455,0.9),-0.06,0.46,-0.04);
       P(g,SPH(0.1,0xFF8800,0.9),0.06,0.46,0.04);
@@ -1916,9 +2004,9 @@ function buildFurniture(type){
       }
     }
   else if(type==='pillar'){
-      P(g,CYL(0.18,0.22,0.96,16,0.5),0,0.48,0);
-      P(g,CYL(0.24,0.24,0.06,16,0.5),0,0.97,0);
-      P(g,CYL(0.24,0.24,0.06,16,0.5),0,0.03,0);
+      P(g,CYL(0.18,0.22,0.96,0x888888,16,0.5),0,0.48,0);
+      P(g,CYL(0.24,0.24,0.06,0x888888,16,0.5),0,0.97,0);
+      P(g,CYL(0.24,0.24,0.06,0x888888,16,0.5),0,0.03,0);
     }
   else if(type==='arch-stone'){
       P(g,B(0.14,0.92,0.22,0xAA9988,0.9),-0.38,0.46,0);
@@ -1951,7 +2039,7 @@ function buildFurniture(type){
       P(g,B(0.36,0.3,0.22,0xCC3333,0.7),0,0.55,0);
       P(g,B(0.38,0.32,0.24,0xAA2222,0.7),0,0.55,0);
       P(g,B(0.24,0.04,0.06,0x222222,0.5),0,0.54,0.12);
-      P(g,CYL(0.03,0.03,0.38,6,0.4,0.4),0,0.19,0);
+      P(g,CYL(0.03,0.03,0.38,0x888888,6,0.4),0,0.19,0);
     }
   else if(type==='garage-door'){
       P(g,B(0.94,0.78,0.06,0xCCCCCC,0.4,0.2),0,0.39,0);
@@ -2058,6 +2146,20 @@ function placeBlock(x,y,z,type,record=true){
   }
   mesh.userData={type,key,x,y,z};
   mesh.traverse(c=>{if(c!==mesh)c.userData={type,key,parentMesh:mesh};});
+
+  // SAFETY CHECK: verify geometry has no NaN positions before adding to scene.
+  // Catches any broken geometry at the source, with the exact block type logged.
+  let hasNaN=false;
+  mesh.traverse(c=>{
+    if(hasNaN || !c.isMesh || !c.geometry || !c.geometry.attributes || !c.geometry.attributes.position) return;
+    const arr=c.geometry.attributes.position.array;
+    for(let i=0;i<arr.length;i++){ if(!isFinite(arr[i])){ hasNaN=true; break; } }
+  });
+  if(hasNaN){
+    console.error(`🛑 placeBlock('${type}') at (${x},${y},${z}) produced NaN geometry — not adding to scene.`);
+    return; // refuse to add broken geometry to the scene at all
+  }
+
   scene.add(mesh);
   placed[key]={mesh,type};
   if(record){undoStack.push({action:'place',key,type,x,y,z});if(undoStack.length>300)undoStack.shift();}
@@ -2085,7 +2187,19 @@ function buildGizmo(obj){
   const bbox=new THREE.Box3().setFromObject(obj.mesh);
   const size=new THREE.Vector3(); bbox.getSize(size);
   const center=new THREE.Vector3(); bbox.getCenter(center);
-  const maxS=Math.max(size.x,size.y,size.z);
+
+  // SAFETY: bbox can be empty/infinite for groups with no visible geometry yet
+  // (e.g. a GLB model that's still loading), or after extreme scale changes.
+  // Guard against NaN/Infinity propagating into all the geometry below.
+  if(!isFinite(size.x) || !isFinite(size.y) || !isFinite(size.z) ||
+     !isFinite(center.x) || !isFinite(center.y) || !isFinite(center.z) ||
+     size.x<=0 || size.y<=0 || size.z<=0){
+    // Fall back to a small default box around the object's position
+    size.set(1,1,1);
+    center.copy(obj.mesh.position);
+  }
+
+  const maxS=Math.max(size.x,size.y,size.z, 0.1); // never let maxS be 0
   const off=maxS/2+0.9; // offset from center
 
   // ── SELECTION BOX (bright gold) ───────────────────
@@ -2101,9 +2215,10 @@ function buildGizmo(obj){
   ];
   verts.forEach(([a,b])=>{
     const dx=b[0]-a[0],dy=b[1]-a[1],dz=b[2]-a[2];
-    const len=Math.sqrt(dx*dx+dy*dy+dz*dz);
+    // Real-world length of this edge segment — use whichever axis it runs along
+    const realLen = dx!==0 ? size.x : dz!==0 ? size.z : size.y;
     const edge=new THREE.Mesh(
-      new THREE.CylinderGeometry(0.03,0.03,len*Math.max(size.x,size.y,size.z)/2,8),
+      new THREE.CylinderGeometry(0.03,0.03,Math.max(realLen,0.05),8),
       new THREE.MeshBasicMaterial({color:0xFFD700,depthTest:false})
     );
     edge.position.set(
@@ -2221,12 +2336,15 @@ function selectObject(mesh){
   while(target&&!placed[target.userData.key])target=target.parent;
   if(!target||!placed[target.userData.key])return;
   deselect();
+  // Make sure the wall editor panel isn't showing at the same time
+  const wp0=document.getElementById('wallPropPanel');
+  if(wp0) wp0.style.display='none';
   selectedObj=placed[target.userData.key];
   buildGizmo(selectedObj);
   const bd=BLOCKS[selectedObj.type];
   document.getElementById('gizmoName').textContent=(bd?bd.e+' '+bd.l:'Block');
-  // block selected - use keyboard/arrows to move
-  toast('✋ Selected! Use ROTATE buttons below or press T for X rotation');
+  openObjProps(selectedObj);
+  toast('✋ Selected! Adjust size, colour & rotation in the panel →');
 }
 
 function deselect(){
@@ -2236,6 +2354,135 @@ function deselect(){
 
   const wp=document.getElementById('wallPropPanel');
   if(wp) wp.style.display='none';
+  const op=document.getElementById('objPropPanel');
+  if(op) op.style.display='none';
+}
+
+// ── UNIVERSAL OBJECT EDITOR ───────────────────────────
+// Colour tint palette — applied as a multiply-tint so multi-part
+// furniture (sofa cushions, bookshelf books, etc) keeps its detail
+// shading and just shifts its overall colour tone.
+const OBJ_TINT_PALETTE = [
+  {label:'Original', hex:null},
+  {label:'White',    hex:0xFFFFFF},
+  {label:'Black',    hex:0x222222},
+  {label:'Red',      hex:0xCC3333},
+  {label:'Orange',   hex:0xFF8833},
+  {label:'Yellow',   hex:0xFFDD33},
+  {label:'Green',    hex:0x44AA44},
+  {label:'Teal',     hex:0x33AAAA},
+  {label:'Blue',     hex:0x3366CC},
+  {label:'Purple',   hex:0x9955CC},
+  {label:'Pink',     hex:0xFF77AA},
+  {label:'Gold',     hex:0xFFD700},
+];
+
+function openObjProps(obj){
+  const panel=document.getElementById('objPropPanel');
+  if(!panel || !obj) return;
+  panel.style.display='flex';
+
+  // Reset sliders to reflect current scale (as % of original)
+  const s=obj.mesh.scale;
+  document.getElementById('opW').value = Math.round(s.x*100);
+  document.getElementById('opH').value = Math.round(s.y*100);
+  document.getElementById('opD').value = Math.round(s.z*100);
+  document.getElementById('opWVal').textContent = Math.round(s.x*100)+'%';
+  document.getElementById('opHVal').textContent = Math.round(s.y*100)+'%';
+  document.getElementById('opDVal').textContent = Math.round(s.z*100)+'%';
+
+  // Build colour swatches
+  const cp=document.getElementById('opColorPicker');
+  const cn=document.getElementById('opColorName');
+  if(cp){
+    cp.innerHTML='';
+    OBJ_TINT_PALETTE.forEach(opt=>{
+      const sw=document.createElement('div');
+      const isActive = (obj.tintHex===opt.hex) || (!obj.tintHex && opt.hex===null);
+      sw.style.cssText=`width:32px;height:32px;border-radius:7px;cursor:pointer;
+        background:${opt.hex===null?'repeating-conic-gradient(#888 0% 25%,#aaa 0% 50%) 50% / 8px 8px':'#'+opt.hex.toString(16).padStart(6,'0')};
+        border:2px solid ${isActive?'#FFD700':'rgba(255,255,255,0.15)'};
+        transition:all 0.15s;`;
+      sw.title=opt.label;
+      sw.onclick=()=>{
+        applyObjTint(obj, opt.hex);
+        cp.querySelectorAll('div').forEach(d=>d.style.borderColor='rgba(255,255,255,0.15)');
+        sw.style.borderColor='#FFD700';
+        if(cn) cn.textContent=opt.label;
+      };
+      cp.appendChild(sw);
+    });
+    const cur=OBJ_TINT_PALETTE.find(o=>o.hex===(obj.tintHex||null));
+    if(cn && cur) cn.textContent=cur.label;
+  }
+
+  updateObjPosDisplay(obj);
+}
+
+// Apply a colour tint across every mesh part of an object.
+// Stores each part's ORIGINAL colour once so tints are always
+// computed from the true base colour (not stacked/darkened over time).
+function applyObjTint(obj, hex){
+  obj.tintHex = hex;
+  obj.mesh.traverse(c=>{
+    if(!c.isMesh || !c.material) return;
+    // Skip glowing/emissive bits (fire, lamp bulbs etc) so they keep their glow
+    if(c.material.emissiveIntensity && c.material.emissiveIntensity>0.3) return;
+
+    if(!c.userData.origColor) c.userData.origColor = c.material.color.clone();
+
+    if(hex===null){
+      c.material.color.copy(c.userData.origColor);
+    } else {
+      const tint=new THREE.Color(hex);
+      const orig=c.userData.origColor;
+      // Blend: keep some of the original shading variation, shift toward the tint
+      c.material.color.set(
+        orig.r*0.35 + tint.r*0.65,
+        orig.g*0.35 + tint.g*0.65,
+        orig.b*0.35 + tint.b*0.65
+      );
+    }
+    c.material.needsUpdate=true;
+  });
+  toast(hex===null ? '🎨 Restored original colours' : '🎨 Colour tint applied!');
+}
+
+function liveObjEdit(){
+  if(!selectedObj) return;
+  const link=document.getElementById('opLinkScale').checked;
+  let w=parseFloat(document.getElementById('opW').value)/100;
+  let h=parseFloat(document.getElementById('opH').value)/100;
+  let d=parseFloat(document.getElementById('opD').value)/100;
+  // Guard against invalid slider values producing NaN/zero scale
+  if(!isFinite(w)||w<=0) w=1;
+  if(!isFinite(h)||h<=0) h=1;
+  if(!isFinite(d)||d<=0) d=1;
+
+  if(link){
+    // Use whichever slider just moved as the master — approximate by averaging
+    const avg=(w+h+d)/3;
+    w=h=d=avg;
+    document.getElementById('opW').value=Math.round(avg*100);
+    document.getElementById('opH').value=Math.round(avg*100);
+    document.getElementById('opD').value=Math.round(avg*100);
+  }
+
+  document.getElementById('opWVal').textContent=Math.round(w*100)+'%';
+  document.getElementById('opHVal').textContent=Math.round(h*100)+'%';
+  document.getElementById('opDVal').textContent=Math.round(d*100)+'%';
+
+  selectedObj.mesh.scale.set(w,h,d);
+  buildGizmo(selectedObj);
+  updateObjPosDisplay(selectedObj);
+}
+
+function updateObjPosDisplay(obj){
+  const pd=document.getElementById('opPosDisplay');
+  if(pd && obj){
+    const p=obj.mesh.position;
+    pd.textContent=`X:${p.x.toFixed(1)} Y:${p.y.toFixed(1)} Z:${p.z.toFixed(1)}`;
+  }
 }
 
 // ── GIZMO ACTIONS ─────────────────────────────────────
@@ -2285,20 +2532,28 @@ function gizmoDuplicate(){
   const{x,y,z,type}=selectedObj.mesh.userData;
   const rot=selectedObj.mesh.rotation.clone();
   const scl=selectedObj.mesh.scale.clone();
+  const tintHex=selectedObj.tintHex;
   placeBlock(x+1,y,z,type,true);
-  if(placed[bk(x+1,y,z)]){
-    placed[bk(x+1,y,z)].mesh.rotation.copy(rot);
-    placed[bk(x+1,y,z)].mesh.scale.copy(scl);
+  const newKey=bk(x+1,y,z);
+  if(placed[newKey]){
+    placed[newKey].mesh.rotation.copy(rot);
+    placed[newKey].mesh.scale.copy(scl);
+    // Carry over the colour tint to the duplicate
+    if(tintHex!==undefined) applyObjTint(placed[newKey], tintHex);
+    // Select the new copy so the editor panel updates to show it
+    selectObject(placed[newKey].mesh);
   }
-  toast('Duplicated!');
+  toast('⧉ Duplicated! Editing the new copy now.');
 }
 
 function gizmoDelete(){
   if(selectedWall){ deleteSelectedWall(); return; }
   if(!selectedObj){return;}
   const{x,y,z}=selectedObj.mesh.userData;
-  deselect();removeBlock(x,y,z);
-  sndErase();toast('Deleted!');
+  deselect();
+  removeBlock(x,y,z);
+  sndErase();
+  toast('🗑 Deleted!');
 }
 
 function moveSelected(dx,dy,dz){
@@ -3539,6 +3794,50 @@ buildPalette();
 initRoomBuilder();
 setLoad(95);
 buildStarter();
+
+// ── NaN GEOMETRY SAFETY SWEEP ─────────────────────────
+// Scans every mesh currently in the scene right after the showcase villa
+// is built. Any geometry with NaN/Infinity in its position attribute gets
+// logged (with its block type + coordinates so we can pinpoint the cause)
+// and safely removed so it can never trigger repeated raycaster/gizmo errors.
+function sweepForBadGeometry(){
+  let foundBad = 0;
+  const toRemove = [];
+  scene.traverse(obj=>{
+    if(!obj.isMesh || !obj.geometry || !obj.geometry.attributes || !obj.geometry.attributes.position) return;
+    const pos = obj.geometry.attributes.position.array;
+    let bad = false;
+    for(let i=0;i<pos.length;i++){
+      if(!isFinite(pos[i])){ bad=true; break; }
+    }
+    if(bad){
+      foundBad++;
+      // Walk up to find the placed/villa object this belongs to
+      let root=obj; let depth=0;
+      while(root.parent && root.parent!==scene && depth<10){ root=root.parent; depth++; }
+      console.error('🛑 Found NaN geometry on mesh:', obj,
+        '| root userData:', root.userData,
+        '| root position:', root.position);
+      toRemove.push(root);
+    }
+  });
+  toRemove.forEach(r=>{
+    if(r.userData && r.userData.key && placed[r.userData.key]){
+      delete placed[r.userData.key];
+    }
+    scene.remove(r);
+  });
+  if(foundBad>0){
+    console.warn(`⚠️ Removed ${foundBad} object(s) with broken NaN geometry — see logs above for details.`);
+    toast(`⚠️ Cleaned up ${foundBad} broken object(s) automatically`);
+  } else {
+    console.log('✅ Scene geometry sweep: all clean, no NaN found.');
+  }
+  return foundBad;
+}
+window.sweepForBadGeometry = sweepForBadGeometry;
+// Run the sweep once shortly after load (let villa + textures settle first)
+setTimeout(sweepForBadGeometry, 800);
 setLoad(100);
 
 setTimeout(()=>{
@@ -3662,6 +3961,18 @@ setTimeout(()=>{
     mesh.userData={isWall:true, wallIdx:wallIdx};
     // Tag children so clicking any part selects the wall
     mesh.traverse(c=>{if(c!==mesh) c.userData={isWall:true, wallIdx:wallIdx};});
+    // SAFETY CHECK: verify wall geometry has no NaN positions
+    let wallHasNaN=false;
+    if(mesh.geometry && mesh.geometry.attributes && mesh.geometry.attributes.position){
+      const arr=mesh.geometry.attributes.position.array;
+      for(let i=0;i<arr.length;i++){ if(!isFinite(arr[i])){ wallHasNaN=true; break; } }
+    }
+    if(wallHasNaN){
+      console.error('🛑 placeRealWall produced NaN geometry — not adding.', {h,thick,len,cx,cz,fy,angle});
+      toast('⚠️ Wall placement failed — try a different drag direction.');
+      return;
+    }
+
     walls.push(wallData);
     scene.add(mesh);
     sndPlace();
@@ -3692,6 +4003,9 @@ setTimeout(()=>{
     clearGizmo();
     selectedObj=null;
     selectedWall=null;
+    // Make sure the universal object panel isn't showing at the same time
+    const op=document.getElementById('objPropPanel');
+    if(op) op.style.display='none';
     // Now set new selection
     selectedWall = wallData;
     buildGizmo({mesh: wallData.mesh, type:'wall'});
@@ -3948,9 +4262,13 @@ setTimeout(()=>{
 
   function liveWallEdit(){
     if(!selectedWall) return;
-    const len=parseFloat(document.getElementById('wpLen').value);
-    const h=parseFloat(document.getElementById('wpH').value);
-    const thick=parseFloat(document.getElementById('wpTh').value);
+    let len=parseFloat(document.getElementById('wpLen').value);
+    let h=parseFloat(document.getElementById('wpH').value);
+    let thick=parseFloat(document.getElementById('wpTh').value);
+    // Guard against any invalid slider values producing NaN geometry
+    if(!isFinite(len)||len<=0) len=0.5;
+    if(!isFinite(h)||h<=0) h=0.5;
+    if(!isFinite(thick)||thick<=0) thick=0.05;
 
     // Update display values
     document.getElementById('wpLenVal').textContent=len.toFixed(1)+'m';
@@ -4011,6 +4329,9 @@ setTimeout(()=>{
   window.gizmoDelete   = gizmoDelete;
   window.moveSelected  = moveSelected;
   window.deselect      = deselect;
+  window.openObjProps  = openObjProps;
+  window.applyObjTint  = applyObjTint;
+  window.liveObjEdit   = liveObjEdit;
   window.addFloorPlate = addFloorPlate;
   window.addWalls      = addWalls;
   window.addRoof       = addRoof;
