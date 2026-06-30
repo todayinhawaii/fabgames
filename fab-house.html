@@ -298,6 +298,75 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   </div>
 </div>
 
+<!-- WALL PROPERTIES PANEL — live edit selected wall -->
+<div id="wallPropPanel" style="display:none;position:fixed;top:58px;right:82px;
+  z-index:300;background:rgba(0,8,20,0.97);backdrop-filter:blur(14px);
+  border:2px solid rgba(100,200,255,0.5);border-radius:18px;
+  padding:16px 18px;flex-direction:column;gap:10px;min-width:220px;
+  box-shadow:0 0 30px rgba(0,180,255,0.25);" onpointerdown="event.stopPropagation()">
+
+  <div style="font-family:'Fredoka One',cursive;font-size:14px;color:#44DDFF;
+    text-align:center;letter-spacing:1px;">✏️ WALL PROPERTIES</div>
+
+  <!-- Length -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.5);">↔ LENGTH</span>
+      <span id="wpLenVal" style="font-family:'Fredoka One',cursive;font-size:14px;color:#44DDFF;">5.0m</span>
+    </div>
+    <input type="range" id="wpLen" min="0.5" max="30" step="0.5" value="5"
+      style="width:100%;accent-color:#44DDFF;"
+      oninput="liveWallEdit()">
+  </div>
+
+  <!-- Height -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.5);">↕ HEIGHT</span>
+      <span id="wpHVal" style="font-family:'Fredoka One',cursive;font-size:14px;color:#44DDFF;">3.0m</span>
+    </div>
+    <input type="range" id="wpH" min="0.5" max="12" step="0.5" value="3"
+      style="width:100%;accent-color:#44DDFF;"
+      oninput="liveWallEdit()">
+  </div>
+
+  <!-- Thickness -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.5);">⬛ THICKNESS</span>
+      <span id="wpThVal" style="font-family:'Fredoka One',cursive;font-size:14px;color:#44DDFF;">0.20m</span>
+    </div>
+    <input type="range" id="wpTh" min="0.05" max="1.5" step="0.05" value="0.2"
+      style="width:100%;accent-color:#44DDFF;"
+      oninput="liveWallEdit()">
+  </div>
+
+  <!-- Material -->
+  <div style="display:flex;flex-direction:column;gap:6px;">
+    <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.5);">🎨 MATERIAL</span>
+    <div id="wpMatPicker" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+  </div>
+
+  <!-- Position display -->
+  <div style="font-family:'Nunito',sans-serif;font-size:10px;color:rgba(255,255,255,0.25);
+    text-align:center;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px;">
+    <span id="wpPosDisplay">Position: —</span>
+  </div>
+
+  <!-- Actions -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+    <button onclick="gizmoDuplicate()" style="font-family:'Fredoka One',cursive;font-size:11px;
+      padding:6px 10px;border-radius:8px;border:none;cursor:pointer;
+      background:rgba(255,215,0,0.2);color:#FFD700;border:1px solid rgba(255,215,0,0.3);">⧉ Copy</button>
+    <button onclick="gizmoDelete()" style="font-family:'Fredoka One',cursive;font-size:11px;
+      padding:6px 10px;border-radius:8px;border:none;cursor:pointer;
+      background:rgba(255,50,50,0.2);color:#ff8888;border:1px solid rgba(255,50,50,0.3);">🗑 Delete</button>
+    <button onclick="closeWallProps()" style="font-family:'Fredoka One',cursive;font-size:11px;
+      padding:6px 10px;border-radius:8px;border:none;cursor:pointer;
+      background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.15);">✕ Done</button>
+  </div>
+</div>
+
 <!-- TRANSFORM PANEL — shows when block selected -->
 <div id="gizmoPanel" onpointerdown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
   <div class="gizmo-title">✋ <span id="gizmoName">Block</span> — Selected</div>
@@ -2237,6 +2306,8 @@ function deselect(){
   selectedObj=null;
   selectedWall=null;
   document.getElementById('gizmoPanel').classList.remove('show');
+  const wp=document.getElementById('wallPropPanel');
+  if(wp) wp.style.display='none';
 }
 
 // ── GIZMO ACTIONS ─────────────────────────────────────
@@ -3517,11 +3588,13 @@ setTimeout(()=>{
   function selectWall(wallData){
     deselect();
     selectedWall = wallData;
-    // Build gizmo around wall mesh
     buildGizmo({mesh: wallData.mesh, type:'wall'});
+    // Show gizmo panel for rotate/scale buttons
     document.getElementById('gizmoName').textContent = '🧱 ' + (BLOCKS[wallData.matKey]?.l||'Wall');
     document.getElementById('gizmoPanel').classList.add('show');
-    toast('✋ Wall selected! Use arrows/E/C to move · Rotate buttons to spin · Delete to remove');
+    // Open live properties panel
+    openWallProps(wallData);
+    toast('✋ Wall selected! Edit size & material in panel · Drag arrows to move!');
   }
 
   function deleteSelectedWall(){
@@ -3560,6 +3633,122 @@ setTimeout(()=>{
     toast(`Wall ${factor>1?'bigger':'smaller'}`);
   }
 
+  // ── WALL PROPERTIES PANEL ────────────────────────────
+  const WALL_MAT_LIST=[
+    {key:'brick-white',  label:'White Plaster', color:'#F5F0E8'},
+    {key:'brick-red',    label:'Red Brick',      color:'#CC4422'},
+    {key:'brick-grey',   label:'Grey Stone',     color:'#888888'},
+    {key:'brick-dark',   label:'Dark Stone',     color:'#333333'},
+    {key:'wood-light',   label:'Light Wood',     color:'#D4A855'},
+    {key:'wood-dark',    label:'Dark Wood',      color:'#7B4F2E'},
+    {key:'concrete',     label:'Concrete',       color:'#AAAAAA'},
+    {key:'brick-blue',   label:'Blue Wall',      color:'#4488CC'},
+    {key:'brick-green',  label:'Green Wall',     color:'#449944'},
+    {key:'brick-pink',   label:'Pink Wall',      color:'#DD88AA'},
+    {key:'glass-wall',   label:'Glass',          color:'#88CCFF'},
+    {key:'brick-yellow', label:'Yellow Wall',    color:'#F0C040'},
+  ];
+
+  function openWallProps(wallData){
+    const panel=document.getElementById('wallPropPanel');
+    if(!panel) return;
+    panel.style.display='flex';
+
+    // Set sliders to current wall dimensions
+    const bbox=new THREE.Box3().setFromObject(wallData.mesh);
+    const size=new THREE.Vector3(); bbox.getSize(size);
+
+    // Determine wall length (longest horizontal dimension)
+    const len=Math.max(size.x,size.z);
+    const h=size.y;
+    const thick=Math.min(size.x,size.z);
+
+    document.getElementById('wpLen').value=len.toFixed(1);
+    document.getElementById('wpH').value=h.toFixed(1);
+    document.getElementById('wpTh').value=thick.toFixed(2);
+    document.getElementById('wpLenVal').textContent=len.toFixed(1)+'m';
+    document.getElementById('wpHVal').textContent=h.toFixed(1)+'m';
+    document.getElementById('wpThVal').textContent=thick.toFixed(2)+'m';
+
+    // Build material swatches
+    const mp=document.getElementById('wpMatPicker');
+    if(mp){
+      mp.innerHTML='';
+      WALL_MAT_LIST.forEach(mat=>{
+        const sw=document.createElement('div');
+        sw.style.cssText=`width:26px;height:26px;border-radius:6px;cursor:pointer;
+          background:${mat.color};border:2px solid ${mat.key===wallData.matKey?'#44DDFF':'rgba(255,255,255,0.15)'};
+          transition:transform 0.1s;`;
+        sw.title=mat.label;
+        sw.onclick=()=>{
+          wallData.matKey=mat.key;
+          const bd=BLOCKS[mat.key];
+          if(bd && wallData.mesh.material){
+            wallData.mesh.material.color.set(new THREE.Color(bd.c));
+            wallData.mesh.material.roughness=bd.r||0.8;
+          }
+          mp.querySelectorAll('div').forEach(s=>s.style.borderColor='rgba(255,255,255,0.15)');
+          sw.style.borderColor='#44DDFF';
+          toast('Material: '+mat.label);
+        };
+        mp.appendChild(sw);
+      });
+    }
+    updateWallPosDisplay(wallData);
+  }
+
+  function updateWallPosDisplay(wallData){
+    const pd=document.getElementById('wpPosDisplay');
+    if(pd && wallData){
+      const p=wallData.mesh.position;
+      pd.textContent=`X:${p.x.toFixed(1)} Y:${p.y.toFixed(1)} Z:${p.z.toFixed(1)}`;
+    }
+  }
+
+  function liveWallEdit(){
+    if(!selectedWall) return;
+    const len=parseFloat(document.getElementById('wpLen').value);
+    const h=parseFloat(document.getElementById('wpH').value);
+    const thick=parseFloat(document.getElementById('wpTh').value);
+
+    // Update display values
+    document.getElementById('wpLenVal').textContent=len.toFixed(1)+'m';
+    document.getElementById('wpHVal').textContent=h.toFixed(1)+'m';
+    document.getElementById('wpThVal').textContent=thick.toFixed(2)+'m';
+
+    // Rebuild wall geometry in-place
+    const mesh=selectedWall.mesh;
+    const rotY=mesh.rotation.y;
+    const pos=mesh.position.clone();
+
+    // Dispose old geometry
+    if(mesh.geometry) mesh.geometry.dispose();
+
+    // Determine if wall is horizontal or vertical based on rotation
+    const isH=Math.abs(Math.sin(rotY))<0.5;
+    const newGeo=new THREE.BoxGeometry(thick, h, len);
+    mesh.geometry=newGeo;
+
+    // Update edge lines
+    mesh.children.forEach(c=>{if(c.isLineSegments||c.isLine)mesh.remove(c);});
+    mesh.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(newGeo),
+      new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:0.15})
+    ));
+
+    // Keep center at same Y (floor level + h/2)
+    mesh.position.y=pos.y;
+
+    // Rebuild gizmo to match new size
+    buildGizmo({mesh});
+    updateWallPosDisplay(selectedWall);
+  }
+
+  function closeWallProps(){
+    document.getElementById('wallPropPanel').style.display='none';
+    deselect();
+  }
+
   // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
   window.setMode       = setMode;
   window.undo          = undo;
@@ -3590,6 +3779,9 @@ setTimeout(()=>{
   window.placeRealWall     = placeRealWall;
   window.selectWall        = selectWall;
   window.deleteSelectedWall= deleteSelectedWall;
+  window.liveWallEdit      = liveWallEdit;
+  window.openWallProps     = openWallProps;
+  window.closeWallProps    = closeWallProps;
   window.rotateSelectedWall= rotateSelectedWall;
   window.scaleSelectedWall = scaleSelectedWall;
   window.moveSelectedWall  = moveSelectedWall;
