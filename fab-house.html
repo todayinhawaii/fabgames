@@ -374,11 +374,7 @@ function doDeselect(){
       background:rgba(255,255,255,0.08);color:#aaa;border:1px solid rgba(255,255,255,0.15);">✕ Done</button>
   </div>
 </div>
-<!-- TEMP DEBUG PANEL — remove once deselect issue is solved -->
-<div id="debugPanel" style="position:fixed;bottom:60px;right:10px;z-index:9999;
-  background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:11px;
-  padding:10px;border-radius:8px;max-width:300px;white-space:pre-wrap;
-  pointer-events:none;border:1px solid #0f0;">DEBUG: waiting for click...</div>
+
 
 <div id="toast" style="position:fixed;top:60px;left:50%;transform:translateX(-50%);
   font-family:'Fredoka One',cursive;font-size:15px;background:rgba(0,0,0,0.85);
@@ -2924,11 +2920,7 @@ canvas.addEventListener('pointermove',e=>{
   prevMouse={x:e.clientX,y:e.clientY};
 });
 
-function dbg(msg){
-  const el=document.getElementById('debugPanel');
-  if(el) el.textContent='DEBUG:\n'+msg;
-  console.log('[DESELECT-DEBUG]', msg);
-}
+function dbg(msg){ /* debug disabled */ }
 
 canvas.addEventListener('pointerup',e=>{
   if(!downOnCanvas){dbg('EARLY EXIT: downOnCanvas was false');isDown=false;return;}
@@ -3031,12 +3023,12 @@ canvas.addEventListener('pointerup',e=>{
         }
       } else if(mode==='select'){
         const hit=hits[0];
+        // Always deselect first — then re-select whatever was actually clicked
+        deselect();
         // Walk up to find wall or placed block
         let foundWall=null, foundBlock=null;
         let node=hit.object;
-        let walkPath=[];
         while(node){
-          walkPath.push(node.type||node.constructor.name);
           if(node.userData){
             if(node.userData.isWall && walls[node.userData.wallIdx]){
               foundWall=walls[node.userData.wallIdx]; break;
@@ -3047,13 +3039,9 @@ canvas.addEventListener('pointerup',e=>{
           }
           node=node.parent;
         }
-        dbg('SELECT mode click. foundWall='+!!foundWall+' foundBlock='+!!foundBlock+
-          '\nwalk path: '+walkPath.join(' -> ')+
-          '\nhit object name: '+(hit.object.name||'(unnamed)')+
-          '\nhit object is ground: '+(hit.object===ground));
         if(foundWall) selectWall(foundWall);
         else if(foundBlock) selectObject(foundBlock);
-        else { dbg('Calling deselect() now...'); deselect(); }
+        // else: nothing meaningful was clicked — deselect already called above, done!
       } else if(mode==='erase'){
         // Check if erasing a wall
         let chkE=hits[0].object;
@@ -3078,42 +3066,7 @@ canvas.addEventListener('pointerup',e=>{
   isDown=false;
 });
 
-// ── CLICK-TO-DESELECT SYSTEM ──────────────────────────
-// Tracks whether a deliberate new selectObject() call happened during
-// this pointer cycle. If not, and something was previously selected,
-// the click landed on something irrelevant — so deselect.
-// clickHadNewSelection is declared globally above
-
-// clickHadNewSelection is set directly inside selectObject() and selectWall()
-
-let toggleDownPos = null;
-let preClickObj = null;
-
-canvas.addEventListener('pointerdown', e=>{
-  if(e.button!==0) return;
-  toggleDownPos = {x:e.clientX, y:e.clientY};
-  preClickObj = selectedObj || selectedWall;
-  clickHadNewSelection = false;
-});
-
-canvas.addEventListener('pointerup', e=>{
-  if(mode!=='select' || !toggleDownPos) return;
-  const dx=e.clientX-toggleDownPos.x, dy=e.clientY-toggleDownPos.y;
-  const isClick = Math.abs(dx)+Math.abs(dy) < 8;
-  toggleDownPos = null;
-  if(!isClick) return;
-  if(!preClickObj) return; // nothing was selected before, nothing to deselect
-
-  setTimeout(()=>{
-    dbg('CLICK CHECK: hadNewSelection='+clickHadNewSelection+
-      ' preClickObj='+!!preClickObj+' now selectedObj='+!!selectedObj);
-    if(!clickHadNewSelection){
-      // No deliberate new selection happened — deselect whatever was selected
-      doDeselect();
-    }
-    clickHadNewSelection = false;
-  }, 30);
-});
+// Click-to-deselect handled directly in the select-mode branch above
 
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{
@@ -3192,10 +3145,10 @@ canvas.addEventListener('touchend',e=>{
           else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
         }
       } else if(mode==='select'){
+        deselect(); // always clear first
         let t=hits[0].object;
         while(t&&!placed[t.userData.key])t=t.parent;
         if(t&&placed[t.userData.key]) selectObject(t);
-        else deselect();
       } else if(mode==='erase'){
         // Check if erasing a wall
         let chkE=hits[0].object;
