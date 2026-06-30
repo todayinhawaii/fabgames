@@ -353,6 +353,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
       background:rgba(255,255,255,0.08);color:#aaa;border:1px solid rgba(255,255,255,0.15);">✕ Done</button>
   </div>
 </div>
+<!-- TEMP DEBUG PANEL — remove once deselect issue is solved -->
+<div id="debugPanel" style="position:fixed;bottom:60px;right:10px;z-index:9999;
+  background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:11px;
+  padding:10px;border-radius:8px;max-width:300px;white-space:pre-wrap;
+  pointer-events:none;border:1px solid #0f0;">DEBUG: waiting for click...</div>
+
 <div id="toast" style="position:fixed;top:60px;left:50%;transform:translateX(-50%);
   font-family:'Fredoka One',cursive;font-size:15px;background:rgba(0,0,0,0.85);
   color:#FFD700;padding:9px 22px;border-radius:18px;border:1px solid rgba(255,215,0,0.3);
@@ -2892,12 +2898,19 @@ canvas.addEventListener('pointermove',e=>{
   prevMouse={x:e.clientX,y:e.clientY};
 });
 
+function dbg(msg){
+  const el=document.getElementById('debugPanel');
+  if(el) el.textContent='DEBUG:\n'+msg;
+  console.log('[DESELECT-DEBUG]', msg);
+}
+
 canvas.addEventListener('pointerup',e=>{
-  if(!downOnCanvas){isDown=false;return;}
+  if(!downOnCanvas){dbg('EARLY EXIT: downOnCanvas was false');isDown=false;return;}
   downOnCanvas=false;
 
   // WALL DRAW — place wall on release (build mode only)
   if(wallActive && wallDragging && mode==='build'){
+    dbg('EARLY EXIT: wall draw branch');
     if(wallDragStart){
       const hits=getHits(e);
       if(hits.length>0){
@@ -2912,6 +2925,7 @@ canvas.addEventListener('pointerup',e=>{
   }
 
   if(activeHandle){
+    dbg('EARLY EXIT: activeHandle was set = '+JSON.stringify(activeHandle));
     activeHandle=null;
     if(selectedWall) buildGizmo({mesh:selectedWall.mesh});
     else if(selectedObj) buildGizmo(selectedObj);
@@ -2920,6 +2934,7 @@ canvas.addEventListener('pointerup',e=>{
 
   // Was orbiting - stop, don't trigger action
   if(isOrbiting && hasMoved){
+    dbg('EARLY EXIT: was orbiting+moved, mode='+mode+' hasMoved='+hasMoved);
     isOrbiting=false; isDown=false; return;
   }
   isOrbiting=false;
@@ -2927,6 +2942,9 @@ canvas.addEventListener('pointerup',e=>{
   // Clean click (no drag) = place/select/erase
   if(isDown&&!hasMoved){
     const hits=getHits(e);
+    dbg('CLEAN CLICK reached. mode='+mode+' hits.length='+hits.length+
+      (hits.length>0 ? ' first hit type='+(hits[0].object.userData?hits[0].object.userData.type:'none')+
+       ' isWall='+!!(hits[0].object.userData&&hits[0].object.userData.isWall) : ''));
     if(hits.length>0){
       // Alt/Option + click = DELETE regardless of mode
       if(e.altKey){
@@ -2990,7 +3008,9 @@ canvas.addEventListener('pointerup',e=>{
         // Walk up to find wall or placed block
         let foundWall=null, foundBlock=null;
         let node=hit.object;
+        let walkPath=[];
         while(node){
+          walkPath.push(node.type||node.constructor.name);
           if(node.userData){
             if(node.userData.isWall && walls[node.userData.wallIdx]){
               foundWall=walls[node.userData.wallIdx]; break;
@@ -3001,9 +3021,13 @@ canvas.addEventListener('pointerup',e=>{
           }
           node=node.parent;
         }
+        dbg('SELECT mode click. foundWall='+!!foundWall+' foundBlock='+!!foundBlock+
+          '\nwalk path: '+walkPath.join(' -> ')+
+          '\nhit object name: '+(hit.object.name||'(unnamed)')+
+          '\nhit object is ground: '+(hit.object===ground));
         if(foundWall) selectWall(foundWall);
         else if(foundBlock) selectObject(foundBlock);
-        else deselect();
+        else { dbg('Calling deselect() now...'); deselect(); }
       } else if(mode==='erase'){
         // Check if erasing a wall
         let chkE=hits[0].object;
@@ -3018,6 +3042,7 @@ canvas.addEventListener('pointerup',e=>{
         eraseAtHit(hits[0]);
       }
     } else {
+      dbg('hits.length WAS 0 (clicked sky/nothing). mode='+mode);
       // Only deselect if clicking empty space in select mode
       if(mode==='select'){
         deselect();
@@ -3041,17 +3066,21 @@ canvas.addEventListener('pointerdown',e=>{
 
 canvas.addEventListener('pointerup',e=>{
   if(mode!=='select') { simpleClickStart=null; return; }
-  if(!simpleClickStart){ return; }
+  if(!simpleClickStart){ dbg('BULLETPROOF: no simpleClickStart recorded'); return; }
   const dx=e.clientX-simpleClickStart.x, dy=e.clientY-simpleClickStart.y;
   const moved=Math.abs(dx)+Math.abs(dy)>5;
   const quick=(Date.now()-simpleClickStart.time)<600;
   simpleClickStart=null;
-  if(moved || !quick) return; // was a drag, not a simple click — leave it alone
+  if(moved || !quick){
+    dbg('BULLETPROOF: ignored, moved='+moved+' quick='+quick);
+    return;
+  }
 
-  // Give the rest of the app's own click handling one frame to finish first
-  // (so a legitimate new selection isn't immediately undone by this check)
   setTimeout(()=>{
-    if(!selectedObj && !selectedWall) return; // nothing selected, nothing to do
+    if(!selectedObj && !selectedWall){
+      dbg('BULLETPROOF: nothing selected after timeout, nothing to do');
+      return;
+    }
 
     const rect=canvas.getBoundingClientRect();
     mouse2.x=((e.clientX-rect.left)/rect.width)*2-1;
@@ -3061,9 +3090,10 @@ canvas.addEventListener('pointerup',e=>{
     const currentMesh = selectedWall ? selectedWall.mesh : selectedObj.mesh;
     const hits=raycaster.intersectObject(currentMesh,true);
 
+    dbg('BULLETPROOF check ran. selectedObj='+!!selectedObj+' selectedWall='+!!selectedWall+
+      ' hits on current mesh='+hits.length+' -> '+(hits.length===0?'WILL DESELECT':'click was ON the object, leaving selected'));
+
     if(hits.length===0){
-      // The click did not land on the currently selected object at all —
-      // treat it as a deliberate "click elsewhere" and deselect.
       deselect();
     }
   },0);
