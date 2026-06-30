@@ -298,6 +298,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   </div>
 </div>
 
+
+<!-- Hidden stubs for JS compatibility -->
+<div id="gizmoPanel" style="display:none;"></div>
+<div id="gizmoName" style="display:none;"></div>
+<div id="toast" style="position:fixed;top:60px;left:50%;transform:translateX(-50%);
+  font-family:'Fredoka One',cursive;font-size:15px;background:rgba(0,0,0,0.85);
+  color:#FFD700;padding:9px 22px;border-radius:18px;border:1px solid rgba(255,215,0,0.3);
+  pointer-events:none;opacity:0;transition:opacity 0.3s;z-index:300;white-space:nowrap;"></div>
+
 <!-- WALL PROPERTIES PANEL -->
 <div id="wallPropPanel" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation()"
   style="display:none;position:fixed;top:58px;right:82px;z-index:400;
@@ -2243,7 +2252,7 @@ function selectObject(mesh){
   buildGizmo(selectedObj);
   const bd=BLOCKS[selectedObj.type];
   document.getElementById('gizmoName').textContent=(bd?bd.e+' '+bd.l:'Block');
-  document.getElementById('gizmoPanel').classList.add('show');
+  const _gp=document.getElementById('gizmoPanel');if(_gp)_gp.classList.add('show');
   toast('✋ Selected! Use ROTATE buttons below or press T for X rotation');
 }
 
