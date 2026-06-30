@@ -3027,6 +3027,48 @@ canvas.addEventListener('pointerup',e=>{
   isDown=false;
 });
 
+// ── BULLETPROOF DESELECT-ON-EMPTY-CLICK ───────────────
+// A completely independent, minimal safety net: regardless of what the
+// complex pointerdown/pointerup branching above decided, if the user is
+// in SELECT mode, didn't drag, and the click did NOT land on a currently
+// selected object's own mesh or its gizmo handles, force a deselect.
+// This guarantees "click anywhere else to deselect" always works, even
+// if some other code path intercepts the event first.
+let simpleClickStart=null;
+canvas.addEventListener('pointerdown',e=>{
+  if(e.button===0) simpleClickStart={x:e.clientX,y:e.clientY,time:Date.now()};
+},{capture:true});
+
+canvas.addEventListener('pointerup',e=>{
+  if(mode!=='select') { simpleClickStart=null; return; }
+  if(!simpleClickStart){ return; }
+  const dx=e.clientX-simpleClickStart.x, dy=e.clientY-simpleClickStart.y;
+  const moved=Math.abs(dx)+Math.abs(dy)>5;
+  const quick=(Date.now()-simpleClickStart.time)<600;
+  simpleClickStart=null;
+  if(moved || !quick) return; // was a drag, not a simple click — leave it alone
+
+  // Give the rest of the app's own click handling one frame to finish first
+  // (so a legitimate new selection isn't immediately undone by this check)
+  setTimeout(()=>{
+    if(!selectedObj && !selectedWall) return; // nothing selected, nothing to do
+
+    const rect=canvas.getBoundingClientRect();
+    mouse2.x=((e.clientX-rect.left)/rect.width)*2-1;
+    mouse2.y=-((e.clientY-rect.top)/rect.height)*2+1;
+    raycaster.setFromCamera(mouse2,camera);
+
+    const currentMesh = selectedWall ? selectedWall.mesh : selectedObj.mesh;
+    const hits=raycaster.intersectObject(currentMesh,true);
+
+    if(hits.length===0){
+      // The click did not land on the currently selected object at all —
+      // treat it as a deliberate "click elsewhere" and deselect.
+      deselect();
+    }
+  },0);
+},{capture:true});
+
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{
   camRadius=Math.max(2,Math.min(80,camRadius+e.deltaY*0.04));
