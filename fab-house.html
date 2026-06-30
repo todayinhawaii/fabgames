@@ -2368,7 +2368,18 @@ canvas.addEventListener('pointerdown',e=>{
   if(wallActive && mode==='build' && e.button===0){
     const hits=getHits(e);
     if(hits.length>0){
-      const p=hits[0].point;
+      const hit=hits[0];
+      // Only allow starting a wall on a roughly FLAT (horizontal) surface
+      // This stops walls floating off sloped roofs or angled faces
+      const normal=hit.face ? hit.face.normal.clone() : new THREE.Vector3(0,1,0);
+      // Transform normal to world space if hit on a rotated mesh
+      if(hit.object.matrixWorld) normal.transformDirection(hit.object.matrixWorld);
+      const isFlat = Math.abs(normal.y) > 0.7; // mostly pointing up
+      if(!isFlat){
+        toast('⚠️ Click flat ground or floor — not a sloped surface!');
+        return;
+      }
+      const p=hit.point;
       wallDragStart={x:p.x, z:p.z};
       wallDragging=true;
     } else {
@@ -3416,7 +3427,7 @@ setTimeout(()=>{
     const angle=Math.atan2(dx,dz);
     const cx=(startWorld.x+endWorld.x)/2;
     const cz=(startWorld.z+endWorld.z)/2;
-    const fy=currentFloor;
+    const fy=currentFloor; // always snap to the active floor level — never floats
     const geo=new THREE.BoxGeometry(thick, h, len);
     const mat=new THREE.MeshBasicMaterial({color:0x44DDFF,transparent:true,opacity:0.4});
     wallPreviewMesh=new THREE.Mesh(geo,mat);
@@ -3443,7 +3454,7 @@ setTimeout(()=>{
     const angle=Math.atan2(dx,dz);
     const cx=(startWorld.x+endWorld.x)/2;
     const cz=(startWorld.z+endWorld.z)/2;
-    const fy=currentFloor;
+    const fy=currentFloor; // always snap to the active floor level — never floats
 
     const geo=new THREE.BoxGeometry(thick,h,len);
     const mat=getWallMat();
@@ -3475,8 +3486,16 @@ setTimeout(()=>{
     sndPlace();
 
     const ws=document.getElementById('wallBarStatus');
-    if(ws) ws.textContent='✅ Wall placed! Drag again for next wall';
-    toast(`✅ Wall placed! ${len.toFixed(1)}m long — drag for next wall!`);
+    if(ws) ws.textContent='✅ Wall placed! Drag again for next wall, or adjust it →';
+
+    // ── AUTO-OPEN EDITOR: show the wall editor panel immediately ──
+    // We do NOT leave wall-draw mode, so the user can keep dragging out
+    // more walls back-to-back. The editor panel just pops up alongside,
+    // ready to fine-tune the wall that was just placed.
+    selectedWall = wallData;
+    buildGizmo({mesh: wallData.mesh, type:'wall'});
+    openWallProps(wallData);
+    toast(`✅ Wall placed! ${len.toFixed(1)}m long — adjust it on the right, or drag to draw another!`);
   }
 
   // Get world position from hit point (flat ground level)
