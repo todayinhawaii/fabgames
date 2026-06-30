@@ -3026,12 +3026,30 @@ canvas.addEventListener('pointerup',e=>{
         // Always deselect first — then re-select whatever was actually clicked
         deselect();
 
-        // Only TRUE ground-cover counts as "empty space" for deselect purposes.
-        // Structural blocks (bricks, floors, roofs, windows) remain fully
-        // selectable and deletable — only grass/water/path/fence are excluded.
-        const BACKGROUND_BLOCKS = new Set([
-          'grass','water','sand','pool-water',
-          'stone-path','decking','fence-wood','fence-iron','hedge',
+        // NON-FURNITURE blocks — clicking these deselects without selecting them.
+        // They can still be erased in ERASE mode. Only furniture/trees/decorations
+        // get selected in SELECT mode.
+        const NON_SELECTABLE = new Set([
+          // Ground cover
+          'grass','water','sand','pool-water','stone-path','decking',
+          'fence-wood','fence-iron','hedge','pool-steps',
+          // Structural walls
+          'brick-red','brick-white','brick-grey','brick-dark','brick-blue',
+          'brick-green','brick-pink','brick-black','brick-yellow',
+          'wood-light','wood-dark','concrete','marble-white','marble-black',
+          // Floors
+          'floor-wood','floor-marble','floor-tile',
+          'floor-carpet-r','floor-carpet-b','floor-carpet-g',
+          // Roofs
+          'roof-red','roof-grey','roof-green','roof-orange',
+          'roof-black','roof-tiles',
+          // Windows & doors
+          'win-clear','win-tinted','win-arched',
+          'door-wood','door-glass',
+          // Columns/pillars
+          'column','pillar','chimney',
+          // Stairs
+          'stairs','stairs-spiral',
         ]);
 
         // Walk up to find wall or placed block
@@ -3044,7 +3062,7 @@ canvas.addEventListener('pointerup',e=>{
             }
             if(node.userData.key && placed[node.userData.key]){
               // Only select if it's not a background/terrain block
-              if(!BACKGROUND_BLOCKS.has(placed[node.userData.key].type)){
+              if(!NON_SELECTABLE.has(placed[node.userData.key].type)){
                 foundBlock=node;
               }
               break;
