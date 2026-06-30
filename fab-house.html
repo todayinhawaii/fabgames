@@ -182,6 +182,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 // Global state and functions needed before initApp runs
 var clickHadNewSelection = false; // true when selectObject/selectWall fires on this click cycle
 
+var lastClickTime=0;
+var lastClickTarget=null;
+
 function doDeselect(){
   clickHadNewSelection = false;
   ['wallPropPanel','objPropPanel'].forEach(id=>{
