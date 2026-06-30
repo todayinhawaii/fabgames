@@ -662,6 +662,7 @@ const BLOCKS={
   'dirt':         {l:'Dirt',         e:'🟤',c:0x8B6347,r:0.98},
   'sand':         {l:'Sand',         e:'🏖️',c:0xF5DEB3,r:0.95},
   'water':        {l:'Water',        e:'🌊',c:0x0099CC,r:0,m:0.2,t:true,o:0.7},
+  'pool-water':   {l:'Pool Water',   e:'🏊',c:0x00AADD,r:0,m:0.3,t:true,o:0.65},
   'stone-path':   {l:'Stone Path',   e:'🪨',c:0xAA9988,r:0.9},
   'gravel':       {l:'Gravel',       e:'⬜',c:0x9A9A88,r:0.98},
   'decking':      {l:'Decking',      e:'🪵',c:0xC8A060,r:0.8},
@@ -832,7 +833,7 @@ const scene=new THREE.Scene();
 scene.fog=new THREE.FogExp2(0x87CEEB,0.006);
 
 const camera=new THREE.PerspectiveCamera(60,1,0.1,500);
-camera.position.set(10,12,16);camera.lookAt(4,2,4);
+camera.position.set(20,18,28);camera.lookAt(5,3,4);
 
 setLoad(25);
 
@@ -2335,8 +2336,8 @@ function getPlacePos(hit){
 
 // ── ORBIT CONTROLS ────────────────────────────────────
 let isOrbiting=false,prevMouse={x:0,y:0};
-let camTheta=0.8,camPhi=0.5,camRadius=22;
-let camTarget=new THREE.Vector3(4,2,4);
+let camTheta=0.7,camPhi=0.55,camRadius=32;
+let camTarget=new THREE.Vector3(5,3,4);
 let spaceDown=false;
 
 function updateCamera(){
@@ -3045,7 +3046,7 @@ function clearAll(){
 }
 
 function resetCamera(){
-  camTheta=0.8;camPhi=0.5;camRadius=22;camTarget.set(4,2,4);updateCamera();toast('Camera reset!');
+  camTheta=0.7;camPhi=0.55;camRadius=32;camTarget.set(5,3,4);updateCamera();toast('Camera reset!');
 }
 
 function toggleGrid(){
@@ -3326,31 +3327,179 @@ function animate(){
 
 // ── STARTER SCENE ─────────────────────────────────────
 function buildStarter(){
-  // Garden
-  for(let x=-3;x<12;x++)for(let z=-3;z<10;z++)placeBlock(x,-1,z,'grass',false);
-  // Floor
-  for(let x=0;x<7;x++)for(let z=0;z<7;z++)placeBlock(x,0,z,'floor-wood',false);
-  // Walls
-  for(let x=0;x<7;x++)for(let y=1;y<=4;y++){
-    placeBlock(x,y,0,'brick-red',false);placeBlock(x,y,6,'brick-red',false);
+  // ═══════════════════════════════════════════════════
+  // SHOWCASE VILLA — demonstrates everything Fab House can do!
+  // House footprint: 10 wide x 9 deep, two storeys + deck + pool + garden
+  // ═══════════════════════════════════════════════════
+  const GY=-1; // garden ground level
+  const FY=0;  // ground floor
+  const F2Y=5; // second floor
+
+  // ── GARDEN GROUND (big grassy plot) ──
+  for(let x=-8;x<20;x++) for(let z=-8;z<18;z++) placeBlock(x,GY,z,'grass',false);
+
+  // ── GROUND FLOOR ──
+  for(let x=0;x<10;x++) for(let z=0;z<9;z++) placeBlock(x,FY,z,'floor-marble',false);
+
+  // Ground floor walls (white plaster, modern look)
+  for(let x=0;x<10;x++) for(let y=1;y<=4;y++){
+    placeBlock(x,y,0,'brick-white',false);
+    placeBlock(x,y,8,'brick-white',false);
   }
-  for(let z=1;z<6;z++)for(let y=1;y<=4;y++){
-    placeBlock(0,y,z,'brick-red',false);placeBlock(6,y,z,'brick-red',false);
+  for(let z=1;z<8;z++) for(let y=1;y<=4;y++){
+    placeBlock(0,y,z,'brick-white',false);
+    placeBlock(9,y,z,'brick-white',false);
   }
-  // Windows
-  placeBlock(1,2,0,'win-clear',false);placeBlock(2,2,0,'win-clear',false);
-  placeBlock(4,2,0,'win-clear',false);placeBlock(5,2,0,'win-clear',false);
-  // Door gap
-  removeBlock(3,1,0,false);removeBlock(3,2,0,false);
-  // Roof
-  for(let x=0;x<7;x++)for(let z=0;z<7;z++)placeBlock(x,5,z,'roof-red',false);
-  // Furniture — sit on floor level y=0 (ground of cell y=0 + 1 = surface at world y=1)
-  placeBlock(1,1,4,'sofa',false);
-  placeBlock(5,1,5,'tv',false);
-  // Path
-  for(let z=-2;z<1;z++)placeBlock(3,-1,z,'stone-path',false);
-  // Tree
-  placeBlock(9,-1,4,'tree',false);
+
+  // Big front windows (panoramic look)
+  [1,2,3,6,7,8].forEach(x=>{
+    placeBlock(x,2,0,'win-clear',false);
+    placeBlock(x,3,0,'win-clear',false);
+  });
+  // Side windows
+  [2,4,6].forEach(z=>{
+    placeBlock(0,2,z,'win-clear',false);
+    placeBlock(9,2,z,'win-clear',false);
+  });
+  // Back windows
+  [2,4,6,7].forEach(x=>placeBlock(x,2,8,'win-clear',false));
+
+  // Grand front door gap (double width)
+  removeBlock(4,1,0,false); removeBlock(4,2,0,false);
+  removeBlock(5,1,0,false); removeBlock(5,2,0,false);
+  placeBlock(4,1,0,'door-glass',false);
+  placeBlock(5,1,0,'door-glass',false);
+
+  // ── SECOND FLOOR ──
+  for(let x=0;x<10;x++) for(let z=0;z<9;z++) placeBlock(x,FY+5,z,'floor-wood',false);
+  for(let x=0;x<10;x++) for(let y=6;y<=8;y++){
+    placeBlock(x,y,0,'brick-white',false);
+    placeBlock(x,y,8,'brick-white',false);
+  }
+  for(let z=1;z<8;z++) for(let y=6;y<=8;y++){
+    placeBlock(0,y,z,'brick-white',false);
+    placeBlock(9,y,z,'brick-white',false);
+  }
+  // Second floor windows
+  [1,2,7,8].forEach(x=>placeBlock(x,7,0,'win-arched',false));
+  [2,4,6].forEach(z=>{
+    placeBlock(0,7,z,'win-arched',false);
+    placeBlock(9,7,z,'win-arched',false);
+  });
+
+  // ── FLAT ROOF ──
+  for(let x=-1;x<11;x++) for(let z=-1;z<10;z++) placeBlock(x,9,z,'roof-tiles',false);
+  // Roof edge trim
+  for(let x=-1;x<11;x++){ placeBlock(x,10,-1,'gold-trim',false); placeBlock(x,10,9,'gold-trim',false); }
+
+  // Chimney
+  placeBlock(2,10,2,'chimney',false);
+
+  // ── GROUND FLOOR FURNITURE — Living Room ──
+  placeBlock(2,1,6,'sofa',false);
+  placeBlock(2,1,6,'sofa',false);
+  placeBlock(6,1,7,'armchair',false);
+  placeBlock(4,1,7,'coffee-table',false);
+  placeBlock(7,1,5,'tv',false);
+  placeBlock(1,1,2,'bookshelf',false);
+  placeBlock(8,1,2,'fireplace',false);
+  placeBlock(3,1,1,'plant-pot',false);
+  placeBlock(6,1,1,'plant-pot',false);
+  placeBlock(2,1,7,'rug',false);
+  placeBlock(8,1,7,'lamp-floor',false);
+  placeBlock(1,1,5,'picture-frame',false);
+
+  // ── KITCHEN AREA ──
+  placeBlock(7,1,2,'kitchen-counter',false);
+  placeBlock(8,1,2,'fridge',false);
+  placeBlock(6,1,2,'stove',false);
+  placeBlock(7,1,1,'kitchen-sink',false);
+  placeBlock(5,1,3,'dining-table',false);
+  placeBlock(5,1,3,'bar-stool',false);
+
+  // ── SECOND FLOOR — Bedroom ──
+  placeBlock(2,6,6,'bed',false);
+  placeBlock(1,6,7,'bedside-lamp',false);
+  placeBlock(3,6,7,'bedside-lamp',false);
+  placeBlock(7,6,6,'wardrobe',false);
+  placeBlock(7,6,2,'desk',false);
+  placeBlock(7,6,1,'office-chair',false);
+  placeBlock(2,6,2,'dresser',false);
+  placeBlock(4,6,7,'mirror-wall',false);
+  placeBlock(1,6,2,'curtains',false);
+
+  // ── BATHROOM (second floor corner) ──
+  placeBlock(8,6,4,'bathtub',false);
+  placeBlock(8,6,5,'toilet',false);
+  placeBlock(8,6,6,'bathrm-vanity',false);
+
+  // ── DECK & OUTDOOR LIVING (front of house) ──
+  for(let x=2;x<8;x++) for(let z=-4;z<0;z++) placeBlock(x,GY,z,'decking',false);
+  placeBlock(3,GY,-2,'garden-table',false);
+  placeBlock(2,GY,-2,'garden-chair',false);
+  placeBlock(4,GY,-2,'garden-chair',false);
+  placeBlock(6,GY,-2,'umbrella',false);
+  placeBlock(7,GY,-3,'bbq',false);
+  placeBlock(2,GY,-1,'tiki-torch',false);
+  placeBlock(7,GY,-1,'tiki-torch',false);
+
+  // ── SWIMMING POOL (side of house) ──
+  for(let x=11;x<17;x++) for(let z=1;z<7;z++) placeBlock(x,GY,z,'pool-water',false);
+  for(let x=10;x<18;x++) for(let z=0;z<8;z++){
+    if(x===10||x===17||z===0||z===7) placeBlock(x,GY,z,'pool-steps',false);
+  }
+  placeBlock(11,GY,1,'pool-steps',false);
+  // Pool loungers
+  placeBlock(11,GY,8,'garden-chair',false);
+  placeBlock(13,GY,8,'garden-chair',false);
+  placeBlock(15,GY,8,'umbrella',false);
+
+  // ── GARDEN PATH (driveway to front door) ──
+  for(let z=-7;z<-4;z++) placeBlock(4,GY,z,'stone-path',false);
+  for(let z=-7;z<-4;z++) placeBlock(5,GY,z,'stone-path',false);
+
+  // ── TREES & LANDSCAPING ──
+  placeBlock(-3,GY,-3,'tree',false);
+  placeBlock(-3,GY,3,'tree',false);
+  placeBlock(-3,GY,9,'palm',false);
+  placeBlock(12,GY,-3,'palm',false);
+  placeBlock(18,GY,3,'tree',false);
+  placeBlock(18,GY,9,'tree',false);
+  placeBlock(-2,GY,12,'tree',false);
+  placeBlock(3,GY,12,'palm',false);
+
+  // Flower beds along the front
+  for(let x=0;x<10;x++){
+    if(x%2===0) placeBlock(x,GY,-5,'flower-pot',false);
+  }
+
+  // Hedges marking the property edge
+  for(let x=-6;x<19;x++){
+    if(x<-1||x>10) placeBlock(x,GY,-7,'hedge',false);
+  }
+
+  // Garden pond feature
+  placeBlock(-5,GY,5,'garden-pond',false);
+  placeBlock(-5,GY,7,'bird-bath',false);
+
+  // Fence around the whole property
+  for(let x=-7;x<19;x++){
+    placeBlock(x,GY,-7,'fence-wood',false);
+    placeBlock(x,GY,17,'fence-wood',false);
+  }
+  for(let z=-7;z<17;z++){
+    placeBlock(-7,GY,z,'fence-wood',false);
+    placeBlock(18,GY,z,'fence-wood',false);
+  }
+  // Front gate
+  removeBlock(4,GY,-7,false); removeBlock(5,GY,-7,false);
+  placeBlock(4,GY,-7,'gate',false);
+
+  // Letterbox by the gate
+  placeBlock(2,GY,-7,'letterbox',false);
+
+  // Hawaiian touch — lei stand by the door
+  placeBlock(3,FY,1,'lei',false);
 }
 
 setLoad(85);
