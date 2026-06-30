@@ -3026,17 +3026,12 @@ canvas.addEventListener('pointerup',e=>{
         // Always deselect first — then re-select whatever was actually clicked
         deselect();
 
-        // Background/terrain blocks that should NOT be selectable —
-        // clicking these counts as "clicking empty space" and just deselects.
+        // Only TRUE ground-cover counts as "empty space" for deselect purposes.
+        // Structural blocks (bricks, floors, roofs, windows) remain fully
+        // selectable and deletable — only grass/water/path/fence are excluded.
         const BACKGROUND_BLOCKS = new Set([
-          'grass','water','sand','stone-path','floor-wood','floor-marble',
-          'floor-tile','floor-carpet-r','floor-carpet-b','floor-carpet-g',
-          'fence-wood','fence-iron','hedge','decking','concrete',
-          'brick-red','brick-white','brick-grey','brick-dark','brick-blue',
-          'brick-green','brick-pink','brick-black','wood-light','wood-dark',
-          'pool-water','pool-steps','roof-red','roof-grey','roof-green',
-          'roof-orange','roof-black','roof-tiles','win-clear','win-tinted',
-          'win-arched','marble-white','marble-black',
+          'grass','water','sand','pool-water',
+          'stone-path','decking','fence-wood','fence-iron','hedge',
         ]);
 
         // Walk up to find wall or placed block
