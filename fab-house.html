@@ -161,6 +161,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   #bottomBar{left:0;right:56px;}
   #threeCanvas{left:0;right:56px;}
 }
+.mobile-only-joystick{display:none !important;}
+@media(max-width:700px), (hover:none){
+  .mobile-only-joystick{display:flex !important;}
+}
 </style>
 </head>
 <body>
@@ -482,7 +486,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 <!-- MOBILE CONTROLS (bottom left) -->
 <div id="joystick" onpointerdown="event.stopPropagation()" 
-  style="position:fixed;bottom:64px;left:226px;z-index:85;display:flex;gap:6px;align-items:flex-end;">
+  style="position:fixed;bottom:64px;left:226px;z-index:85;display:flex;gap:6px;align-items:flex-end;"
+  class="mobile-only-joystick">
   
   <!-- WALK D-PAD -->
   <div style="display:grid;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px);gap:2px;">
@@ -540,16 +545,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
     <div style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFD700;">▼</div>
     <div></div>
   </div>
-</div>
-
-<!-- MODE HINT (changes per mode) -->
-<div id="modeHint" style="position:fixed;bottom:118px;left:226px;z-index:70;pointer-events:none;
-  background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.1);border-radius:12px;
-  padding:7px 12px;font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.55);
-  backdrop-filter:blur(8px);line-height:1.7;max-width:190px;display:none;">
-  🧱 <b style="color:#FFD700;">BUILD MODE</b><br>
-  Click ground or block to place<br>
-  Right-drag to orbit view
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
