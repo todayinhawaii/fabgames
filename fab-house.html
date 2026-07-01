@@ -291,6 +291,8 @@ function doDeselect(){
     background:rgba(255,80,80,0.25);color:#ff9999;border:1px solid rgba(255,80,80,0.4);
     margin-left:8px;white-space:nowrap;" title="Deselect (Esc)">✕ Deselect</button>
   <div class="spacer"></div>
+  <button id="undoBtn" class="top-btn" onclick="undo()" title="Undo (Ctrl+Z)" style="opacity:0.35;">↩ Undo</button>
+  <button id="redoBtn" class="top-btn" onclick="redo()" title="Redo (Ctrl+Y)" style="opacity:0.35;">↪ Redo</button>
   <button class="top-btn" onclick="clearAll()" style="background:rgba(200,50,50,0.25);color:#ff8888;border:1px solid rgba(255,100,100,0.3);" title="Clear all blocks">🗑 Clear</button>
   <button class="top-btn gold" onclick="saveScreenshot()" title="Save screenshot">📸 Save</button>
   <button class="top-btn" onclick="showCredits()" title="Model credits">📜 Credits</button>
@@ -2235,7 +2237,7 @@ function placeBlock(x,y,z,type,record=true){
         placed[bk(x,y,z)] = {mesh:fallback, type};
       }
     });
-    if(record){ undoStack.push({action:'place',key:bk(x,y,z),type,x,y,z}); }
+    if(record){ redoStack=[]; undoStack.push({action:'place',key:bk(x,y,z),type,x,y,z}); }
     return; // async — return early
   }
   else if(bd.f){
@@ -2286,7 +2288,7 @@ function placeBlock(x,y,z,type,record=true){
 
   scene.add(mesh);
   placed[key]={mesh,type};
-  if(record){undoStack.push({action:'place',key,type,x,y,z});if(undoStack.length>300)undoStack.shift();}
+  if(record){redoStack=[];undoStack.push({action:'place',key,type,x,y,z});if(undoStack.length>300)undoStack.shift();}
 }
 
 function removeBlock(x,y,z,record=true){
@@ -2295,7 +2297,7 @@ function removeBlock(x,y,z,record=true){
   const{type,mesh}=placed[key];
   mesh.traverse(c=>{if(c.isMesh){if(c.geometry)c.geometry.dispose();}});
   scene.remove(mesh);delete placed[key];
-  if(record)undoStack.push({action:'remove',key,type,x,y,z});
+  if(record){redoStack=[];undoStack.push({action:'remove',key,type,x,y,z});}
 }
 
 // ── TRANSFORM GIZMO ───────────────────────────────────
@@ -3392,7 +3394,8 @@ document.addEventListener('keydown',e=>{
     if(selectedWall) deleteSelectedWall();
     else if(selectedObj) gizmoDelete();
   }
-  if((e.code==='KeyZ')&&(e.ctrlKey||e.metaKey)){e.preventDefault();undo();}
+  if((e.code==='KeyZ')&&(e.ctrlKey||e.metaKey)&&!e.shiftKey){e.preventDefault();undo();}
+  if(((e.code==='KeyY')||(e.code==='KeyZ'&&e.shiftKey))&&(e.ctrlKey||e.metaKey)){e.preventDefault();redo();}
   if(e.code==='KeyG')toggleGrid();
   if(selectedObj){
     const cam=new THREE.Vector3();camera.getWorldDirection(cam);cam.y=0;cam.normalize();
@@ -3553,13 +3556,37 @@ function setMode(m){
 }
 
 
+let redoStack=[]; // tracks undone actions for redo
+
 function undo(){
   if(!undoStack.length){toast('Nothing to undo!');return;}
   const h=undoStack.pop();
-  if(h.action==='place')removeBlock(h.x,h.y,h.z,false);
-  else placeBlock(h.x,h.y,h.z,h.type,false);
-  toast('↩ Undone!');
+  redoStack.push(h); // save for redo
+  if(h.action==='place') removeBlock(h.x,h.y,h.z,false);
+  else if(h.action==='remove') placeBlock(h.x,h.y,h.z,h.type,false);
+  updateUndoRedoBtns();
+  toast('↩ Undone! ('+(undoStack.length)+' left)');
 }
+
+function redo(){
+  if(!redoStack.length){toast('Nothing to redo!');return;}
+  const h=redoStack.pop();
+  undoStack.push(h); // back to undo stack
+  if(h.action==='place') placeBlock(h.x,h.y,h.z,h.type,false);
+  else if(h.action==='remove') removeBlock(h.x,h.y,h.z,false);
+  updateUndoRedoBtns();
+  toast('↪ Redone! ('+(redoStack.length)+' more)');
+}
+
+function updateUndoRedoBtns(){
+  const ubtn=document.getElementById('undoBtn');
+  const rbtn=document.getElementById('redoBtn');
+  if(ubtn) ubtn.style.opacity=undoStack.length?'1':'0.35';
+  if(rbtn) rbtn.style.opacity=redoStack.length?'1':'0.35';
+}
+
+// Clear redo stack when a new action is taken
+
 
 function clearAll(){
   if(!confirm('Clear everything?'))return;
@@ -4816,6 +4843,8 @@ setTimeout(()=>{
   // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──  // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
   window.setMode       = setMode;
   window.undo          = undo;
+  window.redo          = redo;
+  window.updateUndoRedoBtns = updateUndoRedoBtns;
   window.clearAll      = clearAll;
   window.resetCamera   = resetCamera;
   window.toggleGrid    = toggleGrid;
