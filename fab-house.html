@@ -167,25 +167,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 /* ── UNIFIED LEFT PANEL ── */
 #leftPanel{
   position:fixed;top:50px;left:0;bottom:0;z-index:200;width:230px;
-  overflow:hidden;
+  display:flex;flex-direction:column;overflow:hidden;
   background:rgba(8,8,18,0.97);backdrop-filter:blur(14px);
   border-right:2px solid rgba(255,215,0,0.18);
   transition:transform 0.22s cubic-bezier(0.4,0,0.2,1);
 }
 #leftPanel.collapsed{ transform:translateX(-230px); }
 #lpTop{
-  position:absolute;
-  top:0;left:0;right:0;
-  z-index:2;
+  flex-shrink:0;
   background:rgba(8,8,18,0.97);
   padding-bottom:6px;
   border-bottom:1px solid rgba(255,215,0,0.15);
 }
 #palette{
-  position:absolute;
-  top:var(--lptop-h, 320px);
-  left:0;right:0;bottom:0;
+  flex:1;
   overflow-y:auto;
+  min-height:0;
   scrollbar-width:thin;scrollbar-color:rgba(255,215,0,0.2) transparent;
 }
 #palette::-webkit-scrollbar{width:3px;}
@@ -335,33 +332,6 @@ function doDeselect(){
     <button class="lp-floor-btn" onclick="setFloor(-1)">▼</button>
     <div class="lp-floor-display">Floor <span id="floorNum">1</span></div>
     <button class="lp-floor-btn" onclick="setFloor(1)">▲</button>
-  </div>
-
-  <div class="lp-divider"></div>
-
-  <!-- VIEW & TOOLS -->
-  <span class="lp-section-label">VIEW & TOOLS</span>
-  <div class="lp-btn-row">
-    <div class="lp-btn" onclick="resetCamera()" title="Reset camera">
-      <div class="lp-icon">🎥</div><div class="lp-text">RESET</div>
-    </div>
-    <div class="lp-btn" onclick="toggleGrid()" title="Toggle grid">
-      <div class="lp-icon">⊞</div><div class="lp-text">GRID</div>
-    </div>
-    <div class="lp-btn" onclick="toggleXray()" title="X-Ray">
-      <div class="lp-icon">👁</div><div class="lp-text">X-RAY</div>
-    </div>
-  </div>
-  <div class="lp-btn-row">
-    <div class="lp-btn" onclick="quickFloor()" title="Add floor plate">
-      <div class="lp-icon">🟫</div><div class="lp-text">+ FLOOR</div>
-    </div>
-    <div class="lp-btn" onclick="quickRoof()" title="Add roof">
-      <div class="lp-icon">🔺</div><div class="lp-text">+ ROOF</div>
-    </div>
-    <div class="lp-btn" onclick="undo()" title="Undo (Ctrl+Z)">
-      <div class="lp-icon">↩</div><div class="lp-text">UNDO</div>
-    </div>
   </div>
 
   <div class="lp-divider"></div>
@@ -4919,14 +4889,16 @@ setTimeout(()=>{
   window.keysHeld      = keysHeld;
 
   // Measure lpTop and set palette position dynamically
-setTimeout(()=>{
+// Measure lpTop height and position palette correctly
+function adjustPaletteTop(){
   const lpTop = document.getElementById('lpTop');
   const palette = document.getElementById('palette');
   if(lpTop && palette){
-    const h = lpTop.offsetHeight;
-    palette.style.top = h + 'px';
+    palette.style.top = lpTop.offsetHeight + 'px';
   }
-}, 100);
+}
+setTimeout(adjustPaletteTop, 100);
+setTimeout(adjustPaletteTop, 500); // retry in case fonts/layout shift
 
 // Default to SELECT mode on load — feels more natural for first-time users
   // who want to click around and inspect/move the showcase villa immediately,
