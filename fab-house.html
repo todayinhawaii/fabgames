@@ -4832,11 +4832,14 @@ setTimeout(()=>{
 
   // ── TOOL SYSTEM — simple, fast, no conflicts ────────
   canvas.addEventListener('pointerdown', e=>{
+    console.log('TOOL PD: button='+e.button+' toolActive='+toolActive+' currentTool='+currentTool);
     if(e.button!==0 || !toolActive || !currentTool) return;
+    console.log('TOOL FIRING:', currentTool);
 
     if(currentTool==='dig'){
       const hits=getHits(e);
       const p=hits.length>0 ? hits[0].point : camTarget;
+      console.log('DIG at:', p.x, p.z);
       digAtPoint(p.x, p.z);
       return;
     }
