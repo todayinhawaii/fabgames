@@ -3950,19 +3950,37 @@ function generateUnderground(cx, cz, radius){
 }
 
 function digDown(){
-  // Dig a 3x3 shaft 5 blocks deep straight down at camera target
-  // Camera stays put — you stay in control!
-  const cx = Math.round(camTarget.x);
-  const cz = Math.round(camTarget.z);
-  let count = 0;
-  for(let y=0; y>=-5; y--){
-    for(let dx=-1;dx<=1;dx++) for(let dz=-1;dz<=1;dz++){
-      const key=bk(cx+dx,y,cz+dz);
-      if(placed[key]){ removeBlock(cx+dx,y,cz+dz,false); count++; }
+  // Animated dig — removes blocks layer by layer from surface DOWN
+  // so you SEE the ground being eaten away into the earth!
+  const cx=Math.round(camTarget.x);
+  const cz=Math.round(camTarget.z);
+  const radius=2; // 5x5 shaft
+  const maxDepth=20; // dig 20 layers deep
+  let currentLayer=2; // start from y=2 down to -maxDepth
+
+  // First generate underground terrain if not already there
+  generateUnderground(cx, cz, radius+2);
+
+  function digLayer(){
+    if(currentLayer < -maxDepth) {
+      toast('⛏️ Reached bedrock! Use W/S/A/D to explore the cave!');
+      return;
     }
+    let removed=0;
+    for(let dx=-radius;dx<=radius;dx++){
+      for(let dz=-radius;dz<=radius;dz++){
+        const key=bk(cx+dx, currentLayer, cz+dz);
+        if(placed[key]){ removeBlock(cx+dx,currentLayer,cz+dz,false); removed++; }
+      }
+    }
+    if(removed>0) sndErase();
+    currentLayer--;
+    // Each layer removed with a short delay so you SEE it happening!
+    setTimeout(digLayer, 60);
   }
-  sndErase();
-  toast(`⛏️ Dug ${count} blocks straight down — use W/S to walk over the hole!`);
+
+  toast('⛏️ Digging deep...');
+  digLayer();
 }
 
 function buildStarter(){
@@ -4675,27 +4693,26 @@ setTimeout(()=>{
 
   function setTool(tool){
     currentTool = tool;
+    // Just highlight button — NO mode switching (avoids slow rebuild)
     ['hammer','bulldozer','drill','brush','fill'].forEach(t=>{
       const el=document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
       if(el) el.classList.toggle('active', t===tool);
     });
-
-    // Auto-switch to the right mode for each tool
-    const toolModes={
-      hammer:'erase',
-      bulldozer:'erase',
-      drill:'erase',
-      brush:'build',
-      fill:'build',
-    };
-    if(toolModes[tool]) setMode(toolModes[tool]);
-
+    // Set mode label so user knows what's happening
+    const modeEl=document.getElementById('modeLabel');
+    if(modeEl){
+      const labels={
+        hammer:'🔨 HAMMER',bulldozer:'🚜 BULLDOZER',
+        drill:'⛏️ DRILL',brush:'🖌️ BRUSH',fill:'🪣 FILL'
+      };
+      modeEl.textContent=labels[tool]||tool;
+    }
     const names={
-      hammer:'🔨 Hammer — click any block to erase it',
-      bulldozer:'🚜 Bulldozer — erases 3×3 area! Hold to sweep',
-      drill:'⛏️ Drill — drills 8 blocks straight down!',
-      brush:'🖌️ Brush — drag to paint blocks continuously',
-      fill:'🪣 Fill — flood fills all connected same-type blocks'
+      hammer:'🔨 Hammer ready — click blocks to erase',
+      bulldozer:'🚜 Bulldozer ready — click to erase 3×3',
+      drill:'⛏️ Drill ready — click to drill 5 deep',
+      brush:'🖌️ Brush ready — drag to paint',
+      fill:'🪣 Fill ready — click to flood fill'
     };
     toast(names[tool]||tool);
   }
@@ -4767,23 +4784,18 @@ setTimeout(()=>{
   // Override the canvas pointerdown/up to support hold
   canvas.addEventListener('pointerdown', e=>{
     if(e.button!==0) return;
-    // Tools work whenever they're selected, regardless of mode label
-    const isDestroyTool = ['hammer','bulldozer','drill'].includes(currentTool);
-    const isBuildTool = ['brush','fill'].includes(currentTool);
+    const isDestroyTool=['hammer','bulldozer','drill'].includes(currentTool);
+    const isBuildTool=['brush','fill'].includes(currentTool);
+    // Only intercept if a tool is active — otherwise let normal mode handle it
     if(!isDestroyTool && !isBuildTool) return;
-    isHolding = true;
-    lastHitPos = null;
-    // Immediate first action
+    isHolding=true; lastHitPos=null;
     const hits=getHits(e);
-    if(hits.length>0) applyTool(hits[0]);
-    // Continuous rapid action every 60ms while held — Minecraft feel!
-    holdInterval = setInterval(()=>{
-      if(!isHolding) return;
-      if(lastPointerE){
-        const hits=getHits(lastPointerE);
-        if(hits.length>0) applyTool(hits[0]);
-      }
-    }, 60);
+    if(hits.length>0 && hits[0].object!==ground) applyTool(hits[0]);
+    holdInterval=setInterval(()=>{
+      if(!isHolding||!lastPointerE) return;
+      const h=getHits(lastPointerE);
+      if(h.length>0 && h[0].object!==ground) applyTool(h[0]);
+    },50); // 50ms = snappy and fast
   },{capture:false});
 
   canvas.addEventListener('pointerup', e=>{
