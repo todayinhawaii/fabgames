@@ -2865,15 +2865,7 @@ canvas.addEventListener('pointerdown',e=>{
   downOnCanvas=true;
   canvas.setPointerCapture(e.pointerId);
   prevMouse={x:e.clientX,y:e.clientY};
-  // When tool active, still allow orbiting but skip build/select/erase
-  if(toolActive && currentTool && currentTool!=='brush'){
-    isDown=true;hasMoved=false;
-    // Allow orbit (right click / space) but skip the click action at end
-    if(e.button===2||e.button===1||spaceDown){isOrbiting=true;}
-    // Don't process click actions — tool handler does that
-  } else {
-    isDown=true;hasMoved=false;
-  }
+  isDown=true;hasMoved=false;
 
   // RIGHT click or space = orbit always (even in wall mode)
   if(e.button===2||e.button===1||spaceDown){isOrbiting=true;return;}
@@ -3092,6 +3084,8 @@ canvas.addEventListener('pointerup',e=>{
   isOrbiting=false;
 
   // Clean click (no drag) = place/select/erase
+  // Skip if a tool is handling this click
+  if(toolActive && currentTool) { isDown=false; return; }
   if(isDown&&!hasMoved){
     const hits=getHits(e);
     dbg('CLEAN CLICK reached. mode='+mode+' hits.length='+hits.length+
@@ -4815,32 +4809,69 @@ setTimeout(()=>{
     }
   }
 
-  // ── TOOL SYSTEM — simple, fast, no conflicts ────────
+  // ── TOOL SYSTEM ─────────────────────────────────────
+  // Rules:
+  // 1. Only a CLICK (no drag) adds/removes a brick
+  // 2. Dragging always orbits — never adds/removes
+  // 3. Clicking empty space (grass/terrain) deselects the tool
+  // 4. Clicking same tool button again deselects it
+
+  let toolMouseDown = null; // tracks where mouse went down
+
   canvas.addEventListener('pointerdown', e=>{
     if(e.button!==0 || !toolActive || !currentTool) return;
-
-    // Stop default canvas handling for drill/brush tools
-    isHolding=true; lastHitPos=null;
-    const hits=getHits(e);
-    if(hits.length>0) applyTool(hits[0]);
-
-    holdInterval=setInterval(()=>{
-      if(!isHolding||!lastPointerE) return;
-      const h=getHits(lastPointerE);
-      if(h.length>0) applyTool(h[0]);
-    }, 60);
+    // Record where the mouse went down — don't act yet
+    toolMouseDown = {x:e.clientX, y:e.clientY};
+    // Let the main handler run for orbiting — we just record position
   });
 
   canvas.addEventListener('pointerup', e=>{
-    isHolding=false;
-    lastHitPos=null;
-    if(holdInterval){ clearInterval(holdInterval); holdInterval=null; }
+    if(e.button!==0 || !toolActive || !currentTool || !toolMouseDown) return;
+
+    const dx = e.clientX - toolMouseDown.x;
+    const dy = e.clientY - toolMouseDown.y;
+    const moved = Math.abs(dx)+Math.abs(dy) > 6;
+    toolMouseDown = null;
+
+    // If the mouse moved — it was a drag (orbit) — do nothing
+    if(moved) return;
+
+    // It was a clean click — act on it
+    const hits = getHits(e);
+    if(hits.length === 0){
+      // Clicked empty space — deselect tool
+      setTool(currentTool); // toggles off (same tool = deselect)
+      return;
+    }
+
+    // Check if hit is terrain/background (deselects tool)
+    const TERRAIN = new Set(['grass','water','sand','pool-water','stone-path',
+      'decking','fence-wood','fence-iron','hedge','pool-steps']);
+    let hitNode = hits[0].object;
+    let hitType = null;
+    for(let i=0;i<8;i++){
+      if(hitNode?.userData?.key && placed[hitNode.userData.key]){
+        hitType = placed[hitNode.userData.key].type;
+        break;
+      }
+      if(hitNode) hitNode=hitNode.parent; else break;
+    }
+
+    if(!hitType || TERRAIN.has(hitType)){
+      // Clicked terrain or empty — deselect tool
+      setTool(currentTool); // toggle off
+      return;
+    }
+
+    // Valid brick click — apply the tool once
+    applyTool(hits[0]);
   });
 
   canvas.addEventListener('pointermove', e=>{
-    lastPointerE=e;
-    if(isHolding) lastHitPos=null; // allow hitting new blocks as cursor moves
+    lastPointerE = e;
+    // No continuous action — tools only fire on clean clicks now
   });
+
 
   // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──  // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
   window.setMode       = setMode;
