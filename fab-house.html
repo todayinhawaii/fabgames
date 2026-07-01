@@ -4203,7 +4203,22 @@ function buildStarter(){
   // Hawaiian touch — lei stand by the door
   placeBlock(3,FY,1,'lei',false);
 
-  // Underground terrain generates on-demand when player digs
+  // Generate solid underground world efficiently
+  // We do this AFTER the villa so it doesn't block load
+  setTimeout(()=>{
+    const UW=16, UH=20, UX=-3, UZ=-4;
+    for(let x=UX;x<UX+UW;x++){
+      for(let z=UZ;z<UZ+UW;z++){
+        // Layer by layer underground
+        for(let y=-2;y>=-4;y--) placeBlock(x,y,z,'dirt',false);
+        for(let y=-5;y>=-12;y--) placeBlock(x,y,z,'stone',false);
+        for(let y=-13;y>=-14;y--) placeBlock(x,y,z,'coal-ore',false);
+        for(let y=-15;y>=-18;y--) placeBlock(x,y,z,'stone',false);
+        for(let y=-19;y>=-20;y--) placeBlock(x,y,z,'iron-ore',false);
+      }
+    }
+    console.log('Underground world ready!');
+  }, 500);
 }
 
 setLoad(85);
@@ -4757,76 +4772,66 @@ setTimeout(()=>{
     toast(tips[tool]||tool);
   }
 
+  function getHitBlock(hit){
+    let node=hit.object;
+    for(let i=0;i<8;i++){
+      if(node&&node.userData&&node.userData.key&&placed[node.userData.key])
+        return node.userData;
+      if(node) node=node.parent; else break;
+    }
+    // Fallback to hit point
+    const pt=hit.point;
+    return {x:Math.round(pt.x),y:Math.round(pt.y),z:Math.round(pt.z)};
+  }
+
   function applyTool(hit){
     if(!hit) return;
-    // For build tools, get place position; for erase tools get actual block position
-    let p;
-    if(['brush'].includes(currentTool)){
-      p = getPlacePos(hit);
-    } else {
-      // Walk up to find actual placed block
-      let node=hit.object;
-      while(node && !placed[node.userData?.key]) node=node.parent;
-      if(!node||!placed[node.userData?.key]) return; // no block found
-      p = node.userData;
-    }
-    const posKey = p.x+','+p.y+','+p.z;
+    const p = (currentTool==='brush') ? getPlacePos(hit) : getHitBlock(hit);
+    if(!p) return;
+    const posKey=p.x+','+p.y+','+p.z;
     if(posKey===lastHitPos) return;
-    lastHitPos = posKey;
+    lastHitPos=posKey;
 
     if(currentTool==='hammer'){
-      // Single block erase
-      eraseAtHit(hit);
-      sndErase();
-    }
-    else if(currentTool==='bulldozer'){
-      // 3×3×1 area erase
-      let count=0;
-      for(let dx=-1;dx<=1;dx++) for(let dz=-1;dz<=1;dz++){
-        const key=bk(p.x+dx,p.y,p.z+dz);
-        if(placed[key]){ removeBlock(p.x+dx,p.y,p.z+dz,true); count++; }
-      }
-      if(count>0) sndErase();
-    }
-    else if(currentTool==='drill'){
-      // Drill 5 blocks straight down from click point
-      let count=0;
-      for(let dy=0;dy>=-4;dy--){
-        const key=bk(p.x,p.y+dy,p.z);
-        if(placed[key]){ removeBlock(p.x,p.y+dy,p.z,true); count++; }
-      }
-      if(count>0){ sndErase(); lastHitPos=null; }
-    }
+      const key=bk(p.x,p.y,p.z);
+      if(placed[key]){ removeBlock(p.x,p.y,p.z,true); sndErase(); }
 
-    else if(currentTool==='brush'){
-      // Paint — place current block type
-      if(!placed[bk(p.x,p.y,p.z)]){
-        placeBlock(p.x,p.y,p.z,currentBlock,true);
-        sndPlace();
+    } else if(currentTool==='bulldozer'){
+      // 5x5 wide sweep at same level
+      let n=0;
+      for(let dx=-2;dx<=2;dx++) for(let dz=-2;dz<=2;dz++){
+        const k=bk(p.x+dx,p.y,p.z+dz);
+        if(placed[k]){ removeBlock(p.x+dx,p.y,p.z+dz,false); n++; }
       }
-    }
-    else if(currentTool==='fill'){
-      // Flood fill — replace all connected blocks of same type
-      const targetKey=bk(p.x,p.y,p.z);
-      if(!placed[targetKey]) return;
-      const targetType=placed[targetKey].type;
-      if(targetType===currentBlock) return;
-      const queue=[{x:p.x,y:p.y,z:p.z}];
-      const visited=new Set([targetKey]);
-      let count=0;
-      while(queue.length>0 && count<200){
+      if(n>0){ sndErase(); lastHitPos=null; toast(`🚜 ${n} blocks cleared!`); }
+
+    } else if(currentTool==='drill'){
+      // Drill straight down — removes clicked block + 2 below
+      for(let dy=0;dy>=-2;dy--){
+        const k=bk(p.x,p.y+dy,p.z);
+        if(placed[k]) removeBlock(p.x,p.y+dy,p.z,false);
+      }
+      sndErase(); lastHitPos=null; // reset so hold keeps drilling deeper
+
+    } else if(currentTool==='brush'){
+      if(!placed[bk(p.x,p.y,p.z)]){ placeBlock(p.x,p.y,p.z,currentBlock,true); sndPlace(); }
+
+    } else if(currentTool==='fill'){
+      const tk=bk(p.x,p.y,p.z);
+      if(!placed[tk]) return;
+      const tt=placed[tk].type;
+      if(tt===currentBlock) return;
+      const queue=[{x:p.x,y:p.y,z:p.z}], vis=new Set([tk]);
+      let n=0;
+      while(queue.length&&n<500){
         const {x,y,z}=queue.shift();
-        removeBlock(x,y,z,false);
-        placeBlock(x,y,z,currentBlock,false);
-        count++;
-        [[1,0,0],[-1,0,0],[0,0,1],[0,0,-1],[0,1,0],[0,-1,0]].forEach(([dx,dy,dz])=>{
+        removeBlock(x,y,z,false); placeBlock(x,y,z,currentBlock,false); n++;
+        for(const [dx,dy,dz] of [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]){
           const nk=bk(x+dx,y+dy,z+dz);
-          if(!visited.has(nk) && placed[nk] && placed[nk].type===targetType){
-            visited.add(nk); queue.push({x:x+dx,y:y+dy,z:z+dz});
-          }
-        });
+          if(!vis.has(nk)&&placed[nk]&&placed[nk].type===tt){ vis.add(nk); queue.push({x:x+dx,y:y+dy,z:z+dz}); }
+        }
       }
-      toast(`🪣 Filled ${count} blocks!`);
+      toast(`🪣 Filled ${n} blocks!`);
     }
   }
 
