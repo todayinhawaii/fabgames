@@ -1121,7 +1121,7 @@ const ground=new THREE.Mesh(
   new THREE.PlaneGeometry(200,200),
   new THREE.MeshLambertMaterial({color:0x4CAF50})
 );
-ground.rotation.x=-Math.PI/2;ground.position.y=-0.01;ground.receiveShadow=true;
+ground.rotation.x=-Math.PI/2;ground.position.y=-25;ground.receiveShadow=true;
 scene.add(ground);
 
 const gridHelper=new THREE.GridHelper(200,200,0x000000,0x000000);
@@ -3987,13 +3987,16 @@ function digAtPoint(cx, cz){
   // Grass is at y=-1, so start there and go DOWN
   let y=-1;
 
+  // Place dark bedrock at bottom so hole looks deep (covers green ground plane)
+  for(let dx=-r;dx<=r;dx++)
+    for(let dz=-r;dz<=r;dz++)
+      placeBlock(rx+dx,-maxDepth,rz+dz,'brick-dark',false);
+
   function step(){
     if(y < -maxDepth){
       toast('🕳️ Done! Underground space ready — go build!');
       return;
     }
-    console.log('step running y='+y);
-  // Simply remove all blocks at this level — clean hole, no re-placing
     for(let dx=-r;dx<=r;dx++){
       for(let dz=-r;dz<=r;dz++){
         const key=bk(rx+dx,y,rz+dz);
