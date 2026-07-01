@@ -3950,26 +3950,19 @@ function generateUnderground(cx, cz, radius){
 }
 
 function digDown(){
-  // Dig a shaft straight down from camera target position
+  // Dig a 3x3 shaft 5 blocks deep straight down at camera target
+  // Camera stays put — you stay in control!
   const cx = Math.round(camTarget.x);
   const cz = Math.round(camTarget.z);
-  const r = currentTool==='bulldozer' ? 2 : 1;
   let count = 0;
-  for(let y=0; y>=-22; y--){
-    for(let x=cx-r; x<=cx+r; x++){
-      for(let z=cz-r; z<=cz+r; z++){
-        if(placed[bk(x,y,z)]){
-          removeBlock(x,y,z,false);
-          count++;
-        }
-      }
+  for(let y=0; y>=-5; y--){
+    for(let dx=-1;dx<=1;dx++) for(let dz=-1;dz<=1;dz++){
+      const key=bk(cx+dx,y,cz+dz);
+      if(placed[key]){ removeBlock(cx+dx,y,cz+dz,false); count++; }
     }
   }
-  // Move camera underground
-  camTarget.y = -8;
-  camRadius = 14;
-  updateCamera();
-  toast(`⛏️ Dug ${count} blocks! You're underground — explore the caves!`);
+  sndErase();
+  toast(`⛏️ Dug ${count} blocks straight down — use W/S to walk over the hole!`);
 }
 
 function buildStarter(){
@@ -4729,14 +4722,14 @@ setTimeout(()=>{
       if(count>0) sndErase();
     }
     else if(currentTool==='drill'){
-      // Drill straight DOWN from hit point
+      // Drill: erase the clicked block AND 4 below it — like a drill bit
+      // Camera never moves — you stay in full control
       let count=0;
-      for(let dy=0;dy>=-8;dy--){
+      for(let dy=0;dy>=-4;dy--){
         const key=bk(p.x,p.y+dy,p.z);
         if(placed[key]){ removeBlock(p.x,p.y+dy,p.z,true); count++; }
       }
-      if(count>0) sndErase();
-      lastHitPos=null; // allow re-drilling same column
+      if(count>0){ sndErase(); lastHitPos=null; }
     }
     else if(currentTool==='brush'){
       // Paint — place current block type
@@ -4803,9 +4796,17 @@ setTimeout(()=>{
   let lastPointerE = null;
   canvas.addEventListener('pointermove', e=>{
     lastPointerE = e;
-    // If holding in brush/erase mode, reset lastHitPos so new blocks get hit
-    if(isHolding && (mode==='erase' || (mode==='build'&&currentTool==='brush'))){
-      lastHitPos = null;
+    // If holding a tool and pointer is over a block, reset so next block gets hit
+    if(isHolding){
+      const hits=getHits(e);
+      // Only stay in tool mode if we're actually hitting blocks
+      // If hitting nothing/sky, stop holding so orbit resumes normally
+      if(hits.length===0 || hits[0].object===ground){
+        isHolding=false;
+        if(holdInterval){ clearInterval(holdInterval); holdInterval=null; }
+      } else {
+        lastHitPos=null; // allow hitting new blocks as cursor moves
+      }
     }
   },{capture:false});
 
