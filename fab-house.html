@@ -3973,58 +3973,39 @@ function digAtPoint(cx, cz){
   const rx=Math.round(cx);
   const rz=Math.round(cz);
 
-  // Find surface - scan from y=5 down to y=-3
-  let startY=-1; // default grass level
-  outer: for(let y=5;y>=-3;y--){
-    for(let dx=-radius;dx<=radius;dx++){
-      for(let dz=-radius;dz<=radius;dz++){
-        if(placed[bk(rx+dx,y,rz+dz)]){ startY=y; break outer; }
-      }
-    }
+  // Debug: log what's at click point
+  let found=[];
+  for(let y=5;y>=-5;y--){
+    if(placed[bk(rx,y,rz)]) found.push(y+':'+placed[bk(rx,y,rz)].type);
   }
+  console.log('digAtPoint('+rx+','+rz+') found blocks at y:', found.join(', ')||'NONE');
 
-  let layer=startY;
-
-  // Pick terrain type per depth — no pre-generation needed
-  function terrainTypeAt(y){
-    if(y>=-1) return 'grass';
-    if(y>=-4) return 'dirt';
-    if(y>=-10) return 'stone';
-    if(y>=-13) return 'coal-ore';
-    if(y>=-17) return 'stone';
-    if(y>=-19) return 'iron-ore';
-    return 'stone';
-  }
+  // Start from surface (y=2) and dig down through everything
+  let layer=2;
 
   function digLayer(){
     if(layer < -maxDepth){
-      toast('🕳️ Done! Underground space ready — build your wine cellar!');
+      toast('🕳️ Done! Underground space ready!');
       return;
     }
-    // For each cell in the shaft:
-    // if block exists → remove it
-    // if empty → place terrain block then immediately remove it (creates the visual flash)
+    let removed=0;
     for(let dx=-radius;dx<=radius;dx++){
       for(let dz=-radius;dz<=radius;dz++){
         const x=rx+dx, z=rz+dz;
-        const key=bk(x,layer,z);
-        if(placed[key]){
+        // Remove block if exists
+        if(placed[bk(x,layer,z)]){
           removeBlock(x,layer,z,false);
-        } else {
-          // Place a terrain block briefly so the dig looks like it's
-          // cutting through earth even in areas with no blocks yet
-          const t=terrainTypeAt(layer);
-          placeBlock(x,layer,z,t,false);
-          removeBlock(x,layer,z,false);
+          removed++;
         }
       }
     }
-    sndErase();
+    if(layer===2) console.log('First layer removed: '+removed+' blocks');
+    if(removed>0 || layer>=-1) sndErase();
     layer--;
-    setTimeout(digLayer, 45);
+    setTimeout(digLayer, 40);
   }
 
-  toast('🕳️ Digging...');
+  toast('🕳️ Digging deep...');
   digLayer();
 }
 
