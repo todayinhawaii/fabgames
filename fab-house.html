@@ -3983,36 +3983,41 @@ function digAtPoint(cx, cz){
     return 'iron-ore';
   }
 
-  // Start from y=1 and go down - grass is at -1 so we'll hit it
-  let y=1;
+  // Grass is at y=-1, so start there and go DOWN
+  let y=-1;
 
   function step(){
     if(y < -maxDepth){
       toast('🕳️ Done! Build your wine cellar down here!');
       return;
     }
-    // Place block at this level (creates the visible earth)
-    // then immediately queue removal
-    const toRemove=[];
+    // Remove existing blocks at this level (grass, floors, furniture etc)
+    // AND place terrain if empty so there's something visible to dig through
     for(let dx=-r;dx<=r;dx++){
       for(let dz=-r;dz<=r;dz++){
         const x=rx+dx, z=rz+dz;
         const key=bk(x,y,z);
-        if(!placed[key]){
-          placeBlock(x,y,z,terrain(y),false);
+        if(placed[key]){
+          // Block exists — remove it (this is the actual digging!)
+          removeBlock(x,y,z,false);
         }
-        toRemove.push({x,y,z});
+        // Place terrain block so player sees earth being excavated
+        placeBlock(x,y,z,terrain(y),false);
       }
     }
-    // Remove after a brief delay so Three.js renders the block first
+    sndErase();
+    // After one frame — remove the terrain blocks we just placed
+    // leaving a clean empty hole at this level
     setTimeout(()=>{
-      toRemove.forEach(p=>{
-        if(placed[bk(p.x,p.y,p.z)]) removeBlock(p.x,p.y,p.z,false);
-      });
-      sndErase();
+      for(let dx=-r;dx<=r;dx++){
+        for(let dz=-r;dz<=r;dz++){
+          const key=bk(rx+dx,y,rz+dz);
+          if(placed[key]) removeBlock(rx+dx,y,rz+dz,false);
+        }
+      }
       y--;
-      setTimeout(step, 50);
-    }, 16); // one render frame
+      setTimeout(step, 60);
+    }, 80); // 80ms visible = satisfying flash of earth colour
   }
 
   toast('🕳️ Digging...');
