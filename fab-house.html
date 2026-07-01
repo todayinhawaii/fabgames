@@ -1119,7 +1119,7 @@ const fill2=new THREE.DirectionalLight(0xffffee,0.3);fill2.position.set(10,5,10)
 // ── GROUND ────────────────────────────────────────────
 const ground=new THREE.Mesh(
   new THREE.PlaneGeometry(200,200),
-  new THREE.MeshLambertMaterial({color:0x1a1a1a})
+  new THREE.MeshLambertMaterial({color:0x4CAF50})
 );
 ground.rotation.x=-Math.PI/2;ground.position.y=-1.5;ground.receiveShadow=true;
 scene.add(ground);
@@ -3984,20 +3984,21 @@ function digAtPoint(cx, cz){
 
   let y=-1;
 
-  // Pre-fill the entire shaft with terrain blocks from top to bottom
-  // so there's something to visually remove layer by layer
-  for(let ly=-1;ly>=-maxDepth;ly--){
+  // Add dark walls around shaft perimeter so hole looks deep
+  // (only 1 block thick walls, just enough to see the depth)
+  for(let ly=-2;ly>=-maxDepth;ly--){
     for(let dx=-r;dx<=r;dx++){
       for(let dz=-r;dz<=r;dz++){
-        if(!placed[bk(rx+dx,ly,rz+dz)])
-          placeBlock(rx+dx,ly,rz+dz,ttype(ly),false);
+        // Only place on the EDGE of the shaft, not interior
+        if(Math.abs(dx)===r || Math.abs(dz)===r){
+          if(!placed[bk(rx+dx,ly,rz+dz)]){
+            const t=ly>=-5?'dirt':ly>=-12?'stone':'coal-ore';
+            placeBlock(rx+dx,ly,rz+dz,t,false);
+          }
+        }
       }
     }
   }
-  // Dark floor at bottom
-  for(let dx=-r;dx<=r;dx++)
-    for(let dz=-r;dz<=r;dz++)
-      placeBlock(rx+dx,-(maxDepth+1),rz+dz,'brick-dark',false);
 
   // Now dig layer by layer — visually satisfying!
   function step(){
