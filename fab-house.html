@@ -3991,20 +3991,20 @@ function digAtPoint(cx, cz){
       toast('🕳️ Done! Build your wine cellar down here!');
       return;
     }
-    // Remove existing blocks at this level (grass, floors, furniture etc)
-    // AND place terrain if empty so there's something visible to dig through
+    let blockCount=0;
+    console.log('STEP y='+y+' rx='+rx+' rz='+rz);
     for(let dx=-r;dx<=r;dx++){
       for(let dz=-r;dz<=r;dz++){
         const x=rx+dx, z=rz+dz;
         const key=bk(x,y,z);
         if(placed[key]){
-          // Block exists — remove it (this is the actual digging!)
           removeBlock(x,y,z,false);
+          blockCount++;
         }
-        // Place terrain block so player sees earth being excavated
         placeBlock(x,y,z,terrain(y),false);
       }
     }
+    console.log('STEP removed='+blockCount+' placed new terrain');
     sndErase();
     // After one frame — remove the terrain blocks we just placed
     // leaving a clean empty hole at this level
