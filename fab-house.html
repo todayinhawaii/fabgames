@@ -3988,36 +3988,19 @@ function digAtPoint(cx, cz){
 
   function step(){
     if(y < -maxDepth){
-      toast('🕳️ Done! Build your wine cellar down here!');
+      toast('🕳️ Done! Underground space ready — go build!');
       return;
     }
-    let blockCount=0;
-    console.log('STEP y='+y+' rx='+rx+' rz='+rz);
+    // Simply remove all blocks at this level — clean hole, no re-placing
     for(let dx=-r;dx<=r;dx++){
       for(let dz=-r;dz<=r;dz++){
-        const x=rx+dx, z=rz+dz;
-        const key=bk(x,y,z);
-        if(placed[key]){
-          removeBlock(x,y,z,false);
-          blockCount++;
-        }
-        placeBlock(x,y,z,terrain(y),false);
+        const key=bk(rx+dx,y,rz+dz);
+        if(placed[key]) removeBlock(rx+dx,y,rz+dz,false);
       }
     }
-    console.log('STEP removed='+blockCount+' placed new terrain');
     sndErase();
-    // After one frame — remove the terrain blocks we just placed
-    // leaving a clean empty hole at this level
-    setTimeout(()=>{
-      for(let dx=-r;dx<=r;dx++){
-        for(let dz=-r;dz<=r;dz++){
-          const key=bk(rx+dx,y,rz+dz);
-          if(placed[key]) removeBlock(rx+dx,y,rz+dz,false);
-        }
-      }
-      y--;
-      setTimeout(step, 60);
-    }, 80); // 80ms visible = satisfying flash of earth colour
+    y--;
+    setTimeout(step, 60);
   }
 
   toast('🕳️ Digging...');
