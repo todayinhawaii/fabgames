@@ -324,6 +324,33 @@ function doDeselect(){
 
   <div class="lp-divider"></div>
 
+  <!-- TOOLS (Minecraft-style) -->
+  <span class="lp-section-label">TOOLS</span>
+  <div class="lp-btn-row">
+    <div class="lp-btn active" id="tHammer" onclick="setTool('hammer')" title="Hammer — erase one block">
+      <div class="lp-icon">🔨</div><div class="lp-text">HAMMER</div>
+    </div>
+    <div class="lp-btn" id="tBulldozer" onclick="setTool('bulldozer')" title="Bulldozer — erase 3x3 area">
+      <div class="lp-icon">🚜</div><div class="lp-text">DOZER</div>
+    </div>
+    <div class="lp-btn" id="tDrill" onclick="setTool('drill')" title="Drill — dig straight down">
+      <div class="lp-icon">⛏️</div><div class="lp-text">DRILL</div>
+    </div>
+  </div>
+  <div class="lp-btn-row">
+    <div class="lp-btn" id="tBrush" onclick="setTool('brush')" title="Brush — paint blocks by dragging">
+      <div class="lp-icon">🖌️</div><div class="lp-text">BRUSH</div>
+    </div>
+    <div class="lp-btn" id="tDigDown" onclick="digDown()" title="Dig down to underground">
+      <div class="lp-icon">🕳️</div><div class="lp-text">DIG</div>
+    </div>
+    <div class="lp-btn" id="tFill" onclick="setTool('fill')" title="Fill — flood fill an area">
+      <div class="lp-icon">🪣</div><div class="lp-text">FILL</div>
+    </div>
+  </div>
+
+  <div class="lp-divider"></div>
+
   <!-- FLOOR NAVIGATOR -->
   <span class="lp-section-label">FLOOR  <span style="color:rgba(255,255,255,0.25);font-size:8px;">E=up · C=down</span></span>
   <div class="lp-floor-row">
@@ -893,6 +920,13 @@ const BLOCKS={
   'dirt':         {l:'Dirt',         e:'🟤',c:0x8B6347,r:0.98},
   'sand':         {l:'Sand',         e:'🏖️',c:0xF5DEB3,r:0.95},
   'water':        {l:'Water',        e:'🌊',c:0x0099CC,r:0,m:0.2,t:true,o:0.7},
+  'dirt':         {l:'Dirt',         e:'🟫',c:0x8B5E3C,r:0.95},
+  'stone':        {l:'Stone',        e:'🪨',c:0x888888,r:0.95},
+  'coal-ore':     {l:'Coal Ore',     e:'⬛',c:0x333333,r:0.9},
+  'iron-ore':     {l:'Iron Ore',     e:'🟤',c:0xAA7744,r:0.85},
+  'diamond-ore':  {l:'Diamond Ore',  e:'💎',c:0x00CCFF,r:0.3,m:0.4},
+  'gold-ore':     {l:'Gold Ore',     e:'🟡',c:0xFFCC00,r:0.5,m:0.3},
+  'bedrock':      {l:'Bedrock',      e:'⬛',c:0x111111,r:1.0},
   'pool-water':   {l:'Pool Water',   e:'🏊',c:0x00AADD,r:0,m:0.3,t:true,o:0.65},
   'stone-path':   {l:'Stone Path',   e:'🪨',c:0xAA9988,r:0.9},
   'gravel':       {l:'Gravel',       e:'⬜',c:0x9A9A88,r:0.98},
@@ -1028,6 +1062,7 @@ const PALETTE_CATS=[
   {t:'🛏️ Bedroom', k:['bed','desk','wardrobe']},
   {t:'🚿 Bathroom', k:['bathtub','shower','toilet','bathrm-vanity']},
   {t:'🌳 Nature',   k:['grass','dirt','sand','water','stone-path','gravel','decking','tree','palm','hedge']},
+  {t:'⛏️ Mining',   k:['stone','coal-ore','iron-ore','gold-ore','diamond-ore','bedrock']},
   {t:'🏡 Outdoor',  k:['fence-wood','fence-iron']},
   {t:'✨ Special',  k:['gold-trim','metal']},
   {t:'🛋️ Living+',  k:['coffee-table','lamp-floor','plant-pot','rug','curtains','clock']},
@@ -3883,6 +3918,60 @@ function animate(){
 }
 
 // ── STARTER SCENE ─────────────────────────────────────
+// ── UNDERGROUND TERRAIN SYSTEM ───────────────────────
+// Generates layers of terrain below y=0 so players can dig into
+const TERRAIN_LAYERS = [
+  {y:-1, type:'grass',   depth:1},   // surface grass
+  {y:-2, type:'dirt',    depth:3},   // dirt layer
+  {y:-5, type:'stone',   depth:6},   // stone layer  
+  {y:-11,type:'coal-ore',depth:2},   // coal seams
+  {y:-13,type:'stone',   depth:4},   // more stone
+  {y:-17,type:'iron-ore',depth:2},   // iron ore
+  {y:-19,type:'stone',   depth:3},   // deep stone
+  {y:-22,type:'diamond-ore',depth:1},// diamond!
+];
+
+function generateUnderground(cx, cz, radius){
+  // Generate terrain layers in a radius around a centre point
+  for(let x=cx-radius; x<=cx+radius; x++){
+    for(let z=cz-radius; z<=cz+radius; z++){
+      TERRAIN_LAYERS.forEach(layer=>{
+        for(let d=0; d<layer.depth; d++){
+          const y = layer.y - d;
+          const key = bk(x,y,z);
+          if(!placed[key]){
+            const blockType = BLOCKS[layer.type] ? layer.type : 'brick-grey';
+            placeBlock(x, y, z, blockType, false);
+          }
+        }
+      });
+    }
+  }
+}
+
+function digDown(){
+  // Dig a shaft straight down from camera target position
+  const cx = Math.round(camTarget.x);
+  const cz = Math.round(camTarget.z);
+  const r = currentTool==='bulldozer' ? 2 : 1;
+  let count = 0;
+  for(let y=0; y>=-22; y--){
+    for(let x=cx-r; x<=cx+r; x++){
+      for(let z=cz-r; z<=cz+r; z++){
+        if(placed[bk(x,y,z)]){
+          removeBlock(x,y,z,false);
+          count++;
+        }
+      }
+    }
+  }
+  // Move camera underground
+  camTarget.y = -8;
+  camRadius = 14;
+  updateCamera();
+  toast(`⛏️ Dug ${count} blocks! You're underground — explore the caves!`);
+}
+
 function buildStarter(){
   // ═══════════════════════════════════════════════════
   // SHOWCASE VILLA — demonstrates everything Fab House can do!
@@ -4057,6 +4146,10 @@ function buildStarter(){
 
   // Hawaiian touch — lei stand by the door
   placeBlock(3,FY,1,'lei',false);
+
+  // Generate underground terrain below the villa
+  // (players can dig down to discover caves and ore!)
+  generateUnderground(5, 4, 12);
 }
 
 setLoad(85);
@@ -4581,6 +4674,128 @@ setTimeout(()=>{
     deselect();
   }
 
+  // ── MINECRAFT-STYLE TOOL SYSTEM ──────────────────────
+  let currentTool = 'hammer'; // hammer | bulldozer | drill | brush | fill
+  let isHolding = false;      // true while mouse/touch held down
+  let holdInterval = null;    // interval for continuous action
+  let lastHitPos = null;      // avoid re-hitting same block
+
+  function setTool(tool){
+    currentTool = tool;
+    ['hammer','bulldozer','drill','brush','fill'].forEach(t=>{
+      const el=document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
+      if(el) el.classList.toggle('active', t===tool);
+    });
+    const names={
+      hammer:'🔨 Hammer — click to erase one block',
+      bulldozer:'🚜 Bulldozer — erases 3×3 area instantly',
+      drill:'⛏️ Drill — hold to dig rapidly!',
+      brush:'🖌️ Brush — drag to paint blocks',
+      fill:'🪣 Fill — flood fills connected area'
+    };
+    toast(names[tool]||tool);
+  }
+
+  function applyTool(hit){
+    if(!hit) return;
+    const p = getPlacePos(hit);
+    const posKey = p.x+','+p.y+','+p.z;
+    if(posKey===lastHitPos) return; // don't re-hit same spot
+    lastHitPos = posKey;
+
+    if(currentTool==='hammer'){
+      // Single block erase
+      eraseAtHit(hit);
+      sndErase();
+    }
+    else if(currentTool==='bulldozer'){
+      // 3×3×1 area erase
+      let count=0;
+      for(let dx=-1;dx<=1;dx++) for(let dz=-1;dz<=1;dz++){
+        const key=bk(p.x+dx,p.y,p.z+dz);
+        if(placed[key]){ removeBlock(p.x+dx,p.y,p.z+dz,true); count++; }
+      }
+      if(count>0) sndErase();
+    }
+    else if(currentTool==='drill'){
+      // Drill straight DOWN from hit point
+      let count=0;
+      for(let dy=0;dy>=-8;dy--){
+        const key=bk(p.x,p.y+dy,p.z);
+        if(placed[key]){ removeBlock(p.x,p.y+dy,p.z,true); count++; }
+      }
+      if(count>0) sndErase();
+      lastHitPos=null; // allow re-drilling same column
+    }
+    else if(currentTool==='brush'){
+      // Paint — place current block type
+      if(!placed[bk(p.x,p.y,p.z)]){
+        placeBlock(p.x,p.y,p.z,currentBlock,true);
+        sndPlace();
+      }
+    }
+    else if(currentTool==='fill'){
+      // Flood fill — replace all connected blocks of same type
+      const targetKey=bk(p.x,p.y,p.z);
+      if(!placed[targetKey]) return;
+      const targetType=placed[targetKey].type;
+      if(targetType===currentBlock) return;
+      const queue=[{x:p.x,y:p.y,z:p.z}];
+      const visited=new Set([targetKey]);
+      let count=0;
+      while(queue.length>0 && count<200){
+        const {x,y,z}=queue.shift();
+        removeBlock(x,y,z,false);
+        placeBlock(x,y,z,currentBlock,false);
+        count++;
+        [[1,0,0],[-1,0,0],[0,0,1],[0,0,-1],[0,1,0],[0,-1,0]].forEach(([dx,dy,dz])=>{
+          const nk=bk(x+dx,y+dy,z+dz);
+          if(!visited.has(nk) && placed[nk] && placed[nk].type===targetType){
+            visited.add(nk); queue.push({x:x+dx,y:y+dy,z:z+dz});
+          }
+        });
+      }
+      toast(`🪣 Filled ${count} blocks!`);
+    }
+  }
+
+  // ── HOLD-TO-ACT: continuous action while mouse held ──
+  // Override the canvas pointerdown/up to support hold
+  canvas.addEventListener('pointerdown', e=>{
+    if(e.button!==0) return;
+    if(mode!=='erase' && !(mode==='build' && currentTool==='brush')) return;
+    isHolding = true;
+    lastHitPos = null;
+    // Immediate first action
+    const hits=getHits(e);
+    if(hits.length>0) applyTool(hits[0]);
+    // Continuous action every 80ms while held
+    holdInterval = setInterval(()=>{
+      if(!isHolding) return;
+      // Use last known mouse position
+      if(lastPointerE) {
+        const hits=getHits(lastPointerE);
+        if(hits.length>0) applyTool(hits[0]);
+      }
+    }, 80);
+  },{capture:false});
+
+  canvas.addEventListener('pointerup', e=>{
+    isHolding = false;
+    lastHitPos = null;
+    if(holdInterval){ clearInterval(holdInterval); holdInterval=null; }
+  },{capture:false});
+
+  // Track last pointer position for continuous hold action
+  let lastPointerE = null;
+  canvas.addEventListener('pointermove', e=>{
+    lastPointerE = e;
+    // If holding in brush/erase mode, reset lastHitPos so new blocks get hit
+    if(isHolding && (mode==='erase' || (mode==='build'&&currentTool==='brush'))){
+      lastHitPos = null;
+    }
+  },{capture:false});
+
   // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
   window.setMode       = setMode;
   window.undo          = undo;
@@ -4610,6 +4825,10 @@ setTimeout(()=>{
   window.addWalls      = addWalls;
   window.addRoof       = addRoof;
   window.eraseAtHit      = eraseAtHit;
+  window.setTool         = setTool;
+  window.digDown         = digDown;
+  window.applyTool       = applyTool;
+  window.generateUnderground = generateUnderground;
   window.toggleWallDraw  = toggleWallDraw;
   window.cancelWallDraw    = cancelWallDraw;
   window.placeRealWall     = placeRealWall;
