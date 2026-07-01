@@ -1119,9 +1119,9 @@ const fill2=new THREE.DirectionalLight(0xffffee,0.3);fill2.position.set(10,5,10)
 // ── GROUND ────────────────────────────────────────────
 const ground=new THREE.Mesh(
   new THREE.PlaneGeometry(200,200),
-  new THREE.MeshLambertMaterial({color:0x4CAF50})
+  new THREE.MeshLambertMaterial({color:0x1a1a1a})
 );
-ground.rotation.x=-Math.PI/2;ground.position.y=-200;ground.receiveShadow=true;
+ground.rotation.x=-Math.PI/2;ground.position.y=-1.5;ground.receiveShadow=true;
 scene.add(ground);
 
 const gridHelper=new THREE.GridHelper(200,200,0x000000,0x000000);
@@ -3968,14 +3968,12 @@ function generateColumn(x, z){
 }
 
 function digAtPoint(cx, cz){
-  console.log('digAtPoint called!', cx, cz);
   const rx=Math.round(cx);
   const rz=Math.round(cz);
-  const r=2; // 5x5 shaft
-  const maxDepth=25;
+  const r=2;
+  const maxDepth=20;
 
-  // Terrain type at each depth
-  function terrain(y){
+  function ttype(y){
     if(y>=-1) return 'grass';
     if(y>=-4) return 'dirt';
     if(y>=-10) return 'stone';
@@ -3984,31 +3982,40 @@ function digAtPoint(cx, cz){
     return 'iron-ore';
   }
 
-  // Grass is at y=-1, so start there and go DOWN
   let y=-1;
 
-  // Place dark bedrock BELOW the dig zone so hole looks deep
+  // Pre-fill the entire shaft with terrain blocks from top to bottom
+  // so there's something to visually remove layer by layer
+  for(let ly=-1;ly>=-maxDepth;ly--){
+    for(let dx=-r;dx<=r;dx++){
+      for(let dz=-r;dz<=r;dz++){
+        if(!placed[bk(rx+dx,ly,rz+dz)])
+          placeBlock(rx+dx,ly,rz+dz,ttype(ly),false);
+      }
+    }
+  }
+  // Dark floor at bottom
   for(let dx=-r;dx<=r;dx++)
     for(let dz=-r;dz<=r;dz++)
       placeBlock(rx+dx,-(maxDepth+1),rz+dz,'brick-dark',false);
 
+  // Now dig layer by layer — visually satisfying!
   function step(){
     if(y < -maxDepth){
-      toast('🕳️ Done! Underground space ready — go build!');
+      toast('🕳️ Done! Go build your wine cellar!');
       return;
     }
-    for(let dx=-r;dx<=r;dx++){
+    for(let dx=-r;dx<=r;dx++)
       for(let dz=-r;dz<=r;dz++){
-        const key=bk(rx+dx,y,rz+dz);
-        if(placed[key]) removeBlock(rx+dx,y,rz+dz,false);
+        const k=bk(rx+dx,y,rz+dz);
+        if(placed[k]) removeBlock(rx+dx,y,rz+dz,false);
       }
-    }
     sndErase();
     y--;
-    setTimeout(step, 60);
+    setTimeout(step,55);
   }
 
-  toast('🕳️ Digging...');
+  toast('🕳️ Digging deep...');
   step();
 }
 
