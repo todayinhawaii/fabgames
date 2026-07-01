@@ -3973,15 +3973,12 @@ function digAtPoint(cx, cz){
   const rx=Math.round(cx);
   const rz=Math.round(cz);
 
-  // Debug: log what's at click point
-  let found=[];
-  for(let y=5;y>=-5;y--){
-    if(placed[bk(rx,y,rz)]) found.push(y+':'+placed[bk(rx,y,rz)].type);
+  // Find actual surface level
+  let layer=0;
+  for(let y=5;y>=-3;y--){
+    if(placed[bk(rx,y,rz)]){ layer=y; break; }
+    layer=y; // keep going down til we find something or hit -3
   }
-  console.log('digAtPoint('+rx+','+rz+') found blocks at y:', found.join(', ')||'NONE');
-
-  // Start from surface (y=2) and dig down through everything
-  let layer=2;
 
   function digLayer(){
     if(layer < -maxDepth){
@@ -3999,7 +3996,7 @@ function digAtPoint(cx, cz){
         }
       }
     }
-    if(layer===2) console.log('First layer removed: '+removed+' blocks');
+
     if(removed>0 || layer>=-1) sndErase();
     layer--;
     setTimeout(digLayer, 40);
@@ -4832,14 +4829,11 @@ setTimeout(()=>{
 
   // ── TOOL SYSTEM — simple, fast, no conflicts ────────
   canvas.addEventListener('pointerdown', e=>{
-    console.log('TOOL PD: button='+e.button+' toolActive='+toolActive+' currentTool='+currentTool);
     if(e.button!==0 || !toolActive || !currentTool) return;
-    console.log('TOOL FIRING:', currentTool);
 
     if(currentTool==='dig'){
       const hits=getHits(e);
       const p=hits.length>0 ? hits[0].point : camTarget;
-      console.log('DIG at:', p.x, p.z);
       digAtPoint(p.x, p.z);
       return;
     }
