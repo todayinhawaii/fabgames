@@ -4686,12 +4686,23 @@ setTimeout(()=>{
       const el=document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
       if(el) el.classList.toggle('active', t===tool);
     });
+
+    // Auto-switch to the right mode for each tool
+    const toolModes={
+      hammer:'erase',
+      bulldozer:'erase',
+      drill:'erase',
+      brush:'build',
+      fill:'build',
+    };
+    if(toolModes[tool]) setMode(toolModes[tool]);
+
     const names={
-      hammer:'🔨 Hammer — click to erase one block',
-      bulldozer:'🚜 Bulldozer — erases 3×3 area instantly',
-      drill:'⛏️ Drill — hold to dig rapidly!',
-      brush:'🖌️ Brush — drag to paint blocks',
-      fill:'🪣 Fill — flood fills connected area'
+      hammer:'🔨 Hammer — click any block to erase it',
+      bulldozer:'🚜 Bulldozer — erases 3×3 area! Hold to sweep',
+      drill:'⛏️ Drill — drills 8 blocks straight down!',
+      brush:'🖌️ Brush — drag to paint blocks continuously',
+      fill:'🪣 Fill — flood fills all connected same-type blocks'
     };
     toast(names[tool]||tool);
   }
@@ -4763,21 +4774,23 @@ setTimeout(()=>{
   // Override the canvas pointerdown/up to support hold
   canvas.addEventListener('pointerdown', e=>{
     if(e.button!==0) return;
-    if(mode!=='erase' && !(mode==='build' && currentTool==='brush')) return;
+    // Tools work whenever they're selected, regardless of mode label
+    const isDestroyTool = ['hammer','bulldozer','drill'].includes(currentTool);
+    const isBuildTool = ['brush','fill'].includes(currentTool);
+    if(!isDestroyTool && !isBuildTool) return;
     isHolding = true;
     lastHitPos = null;
     // Immediate first action
     const hits=getHits(e);
     if(hits.length>0) applyTool(hits[0]);
-    // Continuous action every 80ms while held
+    // Continuous rapid action every 60ms while held — Minecraft feel!
     holdInterval = setInterval(()=>{
       if(!isHolding) return;
-      // Use last known mouse position
-      if(lastPointerE) {
+      if(lastPointerE){
         const hits=getHits(lastPointerE);
         if(hits.length>0) applyTool(hits[0]);
       }
-    }, 80);
+    }, 60);
   },{capture:false});
 
   canvas.addEventListener('pointerup', e=>{
