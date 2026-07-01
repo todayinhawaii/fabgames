@@ -3932,16 +3932,18 @@ const TERRAIN_LAYERS = [
 ];
 
 function generateUnderground(cx, cz, radius){
-  // Generate terrain layers in a radius around a centre point
+  // Generate terrain for just the columns needed — called lazily during dig
+  // Only fills spots that don't already have a block
   for(let x=cx-radius; x<=cx+radius; x++){
     for(let z=cz-radius; z<=cz+radius; z++){
       TERRAIN_LAYERS.forEach(layer=>{
         for(let d=0; d<layer.depth; d++){
-          const y = layer.y - d;
-          const key = bk(x,y,z);
+          const y=layer.y-d;
+          const key=bk(x,y,z);
           if(!placed[key]){
-            const blockType = BLOCKS[layer.type] ? layer.type : 'brick-grey';
-            placeBlock(x, y, z, blockType, false);
+            const t=BLOCKS[layer.type]?layer.type:'stone';
+            // Use direct mesh creation instead of placeBlock to avoid overhead
+            placeBlock(x,y,z,t,false);
           }
         }
       });
@@ -3949,38 +3951,77 @@ function generateUnderground(cx, cz, radius){
   }
 }
 
-function digAtPoint(cx, cz){
-  // Minecraft-style BIG DIG — 5x5 hole, 20 layers deep
-  // Blocks vanish layer by layer so you SEE the earth being excavated!
-  const radius=2;
-  const maxDepth=20;
-
-  // First ensure underground terrain exists to dig through
-  generateUnderground(Math.round(cx), Math.round(cz), radius+3);
-
-  let layer=1; // start from y=1 (ground surface) going down
-
-  function removeLayer(){
-    if(layer < -maxDepth){
-      toast('🕳️ Reached the deep! Walk over the hole to look in!');
-      return;
-    }
-    let removed=0;
-    for(let dx=-radius;dx<=radius;dx++){
-      for(let dz=-radius;dz<=radius;dz++){
-        const x=Math.round(cx)+dx;
-        const z=Math.round(cz)+dz;
-        const key=bk(x,layer,z);
-        if(placed[key]){ removeBlock(x,layer,z,false); removed++; }
+function generateColumn(x, z){
+  // Fill just ONE column with terrain — fast, called per-column during dig
+  TERRAIN_LAYERS.forEach(layer=>{
+    for(let d=0;d<layer.depth;d++){
+      const y=layer.y-d;
+      const key=bk(x,y,z);
+      if(!placed[key]){
+        const t=BLOCKS[layer.type]?layer.type:'stone';
+        placeBlock(x,y,z,t,false);
       }
     }
-    if(removed>0) sndErase();
-    layer--;
-    setTimeout(removeLayer, 40); // 40ms per layer = fast but visible!
+  });
+}
+
+function digAtPoint(cx, cz){
+  const radius=2;
+  const maxDepth=20;
+  const rx=Math.round(cx);
+  const rz=Math.round(cz);
+
+  // Find surface level from existing blocks
+  let startY=1;
+  for(let y=8;y>=-2;y--){
+    if(placed[bk(rx,y,rz)]||placed[bk(rx+1,y,rz)]||placed[bk(rx,y,rz+1)]){
+      startY=y; break;
+    }
   }
 
-  toast('🕳️ Digging deep — watch the earth open up!');
-  removeLayer();
+  let layer=startY;
+
+  // Pick terrain type per depth — no pre-generation needed
+  function terrainTypeAt(y){
+    if(y>=-1) return 'grass';
+    if(y>=-4) return 'dirt';
+    if(y>=-10) return 'stone';
+    if(y>=-13) return 'coal-ore';
+    if(y>=-17) return 'stone';
+    if(y>=-19) return 'iron-ore';
+    return 'stone';
+  }
+
+  function digLayer(){
+    if(layer < -maxDepth){
+      toast('🕳️ Done! Underground space ready — build your wine cellar!');
+      return;
+    }
+    // For each cell in the shaft:
+    // if block exists → remove it
+    // if empty → place terrain block then immediately remove it (creates the visual flash)
+    for(let dx=-radius;dx<=radius;dx++){
+      for(let dz=-radius;dz<=radius;dz++){
+        const x=rx+dx, z=rz+dz;
+        const key=bk(x,layer,z);
+        if(placed[key]){
+          removeBlock(x,layer,z,false);
+        } else {
+          // Place a terrain block briefly so the dig looks like it's
+          // cutting through earth even in areas with no blocks yet
+          const t=terrainTypeAt(layer);
+          placeBlock(x,layer,z,t,false);
+          removeBlock(x,layer,z,false);
+        }
+      }
+    }
+    sndErase();
+    layer--;
+    setTimeout(digLayer, 45);
+  }
+
+  toast('🕳️ Digging...');
+  digLayer();
 }
 
 function digDown(){
@@ -4162,9 +4203,7 @@ function buildStarter(){
   // Hawaiian touch — lei stand by the door
   placeBlock(3,FY,1,'lei',false);
 
-  // Generate underground terrain below the villa
-  // (players can dig down to discover caves and ore!)
-  generateUnderground(5, 4, 12);
+  // Underground terrain generates on-demand when player digs
 }
 
 setLoad(85);
@@ -4720,9 +4759,19 @@ setTimeout(()=>{
 
   function applyTool(hit){
     if(!hit) return;
-    const p = getPlacePos(hit);
+    // For build tools, get place position; for erase tools get actual block position
+    let p;
+    if(['brush'].includes(currentTool)){
+      p = getPlacePos(hit);
+    } else {
+      // Walk up to find actual placed block
+      let node=hit.object;
+      while(node && !placed[node.userData?.key]) node=node.parent;
+      if(!node||!placed[node.userData?.key]) return; // no block found
+      p = node.userData;
+    }
     const posKey = p.x+','+p.y+','+p.z;
-    if(posKey===lastHitPos) return; // don't re-hit same spot
+    if(posKey===lastHitPos) return;
     lastHitPos = posKey;
 
     if(currentTool==='hammer'){
@@ -4748,12 +4797,7 @@ setTimeout(()=>{
       }
       if(count>0){ sndErase(); lastHitPos=null; }
     }
-    else if(currentTool==='dig'){
-      // BIG DIG — animated Minecraft-style excavation at click point!
-      // Digs a 5×5 hole 20 layers deep, blocks vanish layer by layer
-      digAtPoint(p.x, p.z);
-      lastHitPos = p.x+',0,'+p.z; // prevent re-triggering same spot
-    }
+
     else if(currentTool==='brush'){
       // Paint — place current block type
       if(!placed[bk(p.x,p.y,p.z)]){
@@ -4786,49 +4830,45 @@ setTimeout(()=>{
     }
   }
 
-  // ── HOLD-TO-ACT: continuous action while mouse held ──
-  // Override the canvas pointerdown/up to support hold
+  // ── TOOL SYSTEM — simple, fast, no conflicts ────────
   canvas.addEventListener('pointerdown', e=>{
     if(e.button!==0) return;
-    const isDestroyTool=['hammer','bulldozer','drill','dig'].includes(currentTool);
-    const isBuildTool=['brush','fill'].includes(currentTool);
-    // Only intercept if a tool is active — otherwise let normal mode handle it
-    if(!isDestroyTool && !isBuildTool) return;
-    isHolding=true; lastHitPos=null;
+    const tools=['hammer','bulldozer','drill','dig','brush','fill'];
+    if(!tools.includes(currentTool)) return;
+
+    // For DIG — fire at click point, always works
+    if(currentTool==='dig'){
+      const hits=getHits(e);
+      const p = hits.length>0 ? hits[0].point : camTarget;
+      digAtPoint(p.x, p.z);
+      return;
+    }
+
+    // For other tools — start holding
+    isHolding=true;
+    lastHitPos=null;
     const hits=getHits(e);
-    if(hits.length>0 && hits[0].object!==ground) applyTool(hits[0]);
+    if(hits.length>0) applyTool(hits[0]);
+
     holdInterval=setInterval(()=>{
       if(!isHolding||!lastPointerE) return;
       const h=getHits(lastPointerE);
-      if(h.length>0 && h[0].object!==ground) applyTool(h[0]);
-    },50); // 50ms = snappy and fast
-  },{capture:false});
+      if(h.length>0) applyTool(h[0]);
+    }, 80);
+  });
 
   canvas.addEventListener('pointerup', e=>{
-    isHolding = false;
-    lastHitPos = null;
+    isHolding=false;
+    lastHitPos=null;
     if(holdInterval){ clearInterval(holdInterval); holdInterval=null; }
-  },{capture:false});
+  });
 
-  // Track last pointer position for continuous hold action
-  let lastPointerE = null;
   canvas.addEventListener('pointermove', e=>{
-    lastPointerE = e;
-    // If holding a tool and pointer is over a block, reset so next block gets hit
-    if(isHolding){
-      const hits=getHits(e);
-      // Only stay in tool mode if we're actually hitting blocks
-      // If hitting nothing/sky, stop holding so orbit resumes normally
-      if(hits.length===0 || hits[0].object===ground){
-        isHolding=false;
-        if(holdInterval){ clearInterval(holdInterval); holdInterval=null; }
-      } else {
-        lastHitPos=null; // allow hitting new blocks as cursor moves
-      }
-    }
-  },{capture:false});
+    lastPointerE=e;
+    if(isHolding) lastHitPos=null; // allow hitting new blocks as cursor moves
+  });
 
-  // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
+  // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──  // ── EXPOSE FUNCTIONS GLOBALLY so HTML onclick attributes work ──
   window.setMode       = setMode;
   window.undo          = undo;
   window.clearAll      = clearAll;
@@ -4861,6 +4901,7 @@ setTimeout(()=>{
   window.digDown         = digDown;
   window.applyTool       = applyTool;
   window.generateUnderground = generateUnderground;
+  window.generateColumn = generateColumn;
   window.toggleWallDraw  = toggleWallDraw;
   window.cancelWallDraw    = cancelWallDraw;
   window.placeRealWall     = placeRealWall;
