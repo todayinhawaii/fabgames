@@ -324,28 +324,14 @@ function doDeselect(){
 
   <div class="lp-divider"></div>
 
-  <!-- TOOLS (Minecraft-style) -->
+  <!-- TOOLS -->
   <span class="lp-section-label">TOOLS</span>
   <div class="lp-btn-row">
-    <div class="lp-btn" id="tHammer" onclick="setTool('hammer')" title="Hammer — erase one block">
-      <div class="lp-icon">🔨</div><div class="lp-text">HAMMER</div>
+    <div class="lp-btn" id="tDrill" onclick="setTool('drill')" title="Delete Brick — click to remove">
+      <div class="lp-icon">🗑️</div><div class="lp-text">DELETE BRICK</div>
     </div>
-    <div class="lp-btn" id="tBulldozer" onclick="setTool('bulldozer')" title="Bulldozer — erase 3x3 area">
-      <div class="lp-icon">🚜</div><div class="lp-text">DOZER</div>
-    </div>
-    <div class="lp-btn" id="tDrill" onclick="setTool('drill')" title="Drill — dig straight down">
-      <div class="lp-icon">⛏️</div><div class="lp-text">DRILL</div>
-    </div>
-  </div>
-  <div class="lp-btn-row">
-    <div class="lp-btn" id="tBrush" onclick="setTool('brush')" title="Brush — paint blocks by dragging">
-      <div class="lp-icon">🖌️</div><div class="lp-text">BRUSH</div>
-    </div>
-    <div class="lp-btn" id="tDig" onclick="setTool('dig')" title="Dig deep underground">
-      <div class="lp-icon">🕳️</div><div class="lp-text">DIG</div>
-    </div>
-    <div class="lp-btn" id="tFill" onclick="setTool('fill')" title="Fill — flood fill an area">
-      <div class="lp-icon">🪣</div><div class="lp-text">FILL</div>
+    <div class="lp-btn" id="tBrush" onclick="setTool('brush')" title="Add Brick — drag to paint">
+      <div class="lp-icon">🧱</div><div class="lp-text">ADD BRICK</div>
     </div>
   </div>
 
@@ -4744,7 +4730,7 @@ setTimeout(()=>{
     // Toggle off if clicking same tool again
     if(currentTool===tool && toolActive){
       currentTool=null; toolActive=false;
-      ['hammer','bulldozer','drill','dig','brush','fill'].forEach(t=>{
+      ['drill','brush'].forEach(t=>{
         const el=document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
         if(el) el.classList.remove('active');
       });
@@ -4753,20 +4739,15 @@ setTimeout(()=>{
       return;
     }
     currentTool=tool; toolActive=true;
-    ['hammer','bulldozer','drill','dig','brush','fill'].forEach(t=>{
+    ['drill','brush'].forEach(t=>{
       const el=document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
       if(el) el.classList.toggle('active', t===tool);
     });
-    const labels={hammer:'🔨 HAMMER',bulldozer:'🚜 BULLDOZER',
-      drill:'⛏️ DRILL',dig:'🕳️ DIG',brush:'🖌️ BRUSH',fill:'🪣 FILL'};
+    const labels={drill:'🗑️ DELETE BRICK', brush:'🧱 ADD BRICK'};
     document.getElementById('modeLabel').textContent=labels[tool]||'🛠️ TOOL';
     const tips={
-      hammer:'🔨 Click any block to remove it',
-      bulldozer:'🚜 Click to blast 5×5 wide — hold & sweep!',
-      drill:'⛏️ Hold over blocks — drills straight down!',
-      dig:'🕳️ Click ground to dig a deep 5×5 shaft!',
-      brush:'🖌️ Hold & drag to paint blocks',
-      fill:'🪣 Click to flood-fill connected area'
+      drill:'🗑️ DELETE BRICK — click any brick to remove it. Hold & drag to remove many!',
+      brush:'🧱 ADD BRICK — hold & drag to place bricks as you move!',
     };
     toast(tips[tool]||tool);
   }
@@ -4838,19 +4819,7 @@ setTimeout(()=>{
   canvas.addEventListener('pointerdown', e=>{
     if(e.button!==0 || !toolActive || !currentTool) return;
 
-    if(currentTool==='dig'){
-      const hits=getHits(e);
-      // Only dig if clicking near the play area (not the distant ground plane)
-      const p=hits.length>0 ? hits[0].point : camTarget;
-      if(Math.abs(p.x)>30||Math.abs(p.z)>30){
-        toast('⛏️ Click closer to the house to dig!');
-        return;
-      }
-      digAtPoint(p.x, p.z);
-      return;
-    }
-
-    // Stop default canvas handling for other tools
+    // Stop default canvas handling for drill/brush tools
     isHolding=true; lastHitPos=null;
     const hits=getHits(e);
     if(hits.length>0) applyTool(hits[0]);
