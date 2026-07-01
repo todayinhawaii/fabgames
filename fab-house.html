@@ -3968,6 +3968,7 @@ function generateColumn(x, z){
 }
 
 function digAtPoint(cx, cz){
+  console.log('digAtPoint called!', cx, cz);
   const rx=Math.round(cx);
   const rz=Math.round(cz);
   const r=2; // 5x5 shaft
@@ -3991,7 +3992,8 @@ function digAtPoint(cx, cz){
       toast('🕳️ Done! Underground space ready — go build!');
       return;
     }
-    // Simply remove all blocks at this level — clean hole, no re-placing
+    console.log('step running y='+y);
+  // Simply remove all blocks at this level — clean hole, no re-placing
     for(let dx=-r;dx<=r;dx++){
       for(let dz=-r;dz<=r;dz++){
         const key=bk(rx+dx,y,rz+dz);
