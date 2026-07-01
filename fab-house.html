@@ -4826,6 +4826,7 @@ setTimeout(()=>{
   });
 
   canvas.addEventListener('pointerup', e=>{
+    console.log('TOOL UP: active='+toolActive+' tool='+currentTool+' mouseDown='+!!toolMouseDown);
     if(e.button!==0 || !toolActive || !currentTool || !toolMouseDown) return;
 
     const dx = e.clientX - toolMouseDown.x;
@@ -4837,6 +4838,7 @@ setTimeout(()=>{
     if(moved) return;
 
     // It was a clean click — act on it
+    lastHitPos = null; // reset so every click works fresh
     const hits = getHits(e);
     if(hits.length === 0){
       // Clicked empty space — deselect tool
