@@ -341,7 +341,7 @@ function doDeselect(){
     <div class="lp-btn" id="tBrush" onclick="setTool('brush')" title="Brush — paint blocks by dragging">
       <div class="lp-icon">🖌️</div><div class="lp-text">BRUSH</div>
     </div>
-    <div class="lp-btn" id="tDigDown" onclick="setTool('dig')" title="Dig deep underground">
+    <div class="lp-btn" id="tDig" onclick="setTool('dig')" title="Dig deep underground">
       <div class="lp-icon">🕳️</div><div class="lp-text">DIG</div>
     </div>
     <div class="lp-btn" id="tFill" onclick="setTool('fill')" title="Fill — flood fill an area">
@@ -3973,11 +3973,13 @@ function digAtPoint(cx, cz){
   const rx=Math.round(cx);
   const rz=Math.round(cz);
 
-  // Find surface level from existing blocks
-  let startY=1;
-  for(let y=8;y>=-2;y--){
-    if(placed[bk(rx,y,rz)]||placed[bk(rx+1,y,rz)]||placed[bk(rx,y,rz+1)]){
-      startY=y; break;
+  // Find surface - scan from y=5 down to y=-3
+  let startY=-1; // default grass level
+  outer: for(let y=5;y>=-3;y--){
+    for(let dx=-radius;dx<=radius;dx++){
+      for(let dz=-radius;dz<=radius;dz++){
+        if(placed[bk(rx+dx,y,rz+dz)]){ startY=y; break outer; }
+      }
     }
   }
 
@@ -4207,20 +4209,21 @@ function buildStarter(){
 
   // Generate solid underground world efficiently
   // We do this AFTER the villa so it doesn't block load
-  setTimeout(()=>{
-    const UW=16, UH=20, UX=-3, UZ=-4;
-    for(let x=UX;x<UX+UW;x++){
-      for(let z=UZ;z<UZ+UW;z++){
-        // Layer by layer underground
-        for(let y=-2;y>=-4;y--) placeBlock(x,y,z,'dirt',false);
-        for(let y=-5;y>=-12;y--) placeBlock(x,y,z,'stone',false);
-        for(let y=-13;y>=-14;y--) placeBlock(x,y,z,'coal-ore',false);
-        for(let y=-15;y>=-18;y--) placeBlock(x,y,z,'stone',false);
-        for(let y=-19;y>=-20;y--) placeBlock(x,y,z,'iron-ore',false);
-      }
+  // Generate underground in batches to avoid freezing
+  let ugX=-8, ugZ=-8;
+  function genNextUndergroundRow(){
+    if(ugX>20){ console.log('Underground world ready!'); return; }
+    for(let z=ugZ;z<18;z++){
+      for(let y=-2;y>=-4;y--) placeBlock(ugX,y,z,'dirt',false);
+      for(let y=-5;y>=-12;y--) placeBlock(ugX,y,z,'stone',false);
+      for(let y=-13;y>=-14;y--) placeBlock(ugX,y,z,'coal-ore',false);
+      for(let y=-15;y>=-18;y--) placeBlock(ugX,y,z,'stone',false);
+      for(let y=-19;y>=-20;y--) placeBlock(ugX,y,z,'iron-ore',false);
     }
-    console.log('Underground world ready!');
-  }, 500);
+    ugX++;
+    setTimeout(genNextUndergroundRow, 10);
+  }
+  setTimeout(genNextUndergroundRow, 800);
 }
 
 setLoad(85);
