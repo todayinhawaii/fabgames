@@ -255,6 +255,9 @@ var clickHadNewSelection = false; // true when selectObject/selectWall fires on 
 
 var lastClickTime=0;
 var lastClickTarget=null;
+var currentTool=null;
+var toolActive=false;
+var toolMouseDown=null;
 
 function toggleLeftPanel(){
   const panel=document.getElementById('leftPanel');
@@ -4714,11 +4717,12 @@ setTimeout(()=>{
   }
 
   // ── MINECRAFT-STYLE TOOL SYSTEM ──────────────────────
-  let currentTool = null;
-  let toolActive = false;
+  // currentTool and toolActive declared globally below initApp
   let isHolding = false;      // true while mouse/touch held down
   let holdInterval = null;    // interval for continuous action
   let lastHitPos = null;      // avoid re-hitting same block
+
+  let toolJustActivated=false; // prevents immediate deactivation after clicking button
 
   function setTool(tool){
     // Toggle off if clicking same tool again
@@ -4733,6 +4737,9 @@ setTimeout(()=>{
       return;
     }
     currentTool=tool; toolActive=true;
+    toolJustActivated=true;
+    // Clear the flag after 300ms — enough time to ignore the button-release click
+    setTimeout(()=>{ toolJustActivated=false; }, 300);
     ['drill','brush'].forEach(t=>{
       const el=document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
       if(el) el.classList.toggle('active', t===tool);
@@ -4816,7 +4823,7 @@ setTimeout(()=>{
   // 3. Clicking empty space (grass/terrain) deselects the tool
   // 4. Clicking same tool button again deselects it
 
-  let toolMouseDown = null; // tracks where mouse went down
+  // toolMouseDown declared globally
 
   canvas.addEventListener('pointerdown', e=>{
     if(e.button!==0 || !toolActive || !currentTool) return;
@@ -4841,8 +4848,7 @@ setTimeout(()=>{
     lastHitPos = null; // reset so every click works fresh
     const hits = getHits(e);
     if(hits.length === 0){
-      // Clicked empty space — deselect tool
-      setTool(currentTool); // toggles off (same tool = deselect)
+      if(!toolJustActivated) setTool(currentTool);
       return;
     }
 
@@ -4860,8 +4866,8 @@ setTimeout(()=>{
     }
 
     if(!hitType || TERRAIN.has(hitType)){
-      // Clicked terrain or empty — deselect tool
-      setTool(currentTool); // toggle off
+      // Clicked terrain or empty — deselect tool (unless just activated)
+      if(!toolJustActivated) setTool(currentTool);
       return;
     }
 
