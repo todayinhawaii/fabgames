@@ -341,7 +341,7 @@ function doDeselect(){
     <div class="lp-btn" id="tBrush" onclick="setTool('brush')" title="Brush — paint blocks by dragging">
       <div class="lp-icon">🖌️</div><div class="lp-text">BRUSH</div>
     </div>
-    <div class="lp-btn" id="tDigDown" onclick="digDown()" title="Dig down to underground">
+    <div class="lp-btn" id="tDigDown" onclick="setTool('dig')" title="Dig deep underground">
       <div class="lp-icon">🕳️</div><div class="lp-text">DIG</div>
     </div>
     <div class="lp-btn" id="tFill" onclick="setTool('fill')" title="Fill — flood fill an area">
@@ -3949,40 +3949,44 @@ function generateUnderground(cx, cz, radius){
   }
 }
 
-function digDown(){
-  // Animated dig — removes blocks layer by layer from surface DOWN
-  // so you SEE the ground being eaten away into the earth!
-  const cx=Math.round(camTarget.x);
-  const cz=Math.round(camTarget.z);
-  const radius=2; // 5x5 shaft
-  const maxDepth=20; // dig 20 layers deep
-  let currentLayer=2; // start from y=2 down to -maxDepth
+function digAtPoint(cx, cz){
+  // Minecraft-style BIG DIG — 5x5 hole, 20 layers deep
+  // Blocks vanish layer by layer so you SEE the earth being excavated!
+  const radius=2;
+  const maxDepth=20;
 
-  // First generate underground terrain if not already there
-  generateUnderground(cx, cz, radius+2);
+  // First ensure underground terrain exists to dig through
+  generateUnderground(Math.round(cx), Math.round(cz), radius+3);
 
-  function digLayer(){
-    if(currentLayer < -maxDepth) {
-      toast('⛏️ Reached bedrock! Use W/S/A/D to explore the cave!');
+  let layer=1; // start from y=1 (ground surface) going down
+
+  function removeLayer(){
+    if(layer < -maxDepth){
+      toast('🕳️ Reached the deep! Walk over the hole to look in!');
       return;
     }
     let removed=0;
     for(let dx=-radius;dx<=radius;dx++){
       for(let dz=-radius;dz<=radius;dz++){
-        const key=bk(cx+dx, currentLayer, cz+dz);
-        if(placed[key]){ removeBlock(cx+dx,currentLayer,cz+dz,false); removed++; }
+        const x=Math.round(cx)+dx;
+        const z=Math.round(cz)+dz;
+        const key=bk(x,layer,z);
+        if(placed[key]){ removeBlock(x,layer,z,false); removed++; }
       }
     }
     if(removed>0) sndErase();
-    currentLayer--;
-    // Each layer removed with a short delay so you SEE it happening!
-    setTimeout(digLayer, 60);
+    layer--;
+    setTimeout(removeLayer, 40); // 40ms per layer = fast but visible!
   }
 
-  toast('⛏️ Digging deep...');
-  digLayer();
+  toast('🕳️ Digging deep — watch the earth open up!');
+  removeLayer();
 }
 
+function digDown(){
+  // Dig at current camera target
+  digAtPoint(camTarget.x, camTarget.z);
+}
 function buildStarter(){
   // ═══════════════════════════════════════════════════
   // SHOWCASE VILLA — demonstrates everything Fab House can do!
@@ -4693,28 +4697,25 @@ setTimeout(()=>{
 
   function setTool(tool){
     currentTool = tool;
-    // Just highlight button — NO mode switching (avoids slow rebuild)
-    ['hammer','bulldozer','drill','brush','fill'].forEach(t=>{
-      const el=document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
+    // Highlight ALL tool buttons including dig
+    ['hammer','bulldozer','drill','dig','brush','fill'].forEach(t=>{
+      const id = 'T'+t.charAt(0).toUpperCase()+t.slice(1);
+      const el = document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
       if(el) el.classList.toggle('active', t===tool);
     });
-    // Set mode label so user knows what's happening
     const modeEl=document.getElementById('modeLabel');
-    if(modeEl){
-      const labels={
-        hammer:'🔨 HAMMER',bulldozer:'🚜 BULLDOZER',
-        drill:'⛏️ DRILL',brush:'🖌️ BRUSH',fill:'🪣 FILL'
-      };
-      modeEl.textContent=labels[tool]||tool;
-    }
-    const names={
-      hammer:'🔨 Hammer ready — click blocks to erase',
-      bulldozer:'🚜 Bulldozer ready — click to erase 3×3',
-      drill:'⛏️ Drill ready — click to drill 5 deep',
-      brush:'🖌️ Brush ready — drag to paint',
-      fill:'🪣 Fill ready — click to flood fill'
+    const labels={hammer:'🔨 HAMMER',bulldozer:'🚜 BULLDOZER',
+      drill:'⛏️ DRILL',dig:'🕳️ DIG',brush:'🖌️ BRUSH',fill:'🪣 FILL'};
+    if(modeEl) modeEl.textContent=labels[tool]||'🛠️ TOOL';
+    const tips={
+      hammer:'🔨 Click any block to remove it',
+      bulldozer:'🚜 Click to blast a 3×3 chunk — hold & drag to sweep!',
+      drill:'⛏️ Click to drill 5 blocks straight down',
+      dig:'🕳️ Click anywhere to dig a big hole into the earth!',
+      brush:'🖌️ Hold & drag to paint blocks as you move',
+      fill:'🪣 Click to flood-fill a whole area instantly'
     };
-    toast(names[tool]||tool);
+    toast(tips[tool]||tool);
   }
 
   function applyTool(hit){
@@ -4739,14 +4740,19 @@ setTimeout(()=>{
       if(count>0) sndErase();
     }
     else if(currentTool==='drill'){
-      // Drill: erase the clicked block AND 4 below it — like a drill bit
-      // Camera never moves — you stay in full control
+      // Drill 5 blocks straight down from click point
       let count=0;
       for(let dy=0;dy>=-4;dy--){
         const key=bk(p.x,p.y+dy,p.z);
         if(placed[key]){ removeBlock(p.x,p.y+dy,p.z,true); count++; }
       }
       if(count>0){ sndErase(); lastHitPos=null; }
+    }
+    else if(currentTool==='dig'){
+      // BIG DIG — animated Minecraft-style excavation at click point!
+      // Digs a 5×5 hole 20 layers deep, blocks vanish layer by layer
+      digAtPoint(p.x, p.z);
+      lastHitPos = p.x+',0,'+p.z; // prevent re-triggering same spot
     }
     else if(currentTool==='brush'){
       // Paint — place current block type
@@ -4784,7 +4790,7 @@ setTimeout(()=>{
   // Override the canvas pointerdown/up to support hold
   canvas.addEventListener('pointerdown', e=>{
     if(e.button!==0) return;
-    const isDestroyTool=['hammer','bulldozer','drill'].includes(currentTool);
+    const isDestroyTool=['hammer','bulldozer','drill','dig'].includes(currentTool);
     const isBuildTool=['brush','fill'].includes(currentTool);
     // Only intercept if a tool is active — otherwise let normal mode handle it
     if(!isDestroyTool && !isBuildTool) return;
