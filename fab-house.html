@@ -3968,43 +3968,36 @@ function generateColumn(x, z){
 }
 
 function digAtPoint(cx, cz){
-  const radius=2;
-  const maxDepth=20;
   const rx=Math.round(cx);
   const rz=Math.round(cz);
+  const radius=2;
 
-  // Find actual surface level
-  let layer=0;
-  for(let y=5;y>=-3;y--){
-    if(placed[bk(rx,y,rz)]){ layer=y; break; }
-    layer=y; // keep going down til we find something or hit -3
+  // Find top block
+  let startY=2;
+  for(let y=2;y>=-3;y--){
+    let found=false;
+    for(let dx=-radius;dx<=radius&&!found;dx++)
+      for(let dz=-radius;dz<=radius&&!found;dz++)
+        if(placed[bk(rx+dx,y,rz+dz)]) found=true;
+    if(found){ startY=y; break; }
   }
 
-  function digLayer(){
-    if(layer < -maxDepth){
-      toast('🕳️ Done! Underground space ready!');
-      return;
-    }
-    let removed=0;
-    for(let dx=-radius;dx<=radius;dx++){
-      for(let dz=-radius;dz<=radius;dz++){
-        const x=rx+dx, z=rz+dz;
-        // Remove block if exists
-        if(placed[bk(x,layer,z)]){
-          removeBlock(x,layer,z,false);
-          removed++;
-        }
-      }
-    }
+  let layer=startY;
+  const maxDepth=-20;
 
-    if(removed>0 || layer>=-1) sndErase();
+  function nextLayer(){
+    if(layer<maxDepth){ toast('🕳️ Deep underground! Start building!'); return; }
+    for(let dx=-radius;dx<=radius;dx++)
+      for(let dz=-radius;dz<=radius;dz++)
+        if(placed[bk(rx+dx,layer,rz+dz)])
+          removeBlock(rx+dx,layer,rz+dz,false);
     layer--;
-    setTimeout(digLayer, 40);
+    setTimeout(nextLayer,40);
   }
-
-  toast('🕳️ Digging deep...');
-  digLayer();
+  toast('🕳️ Digging...');
+  nextLayer();
 }
+
 
 function digDown(){
   // Dig at current camera target
@@ -4185,23 +4178,19 @@ function buildStarter(){
   // Hawaiian touch — lei stand by the door
   placeBlock(3,FY,1,'lei',false);
 
-  // Generate solid underground world efficiently
-  // We do this AFTER the villa so it doesn't block load
-  // Generate underground in batches to avoid freezing
-  let ugX=-8, ugZ=-8;
-  function genNextUndergroundRow(){
-    if(ugX>20){ console.log('Underground world ready!'); return; }
-    for(let z=ugZ;z<18;z++){
-      for(let y=-2;y>=-4;y--) placeBlock(ugX,y,z,'dirt',false);
-      for(let y=-5;y>=-12;y--) placeBlock(ugX,y,z,'stone',false);
-      for(let y=-13;y>=-14;y--) placeBlock(ugX,y,z,'coal-ore',false);
-      for(let y=-15;y>=-18;y--) placeBlock(ugX,y,z,'stone',false);
-      for(let y=-19;y>=-20;y--) placeBlock(ugX,y,z,'iron-ore',false);
+  // Pre-generate underground around the starting view area
+  // Small enough to not freeze but covers where player starts
+  setTimeout(()=>{
+    for(let x=-8;x<=20;x++){
+      for(let z=-8;z<=18;z++){
+        for(let y=-2;y>=-4;y--) placeBlock(x,y,z,'dirt',false);
+        for(let y=-5;y>=-12;y--) placeBlock(x,y,z,'stone',false);
+        for(let y=-13;y>=-15;y--) placeBlock(x,y,z,'coal-ore',false);
+        for(let y=-16;y>=-20;y--) placeBlock(x,y,z,'stone',false);
+      }
     }
-    ugX++;
-    setTimeout(genNextUndergroundRow, 10);
-  }
-  setTimeout(genNextUndergroundRow, 800);
+    toast('⛏️ Underground world ready — use DIG tool to explore!');
+  }, 2000);
 }
 
 setLoad(85);
