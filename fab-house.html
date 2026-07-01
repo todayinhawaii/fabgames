@@ -4301,8 +4301,8 @@ setTimeout(()=>{
     if(mh) mh.style.display='none';
     document.getElementById('rWall')?.classList.add('active');
     document.getElementById('modeLabel').textContent='📐 DRAW WALLS — BUILD mode active';
-    const bh=document.getElementById('bottomHint');
-    if(bh) bh.textContent='📐 BUILD=draw walls by dragging · SELECT=click wall to move/rotate · ERASE=click wall to delete';
+    const bh2=document.getElementById('bottomHint');
+    if(bh2) bh2.textContent='📐 BUILD=draw walls by dragging · SELECT=click wall to move/rotate · ERASE=click wall to delete';
     toast('📐 Wall Draw ON! Drag on floor to draw · Switch to ✋ SELECT to move walls!');
   }
 
@@ -4312,7 +4312,7 @@ setTimeout(()=>{
     document.getElementById('wallBar').style.display='none';
     document.getElementById('rWall')?.classList.remove('active');
     document.getElementById('modeLabel').textContent='🧱 BUILD';
-    document.getElementById('bottomHint').textContent='🧱 Click to place · Drag to orbit · Scroll to zoom';
+    const _bh=document.getElementById('bottomHint'); if(_bh) _bh.textContent='🧱 Click to place';
     toast('Wall draw off');
   }
 
@@ -4406,7 +4406,10 @@ setTimeout(()=>{
     selectedWall = wallData;
     buildGizmo({mesh: wallData.mesh, type:'wall'});
     openWallProps(wallData);
-    toast(`✅ Wall placed! ${len.toFixed(1)}m long — adjust it on the right, or drag to draw another!`);
+    toast(`✅ Wall placed! ${len.toFixed(1)}m long — adjust in the panel →`);
+    // Auto-cancel wall draw after placing so clicking elsewhere doesn't draw more walls
+    cancelWallDraw();
+    setMode('select');
   }
 
   // Get world position from hit point (flat ground level)
