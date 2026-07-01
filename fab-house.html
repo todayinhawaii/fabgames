@@ -3970,32 +3970,53 @@ function generateColumn(x, z){
 function digAtPoint(cx, cz){
   const rx=Math.round(cx);
   const rz=Math.round(cz);
-  const radius=2;
+  const r=2; // 5x5 shaft
+  const maxDepth=18;
 
-  // Find top block
-  let startY=2;
-  for(let y=2;y>=-3;y--){
-    let found=false;
-    for(let dx=-radius;dx<=radius&&!found;dx++)
-      for(let dz=-radius;dz<=radius&&!found;dz++)
-        if(placed[bk(rx+dx,y,rz+dz)]) found=true;
-    if(found){ startY=y; break; }
+  // Terrain type at each depth
+  function terrain(y){
+    if(y>=-1) return 'grass';
+    if(y>=-4) return 'dirt';
+    if(y>=-10) return 'stone';
+    if(y>=-13) return 'coal-ore';
+    if(y>=-17) return 'stone';
+    return 'iron-ore';
   }
 
-  let layer=startY;
-  const maxDepth=-20;
+  // Start from y=1 and go down - grass is at -1 so we'll hit it
+  let y=1;
 
-  function nextLayer(){
-    if(layer<maxDepth){ toast('🕳️ Deep underground! Start building!'); return; }
-    for(let dx=-radius;dx<=radius;dx++)
-      for(let dz=-radius;dz<=radius;dz++)
-        if(placed[bk(rx+dx,layer,rz+dz)])
-          removeBlock(rx+dx,layer,rz+dz,false);
-    layer--;
-    setTimeout(nextLayer,40);
+  function step(){
+    if(y < -maxDepth){
+      toast('🕳️ Done! Build your wine cellar down here!');
+      return;
+    }
+    // Place block at this level (creates the visible earth)
+    // then immediately queue removal
+    const toRemove=[];
+    for(let dx=-r;dx<=r;dx++){
+      for(let dz=-r;dz<=r;dz++){
+        const x=rx+dx, z=rz+dz;
+        const key=bk(x,y,z);
+        if(!placed[key]){
+          placeBlock(x,y,z,terrain(y),false);
+        }
+        toRemove.push({x,y,z});
+      }
+    }
+    // Remove after a brief delay so Three.js renders the block first
+    setTimeout(()=>{
+      toRemove.forEach(p=>{
+        if(placed[bk(p.x,p.y,p.z)]) removeBlock(p.x,p.y,p.z,false);
+      });
+      sndErase();
+      y--;
+      setTimeout(step, 50);
+    }, 16); // one render frame
   }
+
   toast('🕳️ Digging...');
-  nextLayer();
+  step();
 }
 
 
@@ -4178,19 +4199,7 @@ function buildStarter(){
   // Hawaiian touch — lei stand by the door
   placeBlock(3,FY,1,'lei',false);
 
-  // Pre-generate underground around the starting view area
-  // Small enough to not freeze but covers where player starts
-  setTimeout(()=>{
-    for(let x=-8;x<=20;x++){
-      for(let z=-8;z<=18;z++){
-        for(let y=-2;y>=-4;y--) placeBlock(x,y,z,'dirt',false);
-        for(let y=-5;y>=-12;y--) placeBlock(x,y,z,'stone',false);
-        for(let y=-13;y>=-15;y--) placeBlock(x,y,z,'coal-ore',false);
-        for(let y=-16;y>=-20;y--) placeBlock(x,y,z,'stone',false);
-      }
-    }
-    toast('⛏️ Underground world ready — use DIG tool to explore!');
-  }, 2000);
+  // No pre-generation — underground blocks created on-demand during dig
 }
 
 setLoad(85);
