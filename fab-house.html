@@ -327,7 +327,7 @@ function doDeselect(){
   <!-- TOOLS (Minecraft-style) -->
   <span class="lp-section-label">TOOLS</span>
   <div class="lp-btn-row">
-    <div class="lp-btn active" id="tHammer" onclick="setTool('hammer')" title="Hammer — erase one block">
+    <div class="lp-btn" id="tHammer" onclick="setTool('hammer')" title="Hammer — erase one block">
       <div class="lp-icon">🔨</div><div class="lp-text">HAMMER</div>
     </div>
     <div class="lp-btn" id="tBulldozer" onclick="setTool('bulldozer')" title="Bulldozer — erase 3x3 area">
@@ -2879,6 +2879,8 @@ canvas.addEventListener('pointerdown',e=>{
   downOnCanvas=true;
   canvas.setPointerCapture(e.pointerId);
   prevMouse={x:e.clientX,y:e.clientY};
+  // Let tool system handle it exclusively when a tool is active
+  if(toolActive && currentTool && currentTool!=='brush'){isDown=false;return;}
   isDown=true;hasMoved=false;
 
   // RIGHT click or space = orbit always (even in wall mode)
@@ -4744,30 +4746,39 @@ setTimeout(()=>{
   }
 
   // ── MINECRAFT-STYLE TOOL SYSTEM ──────────────────────
-  let currentTool = 'hammer'; // hammer | bulldozer | drill | brush | fill
+  let currentTool = null;
+  let toolActive = false;
   let isHolding = false;      // true while mouse/touch held down
   let holdInterval = null;    // interval for continuous action
   let lastHitPos = null;      // avoid re-hitting same block
 
   function setTool(tool){
-    currentTool = tool;
-    // Highlight ALL tool buttons including dig
+    // Toggle off if clicking same tool again
+    if(currentTool===tool && toolActive){
+      currentTool=null; toolActive=false;
+      ['hammer','bulldozer','drill','dig','brush','fill'].forEach(t=>{
+        const el=document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
+        if(el) el.classList.remove('active');
+      });
+      document.getElementById('modeLabel').textContent='✋ SELECT';
+      toast('Tool deactivated');
+      return;
+    }
+    currentTool=tool; toolActive=true;
     ['hammer','bulldozer','drill','dig','brush','fill'].forEach(t=>{
-      const id = 'T'+t.charAt(0).toUpperCase()+t.slice(1);
-      const el = document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
+      const el=document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1));
       if(el) el.classList.toggle('active', t===tool);
     });
-    const modeEl=document.getElementById('modeLabel');
     const labels={hammer:'🔨 HAMMER',bulldozer:'🚜 BULLDOZER',
       drill:'⛏️ DRILL',dig:'🕳️ DIG',brush:'🖌️ BRUSH',fill:'🪣 FILL'};
-    if(modeEl) modeEl.textContent=labels[tool]||'🛠️ TOOL';
+    document.getElementById('modeLabel').textContent=labels[tool]||'🛠️ TOOL';
     const tips={
       hammer:'🔨 Click any block to remove it',
-      bulldozer:'🚜 Click to blast a 3×3 chunk — hold & drag to sweep!',
-      drill:'⛏️ Click to drill 5 blocks straight down',
-      dig:'🕳️ Click anywhere to dig a big hole into the earth!',
-      brush:'🖌️ Hold & drag to paint blocks as you move',
-      fill:'🪣 Click to flood-fill a whole area instantly'
+      bulldozer:'🚜 Click to blast 5×5 wide — hold & sweep!',
+      drill:'⛏️ Hold over blocks — drills straight down!',
+      dig:'🕳️ Click ground to dig a deep 5×5 shaft!',
+      brush:'🖌️ Hold & drag to paint blocks',
+      fill:'🪣 Click to flood-fill connected area'
     };
     toast(tips[tool]||tool);
   }
@@ -4837,21 +4848,17 @@ setTimeout(()=>{
 
   // ── TOOL SYSTEM — simple, fast, no conflicts ────────
   canvas.addEventListener('pointerdown', e=>{
-    if(e.button!==0) return;
-    const tools=['hammer','bulldozer','drill','dig','brush','fill'];
-    if(!tools.includes(currentTool)) return;
+    if(e.button!==0 || !toolActive || !currentTool) return;
 
-    // For DIG — fire at click point, always works
     if(currentTool==='dig'){
       const hits=getHits(e);
-      const p = hits.length>0 ? hits[0].point : camTarget;
+      const p=hits.length>0 ? hits[0].point : camTarget;
       digAtPoint(p.x, p.z);
       return;
     }
 
-    // For other tools — start holding
-    isHolding=true;
-    lastHitPos=null;
+    // Stop default canvas handling for other tools
+    isHolding=true; lastHitPos=null;
     const hits=getHits(e);
     if(hits.length>0) applyTool(hits[0]);
 
@@ -4859,7 +4866,7 @@ setTimeout(()=>{
       if(!isHolding||!lastPointerE) return;
       const h=getHits(lastPointerE);
       if(h.length>0) applyTool(h[0]);
-    }, 80);
+    }, 60);
   });
 
   canvas.addEventListener('pointerup', e=>{
