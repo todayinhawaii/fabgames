@@ -1121,7 +1121,7 @@ const ground=new THREE.Mesh(
   new THREE.PlaneGeometry(200,200),
   new THREE.MeshLambertMaterial({color:0x4CAF50})
 );
-ground.rotation.x=-Math.PI/2;ground.position.y=-25;ground.receiveShadow=true;
+ground.rotation.x=-Math.PI/2;ground.position.y=-200;ground.receiveShadow=true;
 scene.add(ground);
 
 const gridHelper=new THREE.GridHelper(200,200,0x000000,0x000000);
@@ -3972,7 +3972,7 @@ function digAtPoint(cx, cz){
   const rx=Math.round(cx);
   const rz=Math.round(cz);
   const r=2; // 5x5 shaft
-  const maxDepth=18;
+  const maxDepth=25;
 
   // Terrain type at each depth
   function terrain(y){
@@ -3987,10 +3987,10 @@ function digAtPoint(cx, cz){
   // Grass is at y=-1, so start there and go DOWN
   let y=-1;
 
-  // Place dark bedrock at bottom so hole looks deep (covers green ground plane)
+  // Place dark bedrock BELOW the dig zone so hole looks deep
   for(let dx=-r;dx<=r;dx++)
     for(let dz=-r;dz<=r;dz++)
-      placeBlock(rx+dx,-maxDepth,rz+dz,'brick-dark',false);
+      placeBlock(rx+dx,-(maxDepth+1),rz+dz,'brick-dark',false);
 
   function step(){
     if(y < -maxDepth){
@@ -4824,7 +4824,12 @@ setTimeout(()=>{
 
     if(currentTool==='dig'){
       const hits=getHits(e);
+      // Only dig if clicking near the play area (not the distant ground plane)
       const p=hits.length>0 ? hits[0].point : camTarget;
+      if(Math.abs(p.x)>30||Math.abs(p.z)>30){
+        toast('⛏️ Click closer to the house to dig!');
+        return;
+      }
       digAtPoint(p.x, p.z);
       return;
     }
