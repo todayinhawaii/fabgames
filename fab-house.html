@@ -2879,9 +2879,15 @@ canvas.addEventListener('pointerdown',e=>{
   downOnCanvas=true;
   canvas.setPointerCapture(e.pointerId);
   prevMouse={x:e.clientX,y:e.clientY};
-  // Let tool system handle it exclusively when a tool is active
-  if(toolActive && currentTool && currentTool!=='brush'){isDown=false;return;}
-  isDown=true;hasMoved=false;
+  // When tool active, still allow orbiting but skip build/select/erase
+  if(toolActive && currentTool && currentTool!=='brush'){
+    isDown=true;hasMoved=false;
+    // Allow orbit (right click / space) but skip the click action at end
+    if(e.button===2||e.button===1||spaceDown){isOrbiting=true;}
+    // Don't process click actions — tool handler does that
+  } else {
+    isDown=true;hasMoved=false;
+  }
 
   // RIGHT click or space = orbit always (even in wall mode)
   if(e.button===2||e.button===1||spaceDown){isOrbiting=true;return;}
@@ -3970,40 +3976,40 @@ function generateColumn(x, z){
 function digAtPoint(cx, cz){
   const rx=Math.round(cx);
   const rz=Math.round(cz);
-  const r=2;
-  const maxDepth=20;
+  const r=2; // 5x5 hole
+  const depth=20;
 
-  function ttype(y){
-    if(y>=-1) return 'grass';
-    if(y>=-4) return 'dirt';
-    if(y>=-10) return 'stone';
-    if(y>=-13) return 'coal-ore';
-    if(y>=-17) return 'stone';
-    return 'iron-ore';
+  // Step 1: Place a solid column of terrain blocks from grass down 20 deep
+  // Use direct scene addition to bypass the NaN safety check
+  function addBlock(x,y,z,type){
+    const k=bk(x,y,z);
+    if(placed[k]) return; // don't overwrite existing
+    const bd=BLOCKS[type];
+    if(!bd) return;
+    const mesh=new THREE.Mesh(
+      new THREE.BoxGeometry(0.98,0.98,0.98),
+      new THREE.MeshStandardMaterial({color:bd.c,roughness:bd.r||0.8})
+    );
+    mesh.position.set(x+0.5,y+0.5,z+0.5);
+    mesh.castShadow=true;mesh.receiveShadow=true;
+    mesh.userData={type,key:k,x,y,z};
+    scene.add(mesh);
+    placed[k]={mesh,type};
   }
 
+  // Fill shaft top to bottom
+  for(let y=-1;y>=-depth;y--){
+    const t=y>=-1?'grass':y>=-4?'dirt':y>=-12?'stone':y>=-15?'coal-ore':'iron-ore';
+    for(let dx=-r;dx<=r;dx++)
+      for(let dz=-r;dz<=r;dz++)
+        addBlock(rx+dx,y,rz+dz,t);
+  }
+
+  // Step 2: Remove layer by layer from top to bottom
   let y=-1;
-
-  // Add dark walls around shaft perimeter so hole looks deep
-  // (only 1 block thick walls, just enough to see the depth)
-  for(let ly=-2;ly>=-maxDepth;ly--){
-    for(let dx=-r;dx<=r;dx++){
-      for(let dz=-r;dz<=r;dz++){
-        // Only place on the EDGE of the shaft, not interior
-        if(Math.abs(dx)===r || Math.abs(dz)===r){
-          if(!placed[bk(rx+dx,ly,rz+dz)]){
-            const t=ly>=-5?'dirt':ly>=-12?'stone':'coal-ore';
-            placeBlock(rx+dx,ly,rz+dz,t,false);
-          }
-        }
-      }
-    }
-  }
-
-  // Now dig layer by layer — visually satisfying!
   function step(){
-    if(y < -maxDepth){
-      toast('🕳️ Done! Go build your wine cellar!');
+    if(y<-depth){
+      toast('🕳️ Deep tunnel ready! Go build your bunker!');
       return;
     }
     for(let dx=-r;dx<=r;dx++)
@@ -4015,8 +4021,7 @@ function digAtPoint(cx, cz){
     y--;
     setTimeout(step,55);
   }
-
-  toast('🕳️ Digging deep...');
+  toast('🕳️ Digging deep tunnel...');
   step();
 }
 
