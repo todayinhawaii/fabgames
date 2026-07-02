@@ -29,12 +29,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   -webkit-user-select:none;user-select:none;
   -webkit-touch-callout:none;}
 
-#threeCanvas{position:fixed;top:50px;left:230px;right:0;bottom:0;z-index:0;display:block;}
+#threeCanvas{
+  position:fixed;top:50px;left:230px;right:0;bottom:0;
+  z-index:0;display:block;
+  transition:left 0.22s cubic-bezier(0.4,0,0.2,1);
+}
 @media(max-width:768px){
-  #threeCanvas{left:0;top:50px;}
+  #threeCanvas{left:0 !important;}
   #leftPanel{transform:translateX(-230px);}
-  #lpToggle{left:0;}
-  #lpToggle.collapsed{left:0;}
+  #lpToggle{left:0 !important;}
+  #topbar .logo{margin-left:10px !important;}
+  /* Hide topbar buttons on mobile to save space */
+  #topbar .top-btn:not(.gold){display:none;}
 }
 
 /* ── TOP BAR ── */
@@ -166,10 +172,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 .joy-zoom:active{background:rgba(150,100,255,0.4);}
 
 @media(max-width:700px){
-  #palette{width:0;overflow:hidden;}
-
-  #bottomBar{left:0;right:56px;}
-  #threeCanvas{left:0;right:0;}
+  #threeCanvas{left:0 !important;right:0;}
 }
 .mobile-only-joystick{display:none !important;}
 @media(max-width:700px), (hover:none){
@@ -277,8 +280,11 @@ function toggleLeftPanel(){
   toggle.classList.toggle('collapsed');
   const isCollapsed=panel.classList.contains('collapsed');
   toggle.textContent=isCollapsed?'▶':'◀';
-  canvas.style.left=isCollapsed?'0':'230px';
-  if(logo) logo.style.marginLeft=isCollapsed?'10px':'238px';
+  // On mobile canvas always full width, on desktop adjust
+  if(window.innerWidth > 768){
+    canvas.style.left=isCollapsed?'0':'230px';
+    if(logo) logo.style.marginLeft=isCollapsed?'10px':'238px';
+  }
 }
 
 function doDeselect(){
@@ -703,11 +709,6 @@ function doDeselect(){
 </div>
 
 <!-- MOBILE CONTROLS (bottom left) -->
-<button onclick="const n=document.getElementById('navHelp');n.style.display=n.style.display==='none'?'block':'none';" 
-  style="position:fixed;bottom:70px;right:10px;z-index:86;width:32px;height:32px;
-  border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid rgba(255,215,0,0.4);
-  color:rgba(255,215,0,0.8);font-size:14px;cursor:pointer;font-family:'Fredoka One',cursive;">?</button>
-
 <div id="joystick" onpointerdown="event.stopPropagation()" 
   style="position:fixed;bottom:64px;left:226px;z-index:85;display:flex;gap:6px;align-items:flex-end;"
   class="mobile-only-joystick">
@@ -742,32 +743,30 @@ function doDeselect(){
   </div>
 </div>
 
-<!-- HUD OVERLAY -->
-<div id="hud" style="position:fixed;bottom:64px;right:82px;z-index:80;pointer-events:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-  <!-- NAV HINT -->
-  <div id="navHint" style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,215,0,0.3);border-radius:14px;padding:10px 14px;font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,215,0,0.8);text-align:center;backdrop-filter:blur(8px);line-height:1.8;max-width:180px;">
-    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;letter-spacing:1px;">NAVIGATE</div>
-    🖱️ <b style="color:#FFD700;">Drag</b> = orbit · Scroll = zoom<br>
-    📱 <b style="color:#FFD700;">1 finger</b> = orbit · Pinch = zoom<br>
-    <b style="color:#FFD700;">W S ⬆⬇</b> = walk fwd/back<br>
-    <b style="color:#FFD700;">A D</b> = strafe left/right<br>
-    <b style="color:#FFD700;">Q E</b> = orbit · <b style="color:#FFD700;">R F</b> = tilt<br>
-    <b style="color:#FFD700;">E C</b> = fly up/down<br>
-    <span style="color:#FFD700;font-size:10px;">★ When block selected:<br>
-    Arrows=move · E=up · C=down</span>
-  </div>
-  <!-- COMPASS ARROWS -->
-  <div style="display:grid;grid-template-columns:repeat(3,36px);grid-template-rows:repeat(3,36px);gap:3px;opacity:0.75;">
-    <div></div>
-    <div style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFD700;">▲</div>
-    <div></div>
-    <div style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFD700;">◀</div>
-    <div style="background:rgba(255,215,0,0.2);border:1px solid rgba(255,215,0,0.5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#FFD700;">🎥</div>
-    <div style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFD700;">▶</div>
-    <div></div>
-    <div style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#FFD700;">▼</div>
-    <div></div>
-  </div>
+<!-- NAVIGATE TOGGLE BUTTON -->
+<button id="navToggleBtn" onclick="
+  const h=document.getElementById('navHintPanel');
+  const isHidden=h.style.display==='none'||!h.style.display;
+  h.style.display=isHidden?'block':'none';
+  this.textContent=isHidden?'✕':'?';
+" style="position:fixed;bottom:16px;right:16px;z-index:200;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(0,0,0,0.8);border:2px solid rgba(255,215,0,0.5);
+  color:#FFD700;font-size:16px;cursor:pointer;
+  font-family:'Fredoka One',cursive;pointer-events:all;">?</button>
+
+<!-- NAV HINT PANEL - hidden by default -->
+<div id="navHintPanel" style="display:none;position:fixed;bottom:60px;right:16px;z-index:199;
+  background:rgba(0,0,0,0.9);border:1px solid rgba(255,215,0,0.3);
+  border-radius:14px;padding:10px 14px;font-family:'Fredoka One',cursive;
+  font-size:12px;color:rgba(255,215,0,0.8);text-align:center;
+  backdrop-filter:blur(8px);line-height:1.8;max-width:200px;">
+  <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;letter-spacing:1px;">NAVIGATE</div>
+  🖱️ <b style="color:#FFD700;">Drag</b> = orbit · Scroll = zoom<br>
+  📱 <b style="color:#FFD700;">1 finger</b> = orbit · Pinch = zoom<br>
+  <b style="color:#FFD700;">W S ⬆⬇</b> = walk fwd/back<br>
+  <b style="color:#FFD700;">A D</b> = strafe · <b style="color:#FFD700;">Q E</b> = orbit<br>
+  <span style="color:#FFD700;font-size:10px;">★ Block selected: Arrows=move</span>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
