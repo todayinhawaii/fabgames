@@ -3612,6 +3612,8 @@ function buildPalette(){
   });
   sw.appendChild(inp);pal.appendChild(sw);
 
+  console.log('Building palette with', PALETTE_CATS.length, 'categories');
+  console.log('Categories:', PALETTE_CATS.map(c=>c.t).join(', '));
   PALETTE_CATS.forEach((cat,ci)=>{
     const sec=document.createElement('div');
     const btn=document.createElement('button');btn.className='pal-cat-btn'+(ci===0?' open':'');
