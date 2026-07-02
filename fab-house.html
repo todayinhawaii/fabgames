@@ -1168,33 +1168,18 @@ const PALETTE_CATS=[
   {t:'🌿 Nature',    k:['glb-tree','glb-tree2','glb-birch','glb-pine','glb-pine2','glb-dead-trees','glb-flowers','glb-flower-pot','glb-flower-pot2','glb-house-plant','glb-houseplant','glb-potted-plant','glb-white-pot','glb-shelf-plants','glb-pots','glb-coffee-plant','glb-grass']},
   {t:'🏠 Buildings', k:['glb-house','glb-hut','glb-building','glb-building-red','glb-building-corner','glb-big-building','glb-blacksmith','glb-donut-store','glb-little-shop','glb-village-market','glb-cabana']},
   {t:'🏊 Outdoor',   k:['glb-pool','glb-fence','glb-stairs','glb-wooden-wall']},
-  {t:'🧱 Walls',    k:['brick-red','brick-white','brick-grey','brick-dark','brick-yellow','brick-blue','brick-pink','brick-green','wood-light','wood-dark','concrete','glass-wall']},
-  {t:'🪟 Windows & Doors',k:['win-clear','win-tinted','win-arched','door-wood','door-glass','door-modern']},
-  {t:'🏠 Roofs',    k:['roof-red','roof-grey','roof-green','roof-orange','roof-black','roof-tiles','chimney','column']},
-  {t:'🪵 Floors',   k:['floor-wood','floor-marble','floor-tile','floor-carpet-r','floor-carpet-b']},
-  {t:'🛋️ Living',  k:['sofa','armchair','tv','fireplace','piano','bookshelf']},
-  {t:'🍳 Kitchen',  k:['kitchen-counter','fridge','stove','dining-table']},
-  {t:'🛏️ Bedroom', k:['bed','desk','wardrobe']},
-  {t:'🚿 Bathroom', k:['bathtub','shower','toilet','bathrm-vanity']},
-  {t:'🌳 Nature',   k:['grass','dirt','sand','water','stone-path','gravel','decking','tree','palm','hedge']},
-  {t:'⛏️ Mining',   k:['stone','coal-ore','iron-ore','gold-ore','diamond-ore','bedrock']},
-    {t:'🏡 Outdoor',  k:['fence-wood','fence-iron']},
-  {t:'✨ Special',  k:['gold-trim','metal']},
-  {t:'🛋️ Living+',  k:['coffee-table','lamp-floor','plant-pot','rug','curtains','clock']},
-  {t:'🍳 Kitchen+', k:['microwave','kitchen-sink','bar-stool']},
-  {t:'🛏️ Bedroom+', k:['bedside-lamp','dresser','mirror-wall']},
-  {t:'🚿 Bathroom+',k:['towel-rail','bathroom-cab']},
-  {t:'🏡 Garden',   k:['bbq','garden-chair','garden-table','umbrella','flower-pot','gate','letterbox']},
-  {t:'🏗️ Structure',k:['stairs','pillar','arch-stone','balcony-rail','garage-door','stairs-spiral']},
-  {t:'🎉 Luxury',    k:['hot-tub','pool-steps','fountain','arcade','pool-table','home-theatre','bar-cabinet','wine-rack','aquarium']},
-  {t:'👶 Kids Room', k:['kids-bed','toy-box','slide','swing','crib','rocking-horse']},
-  {t:'💪 Gym',       k:['treadmill','weights','yoga-mat','punching-bag','bench-press']},
-  {t:'💼 Office',    k:['office-chair','filing-cab','printer','whiteboard','safe']},
-  {t:'🌺 Hawaiian',  k:['tiki-torch','hammock','surf-board','lei','fire-pit']},
-  {t:'🍽️ Dining',   k:['round-table','bar-counter','wine-glass']},
-  {t:'🎨 Decor',     k:['picture-frame','vase','candles','trophy','map-wall']},
-  {t:'🚗 Vehicles',  k:['car','motorbike','bicycle']},
-  {t:'🏡 Garden+',   k:['pergola','garden-pond','statue','bird-bath','bench-garden']},
+  {t:'🧱 Walls',     k:['brick-red','brick-white','brick-grey','brick-dark','brick-blue','brick-green','brick-pink','brick-yellow','wood-light','wood-dark','concrete','glass-wall','marble-white','marble-black']},
+  {t:'🪟 Windows',   k:['win-clear','win-tinted','win-arched','door-wood','door-glass']},
+  {t:'🏠 Roofs',     k:['roof-red','roof-grey','roof-green','roof-orange','roof-black','roof-tiles','chimney','column']},
+  {t:'🪵 Floors',    k:['floor-wood','floor-marble','floor-tile','floor-carpet-r','floor-carpet-b','decking','stone-path','grass','sand','water','pool-water']},
+  {t:'🛋️ Furniture', k:['sofa','armchair','coffee-table','tv','fireplace','bookshelf','rug','lamp-floor','picture-frame','curtains','clock','vase','candles','trophy','map-wall']},
+  {t:'🍳 Appliances',k:['kitchen-counter','fridge','stove','kitchen-sink','microwave','bar-stool','dining-table','round-table','bar-counter','wine-glass','wine-rack']},
+  {t:'🛏️ Sleep',     k:['bed','bedside-lamp','wardrobe','dresser','mirror-wall','kids-bed','crib','bunk-bed']},
+  {t:'🚿 Bath',      k:['bathtub','toilet','shower','towel-rail','bathroom-cab']},
+  {t:'🌳 Garden',    k:['tree','palm','hedge','flower-pot','plant-pot','tiki-torch','bbq','garden-chair','garden-table','umbrella','garden-pond','bird-bath','statue','bench-garden','pergola']},
+  {t:'🎉 Extras',    k:['hot-tub','pool-steps','fountain','pool-table','home-theatre','bar-cabinet','aquarium','safe','trophy','hammock','surf-board','lei','fire-pit','treadmill','weights','yoga-mat']},
+  {t:'🚗 Cars',      k:['car','motorbike','bicycle']},
+  {t:'🏗️ Structure', k:['stairs','stairs-spiral','pillar','arch-stone','fence-wood','fence-iron','gate','letterbox']},
 ];
 
 function initApp(){
@@ -3612,8 +3597,6 @@ function buildPalette(){
   });
   sw.appendChild(inp);pal.appendChild(sw);
 
-  console.log('Building palette with', PALETTE_CATS.length, 'categories');
-  console.log('Categories:', PALETTE_CATS.map(c=>c.t).join(', '));
   PALETTE_CATS.forEach((cat,ci)=>{
     const sec=document.createElement('div');
     const btn=document.createElement('button');btn.className='pal-cat-btn'+(ci===0?' open':'');
@@ -3625,7 +3608,7 @@ function buildPalette(){
       const item=document.createElement('div');
       item.className='pal-item'+(key===currentBlock?' active':'');
       item.dataset.key=key;item.dataset.l=(bd.l||'').toLowerCase();
-      item.innerHTML=`<span class="pal-icon">${bd.e}</span><span class="pal-label">${bd.l}</span>`;
+      item.innerHTML=`<span class="pal-label">${bd.l}</span>`;
       const sw2=document.createElement('div');sw2.className='pal-swatch';
       sw2.style.background='#'+bd.c.toString(16).padStart(6,'0');
       item.appendChild(sw2);
@@ -4959,7 +4942,6 @@ setTimeout(()=>{
   });
 
   canvas.addEventListener('pointerup', e=>{
-    console.log('TOOL UP: active='+toolActive+' tool='+currentTool+' mouseDown='+!!toolMouseDown);
     if(e.button!==0 || !toolActive || !currentTool || !toolMouseDown) return;
 
     const dx = e.clientX - toolMouseDown.x;
