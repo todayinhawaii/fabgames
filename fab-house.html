@@ -6,11 +6,17 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-// Auto-unregister service workers so updates always show immediately
+// KILL all service workers and caches — forces fresh content every time
 if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(regs=>{
-    regs.forEach(r=>r.unregister());
+    regs.forEach(r=>{ r.unregister(); console.log('SW unregistered'); });
   });
+  // Also clear all caches
+  if('caches' in window){
+    caches.keys().then(keys=>{
+      keys.forEach(k=>{ caches.delete(k); console.log('Cache cleared:',k); });
+    });
+  }
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
