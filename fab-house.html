@@ -3427,7 +3427,13 @@ canvas.addEventListener('touchend',e=>{
           const pos=getPlacePos(hits[0]);
           const existingKey=bk(pos.x,pos.y,pos.z);
           if(placed[existingKey]){ setMode('select'); selectObject(placed[existingKey].mesh); }
-          else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
+          else {
+            placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace();
+            // Auto-switch to SELECT after placing so user can immediately edit
+            // and doesn't accidentally place duplicates
+            const newKey=bk(pos.x,pos.y,pos.z);
+            if(placed[newKey]){ setMode('select'); selectObject(placed[newKey].mesh); }
+          }
         }
       } else if(mode==='select'){
         deselect(); // always clear first
