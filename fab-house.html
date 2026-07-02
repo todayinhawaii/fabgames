@@ -2900,6 +2900,7 @@ function moveSelected(dx,dy,dz){
   const{x,y,z,type}=selectedObj.mesh.userData;
   const rot=selectedObj.mesh.rotation.clone();
   const scl=selectedObj.mesh.scale.clone();
+  const tintHex=selectedObj.tintHex; // preserve colour tint!
   const nx=x+dx, ny=Math.max(0,y+dy), nz=z+dz;
   removeBlock(x,y,z,false);
   placeBlock(nx,ny,nz,type,true);
@@ -2907,6 +2908,10 @@ function moveSelected(dx,dy,dz){
   if(placed[newKey]){
     placed[newKey].mesh.rotation.copy(rot);
     placed[newKey].mesh.scale.copy(scl);
+    // Re-apply colour tint if one was set
+    if(tintHex!==undefined && tintHex!==null){
+      applyObjTint(placed[newKey], tintHex);
+    }
     selectedObj=placed[newKey];
     buildGizmo(selectedObj);
     document.getElementById('gizmoName').textContent=
@@ -3608,10 +3613,13 @@ function buildPalette(){
       const item=document.createElement('div');
       item.className='pal-item'+(key===currentBlock?' active':'');
       item.dataset.key=key;item.dataset.l=(bd.l||'').toLowerCase();
-      item.innerHTML=`<span class="pal-label">${bd.l}</span>`;
-      const sw2=document.createElement('div');sw2.className='pal-swatch';
-      sw2.style.background='#'+bd.c.toString(16).padStart(6,'0');
-      item.appendChild(sw2);
+      item.innerHTML=`<span class="pal-label">${bd.l}</span>${bd.glb?'<span style="font-size:8px;color:rgba(255,215,0,0.5);font-family:Fredoka One,cursive;">3D MODEL</span>':''}`;
+      // Only show colour swatch for non-GLB blocks
+      if(!bd.glb){
+        const sw2=document.createElement('div');sw2.className='pal-swatch';
+        sw2.style.background='#'+bd.c.toString(16).padStart(6,'0');
+        item.appendChild(sw2);
+      }
       item.onclick=()=>{
         currentBlock=key;mode='build';
         document.querySelectorAll('.pal-item').forEach(i=>i.classList.toggle('active',i.dataset.key===key));
