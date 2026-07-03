@@ -3463,8 +3463,7 @@ canvas.addEventListener('pointerup',e=>{
         }
       } else if(mode==='select'){
         const hit=hits[0];
-        // Always deselect first
-        deselect();
+        // NOTE: deselect() called inside each branch below (after double-tap check)
 
         // Ground-only blocks — pure terrain, never selectable even on double-click
         const TERRAIN_ONLY = new Set([
@@ -3512,18 +3511,22 @@ canvas.addEventListener('pointerup',e=>{
         const hitObj=foundBlock||foundStructural||foundWall;
 
         if(isMobile){
-          // MOBILE: double-tap check BEFORE deselect()
-          const isDouble=(now-lastClickTime)<450 && lastClickTarget===hitObj && hitObj;
+          // MOBILE: DOUBLE-TAP ONLY — never select on single tap
+          const hitNode = foundBlock||foundStructural||(foundWall&&foundWall.mesh)||null;
+          const isDouble = hitNode && (now-lastClickTime)<450 && lastClickTarget===hitNode;
           if(isDouble){
+            deselect();
             if(foundWall) selectWall(foundWall);
             else if(foundBlock) selectObject(foundBlock);
             else if(foundStructural) selectObject(foundStructural);
             lastClickTime=0; lastClickTarget=null;
           } else {
-            if(hitObj){ lastClickTime=now; lastClickTarget=hitObj; }
+            deselect();
+            lastClickTime=now; lastClickTarget=hitNode;
           }
         } else {
-          // DESKTOP: single click selects furniture, double-click selects structural
+          // DESKTOP unchanged
+          deselect();
           if(foundWall) selectWall(foundWall);
           else if(foundBlock) selectObject(foundBlock);
           else if(foundStructural && (now-lastClickTime)<400 && lastClickTarget===foundStructural){
@@ -3635,17 +3638,17 @@ canvas.addEventListener('touchend',e=>{
           else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
         }
       } else if(mode==='select'){
-        // MOBILE touch: double-tap check BEFORE deselect
+        // MOBILE touch: double-tap only
         let t=hits[0].object;
         while(t&&!placed[t.userData.key])t=t.parent;
-        const now=Date.now();
-        const isDouble=t&&placed[t.userData.key]&&(now-lastClickTime)<450&&lastClickTarget===t;
-        deselect(); // clear previous selection
-        if(isDouble){
+        const now2=Date.now();
+        const isDouble2=t&&placed[t.userData.key]&&(now2-lastClickTime)<450&&lastClickTarget===t;
+        deselect();
+        if(isDouble2){
           selectObject(t);
           lastClickTime=0; lastClickTarget=null;
         } else if(t&&placed[t.userData.key]){
-          lastClickTime=now; lastClickTarget=t;
+          lastClickTime=now2; lastClickTarget=t;
         }
       } else if(mode==='erase'){
         // Check if erasing a wall
