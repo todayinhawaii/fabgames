@@ -34,18 +34,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   z-index:0;display:block;
   transition:left 0.22s cubic-bezier(0.4,0,0.2,1);
 }
-/* Desktop: when panel collapsed, truly center the canvas */
-#leftPanel.collapsed ~ #threeCanvas,
-#leftPanel.collapsed + #threeCanvas{
-  left:0;
-}
 @media(max-width:768px){
-  #threeCanvas{left:0 !important;right:0 !important;}
-  #leftPanel{transform:translateX(-230px) !important;}
-  #leftPanel:not(.collapsed){transform:translateX(0) !important;}
+  #threeCanvas{left:0 !important;right:0 !important;width:100vw !important;}
+  #leftPanel{transform:translateX(-230px);}
   #lpToggle{left:0 !important;}
-  #lpToggle.open{left:230px !important;}
-  #topbar .logo{margin-left:40px !important;}
 }
 
 /* ── TOP BAR ── */
@@ -285,21 +277,13 @@ var toolMouseDown=null;
 function toggleLeftPanel(){
   const panel=document.getElementById('leftPanel');
   const toggle=document.getElementById('lpToggle');
-  const canvas=document.getElementById('threeCanvas');
   const logo=document.querySelector('.logo');
   const isNowCollapsed=!panel.classList.contains('collapsed');
-  
   panel.classList.toggle('collapsed');
   toggle.textContent=isNowCollapsed?'▶':'◀';
-  
-  // Move toggle button with panel
   toggle.style.left=isNowCollapsed?'0':'230px';
-  
-  // Adjust canvas on desktop only
-  if(window.innerWidth > 768){
-    canvas.style.left=isNowCollapsed?'0':'230px';
-    if(logo) logo.style.marginLeft=isNowCollapsed?'10px':'238px';
-  }
+  if(logo) logo.style.marginLeft=isNowCollapsed?'10px':'238px';
+  setTimeout(onResize, 250); // resize after animation
 }
 
 function doDeselect(){
@@ -4087,11 +4071,15 @@ function toast(m){
 
 // ── RESIZE ────────────────────────────────────────────
 function onResize(){
-  const canvas=document.getElementById('threeCanvas');
-  const w=canvas.offsetWidth||window.innerWidth;
-  const h=canvas.offsetHeight||(window.innerHeight-50);
-  renderer.setSize(w,h);
-  camera.aspect=w/h;
+  const isMobile = window.innerWidth <= 768;
+  const panelOpen = isMobile ? false : !document.getElementById('leftPanel').classList.contains('collapsed');
+  const leftW = panelOpen ? 230 : 0;
+  const w = window.innerWidth - leftW;
+  const h = window.innerHeight - 50;
+  const cv = document.getElementById('threeCanvas');
+  if(cv){ cv.style.left = leftW+'px'; cv.style.width=w+'px'; cv.style.height=h+'px'; }
+  renderer.setSize(w, h);
+  camera.aspect = w/h;
   camera.updateProjectionMatrix();
 }
 window.addEventListener('resize',onResize);onResize();
