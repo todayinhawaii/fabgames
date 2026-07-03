@@ -779,21 +779,7 @@ function doDeselect(){
     <div></div>
   </div>
 
-  <!-- ORBIT + FLY BUTTONS -->
-  <div style="display:grid;grid-template-columns:repeat(2,40px);grid-template-rows:repeat(3,40px);gap:2px;">
-    <button class="joy-btn joy-orbit" title="Orbit Up" ontouchstart="keysHeld['KeyR']=true;event.preventDefault()" ontouchend="keysHeld['KeyR']=false" onmousedown="keysHeld['KeyR']=true" onmouseup="keysHeld['KeyR']=false">↑🎥</button>
-    <button class="joy-btn joy-fly" title="Fly Up" ontouchstart="keysHeld['KeyZ']=true;event.preventDefault()" ontouchend="keysHeld['KeyZ']=false" onmousedown="keysHeld['KeyZ']=true" onmouseup="keysHeld['KeyZ']=false">⬆️</button>
-    <button class="joy-btn joy-orbit" title="Orbit Left" ontouchstart="keysHeld['KeyQ']=true;event.preventDefault()" ontouchend="keysHeld['KeyQ']=false" onmousedown="keysHeld['KeyQ']=true" onmouseup="keysHeld['KeyQ']=false">↺</button>
-    <button class="joy-btn joy-orbit" title="Orbit Right" ontouchstart="keysHeld['KeyE']=true;event.preventDefault()" ontouchend="keysHeld['KeyE']=false" onmousedown="keysHeld['KeyE']=true" onmouseup="keysHeld['KeyE']=false">↻</button>
-    <button class="joy-btn joy-orbit" title="Orbit Down" ontouchstart="keysHeld['KeyF']=true;event.preventDefault()" ontouchend="keysHeld['KeyF']=false" onmousedown="keysHeld['KeyF']=true" onmouseup="keysHeld['KeyF']=false">↓🎥</button>
-    <button class="joy-btn joy-fly" title="Fly Down" ontouchstart="keysHeld['KeyX']=true;event.preventDefault()" ontouchend="keysHeld['KeyX']=false" onmousedown="keysHeld['KeyX']=true" onmouseup="keysHeld['KeyX']=false">⬇️</button>
-  </div>
 
-  <!-- ZOOM BUTTONS -->
-  <div style="display:flex;flex-direction:column;gap:2px;justify-content:center;">
-    <button class="joy-btn joy-zoom" ontouchstart="keysHeld['Equal']=true;event.preventDefault()" ontouchend="keysHeld['Equal']=false" onmousedown="keysHeld['Equal']=true" onmouseup="keysHeld['Equal']=false">🔍+</button>
-    <button class="joy-btn joy-zoom" ontouchstart="keysHeld['Minus']=true;event.preventDefault()" ontouchend="keysHeld['Minus']=false" onmousedown="keysHeld['Minus']=true" onmouseup="keysHeld['Minus']=false">🔍-</button>
-  </div>
 </div>
 
 <!-- MOBILE EDITOR TAB - shows when object selected on mobile -->
@@ -3729,13 +3715,36 @@ function buildPalette(){
         sw2.style.background='#'+bd.c.toString(16).padStart(6,'0');
         item.appendChild(sw2);
       }
-      item.onclick=()=>{
+      // Track taps for double-tap detection on mobile
+      let lastItemTap=0;
+      item.addEventListener('pointerdown', e=>{
         currentBlock=key;mode='build';
         document.querySelectorAll('.pal-item').forEach(i=>i.classList.toggle('active',i.dataset.key===key));
         setMode('build');
         if(ghostMesh){const c=new THREE.Color(bd.c);ghostMesh.material.color.set(c);}
-        toast(`${bd.e} ${bd.l} selected`);
-      };
+
+        // MOBILE DOUBLE-TAP: place model right in front of camera
+        if(window.innerWidth<=768){
+          const now=Date.now();
+          if(now-lastItemTap<400){
+            // Double tap! Place at camera target
+            e.preventDefault();
+            const cx=Math.round(camTarget.x);
+            const cz=Math.round(camTarget.z);
+            placeBlock(cx,0,cz,key,true);
+            setMode('select');
+            const nk=bk(cx,0,cz);
+            if(placed[nk]) setTimeout(()=>selectObject(placed[nk].mesh),300);
+            toast('✅ '+(bd.l)+' placed! Tap to adjust');
+          } else {
+            toast((bd.l)+' — double-tap to place instantly!');
+          }
+          lastItemTap=now;
+        } else {
+          toast(`${bd.e||''} ${bd.l} selected — click floor to place`);
+        }
+      });
+      item.onclick=e=>{}; // handled by pointerdown
       grid.appendChild(item);
     });
     sec.appendChild(btn);sec.appendChild(grid);pal.appendChild(sec);
