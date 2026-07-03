@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v4.2</title>
+<title>Fab House! 🏠 v4.3</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -3931,47 +3931,18 @@ function buildPalette(){
           e.stopPropagation();
           currentBlock=key;
           // Place at camera target position
-          // Raycast from screen CENTER to find what's actually in view
-          let px, py, pz;
-          const screenCenterX = window.innerWidth/2;
-          const screenCenterY = window.innerHeight/2;
-          // Cast ray from screen center into scene
-          const raycaster2 = new THREE.Raycaster();
-          const ndcX = (screenCenterX/window.innerWidth)*2-1;
-          const ndcY = -(screenCenterY/window.innerHeight)*2+1;
-          raycaster2.setFromCamera(new THREE.Vector2(ndcX,ndcY), camera);
-          // Get all objects in scene
-          const allMeshes=[];
-          scene.traverse(o=>{if(o.isMesh&&o!==ground)allMeshes.push(o);});
-          const hits2=raycaster2.intersectObjects(allMeshes,true);
-          if(hits2.length>0){
-            // Find the first hit that has a placed block
-            let found=false;
-            for(const h of hits2){
-              let node=h.object;
-              let depth=0;
-              while(node&&depth<10){
-                if(node.userData&&node.userData.key&&placed[node.userData.key]){
-                  // Place next to this block
-                  px=node.userData.x;
-                  py=node.userData.y+1;
-                  pz=node.userData.z;
-                  found=true; break;
-                }
-                node=node.parent; depth++;
-              }
-              if(found) break;
-            }
-            if(!found){
-              // Hit ground or something — use hit point
-              const hp=hits2[0].point;
-              px=Math.round(hp.x); py=0; pz=Math.round(hp.z);
-            }
+          // Use existing getHits function with screen center - already optimised
+          const ch = getHits({clientX:window.innerWidth/2, clientY:window.innerHeight/2});
+          let px,py,pz;
+          if(ch.length>0){
+            const pos=getPlacePos(ch[0]);
+            px=pos.x; py=pos.y; pz=pos.z;
           } else {
-            // Nothing hit — use camTarget
-            px=Math.round(camTarget.x); py=0; pz=Math.round(camTarget.z);
+            // Nothing in center - use camTarget but clamp to scene
+            px=Math.round(camTarget.x);
+            pz=Math.round(camTarget.z);
+            py=currentFloor;
           }
-          // Find free vertical spot
           while(placed[bk(px,py,pz)]) py++;
           placeBlock(px,py,pz,key,true);
           const nk=bk(px,py,pz);
