@@ -2810,13 +2810,22 @@ function deselect(){
   clearGizmo();
   selectedObj=null;
   selectedWall=null;
+  _selectedObj=null; // sync global for mobile joystick
+  _selectedWall=null;
 
   const wp=document.getElementById('wallPropPanel');
-  if(wp) wp.style.display='none';
+  if(wp){ wp.style.display='none'; wp.classList.remove('mobile-open'); }
   const op=document.getElementById('objPropPanel');
-  if(op) op.style.display='none';
+  if(op){ op.style.display='none'; op.classList.remove('mobile-open'); }
   const db1=document.getElementById('deselectBtn');
   if(db1) db1.style.display='none';
+  // Hide mobile buttons
+  const tab=document.getElementById('mobileEditorTab');
+  if(tab) tab.style.display='none';
+  const delBtn=document.getElementById('mobileDeleteBtn');
+  if(delBtn) delBtn.style.display='none';
+  // Reset double-tap tracking so navigation doesn't accidentally select
+  lastClickTime=0; lastClickTarget=null;
 }
 
 // ── UNIVERSAL OBJECT EDITOR ───────────────────────────
