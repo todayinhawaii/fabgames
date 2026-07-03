@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v4.7</title>
+<title>Fab House! 🏠 v5.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -375,22 +375,18 @@ function mobileJoyRelease(){
 }
 
 function deleteMobileSelected(){
-  // Use global refs _selectedObj/_selectedWall since this runs outside initApp
-  const obj = _selectedObj || (typeof selectedObj!=='undefined'?selectedObj:null);
-  const wall = _selectedWall || (typeof selectedWall!=='undefined'?selectedWall:null);
-  if(obj && obj.mesh){
-    const{x,y,z}=obj.mesh.userData;
-    if(typeof removeBlock==='function') removeBlock(x,y,z,true);
-    if(typeof doDeselect==='function') doDeselect();
-    else if(window.deselect) window.deselect();
+  const obj = _selectedObj;
+  if(!obj||!obj.mesh){ toast('Nothing selected'); return; }
+  // _selectedObj is the placed{} entry {mesh, type}
+  // Get coords from mesh userData
+  const ud = obj.mesh.userData;
+  const x=ud.x, y=ud.y, z=ud.z, key=ud.key;
+  if(typeof removeBlock==='function'){
+    removeBlock(x,y,z,true);
     toast('🗑️ Deleted!');
-  } else if(wall){
-    if(typeof removeWall==='function') removeWall(wall.idx||0);
-    if(typeof doDeselect==='function') doDeselect();
-    toast('🗑️ Wall deleted!');
-  } else {
-    toast('Nothing selected to delete');
   }
+  _selectedObj=null; _selectedWall=null;
+  if(window.deselect) window.deselect();
 }
 
 function toggleMobileEditor(){
@@ -427,8 +423,6 @@ function doDeselect(){
   // Hide mobile editor tab and delete button
   const tab=document.getElementById('mobileEditorTab');
   if(tab) tab.style.display='none';
-  const delBtn=document.getElementById('mobileDeleteBtn');
-  if(delBtn) delBtn.style.display='none';
   ['wallPropPanel','objPropPanel'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display='none';
@@ -933,14 +927,7 @@ function doDeselect(){
     cursor:pointer;display:flex;flex-direction:column;
     align-items:center;justify-content:center;gap:2px;">
     <span style="font-size:18px;">↪</span>REDO</button>
-  <button onclick="deleteMobileSelected()" id="mobileDeleteBtn" style="
-    width:52px;height:52px;border-radius:12px;
-    background:rgba(180,0,0,0.7);border:2px solid rgba(255,80,80,0.6);
-    color:#ff9999;font-size:11px;font-family:'Fredoka One',cursive;
-    cursor:pointer;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:2px;
-    display:none;">
-    <span style="font-size:18px;">🗑️</span>DEL</button>
+
 </div>
 
 <!-- MOBILE EDITOR TAB - shows when object selected on mobile -->
@@ -2887,8 +2874,6 @@ function deselect(){
   // Hide mobile buttons
   const tab=document.getElementById('mobileEditorTab');
   if(tab) tab.style.display='none';
-  const delBtn=document.getElementById('mobileDeleteBtn');
-  if(delBtn) delBtn.style.display='none';
 
 }
 
@@ -2920,8 +2905,6 @@ function openObjProps(obj){
     panel.classList.remove('mobile-open');
     const tab=document.getElementById('mobileEditorTab');
     if(tab){ tab.style.display='flex'; tab.textContent='▶ Edit'; }
-    const delBtn=document.getElementById('mobileDeleteBtn');
-    if(delBtn) delBtn.style.display='flex';
   }
 
   // Reset sliders to reflect current scale (as % of original)
