@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v4.0</title>
+<title>Fab House! 🏠 v4.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -3932,7 +3932,7 @@ function buildPalette(){
           currentBlock=key;
           // Place at camera target position
           // Place at camera target X,Z, find floor by scanning DOWN
-          toast('📍 x:'+camTarget.x.toFixed(1)+' y:'+camTarget.y.toFixed(1)+' z:'+camTarget.z.toFixed(1));
+          alert('camTarget x:'+camTarget.x.toFixed(1)+' y:'+camTarget.y.toFixed(1)+' z:'+camTarget.z.toFixed(1));
           const px=Math.round(camTarget.x);
           const pz=Math.round(camTarget.z);
           // Scan downward from camTarget.y to find the floor surface
