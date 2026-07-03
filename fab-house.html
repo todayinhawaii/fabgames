@@ -764,34 +764,46 @@ function doDeselect(){
 <!-- MOBILE CONTROLS (bottom left) -->
 <div id="joystick" onpointerdown="event.stopPropagation()"
   style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
-  z-index:85;display:flex;gap:10px;align-items:center;"
+  z-index:85;display:flex;gap:12px;align-items:center;"
   class="mobile-only-joystick">
 
-  <!-- WALK D-PAD -->
-  <div style="display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:3px;">
+  <!-- SMART D-PAD: moves selected object OR camera -->
+  <div style="display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,48px);gap:4px;">
     <div></div>
-    <button class="joy-btn" ontouchstart="keysHeld['KeyW']=true;event.preventDefault()" ontouchend="keysHeld['KeyW']=false" onmousedown="keysHeld['KeyW']=true" onmouseup="keysHeld['KeyW']=false">▲</button>
+    <button class="joy-btn" style="font-size:22px;"
+      ontouchstart="mobileJoyPress('N');event.preventDefault()"
+      ontouchend="mobileJoyRelease('N')"
+      onmousedown="mobileJoyPress('N')" onmouseup="mobileJoyRelease('N')">▲</button>
     <div></div>
-    <button class="joy-btn" ontouchstart="keysHeld['KeyA']=true;event.preventDefault()" ontouchend="keysHeld['KeyA']=false" onmousedown="keysHeld['KeyA']=true" onmouseup="keysHeld['KeyA']=false">◀</button>
-    <button class="joy-btn joy-mid" onclick="resetCamera()">🎥</button>
-    <button class="joy-btn" ontouchstart="keysHeld['KeyD']=true;event.preventDefault()" ontouchend="keysHeld['KeyD']=false" onmousedown="keysHeld['KeyD']=true" onmouseup="keysHeld['KeyD']=false">▶</button>
+    <button class="joy-btn" style="font-size:22px;"
+      ontouchstart="mobileJoyPress('W');event.preventDefault()"
+      ontouchend="mobileJoyRelease('W')"
+      onmousedown="mobileJoyPress('W')" onmouseup="mobileJoyRelease('W')">◀</button>
+    <button class="joy-btn joy-mid" onclick="if(selectedObj||selectedWall){doDeselect();}else{resetCamera();}">🎥</button>
+    <button class="joy-btn" style="font-size:22px;"
+      ontouchstart="mobileJoyPress('E');event.preventDefault()"
+      ontouchend="mobileJoyRelease('E')"
+      onmousedown="mobileJoyPress('E')" onmouseup="mobileJoyRelease('E')">▶</button>
     <div></div>
-    <button class="joy-btn" ontouchstart="keysHeld['KeyS']=true;event.preventDefault()" ontouchend="keysHeld['KeyS']=false" onmousedown="keysHeld['KeyS']=true" onmouseup="keysHeld['KeyS']=false">▼</button>
+    <button class="joy-btn" style="font-size:22px;"
+      ontouchstart="mobileJoyPress('S');event.preventDefault()"
+      ontouchend="mobileJoyRelease('S')"
+      onmousedown="mobileJoyPress('S')" onmouseup="mobileJoyRelease('S')">▼</button>
     <div></div>
   </div>
 
-  <!-- UP / DOWN buttons (E=up, C=down) -->
-  <div style="display:flex;flex-direction:column;gap:6px;">
-    <button class="joy-btn joy-fly" title="Fly Up (E)"
-      ontouchstart="keysHeld['KeyE']=true;event.preventDefault()"
-      ontouchend="keysHeld['KeyE']=false"
-      onmousedown="keysHeld['KeyE']=true"
-      onmouseup="keysHeld['KeyE']=false">⬆</button>
-    <button class="joy-btn joy-fly" title="Fly Down (C)"
-      ontouchstart="keysHeld['KeyC']=true;event.preventDefault()"
-      ontouchend="keysHeld['KeyC']=false"
-      onmousedown="keysHeld['KeyC']=true"
-      onmouseup="keysHeld['KeyC']=false">⬇</button>
+  <!-- UP / DOWN — bigger green buttons -->
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <button class="joy-btn" style="width:54px;height:54px;font-size:28px;
+      background:rgba(0,200,80,0.25);border-color:rgba(0,255,100,0.6);color:#00ff66;"
+      ontouchstart="mobileJoyPress('UP');event.preventDefault()"
+      ontouchend="mobileJoyRelease('UP')"
+      onmousedown="mobileJoyPress('UP')" onmouseup="mobileJoyRelease('UP')">⬆</button>
+    <button class="joy-btn" style="width:54px;height:54px;font-size:28px;
+      background:rgba(0,200,80,0.25);border-color:rgba(0,255,100,0.6);color:#00ff66;"
+      ontouchstart="mobileJoyPress('DN');event.preventDefault()"
+      ontouchend="mobileJoyRelease('DN')"
+      onmousedown="mobileJoyPress('DN')" onmouseup="mobileJoyRelease('DN')">⬇</button>
   </div>
 </div>
 
