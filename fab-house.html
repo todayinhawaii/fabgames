@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v4.5</title>
+<title>Fab House! 🏠 v4.4</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -3935,19 +3935,12 @@ function buildPalette(){
           const ch = getHits({clientX:window.innerWidth/2, clientY:window.innerHeight/2});
           let px,py,pz;
           if(ch.length>0){
-            const hp=ch[0].point;
-            // Offset toward camera to avoid walls
+            const pos=getPlacePos(ch[0]);
             const camDir=new THREE.Vector3();
-            camDir.subVectors(camera.position, hp).normalize();
-            px=Math.round(hp.x+camDir.x*2);
-            pz=Math.round(hp.z+camDir.z*2);
-            // Always find floor level at this X,Z by scanning down
-            py=currentFloor;
-            for(let y=4;y>=-2;y--){
-              if(placed[bk(px,y,pz)]||placed[bk(px,y,pz+1)]||placed[bk(px+1,y,pz)]){
-                py=y+1; break;
-              }
-            }
+            camDir.subVectors(camera.position, new THREE.Vector3(pos.x,pos.y,pos.z)).normalize();
+            px=pos.x+Math.round(camDir.x*2);
+            pz=pos.z+Math.round(camDir.z*2);
+            py=currentFloor; // always place at current floor level
           } else {
             px=Math.round(camTarget.x);
             pz=Math.round(camTarget.z);
