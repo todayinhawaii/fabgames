@@ -308,6 +308,42 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 var clickHadNewSelection = false; // true when selectObject/selectWall fires on this click cycle
 
 var lastClickTime=0;
+var lastClickTarget=null;
+var mobileJoyInterval=null;
+
+function mobileJoyPress(dir){
+  mobileJoyRelease();
+  function act(){
+    if(typeof selectedObj !== 'undefined' && selectedObj){
+      switch(dir){
+        case 'N':  if(typeof moveSelected!=='undefined') moveSelected(0,0,-1); break;
+        case 'S':  if(typeof moveSelected!=='undefined') moveSelected(0,0,1);  break;
+        case 'W':  if(typeof moveSelected!=='undefined') moveSelected(-1,0,0); break;
+        case 'E':  if(typeof moveSelected!=='undefined') moveSelected(1,0,0);  break;
+        case 'UP': if(typeof moveSelected!=='undefined') moveSelected(0,1,0);  break;
+        case 'DN': if(typeof moveSelected!=='undefined') moveSelected(0,-1,0); break;
+      }
+    } else {
+      if(typeof keysHeld==='undefined') return;
+      ['KeyW','KeyS','KeyA','KeyQ','KeyE','KeyC'].forEach(k=>keysHeld[k]=false);
+      switch(dir){
+        case 'N':  keysHeld['KeyW']=true; break;
+        case 'S':  keysHeld['KeyS']=true; break;
+        case 'W':  keysHeld['KeyA']=true; break;
+        case 'E':  keysHeld['KeyQ']=true; break;
+        case 'UP': keysHeld['KeyE']=true; break;
+        case 'DN': keysHeld['KeyC']=true; break;
+      }
+    }
+  }
+  act();
+  mobileJoyInterval=setInterval(act,120);
+}
+function mobileJoyRelease(){
+  if(mobileJoyInterval){clearInterval(mobileJoyInterval);mobileJoyInterval=null;}
+  if(typeof keysHeld!=='undefined')
+    ['KeyW','KeyS','KeyA','KeyQ','KeyE','KeyC'].forEach(k=>keysHeld[k]=false);
+}
 
 function toggleMobileEditor(){
   if(window.innerWidth > 768) return;
@@ -3409,26 +3445,30 @@ canvas.addEventListener('pointerup',e=>{
         }
 
         const isMobile=window.innerWidth<=768;
-        const isDouble=(Date.now()-lastClickTime)<400 && lastClickTarget===(foundBlock||foundStructural);
+        const now=Date.now();
+        const hitObj=foundBlock||foundStructural||foundWall;
+        const isDouble=isMobile && (now-lastClickTime)<400 && lastClickTarget===hitObj;
 
-        if(foundWall) selectWall(foundWall);
-        else if(foundBlock){
-          // Furniture/GLB/decorations:
-          // Desktop = single click selects
-          // Mobile = double-tap selects (avoids accidental selections while navigating)
-          if(!isMobile || isDouble){
-            selectObject(foundBlock);
-          } else {
-            toast('👆 Double-tap to select & edit');
-            lastClickTime=Date.now(); lastClickTarget=foundBlock;
+        if(isMobile){
+          // MOBILE: everything needs double-tap to select
+          // Single tap just deselects (already done above) - no new selection
+          if(isDouble && foundWall){ selectWall(foundWall); lastClickTime=0; }
+          else if(isDouble && foundBlock){ selectObject(foundBlock); lastClickTime=0; }
+          else if(isDouble && foundStructural){ selectObject(foundStructural); lastClickTime=0; }
+          else if(hitObj){
+            // First tap - record for potential double tap, show hint once
+            lastClickTime=now; lastClickTarget=hitObj;
           }
-        }
-        else if(foundStructural && isDouble){
-          selectObject(foundStructural);
-          toast('🧱 Selected — adjust in panel');
-          lastClickTime=0;
-        } else if(foundStructural){
-          lastClickTime=Date.now(); lastClickTarget=foundStructural;
+        } else {
+          // DESKTOP: single click selects furniture, double-click selects structural
+          if(foundWall) selectWall(foundWall);
+          else if(foundBlock) selectObject(foundBlock);
+          else if(foundStructural && (now-lastClickTime)<400 && lastClickTarget===foundStructural){
+            selectObject(foundStructural);
+            lastClickTime=0;
+          } else if(foundStructural){
+            lastClickTime=now; lastClickTarget=foundStructural;
+          }
         }
       } else if(mode==='erase'){
         // Check if erasing a wall
