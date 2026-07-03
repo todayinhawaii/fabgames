@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v3.6</title>
+<title>Fab House! 🏠 v3.7</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -3923,23 +3923,30 @@ function buildPalette(){
           e.stopPropagation();
           currentBlock=key;
           // Place at camera target position
-          const cx=Math.round(camTarget.x);
-          const cz=Math.round(camTarget.z);
-          // Find a free spot
-          let placed_y=0;
-          while(placed[bk(cx,placed_y,cz)]) placed_y++;
-          // Find the floor level at camera target by scanning downward
-          let floorY=Math.round(camTarget.y);
-          // Scan down from camera target to find nearest surface
-          for(let y=Math.round(camTarget.y)+2;y>=-2;y--){
-            if(placed[bk(cx,y,cz)]||placed[bk(cx,y,cz+1)]||placed[bk(cx,y+1,cz)]){
-              floorY=y+1; break;
+          // Raycast from camera center to find exactly where we're looking
+          const centerHits = getHits({clientX: window.innerWidth/2, clientY: window.innerHeight/2});
+          let px, py, pz;
+          if(centerHits.length>0){
+            // Hit something - place on top of it
+            const hp = centerHits[0].point;
+            px=Math.round(hp.x); py=Math.round(hp.y); pz=Math.round(hp.z);
+            // Walk up to find the placed block surface
+            let node=centerHits[0].object;
+            while(node&&!placed[node.userData?.key])node=node.parent;
+            if(node&&placed[node.userData?.key]){
+              const ud=node.userData;
+              px=ud.x; py=ud.y+1; pz=ud.z;
             }
+          } else {
+            // Nothing hit - use camera target
+            px=Math.round(camTarget.x);
+            py=Math.round(camTarget.y);
+            pz=Math.round(camTarget.z);
           }
-          // Find free spot at that level
-          while(placed[bk(cx,floorY,cz)]) floorY++;
-          placeBlock(cx,floorY,cz,key,true);
-          const nk=bk(cx,floorY,cz);
+          // Find free spot
+          while(placed[bk(px,py,pz)]) py++;
+          placeBlock(px,py,pz,key,true);
+          const nk=bk(px,py,pz);
           setMode('select');
           lastClickTime=0; lastClickTarget=null;
           toast('✅ '+bd.l+' placed here!');
