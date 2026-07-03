@@ -311,21 +311,26 @@ var clickHadNewSelection = false; // true when selectObject/selectWall fires on 
 var lastClickTime=0;
 var lastClickTarget=null;
 var mobileJoyInterval=null;
+// These get set by initApp but need global access for mobile joystick
+var _selectedObj=null;
+var _selectedWall=null;
+var _moveSelected=null;
 
 function mobileJoyPress(dir){
   mobileJoyRelease();
   function act(){
-    if(typeof selectedObj !== 'undefined' && selectedObj){
+    if(_selectedObj && _moveSelected){
+      // Move the selected object
       switch(dir){
-        case 'N':  if(typeof moveSelected!=='undefined') moveSelected(0,0,-1); break;
-        case 'S':  if(typeof moveSelected!=='undefined') moveSelected(0,0,1);  break;
-        case 'W':  if(typeof moveSelected!=='undefined') moveSelected(-1,0,0); break;
-        case 'E':  if(typeof moveSelected!=='undefined') moveSelected(1,0,0);  break;
-        case 'UP': if(typeof moveSelected!=='undefined') moveSelected(0,1,0);  break;
-        case 'DN': if(typeof moveSelected!=='undefined') moveSelected(0,-1,0); break;
+        case 'N':  _moveSelected(0,0,-1); break;
+        case 'S':  _moveSelected(0,0,1);  break;
+        case 'W':  _moveSelected(-1,0,0); break;
+        case 'E':  _moveSelected(1,0,0);  break;
+        case 'UP': _moveSelected(0,1,0);  break;
+        case 'DN': _moveSelected(0,-1,0); break;
       }
-    } else {
-      if(typeof keysHeld==='undefined') return;
+    } else if(typeof keysHeld!=='undefined'){
+      // Move the camera
       ['KeyW','KeyS','KeyA','KeyQ','KeyE','KeyC'].forEach(k=>keysHeld[k]=false);
       switch(dir){
         case 'N':  keysHeld['KeyW']=true; break;
@@ -338,7 +343,7 @@ function mobileJoyPress(dir){
     }
   }
   act();
-  mobileJoyInterval=setInterval(act,120);
+  mobileJoyInterval=setInterval(act,150);
 }
 function mobileJoyRelease(){
   if(mobileJoyInterval){clearInterval(mobileJoyInterval);mobileJoyInterval=null;}
@@ -390,6 +395,7 @@ function toggleLeftPanel(){
 
 function doDeselect(){
   clickHadNewSelection = false;
+  _selectedObj=null; _selectedWall=null; // sync global refs
   // Hide mobile editor tab and delete button
   const tab=document.getElementById('mobileEditorTab');
   if(tab) tab.style.display='none';
@@ -3494,25 +3500,25 @@ canvas.addEventListener('pointerup',e=>{
         const isMobile=window.innerWidth<=768;
         const now=Date.now();
         const hitObj=foundBlock||foundStructural||foundWall;
-        const isDouble=isMobile && (now-lastClickTime)<400 && lastClickTarget===hitObj;
 
         if(isMobile){
-          // MOBILE: everything needs double-tap to select
-          // Single tap just deselects (already done above) - no new selection
-          if(isDouble && foundWall){ selectWall(foundWall); lastClickTime=0; }
-          else if(isDouble && foundBlock){ selectObject(foundBlock); lastClickTime=0; }
-          else if(isDouble && foundStructural){ selectObject(foundStructural); lastClickTime=0; }
-          else if(hitObj){
-            // First tap - record for potential double tap, show hint once
-            lastClickTime=now; lastClickTarget=hitObj;
+          // MOBILE: ONLY double-tap selects — single tap = no selection at all
+          const isDouble=(now-lastClickTime)<450 && lastClickTarget===hitObj && hitObj;
+          if(isDouble){
+            if(foundWall) selectWall(foundWall);
+            else if(foundBlock) selectObject(foundBlock);
+            else if(foundStructural) selectObject(foundStructural);
+            lastClickTime=0; lastClickTarget=null;
+          } else {
+            // Single tap - just record for potential double-tap, NO highlight
+            if(hitObj){ lastClickTime=now; lastClickTarget=hitObj; }
           }
         } else {
           // DESKTOP: single click selects furniture, double-click selects structural
           if(foundWall) selectWall(foundWall);
           else if(foundBlock) selectObject(foundBlock);
           else if(foundStructural && (now-lastClickTime)<400 && lastClickTarget===foundStructural){
-            selectObject(foundStructural);
-            lastClickTime=0;
+            selectObject(foundStructural); lastClickTime=0;
           } else if(foundStructural){
             lastClickTime=now; lastClickTarget=foundStructural;
           }
@@ -4772,6 +4778,7 @@ setTimeout(()=>{
 
   // ── WALL SELECTION & TRANSFORM ──────────────────────
   function selectWall(wallData){
+  _selectedWall=wallData; _selectedObj=null; // sync global refs
     // Clear previous selection without hiding wallPropPanel
     clearGizmo();
     selectedObj=null;
@@ -5279,6 +5286,7 @@ setTimeout(()=>{
   window.addWalls      = addWalls;
   window.addRoof       = addRoof;
   window.eraseAtHit      = eraseAtHit;
+  _moveSelected = moveSelected; // expose for mobile joystick
   window.setTool         = setTool;
   window.digDown         = digDown;
   window.applyTool       = applyTool;
