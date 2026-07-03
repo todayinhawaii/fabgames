@@ -2824,8 +2824,7 @@ function deselect(){
   if(tab) tab.style.display='none';
   const delBtn=document.getElementById('mobileDeleteBtn');
   if(delBtn) delBtn.style.display='none';
-  // Reset double-tap tracking so navigation doesn't accidentally select
-  lastClickTime=0; lastClickTarget=null;
+
 }
 
 // ── UNIVERSAL OBJECT EDITOR ───────────────────────────
@@ -3513,7 +3512,7 @@ canvas.addEventListener('pointerup',e=>{
         const hitObj=foundBlock||foundStructural||foundWall;
 
         if(isMobile){
-          // MOBILE: ONLY double-tap selects — single tap = no selection at all
+          // MOBILE: double-tap check BEFORE deselect()
           const isDouble=(now-lastClickTime)<450 && lastClickTarget===hitObj && hitObj;
           if(isDouble){
             if(foundWall) selectWall(foundWall);
@@ -3521,7 +3520,6 @@ canvas.addEventListener('pointerup',e=>{
             else if(foundStructural) selectObject(foundStructural);
             lastClickTime=0; lastClickTarget=null;
           } else {
-            // Single tap - just record for potential double-tap, NO highlight
             if(hitObj){ lastClickTime=now; lastClickTarget=hitObj; }
           }
         } else {
@@ -3637,20 +3635,17 @@ canvas.addEventListener('touchend',e=>{
           else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
         }
       } else if(mode==='select'){
-        // MOBILE touch: require double-tap to select
-        // single tap = deselect only, no new selection
-        deselect();
+        // MOBILE touch: double-tap check BEFORE deselect
         let t=hits[0].object;
         while(t&&!placed[t.userData.key])t=t.parent;
-        if(t&&placed[t.userData.key]){
-          const now=Date.now();
-          const isDouble=(now-lastClickTime)<450 && lastClickTarget===t;
-          if(isDouble){
-            selectObject(t);
-            lastClickTime=0; lastClickTarget=null;
-          } else {
-            lastClickTime=now; lastClickTarget=t;
-          }
+        const now=Date.now();
+        const isDouble=t&&placed[t.userData.key]&&(now-lastClickTime)<450&&lastClickTarget===t;
+        deselect(); // clear previous selection
+        if(isDouble){
+          selectObject(t);
+          lastClickTime=0; lastClickTarget=null;
+        } else if(t&&placed[t.userData.key]){
+          lastClickTime=now; lastClickTarget=t;
         }
       } else if(mode==='erase'){
         // Check if erasing a wall
@@ -3890,12 +3885,10 @@ function buildPalette(){
           while(placed[bk(cx,placed_y,cz)]) placed_y++;
           placeBlock(cx,placed_y,cz,key,true);
           const nk=bk(cx,placed_y,cz);
-          // Immediately switch to select so next tap edits, not duplicates
           setMode('select');
-          setTimeout(()=>{
-            if(placed[nk]){ selectObject(placed[nk].mesh); }
-          },300);
-          toast('✅ '+bd.l+' placed! Tap it to edit');
+          // Reset double-tap so user can immediately double-tap to select
+          lastClickTime=0; lastClickTarget=null;
+          toast('✅ '+bd.l+' placed! Double-tap it to edit');
         }
         lastItemTap=now;
       });
