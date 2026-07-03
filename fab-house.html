@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v3.3</title>
+<title>Fab House! 🏠 v3.4</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -316,24 +316,19 @@ var mobileTapObj=null;
 var mobileTapCount=0;
 
 function registerMobileTap(obj, selectFn){
-  // Simple double-tap: two taps on same object within 400ms
+  // Use window.deselect since this runs before initApp
+  const _desel = window.deselect || function(){};
   if(mobileTapObj===obj && mobileTapCount===1){
-    // SECOND TAP - select it!
     clearTimeout(mobileTapTimer);
-    mobileTapTimer=null;
-    mobileTapObj=null;
-    mobileTapCount=0;
-    deselect();
+    mobileTapTimer=null; mobileTapObj=null; mobileTapCount=0;
+    _desel();
     selectFn();
   } else {
-    // FIRST TAP - wait for second
     clearTimeout(mobileTapTimer);
-    mobileTapObj=obj;
-    mobileTapCount=1;
-    deselect();
+    mobileTapObj=obj; mobileTapCount=1;
+    _desel();
     mobileTapTimer=setTimeout(()=>{
-      mobileTapObj=null;
-      mobileTapCount=0;
+      mobileTapObj=null; mobileTapCount=0;
     },400);
   }
 }
