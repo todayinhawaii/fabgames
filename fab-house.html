@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v4.4</title>
+<title>Fab House! 🏠 v4.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -545,6 +545,26 @@ function doDeselect(){
       <span id="opDVal" style="font-family:'Fredoka One',cursive;font-size:13px;color:#FFD700;">100%</span>
     </div>
     <input type="range" id="opD" min="20" max="300" step="5" value="100"
+      style="width:100%;accent-color:#FFD700;" oninput="liveObjEdit()">
+  </div>
+
+  <!-- ROTATION Y (spin) -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.4);">🔄 ROTATE</span>
+      <span id="opRotVal" style="font-family:'Fredoka One',cursive;font-size:13px;color:#FFD700;">0°</span>
+    </div>
+    <input type="range" id="opRot" min="0" max="360" step="5" value="0"
+      style="width:100%;accent-color:#FFD700;" oninput="liveObjEdit()">
+  </div>
+
+  <!-- TILT X -->
+  <div style="display:flex;flex-direction:column;gap:4px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Fredoka One',cursive;font-size:11px;color:rgba(255,255,255,0.4);">↗️ TILT</span>
+      <span id="opTiltVal" style="font-family:'Fredoka One',cursive;font-size:13px;color:#FFD700;">0°</span>
+    </div>
+    <input type="range" id="opTilt" min="-90" max="90" step="5" value="0"
       style="width:100%;accent-color:#FFD700;" oninput="liveObjEdit()">
   </div>
 
@@ -2906,6 +2926,13 @@ function openObjProps(obj){
   document.getElementById('opD').value = Math.round(s.z*100);
   document.getElementById('opWVal').textContent = Math.round(s.x*100)+'%';
   document.getElementById('opHVal').textContent = Math.round(s.y*100)+'%';
+  // Rotation and tilt
+  const rotDeg=Math.round(obj.mesh.rotation.y*(180/Math.PI));
+  const tiltDeg=Math.round(obj.mesh.rotation.x*(180/Math.PI));
+  document.getElementById('opRot').value=((rotDeg%360)+360)%360;
+  document.getElementById('opRotVal').textContent=((rotDeg%360)+360)%360+'°';
+  document.getElementById('opTilt').value=tiltDeg;
+  document.getElementById('opTiltVal').textContent=tiltDeg+'°';
   document.getElementById('opDVal').textContent = Math.round(s.z*100)+'%';
 
   // Build colour swatches
