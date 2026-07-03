@@ -2789,8 +2789,10 @@ function selectObject(mesh){
   let target=mesh;
   while(target&&!placed[target.userData.key])target=target.parent;
   if(!target||!placed[target.userData.key])return;
-  clickHadNewSelection = true; // signal that a real selection happened
+  clickHadNewSelection = true;
   deselect();
+  _selectedObj=placed[target.userData.key]; // sync global for mobile joystick
+  _selectedWall=null;
   const db0=document.getElementById('deselectBtn');
   if(db0) db0.style.display='inline-block';
   // Make sure the wall editor panel isn't showing at the same time
