@@ -3924,7 +3924,7 @@ function buildPalette(){
           currentBlock=key;
           // Place at camera target position
           // Place at camera target X,Z, find floor by scanning DOWN
-          console.log('camTarget:', camTarget.x.toFixed(1), camTarget.y.toFixed(1), camTarget.z.toFixed(1));
+          toast('📍 x:'+camTarget.x.toFixed(1)+' y:'+camTarget.y.toFixed(1)+' z:'+camTarget.z.toFixed(1));
           const px=Math.round(camTarget.x);
           const pz=Math.round(camTarget.z);
           // Scan downward from camTarget.y to find the floor surface
