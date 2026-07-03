@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v3.5</title>
+<title>Fab House! 🏠 v3.6</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -3928,12 +3928,21 @@ function buildPalette(){
           // Find a free spot
           let placed_y=0;
           while(placed[bk(cx,placed_y,cz)]) placed_y++;
-          placeBlock(cx,placed_y,cz,key,true);
-          const nk=bk(cx,placed_y,cz);
+          // Find the floor level at camera target by scanning downward
+          let floorY=Math.round(camTarget.y);
+          // Scan down from camera target to find nearest surface
+          for(let y=Math.round(camTarget.y)+2;y>=-2;y--){
+            if(placed[bk(cx,y,cz)]||placed[bk(cx,y,cz+1)]||placed[bk(cx,y+1,cz)]){
+              floorY=y+1; break;
+            }
+          }
+          // Find free spot at that level
+          while(placed[bk(cx,floorY,cz)]) floorY++;
+          placeBlock(cx,floorY,cz,key,true);
+          const nk=bk(cx,floorY,cz);
           setMode('select');
-          // Reset double-tap so user can immediately double-tap to select
           lastClickTime=0; lastClickTarget=null;
-          toast('✅ '+bd.l+' placed! Double-tap it to edit');
+          toast('✅ '+bd.l+' placed here!');
         }
         lastItemTap=now;
       });
