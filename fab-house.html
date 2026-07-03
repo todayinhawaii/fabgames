@@ -36,8 +36,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 }
 @media(max-width:768px){
   #threeCanvas{left:0 !important;right:0 !important;width:100vw !important;}
-  #leftPanel{transform:translateX(-230px);}
+  #leftPanel:not(.collapsed){transform:translateX(0) !important;}
   #lpToggle{left:0 !important;}
+  #lpToggle:not(.collapsed){left:230px !important;}
 }
 
 /* ── TOP BAR ── */
