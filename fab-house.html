@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v5.0</title>
+<title>Fab House! 🏠 v5.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -3717,7 +3717,18 @@ canvas.addEventListener('touchend',e=>{
           if(placed[existingKey]){
             setMode('select');
             selectObject(placed[existingKey].mesh);
-          } else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
+          } else {
+            placeBlock(pos.x,pos.y,pos.z,currentBlock);
+            sndPlace();
+            // Desktop: if placing a GLB model, auto-switch to select so
+            // next click edits it rather than duplicating
+            if(BLOCKS[currentBlock]&&BLOCKS[currentBlock].glb){
+              const nk=bk(pos.x,pos.y,pos.z);
+              setTimeout(()=>{
+                if(placed[nk]){ setMode('select'); selectObject(placed[nk].mesh); }
+              },100);
+            }
+          }
         }
       } else if(mode==='select'){
         // MOBILE touch: use same registerMobileTap
