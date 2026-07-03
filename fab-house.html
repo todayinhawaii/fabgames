@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v3.4</title>
+<title>Fab House! 🏠 v3.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -3506,6 +3506,8 @@ canvas.addEventListener('pointerup',e=>{
           }
         }
       } else if(mode==='select'){
+        // On mobile, touchend handles selection — skip pointerup to avoid double-firing
+        if(window.innerWidth<=768) { /* handled by touchend */ return; }
         const hit=hits[0];
         // NOTE: deselect() called inside each branch below (after double-tap check)
 
