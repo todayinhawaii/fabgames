@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v4.6</title>
+<title>Fab House! 🏠 v4.7</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -375,16 +375,21 @@ function mobileJoyRelease(){
 }
 
 function deleteMobileSelected(){
-  if(selectedObj){
-    const{x,y,z}=selectedObj.mesh.userData;
-    removeBlock(x,y,z,true);
-    doDeselect();
+  // Use global refs _selectedObj/_selectedWall since this runs outside initApp
+  const obj = _selectedObj || (typeof selectedObj!=='undefined'?selectedObj:null);
+  const wall = _selectedWall || (typeof selectedWall!=='undefined'?selectedWall:null);
+  if(obj && obj.mesh){
+    const{x,y,z}=obj.mesh.userData;
+    if(typeof removeBlock==='function') removeBlock(x,y,z,true);
+    if(typeof doDeselect==='function') doDeselect();
+    else if(window.deselect) window.deselect();
     toast('🗑️ Deleted!');
-  } else if(selectedWall){
-    const idx=selectedWall.idx;
-    if(typeof removeWall==='function') removeWall(idx);
-    doDeselect();
+  } else if(wall){
+    if(typeof removeWall==='function') removeWall(wall.idx||0);
+    if(typeof doDeselect==='function') doDeselect();
     toast('🗑️ Wall deleted!');
+  } else {
+    toast('Nothing selected to delete');
   }
 }
 
@@ -3157,9 +3162,10 @@ function gizmoDuplicate(){
 }
 
 function gizmoDelete(){
-  if(selectedWall){ deleteSelectedWall(); return; }
-  if(!selectedObj){return;}
-  const{x,y,z}=selectedObj.mesh.userData;
+  if(selectedWall||_selectedWall){ deleteSelectedWall(); return; }
+  const obj=selectedObj||_selectedObj;
+  if(!obj||!obj.mesh){toast('Nothing selected');return;}
+  const{x,y,z}=obj.mesh.userData;
   deselect();
   removeBlock(x,y,z);
   sndErase();
