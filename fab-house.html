@@ -3092,7 +3092,7 @@ function gizmoDuplicate(){
     // Carry over the colour tint to the duplicate
     if(tintHex!==undefined) applyObjTint(placed[newKey], tintHex);
     // Select the new copy so the editor panel updates to show it
-    selectObject(placed[newKey].mesh);
+    if(window.innerWidth>768) selectObject(placed[newKey].mesh);
   }
   toast('⧉ Duplicated! Editing the new copy now.');
 }
@@ -3475,13 +3475,17 @@ canvas.addEventListener('pointerup',e=>{
           if(chk2.userData&&chk2.userData.isWall){hitWall2=walls[chk2.userData.wallIdx];break;}
           chk2=chk2.parent;
         }
-        if(hitWall2){ setMode('select'); selectWall(hitWall2); }
-        // Check if clicking placed block
+        if(hitWall2){ 
+          setMode('select');
+          if(window.innerWidth>768) selectWall(hitWall2);
+          else registerMobileTap(hitWall2, ()=>selectWall(hitWall2));
+        }
         else {
           const existingKey=bk(pos.x,pos.y,pos.z);
           if(placed[existingKey]){
             setMode('select');
-            selectObject(placed[existingKey].mesh);
+            if(window.innerWidth>768) selectObject(placed[existingKey].mesh);
+            else registerMobileTap(placed[existingKey].mesh, ()=>selectObject(placed[existingKey].mesh));
           } else {
             placeBlock(pos.x,pos.y,pos.z,currentBlock);
             sndPlace();
@@ -3657,8 +3661,11 @@ canvas.addEventListener('touchend',e=>{
         else {
           const pos=getPlacePos(hits[0]);
           const existingKey=bk(pos.x,pos.y,pos.z);
-          if(placed[existingKey]){ setMode('select'); selectObject(placed[existingKey].mesh); }
-          else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
+          if(placed[existingKey]){
+            setMode('select');
+            if(window.innerWidth>768) selectObject(placed[existingKey].mesh);
+            else registerMobileTap(placed[existingKey].mesh, ()=>selectObject(placed[existingKey].mesh));
+          } else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
         }
       } else if(mode==='select'){
         // MOBILE touch: use same registerMobileTap
