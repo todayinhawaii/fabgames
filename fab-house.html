@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v3.9</title>
+<title>Fab House! 🏠 v4.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -3674,13 +3674,15 @@ canvas.addEventListener('touchend',e=>{
         // handled by main pointerup
       } else if(mode==='build'){
         if(fakeEvent.altKey){ eraseAtHit(hits[0]); }
-        else {
+        else if(window.innerWidth<=768){
+          // Mobile: don't place on single tap - use double-tap from palette
+          toast('Double-tap palette item to place');
+        } else {
           const pos=getPlacePos(hits[0]);
           const existingKey=bk(pos.x,pos.y,pos.z);
           if(placed[existingKey]){
             setMode('select');
-            if(window.innerWidth>768) selectObject(placed[existingKey].mesh);
-            else registerMobileTap(placed[existingKey].mesh, ()=>selectObject(placed[existingKey].mesh));
+            selectObject(placed[existingKey].mesh);
           } else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
         }
       } else if(mode==='select'){
@@ -3909,10 +3911,16 @@ function buildPalette(){
       item.onclick=()=>{
         currentBlock=key;
         document.querySelectorAll('.pal-item').forEach(i=>i.classList.toggle('active',i.dataset.key===key));
-        setMode('build');
-        if(ghostMesh){const c=new THREE.Color(bd.c);ghostMesh.material.color.set(c);}
-        if(window.innerWidth>768) toast(`${bd.e||''} ${bd.l} — click floor to place`);
-        else toast(`${bd.l} — tap floor or double-tap here to place`);
+        if(window.innerWidth>768){
+          // Desktop: switch to build mode, click floor to place
+          setMode('build');
+          if(ghostMesh){const c=new THREE.Color(bd.c);ghostMesh.material.color.set(c);}
+          toast(`${bd.e||''} ${bd.l} — click floor to place`);
+        } else {
+          // Mobile: stay in SELECT mode, double-tap palette to place
+          setMode('select');
+          toast(`${bd.l} — double-tap here to place`);
+        }
       };
       // Mobile double-tap on palette item = instant place
       item.addEventListener('touchend', e=>{
