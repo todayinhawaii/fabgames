@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v4.5</title>
+<title>Fab House! 🏠 v4.6</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -3065,6 +3065,24 @@ function liveObjEdit(){
   document.getElementById('opDVal').textContent=Math.round(d*100)+'%';
 
   selectedObj.mesh.scale.set(w,h,d);
+
+  // Apply rotation slider
+  const rotEl=document.getElementById('opRot');
+  if(rotEl){
+    const rotRad=parseFloat(rotEl.value)*(Math.PI/180);
+    selectedObj.mesh.rotation.y=rotRad;
+    const rotValEl=document.getElementById('opRotVal');
+    if(rotValEl) rotValEl.textContent=rotEl.value+'°';
+  }
+  // Apply tilt slider
+  const tiltEl=document.getElementById('opTilt');
+  if(tiltEl){
+    const tiltRad=parseFloat(tiltEl.value)*(Math.PI/180);
+    selectedObj.mesh.rotation.x=tiltRad;
+    const tiltValEl=document.getElementById('opTiltVal');
+    if(tiltValEl) tiltValEl.textContent=tiltEl.value+'°';
+  }
+
   buildGizmo(selectedObj);
   updateObjPosDisplay(selectedObj);
 }
