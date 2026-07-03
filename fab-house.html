@@ -762,12 +762,13 @@ function doDeselect(){
 </div>
 
 <!-- MOBILE CONTROLS (bottom left) -->
-<div id="joystick" onpointerdown="event.stopPropagation()" 
-  style="position:fixed;bottom:64px;left:226px;z-index:85;display:flex;gap:6px;align-items:flex-end;"
+<div id="joystick" onpointerdown="event.stopPropagation()"
+  style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+  z-index:85;display:flex;gap:10px;align-items:center;"
   class="mobile-only-joystick">
-  
+
   <!-- WALK D-PAD -->
-  <div style="display:grid;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px);gap:2px;">
+  <div style="display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:3px;">
     <div></div>
     <button class="joy-btn" ontouchstart="keysHeld['KeyW']=true;event.preventDefault()" ontouchend="keysHeld['KeyW']=false" onmousedown="keysHeld['KeyW']=true" onmouseup="keysHeld['KeyW']=false">▲</button>
     <div></div>
@@ -779,8 +780,21 @@ function doDeselect(){
     <div></div>
   </div>
 
-
+  <!-- UP / DOWN buttons (E=up, C=down) -->
+  <div style="display:flex;flex-direction:column;gap:6px;">
+    <button class="joy-btn joy-fly" title="Fly Up (E)"
+      ontouchstart="keysHeld['KeyE']=true;event.preventDefault()"
+      ontouchend="keysHeld['KeyE']=false"
+      onmousedown="keysHeld['KeyE']=true"
+      onmouseup="keysHeld['KeyE']=false">⬆</button>
+    <button class="joy-btn joy-fly" title="Fly Down (C)"
+      ontouchstart="keysHeld['KeyC']=true;event.preventDefault()"
+      ontouchend="keysHeld['KeyC']=false"
+      onmousedown="keysHeld['KeyC']=true"
+      onmouseup="keysHeld['KeyC']=false">⬇</button>
+  </div>
 </div>
+
 
 <!-- MOBILE EDITOR TAB - shows when object selected on mobile -->
 <div id="mobileEditorTab" onclick="toggleMobileEditor()"
@@ -3382,19 +3396,28 @@ canvas.addEventListener('pointerup',e=>{
           node=node.parent;
         }
 
+        const isMobile=window.innerWidth<=768;
+        const isDouble=(Date.now()-lastClickTime)<400 && lastClickTarget===(foundBlock||foundStructural);
+
         if(foundWall) selectWall(foundWall);
-        else if(foundBlock) selectObject(foundBlock);
-        else if(foundStructural && (Date.now()-lastClickTime)<400 && lastClickTarget===foundStructural){
-          // Double-click on structural block — select it for editing
-          selectObject(foundStructural);
-          toast('🧱 Double-clicked! Adjust colour & size in the panel →');
-          lastClickTime=0; // reset so triple-click doesn't re-trigger
-        } else if(foundStructural){
-          // First click on structural — record it for potential double-click
-          lastClickTime=Date.now();
-          lastClickTarget=foundStructural;
+        else if(foundBlock){
+          // Furniture/GLB/decorations:
+          // Desktop = single click selects
+          // Mobile = double-tap selects (avoids accidental selections while navigating)
+          if(!isMobile || isDouble){
+            selectObject(foundBlock);
+          } else {
+            toast('👆 Double-tap to select & edit');
+            lastClickTime=Date.now(); lastClickTarget=foundBlock;
+          }
         }
-        // else: clicked terrain = just deselect, done!
+        else if(foundStructural && isDouble){
+          selectObject(foundStructural);
+          toast('🧱 Selected — adjust in panel');
+          lastClickTime=0;
+        } else if(foundStructural){
+          lastClickTime=Date.now(); lastClickTarget=foundStructural;
+        }
       } else if(mode==='erase'){
         // Check if erasing a wall
         let chkE=hits[0].object;
@@ -3715,36 +3738,38 @@ function buildPalette(){
         sw2.style.background='#'+bd.c.toString(16).padStart(6,'0');
         item.appendChild(sw2);
       }
-      // Track taps for double-tap detection on mobile
       let lastItemTap=0;
-      item.addEventListener('pointerdown', e=>{
-        currentBlock=key;mode='build';
+      item.onclick=()=>{
+        currentBlock=key;
         document.querySelectorAll('.pal-item').forEach(i=>i.classList.toggle('active',i.dataset.key===key));
         setMode('build');
         if(ghostMesh){const c=new THREE.Color(bd.c);ghostMesh.material.color.set(c);}
-
-        // MOBILE DOUBLE-TAP: place model right in front of camera
-        if(window.innerWidth<=768){
-          const now=Date.now();
-          if(now-lastItemTap<400){
-            // Double tap! Place at camera target
-            e.preventDefault();
-            const cx=Math.round(camTarget.x);
-            const cz=Math.round(camTarget.z);
-            placeBlock(cx,0,cz,key,true);
-            setMode('select');
-            const nk=bk(cx,0,cz);
-            if(placed[nk]) setTimeout(()=>selectObject(placed[nk].mesh),300);
-            toast('✅ '+(bd.l)+' placed! Tap to adjust');
-          } else {
-            toast((bd.l)+' — double-tap to place instantly!');
-          }
-          lastItemTap=now;
-        } else {
-          toast(`${bd.e||''} ${bd.l} selected — click floor to place`);
+        if(window.innerWidth>768) toast(`${bd.e||''} ${bd.l} — click floor to place`);
+        else toast(`${bd.l} — tap floor or double-tap here to place`);
+      };
+      // Mobile double-tap on palette item = instant place
+      item.addEventListener('touchend', e=>{
+        if(window.innerWidth>768) return;
+        const now=Date.now();
+        if(now-lastItemTap<450){
+          e.preventDefault();
+          e.stopPropagation();
+          currentBlock=key;
+          // Place at camera target position
+          const cx=Math.round(camTarget.x);
+          const cz=Math.round(camTarget.z);
+          // Find a free spot
+          let placed_y=0;
+          while(placed[bk(cx,placed_y,cz)]) placed_y++;
+          placeBlock(cx,placed_y,cz,key,true);
+          const nk=bk(cx,placed_y,cz);
+          setTimeout(()=>{
+            if(placed[nk]){ setMode('select'); selectObject(placed[nk].mesh); }
+          },300);
+          toast('✅ '+bd.l+' placed!');
         }
+        lastItemTap=now;
       });
-      item.onclick=e=>{}; // handled by pointerdown
       grid.appendChild(item);
     });
     sec.appendChild(btn);sec.appendChild(grid);pal.appendChild(sec);
