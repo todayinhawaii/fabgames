@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v4.3</title>
+<title>Fab House! 🏠 v4.4</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -347,8 +347,8 @@ function mobileJoyPress(dir){
       switch(dir){
         case 'N':  _moveSelected(0,0,-1); break;
         case 'S':  _moveSelected(0,0,1);  break;
-        case 'W':  _moveSelected(-1,0,0); break;
-        case 'E':  _moveSelected(1,0,0);  break;
+        case 'W':  _moveSelected(1,0,0);  break; // swapped
+        case 'E':  _moveSelected(-1,0,0); break; // swapped
         case 'UP': _moveSelected(0,1,0);  break;
         case 'DN': _moveSelected(0,-1,0); break;
       }
@@ -3936,9 +3936,13 @@ function buildPalette(){
           let px,py,pz;
           if(ch.length>0){
             const pos=getPlacePos(ch[0]);
-            px=pos.x; py=pos.y; pz=pos.z;
+            // Offset 2 units toward camera so it's not stuck in wall
+            const camDir=new THREE.Vector3();
+            camDir.subVectors(camera.position, new THREE.Vector3(pos.x,pos.y,pos.z)).normalize();
+            px=pos.x+Math.round(camDir.x*2);
+            py=pos.y;
+            pz=pos.z+Math.round(camDir.z*2);
           } else {
-            // Nothing in center - use camTarget but clamp to scene
             px=Math.round(camTarget.x);
             pz=Math.round(camTarget.z);
             py=currentFloor;
