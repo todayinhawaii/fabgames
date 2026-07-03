@@ -20,7 +20,7 @@ if('serviceWorker' in navigator){
 }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Fab House! 🏠 v4.8</title>
+<title>Fab House! 🏠 v4.9</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -375,16 +375,18 @@ function mobileJoyRelease(){
 }
 
 function deleteMobileSelected(){
-  alert('_selectedObj='+!!_selectedObj+' mesh='+!!(_selectedObj&&_selectedObj.mesh));
   const obj = _selectedObj;
-  if(obj && obj.mesh){
-    const{x,y,z}=obj.mesh.userData;
-    if(typeof removeBlock==='function'){ removeBlock(x,y,z,true); toast('🗑️ Deleted!'); }
-    _selectedObj=null; _selectedWall=null;
-    if(window.deselect) window.deselect();
-  } else {
-    toast('_selectedObj is '+JSON.stringify(_selectedObj));
+  if(!obj||!obj.mesh){ toast('Nothing selected'); return; }
+  // _selectedObj is the placed{} entry {mesh, type}
+  // Get coords from mesh userData
+  const ud = obj.mesh.userData;
+  const x=ud.x, y=ud.y, z=ud.z, key=ud.key;
+  if(typeof removeBlock==='function'){
+    removeBlock(x,y,z,true);
+    toast('🗑️ Deleted!');
   }
+  _selectedObj=null; _selectedWall=null;
+  if(window.deselect) window.deselect();
 }
 
 function toggleMobileEditor(){
