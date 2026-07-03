@@ -3628,10 +3628,21 @@ canvas.addEventListener('touchend',e=>{
           else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
         }
       } else if(mode==='select'){
-        deselect(); // always clear first
+        // MOBILE touch: require double-tap to select
+        // single tap = deselect only, no new selection
+        deselect();
         let t=hits[0].object;
         while(t&&!placed[t.userData.key])t=t.parent;
-        if(t&&placed[t.userData.key]) selectObject(t);
+        if(t&&placed[t.userData.key]){
+          const now=Date.now();
+          const isDouble=(now-lastClickTime)<450 && lastClickTarget===t;
+          if(isDouble){
+            selectObject(t);
+            lastClickTime=0; lastClickTarget=null;
+          } else {
+            lastClickTime=now; lastClickTarget=t;
+          }
+        }
       } else if(mode==='erase'){
         // Check if erasing a wall
         let chkE=hits[0].object;
