@@ -39,6 +39,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   #leftPanel:not(.collapsed){transform:translateX(0) !important;}
   #lpToggle{left:0 !important;}
   #lpToggle:not(.collapsed){left:230px !important;}
+  #mobileActionBar{display:flex !important;}
   /* Object editor - slides in from RIGHT on mobile */
   #objPropPanel{
     top:58px !important;
@@ -345,6 +346,20 @@ function mobileJoyRelease(){
     ['KeyW','KeyS','KeyA','KeyQ','KeyE','KeyC'].forEach(k=>keysHeld[k]=false);
 }
 
+function deleteMobileSelected(){
+  if(selectedObj){
+    const{x,y,z}=selectedObj.mesh.userData;
+    removeBlock(x,y,z,true);
+    doDeselect();
+    toast('🗑️ Deleted!');
+  } else if(selectedWall){
+    const idx=selectedWall.idx;
+    if(typeof removeWall==='function') removeWall(idx);
+    doDeselect();
+    toast('🗑️ Wall deleted!');
+  }
+}
+
 function toggleMobileEditor(){
   if(window.innerWidth > 768) return;
   const panel = document.getElementById('objPropPanel') || 
@@ -375,9 +390,11 @@ function toggleLeftPanel(){
 
 function doDeselect(){
   clickHadNewSelection = false;
-  // Hide mobile editor tab
+  // Hide mobile editor tab and delete button
   const tab=document.getElementById('mobileEditorTab');
   if(tab) tab.style.display='none';
+  const delBtn=document.getElementById('mobileDeleteBtn');
+  if(delBtn) delBtn.style.display='none';
   ['wallPropPanel','objPropPanel'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display='none';
@@ -843,6 +860,34 @@ function doDeselect(){
   </div>
 </div>
 
+
+<!-- MOBILE ACTION BAR - always visible on mobile -->
+<div id="mobileActionBar" class="mobile-only-joystick"
+  style="position:fixed;top:58px;right:8px;z-index:300;
+  display:none;flex-direction:column;gap:6px;">
+  <button onclick="undo()" style="
+    width:52px;height:52px;border-radius:12px;
+    background:rgba(0,0,0,0.85);border:2px solid rgba(255,215,0,0.5);
+    color:#FFD700;font-size:11px;font-family:'Fredoka One',cursive;
+    cursor:pointer;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:2px;">
+    <span style="font-size:18px;">↩</span>UNDO</button>
+  <button onclick="redo()" style="
+    width:52px;height:52px;border-radius:12px;
+    background:rgba(0,0,0,0.85);border:2px solid rgba(255,215,0,0.5);
+    color:#FFD700;font-size:11px;font-family:'Fredoka One',cursive;
+    cursor:pointer;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:2px;">
+    <span style="font-size:18px;">↪</span>REDO</button>
+  <button onclick="deleteMobileSelected()" id="mobileDeleteBtn" style="
+    width:52px;height:52px;border-radius:12px;
+    background:rgba(180,0,0,0.7);border:2px solid rgba(255,80,80,0.6);
+    color:#ff9999;font-size:11px;font-family:'Fredoka One',cursive;
+    cursor:pointer;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:2px;
+    display:none;">
+    <span style="font-size:18px;">🗑️</span>DEL</button>
+</div>
 
 <!-- MOBILE EDITOR TAB - shows when object selected on mobile -->
 <div id="mobileEditorTab" onclick="toggleMobileEditor()"
@@ -2789,11 +2834,13 @@ function openObjProps(obj){
   const panel=document.getElementById('objPropPanel');
   if(!panel || !obj) return;
   panel.style.display='flex';
-  // On mobile: hide panel, show the ▶ tab instead
+  // On mobile: show tab + delete button
   if(window.innerWidth <= 768){
     panel.classList.remove('mobile-open');
     const tab=document.getElementById('mobileEditorTab');
     if(tab){ tab.style.display='flex'; tab.textContent='▶ Edit'; }
+    const delBtn=document.getElementById('mobileDeleteBtn');
+    if(delBtn) delBtn.style.display='flex';
   }
 
   // Reset sliders to reflect current scale (as % of original)
@@ -3815,10 +3862,12 @@ function buildPalette(){
           while(placed[bk(cx,placed_y,cz)]) placed_y++;
           placeBlock(cx,placed_y,cz,key,true);
           const nk=bk(cx,placed_y,cz);
+          // Immediately switch to select so next tap edits, not duplicates
+          setMode('select');
           setTimeout(()=>{
-            if(placed[nk]){ setMode('select'); selectObject(placed[nk].mesh); }
+            if(placed[nk]){ selectObject(placed[nk].mesh); }
           },300);
-          toast('✅ '+bd.l+' placed!');
+          toast('✅ '+bd.l+' placed! Tap it to edit');
         }
         lastItemTap=now;
       });
