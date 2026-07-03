@@ -315,8 +315,10 @@ var mobileTapTimer=null;
 var mobileTapObj=null;
 var mobileTapCount=0;
 
+// Global deselect stub - overridden by initApp
+window.deselect = function(){};
+
 function registerMobileTap(obj, selectFn){
-  // Use window.deselect since this runs before initApp
   const _desel = window.deselect || function(){};
   if(mobileTapObj===obj && mobileTapCount===1){
     clearTimeout(mobileTapTimer);
@@ -1379,6 +1381,23 @@ const PALETTE_CATS=[
 ];
 
 function initApp(){
+  // Make deselect available globally immediately
+  window.deselect = function(){
+    if(typeof clearGizmo==='function') clearGizmo();
+    if(typeof selectedObj!=='undefined') selectedObj=null;
+    if(typeof selectedWall!=='undefined') selectedWall=null;
+    _selectedObj=null; _selectedWall=null;
+    ['wallPropPanel','objPropPanel'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){el.style.display='none';el.classList.remove('mobile-open');}
+    });
+    const db=document.getElementById('deselectBtn');
+    if(db) db.style.display='none';
+    const tab=document.getElementById('mobileEditorTab');
+    if(tab) tab.style.display='none';
+    const del=document.getElementById('mobileDeleteBtn');
+    if(del) del.style.display='none';
+  };
 const loadBar=document.getElementById('loadBar');
 function setLoad(p){loadBar.style.width=p+'%';}
 setLoad(10);
