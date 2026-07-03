@@ -39,29 +39,41 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   #leftPanel:not(.collapsed){transform:translateX(0) !important;}
   #lpToggle{left:0 !important;}
   #lpToggle:not(.collapsed){left:230px !important;}
-  /* Object editor - bottom center on mobile */
+  /* Object editor - slides in from RIGHT on mobile */
   #objPropPanel{
-    top:auto !important;
+    top:58px !important;
     bottom:0 !important;
-    left:0 !important;
-    right:0 !important;
-    width:100% !important;
-    border-radius:20px 20px 0 0 !important;
-    max-height:60vh;
+    left:auto !important;
+    right:-270px !important;
+    width:260px !important;
+    border-radius:16px 0 0 16px !important;
+    max-height:calc(100vh - 58px) !important;
     overflow-y:auto;
     box-sizing:border-box;
+    transition:right 0.25s ease !important;
   }
-  /* Wall editor too */
-  #wallPropPanel{
-    top:auto !important;
-    bottom:0 !important;
-    left:0 !important;
+  #objPropPanel.mobile-open{
     right:0 !important;
-    width:100% !important;
-    border-radius:20px 20px 0 0 !important;
-    max-height:60vh;
+  }
+  /* Wall editor same */
+  #wallPropPanel{
+    top:58px !important;
+    bottom:0 !important;
+    left:auto !important;
+    right:-270px !important;
+    width:260px !important;
+    border-radius:16px 0 0 16px !important;
+    max-height:calc(100vh - 58px) !important;
     overflow-y:auto;
     box-sizing:border-box;
+    transition:right 0.25s ease !important;
+  }
+  #wallPropPanel.mobile-open{
+    right:0 !important;
+  }
+  /* Mobile editor tab button */
+  #mobileEditorTab{
+    display:flex !important;
   }
 }
 
@@ -296,6 +308,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 var clickHadNewSelection = false; // true when selectObject/selectWall fires on this click cycle
 
 var lastClickTime=0;
+
+function toggleMobileEditor(){
+  if(window.innerWidth > 768) return;
+  const panel = document.getElementById('objPropPanel') || 
+                document.getElementById('wallPropPanel');
+  const tab = document.getElementById('mobileEditorTab');
+  if(!panel) return;
+  const isOpen = panel.classList.contains('mobile-open');
+  panel.classList.toggle('mobile-open');
+  if(tab) tab.textContent = isOpen ? '▶' : '◀';
+}
 var lastClickTarget=null;
 var currentTool=null;
 var toolActive=false;
@@ -316,6 +339,9 @@ function toggleLeftPanel(){
 
 function doDeselect(){
   clickHadNewSelection = false;
+  // Hide mobile editor tab
+  const tab=document.getElementById('mobileEditorTab');
+  if(tab) tab.style.display='none';
   ['wallPropPanel','objPropPanel'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display='none';
@@ -769,6 +795,17 @@ function doDeselect(){
     <button class="joy-btn joy-zoom" ontouchstart="keysHeld['Minus']=true;event.preventDefault()" ontouchend="keysHeld['Minus']=false" onmousedown="keysHeld['Minus']=true" onmouseup="keysHeld['Minus']=false">🔍-</button>
   </div>
 </div>
+
+<!-- MOBILE EDITOR TAB - shows when object selected on mobile -->
+<div id="mobileEditorTab" onclick="toggleMobileEditor()"
+  style="display:none;position:fixed;top:50%;right:0;z-index:401;
+  transform:translateY(-50%);
+  width:28px;height:60px;
+  background:rgba(255,215,0,0.9);
+  border-radius:10px 0 0 10px;
+  align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;color:#000;font-weight:bold;
+  box-shadow:-2px 0 10px rgba(0,0,0,0.3);">▶</div>
 
 <!-- NAVIGATE TOGGLE BUTTON -->
 <button id="navToggleBtn" onclick="
@@ -2704,6 +2741,12 @@ function openObjProps(obj){
   const panel=document.getElementById('objPropPanel');
   if(!panel || !obj) return;
   panel.style.display='flex';
+  // On mobile: hide panel, show the ▶ tab instead
+  if(window.innerWidth <= 768){
+    panel.classList.remove('mobile-open');
+    const tab=document.getElementById('mobileEditorTab');
+    if(tab){ tab.style.display='flex'; tab.textContent='▶ Edit'; }
+  }
 
   // Reset sliders to reflect current scale (as % of original)
   const s=obj.mesh.scale;
