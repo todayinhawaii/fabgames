@@ -311,6 +311,32 @@ var clickHadNewSelection = false; // true when selectObject/selectWall fires on 
 var lastClickTime=0;
 var lastClickTarget=null;
 var mobileJoyInterval=null;
+var mobileTapTimer=null;
+var mobileTapObj=null;
+var mobileTapCount=0;
+
+function registerMobileTap(obj, selectFn){
+  // Simple double-tap: two taps on same object within 400ms
+  if(mobileTapObj===obj && mobileTapCount===1){
+    // SECOND TAP - select it!
+    clearTimeout(mobileTapTimer);
+    mobileTapTimer=null;
+    mobileTapObj=null;
+    mobileTapCount=0;
+    deselect();
+    selectFn();
+  } else {
+    // FIRST TAP - wait for second
+    clearTimeout(mobileTapTimer);
+    mobileTapObj=obj;
+    mobileTapCount=1;
+    deselect();
+    mobileTapTimer=setTimeout(()=>{
+      mobileTapObj=null;
+      mobileTapCount=0;
+    },400);
+  }
+}
 // These get set by initApp but need global access for mobile joystick
 var _selectedObj=null;
 var _selectedWall=null;
@@ -3511,21 +3537,18 @@ canvas.addEventListener('pointerup',e=>{
         const hitObj=foundBlock||foundStructural||foundWall;
 
         if(isMobile){
-          // MOBILE: DOUBLE-TAP ONLY — never select on single tap
-          const hitNode = foundBlock||foundStructural||(foundWall&&foundWall.mesh)||null;
-          const isDouble = hitNode && (now-lastClickTime)<450 && lastClickTarget===hitNode;
-          if(isDouble){
-            deselect();
-            if(foundWall) selectWall(foundWall);
-            else if(foundBlock) selectObject(foundBlock);
-            else if(foundStructural) selectObject(foundStructural);
-            lastClickTime=0; lastClickTarget=null;
+          // Mobile: use registerMobileTap for clean double-tap detection
+          if(foundWall){
+            registerMobileTap(foundWall, ()=>selectWall(foundWall));
+          } else if(foundBlock){
+            registerMobileTap(foundBlock, ()=>selectObject(foundBlock));
+          } else if(foundStructural){
+            registerMobileTap(foundStructural, ()=>selectObject(foundStructural));
           } else {
-            deselect();
-            lastClickTime=now; lastClickTarget=hitNode;
+            deselect(); // tapped empty space
           }
         } else {
-          // DESKTOP unchanged
+          // DESKTOP: single click furniture, double-click structural
           deselect();
           if(foundWall) selectWall(foundWall);
           else if(foundBlock) selectObject(foundBlock);
@@ -3638,17 +3661,13 @@ canvas.addEventListener('touchend',e=>{
           else { placeBlock(pos.x,pos.y,pos.z,currentBlock); sndPlace(); }
         }
       } else if(mode==='select'){
-        // MOBILE touch: double-tap only
+        // MOBILE touch: use same registerMobileTap
         let t=hits[0].object;
         while(t&&!placed[t.userData.key])t=t.parent;
-        const now2=Date.now();
-        const isDouble2=t&&placed[t.userData.key]&&(now2-lastClickTime)<450&&lastClickTarget===t;
-        deselect();
-        if(isDouble2){
-          selectObject(t);
-          lastClickTime=0; lastClickTarget=null;
-        } else if(t&&placed[t.userData.key]){
-          lastClickTime=now2; lastClickTarget=t;
+        if(t&&placed[t.userData.key]){
+          registerMobileTap(t, ()=>selectObject(t));
+        } else {
+          deselect();
         }
       } else if(mode==='erase'){
         // Check if erasing a wall
