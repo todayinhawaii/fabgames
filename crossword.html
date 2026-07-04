@@ -624,10 +624,19 @@ function selectCell(r,c){
   if(!gr[r]||gr[r][c]==='#') return;
   selR=r; selC=c;
   clearHighlights();
-  const cl=findClue(r,c,dir)||findClue(r,c,dir==='across'?'down':'across');
-  if(cl){ dir=cl._d; selClue=cl; highlightWord(cl); activateClue(cl.num,cl._d); }
-  document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`)?.classList.add('hi-cell');
-  document.querySelector(`input[data-r="${r}"][data-c="${c}"]`)?.focus();
+  const isMobile = window.innerWidth <= 768;
+  if(isMobile){
+    // Mobile: NO word highlighting — just highlight the tapped cell
+    // Player can type freely in any direction they choose
+    document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`)?.classList.add('hi-cell');
+    document.querySelector(`input[data-r="${r}"][data-c="${c}"]`)?.focus();
+  } else {
+    // Desktop: full word highlighting as normal
+    const cl = findClue(r,c,dir) || findClue(r,c,dir==='across'?'down':'across');
+    if(cl){ dir=cl._d; selClue=cl; highlightWord(cl); activateClue(cl.num,cl._d); }
+    document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`)?.classList.add('hi-cell');
+    document.querySelector(`input[data-r="${r}"][data-c="${c}"]`)?.focus();
+  }
 }
 function clearHighlights(){
   document.querySelectorAll('.cell.white').forEach(el=>el.classList.remove('hi-cell','hi-word'));
@@ -644,7 +653,10 @@ function activateClue(num,d){
     el.classList.remove('active');
     if(+el.dataset.num===num&&el.dataset.dir===d) el.classList.add('active');
   });
-  document.querySelector('.clue-item.active')?.scrollIntoView({block:'nearest',behavior:'smooth'});
+  // Only scroll clues on desktop — on mobile it jumps the whole page
+  if(window.innerWidth > 768){
+    document.querySelector('.clue-item.active')?.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
 }
 function findClue(r,c,d){
   for(const cl of clues[d]){
