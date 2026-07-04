@@ -182,17 +182,69 @@ body{
 
 /* ── BUTTONS ── */
 #actionBtn{
-  font-family:'Fredoka One',cursive;font-size:22px;
-  padding:16px 48px;border-radius:50px;border:none;
+  font-family:'Fredoka One',cursive;font-size:24px;
+  padding:18px 52px;border-radius:50px;border:none;
   cursor:pointer;transition:all 0.25s;
-  background:linear-gradient(135deg,#87CEEB,#ADD8E6);
+  background:linear-gradient(180deg,#b8e8ff 0%,#87CEEB 50%,#5bb8e8 100%);
   color:#FF69B4;
-  box-shadow:0 6px 24px rgba(135,206,235,0.5);
+  box-shadow:0 8px 0 #3a9cc4, 0 12px 20px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.6);
   letter-spacing:1px;
+  animation:btnFlash 2s ease-in-out infinite;
+  transform:translateY(0);
+  text-shadow:0 1px 2px rgba(255,255,255,0.4);
 }
-#actionBtn:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(135,206,235,0.6);}
-#actionBtn.ready{background:linear-gradient(135deg,#FFB6C1,#FF69B4);color:#fff;}
-#actionBtn.check{background:linear-gradient(135deg,#98FB98,#44cc66);color:#fff;}
+#actionBtn:hover{
+  transform:translateY(4px);
+  box-shadow:0 4px 0 #3a9cc4, 0 6px 12px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.6);
+}
+#actionBtn:active{
+  transform:translateY(8px);
+  box-shadow:0 0px 0 #3a9cc4, 0 2px 8px rgba(0,0,0,0.3);
+}
+#actionBtn.ready{
+  background:linear-gradient(180deg,#ffccd5 0%,#FF69B4 50%,#e0407a 100%);
+  box-shadow:0 8px 0 #b02060, 0 12px 20px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.5);
+  color:#fff;
+}
+#actionBtn.check{
+  background:linear-gradient(180deg,#c8ffc8 0%,#44cc66 50%,#228833 100%);
+  box-shadow:0 8px 0 #155522, 0 12px 20px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.5);
+  color:#fff;
+}
+@keyframes btnFlash{
+  0%,100%{box-shadow:0 8px 0 #3a9cc4, 0 12px 20px rgba(0,0,0,0.3), 0 0 0 rgba(135,206,235,0);}
+  50%{box-shadow:0 8px 0 #3a9cc4, 0 12px 30px rgba(0,0,0,0.3), 0 0 30px rgba(135,206,235,0.8);}
+}
+
+/* Feedback popup */
+#feedbackMsg{
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-family:'Fredoka One',cursive;
+  font-size:48px;
+  padding:20px 48px;
+  border-radius:30px;
+  z-index:999;
+  pointer-events:none;
+  transition:transform 0.15s, opacity 0.3s;
+  opacity:0;
+  text-align:center;
+}
+#feedbackMsg.wrong{
+  background:linear-gradient(135deg,#ff6b6b,#ee0979);
+  color:#fff;
+  box-shadow:0 8px 40px rgba(238,9,121,0.5);
+}
+#feedbackMsg.right{
+  background:linear-gradient(135deg,#a8edea,#fed6e3);
+  color:#FF69B4;
+  box-shadow:0 8px 40px rgba(168,237,234,0.6);
+}
+#feedbackMsg.show{
+  transform:translate(-50%,-50%) scale(1);
+  opacity:1;
+}
 
 /* ── WIN OVERLAY ── */
 #winOverlay{
@@ -307,6 +359,9 @@ body{
 <!-- Drag ghost -->
 <div id="dragGhost"><img id="ghostImg" src="" alt=""></div>
 
+<!-- Feedback message -->
+<div id="feedbackMsg"></div>
+
 <script>
 // ── CONFIG ────────────────────────────────────────
 const LEVEL_CONFIG = {
@@ -329,6 +384,43 @@ let dragItem = null;     // {itemId, el}
 let correct = 0;
 
 // ── INIT ──────────────────────────────────────────
+// ── SOUNDS ───────────────────────────────────────
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playWrong(){
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.connect(g); g.connect(audioCtx.destination);
+  o.type='sawtooth'; o.frequency.setValueAtTime(200,audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(100,audioCtx.currentTime+0.3);
+  g.gain.setValueAtTime(0.3,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.3);
+  o.start(); o.stop(audioCtx.currentTime+0.3);
+}
+
+function playRight(){
+  [523,659,784,1047].forEach((freq,i)=>{
+    const o=audioCtx.createOscillator();
+    const g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type='sine'; o.frequency.value=freq;
+    const t=audioCtx.currentTime+i*0.1;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(0.3,t+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+    o.start(t); o.stop(t+0.25);
+  });
+}
+
+function showFeedback(type, msg){
+  const el=document.getElementById('feedbackMsg');
+  el.className=''; el.textContent='';
+  void el.offsetWidth; // force reflow
+  el.textContent=msg;
+  el.className=type+' show';
+  setTimeout(()=>el.classList.remove('show'),1500);
+}
+
 function setLevel(lv){
   currentLevel = lv;
   document.querySelectorAll('.lvl-btn').forEach((b,i)=>b.classList.toggle('active',i+1===lv));
@@ -545,12 +637,29 @@ function placeItem(slotKey, slotEl, itemId, sourceEl){
     sourceEl.draggable=false;
   }
 
+  // Check if correct
+  const correctItemId = parseInt(slotEl.dataset.itemId);
+  const isCorrect = itemId === correctItemId;
+
   // Show in slot
   slotEl.innerHTML='';
   const img=document.createElement('img');
   img.src=selectedItems.find(it=>it.id===itemId).src;
-  img.style.cssText='width:72px;height:72px;object-fit:contain;border-radius:8px;';
+  img.style.cssText='width:150px;height:150px;object-fit:contain;border-radius:8px;';
   slotEl.appendChild(img);
+
+  // Sound and feedback
+  if(isCorrect){
+    playRight();
+    showFeedback("right","Yesss Thats It!");
+    slotEl.style.border='2px solid rgba(80,220,80,0.6)';
+    slotEl.style.background='rgba(80,220,80,0.1)';
+  } else {
+    playWrong();
+    showFeedback("wrong","Oops Not Here!");
+    slotEl.style.border='2px solid rgba(220,80,80,0.6)';
+    slotEl.style.background='rgba(220,80,80,0.1)';
+  }
 
   updateScore();
 }
