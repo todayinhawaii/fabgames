@@ -150,6 +150,10 @@ const GAMES=[
    desc:'Build your dream home in full 3D! Place walls, windows, roofs, furniture and more. Drag, rotate and move anything you place. The ultimate creative building experience!!',
    color:'rgba(255,150,50,0.15)',href:'/fab-house'},
 
+  {id:'crossword',emoji:'🔤',cat:'Word · Puzzle',title:'Fab Crossword',
+   desc:'Classic crossword puzzles with a proper interlocking grid! Easy, Medium, Hard and Expert levels. 20 puzzles — animals, science, geography, philosophy and more!!',
+   color:'rgba(100,180,255,0.15)',href:'/crossword'},
+
   {id:'galaxy-explorer',emoji:'🚀',cat:'Educational · Space',title:'Galaxy Explorer',
    desc:'Blast off and tour the solar system! Visit the Sun, all 8 planets, the Moon and a Black Hole! Learn amazing facts and answer quiz questions to earn stars!!',
    color:'rgba(0,100,255,0.15)',href:'/galaxy-explorer'},
