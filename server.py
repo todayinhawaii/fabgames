@@ -502,6 +502,10 @@ def galaxy_explorer():
 def fab_house():
     return send_from_directory('.', 'fab-house.html')
 
+@app.route('/crossword')
+def crossword():
+    return send_from_directory('.', 'crossword.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
