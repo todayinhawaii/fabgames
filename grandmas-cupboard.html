@@ -29,17 +29,33 @@ body{
 #topbar{
   width:100%;max-width:1100px;
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 20px;
+  padding:14px 20px;
   background:rgba(0,0,0,0.5);
-  border-bottom:2px solid rgba(255,215,0,0.2);
+  border-bottom:2px solid rgba(255,182,193,0.3);
   position:sticky;top:0;z-index:200;
   backdrop-filter:blur(10px);
 }
-.logo{font-family:'Fredoka One',cursive;font-size:22px;color:var(--gold);}
+.logo{font-family:'Fredoka One',cursive;font-size:24px;color:#FFB6C1;}
 .logo span{font-size:13px;color:rgba(255,255,255,0.4);margin-left:4px;}
-#levelBar{display:flex;gap:6px;}
-.lvl-btn{font-family:'Fredoka One',cursive;font-size:12px;padding:5px 14px;border-radius:20px;border:2px solid rgba(255,255,255,0.2);cursor:pointer;background:transparent;color:rgba(255,255,255,0.5);transition:all 0.2s;}
-.lvl-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
+#levelBar{display:flex;gap:8px;}
+.lvl-btn{
+  font-family:'Fredoka One',cursive;font-size:15px;
+  padding:8px 20px;border-radius:30px;
+  border:2px solid rgba(255,182,193,0.4);
+  cursor:pointer;
+  background:rgba(173,216,230,0.15);
+  color:rgba(255,182,193,0.7);
+  transition:all 0.2s;
+  letter-spacing:0.5px;
+}
+.lvl-btn:hover{background:rgba(173,216,230,0.3);color:#FFB6C1;border-color:#FFB6C1;}
+.lvl-btn.active{
+  background:linear-gradient(135deg,#87CEEB,#ADD8E6);
+  color:#FF69B4;
+  border-color:#87CEEB;
+  box-shadow:0 4px 15px rgba(135,206,235,0.4);
+  font-size:16px;
+}
 
 /* ── MAIN ── */
 #main{width:100%;max-width:1100px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px;}
@@ -47,13 +63,13 @@ body{
 /* ── STATUS BAR ── */
 #statusBar{
   display:flex;align-items:center;justify-content:space-between;
-  width:100%;padding:10px 20px;
-  background:rgba(255,255,255,0.05);
-  border-radius:14px;border:1px solid rgba(255,215,0,0.2);
+  width:100%;padding:12px 24px;
+  background:rgba(135,206,235,0.08);
+  border-radius:20px;border:2px solid rgba(255,182,193,0.25);
 }
-#statusMsg{font-family:'Fredoka One',cursive;font-size:18px;color:var(--gold);}
-#scoreDisplay{font-family:'Fredoka One',cursive;font-size:16px;color:rgba(255,255,255,0.6);}
-#timerDisplay{font-family:'Fredoka One',cursive;font-size:20px;color:#ff9966;}
+#statusMsg{font-family:'Fredoka One',cursive;font-size:20px;color:#FFB6C1;}
+#scoreDisplay{font-family:'Fredoka One',cursive;font-size:18px;color:rgba(135,206,235,0.8);}
+#timerDisplay{font-family:'Fredoka One',cursive;font-size:20px;color:#FF69B4;}
 
 /* ── CUPBOARD IMAGE-BASED ── */
 #cupboardWrap{
@@ -166,15 +182,17 @@ body{
 
 /* ── BUTTONS ── */
 #actionBtn{
-  font-family:'Fredoka One',cursive;font-size:18px;
-  padding:14px 36px;border-radius:16px;border:none;
-  cursor:pointer;transition:all 0.2s;
-  background:var(--gold);color:#000;
-  box-shadow:0 4px 20px rgba(255,215,0,0.3);
+  font-family:'Fredoka One',cursive;font-size:22px;
+  padding:16px 48px;border-radius:50px;border:none;
+  cursor:pointer;transition:all 0.25s;
+  background:linear-gradient(135deg,#87CEEB,#ADD8E6);
+  color:#FF69B4;
+  box-shadow:0 6px 24px rgba(135,206,235,0.5);
+  letter-spacing:1px;
 }
-#actionBtn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(255,215,0,0.5);}
-#actionBtn.ready{background:linear-gradient(135deg,#ff9933,#ff6600);color:#fff;}
-#actionBtn.check{background:linear-gradient(135deg,#44cc66,#228833);color:#fff;}
+#actionBtn:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(135,206,235,0.6);}
+#actionBtn.ready{background:linear-gradient(135deg,#FFB6C1,#FF69B4);color:#fff;}
+#actionBtn.check{background:linear-gradient(135deg,#98FB98,#44cc66);color:#fff;}
 
 /* ── WIN OVERLAY ── */
 #winOverlay{
@@ -189,7 +207,7 @@ body{
   padding:48px;text-align:center;max-width:420px;
 }
 .win-emoji{font-size:72px;margin-bottom:16px;}
-.win-title{font-family:'Fredoka One',cursive;font-size:40px;color:var(--gold);margin-bottom:8px;}
+.win-title{font-family:'Fredoka One',cursive;font-size:40px;color:#FF69B4;margin-bottom:8px;}
 .win-sub{font-size:16px;color:rgba(255,255,255,0.6);margin-bottom:28px;}
 .win-stats{display:flex;gap:24px;justify-content:center;margin-bottom:28px;}
 .win-stat{text-align:center;}
@@ -202,8 +220,8 @@ body{
   font-family:'Fredoka One',cursive;font-size:13px;
 }
 .phase{padding:4px 12px;border-radius:20px;color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.1);}
-.phase.active{color:var(--gold);border-color:var(--gold);background:rgba(255,215,0,0.1);}
-.phase.done{color:rgba(255,255,255,0.5);border-color:rgba(255,255,255,0.2);text-decoration:line-through;}
+.phase.active{color:#FFB6C1;border-color:#FFB6C1;background:rgba(255,182,193,0.1);}
+.phase.done{color:rgba(255,255,255,0.4);border-color:rgba(255,255,255,0.15);text-decoration:line-through;}
 
 /* ── DRAG GHOST ── */
 #dragGhost{
@@ -385,6 +403,7 @@ function renderCupboard(){
         const img=document.createElement('img');
         img.src=item.src;
         img.style.cssText='width:150px;height:150px;object-fit:contain;border-radius:8px;';
+        img.onerror=()=>{img.style.display='none';}; // hide broken images
         slot.appendChild(img);
         slot.style.border='none';slot.style.background='none';
       }
