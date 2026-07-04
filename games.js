@@ -4,6 +4,9 @@
 
 const GAMES=[
   // ── ROW 1 ──
+  {id:'grandmas-cupboard',emoji:'🧺',cat:'Memory · Fun',title:"Grandma's Cupboard",
+   desc:"Open the cupboard and study what's inside — then close it! Can you remember where everything goes? Drag it all back in the right place. Easy, Medium and Hard!!",
+   color:'rgba(180,120,80,0.15)',href:'/grandmas-cupboard'},
   {id:'donut',emoji:'🍩',cat:'Arcade · Fun',title:'Donut Dash',
    desc:'Hit the falling donuts into the goal — but watch out for the mad chef!! He floats around and if he touches you, you lose ALL your points!! How high can you score??',
    color:'rgba(255,157,226,0.15)',href:'/donut'},
