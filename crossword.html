@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fab Crossword 🔤 — fab.games</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:#0a0a1a;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+#topbar{width:100%;max-width:1100px;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(0,0,0,0.6);border-bottom:2px solid rgba(255,215,0,0.2);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.logo{font-family:'Fredoka One',cursive;font-size:22px;color:#FFD700;}
+.logo span{color:#fff;font-size:14px;opacity:0.5;margin-left:4px;}
+#levelBar{display:flex;gap:6px;}
+.lvl-btn{font-family:'Fredoka One',cursive;font-size:12px;padding:5px 14px;border-radius:20px;border:2px solid rgba(255,255,255,0.2);cursor:pointer;background:transparent;color:rgba(255,255,255,0.6);transition:all 0.2s;}
+.lvl-btn.active{background:#FFD700;color:#000;border-color:#FFD700;}
+.lvl-btn.expert{border-color:rgba(255,80,80,0.4);color:rgba(255,150,150,0.8);}
+.lvl-btn.expert.active{background:linear-gradient(135deg,#ff4444,#cc0000);color:#fff;border-color:#ff4444;}
+#main{width:100%;max-width:1100px;padding:16px;display:flex;flex-direction:column;gap:14px;}
+#btnBar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.btn{font-family:'Fredoka One',cursive;font-size:13px;padding:9px 18px;border-radius:12px;border:none;cursor:pointer;transition:all 0.2s;}
+.btn-check{background:rgba(80,200,80,0.2);color:#80FF80;border:2px solid rgba(80,200,80,0.4);}
+.btn-reveal{background:rgba(255,150,0,0.2);color:#FFB347;border:2px solid rgba(255,150,0,0.4);}
+.btn-clear{background:rgba(200,80,80,0.2);color:#FF9999;border:2px solid rgba(200,80,80,0.4);}
+.btn-next{background:#FFD700;color:#000;border:2px solid #FFD700;}
+.puzzle-title{font-family:'Fredoka One',cursive;font-size:14px;color:rgba(255,215,0,0.6);}
+#puzzleWrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+#gridWrap{flex-shrink:0;background:rgba(255,255,255,0.03);border-radius:16px;padding:10px;border:2px solid rgba(255,215,0,0.15);}
+#grid{display:inline-grid;gap:2px;}
+.cell{width:72px;height:72px;position:relative;}
+.cell.black{background:#0a0a0a;border-radius:3px;}
+.cell.white{background:#f0f0f0;border-radius:3px;cursor:text;}
+.cell.white input{width:100%;height:100%;border:none;background:transparent;text-align:center;font-family:'Fredoka One',cursive;font-size:32px;color:#111;text-transform:uppercase;cursor:text;outline:none;caret-color:transparent;padding:0;}
+.cell.white.hi-word{background:#ffe566;}
+.cell.white.hi-cell{background:#FFD700;}
+.cell.white.correct{background:#1a1a2e;}
+.cell.white.correct input{color:#FFD700;}
+.cell.white.wrong{background:rgba(200,50,50,0.4);}
+.cell.white.wrong input{color:#fff;}
+.cell-num{position:absolute;top:1px;left:2px;font-size:20px;color:#444;font-family:'Nunito',sans-serif;font-weight:700;line-height:1;pointer-events:none;z-index:2;}
+#cluesWrap{flex:1;min-width:260px;display:flex;gap:16px;max-height:600px;}
+.clue-col{flex:1;overflow-y:auto;scrollbar-width:thin;}
+.clue-col h3{font-family:'Fredoka One',cursive;font-size:20px;color:#FFD700;letter-spacing:2px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(255,215,0,0.2);position:sticky;top:0;background:#0a0a1a;z-index:1;padding-top:2px;}
+.clue-item{font-size:21px;color:rgba(255,255,255,0.65);padding:8px 10px;border-radius:6px;cursor:pointer;border-left:2px solid transparent;transition:all 0.15s;line-height:1.5;margin-bottom:4px;}
+.clue-item:hover{background:rgba(255,215,0,0.08);color:#FFD700;}
+.clue-item.active{background:rgba(255,215,0,0.12);border-left-color:#FFD700;color:#FFD700;}
+.clue-item.done{color:rgba(255,255,255,0.25);text-decoration:line-through;}
+.clue-num{font-weight:700;color:#FFD700;margin-right:6px;font-size:21px;}
+#winOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;}
+#winOverlay.show{display:flex;}
+.win-box{background:#0d0d1a;border:3px solid #FFD700;border-radius:24px;padding:40px;text-align:center;}
+.win-emoji{font-size:64px;margin-bottom:12px;}
+.win-title{font-family:'Fredoka One',cursive;font-size:36px;color:#FFD700;margin-bottom:8px;}
+.win-sub{font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:24px;}
+#status{font-family:'Fredoka One',cursive;font-size:12px;color:rgba(255,215,0,0.4);padding:4px 0;}
+@media(max-width:700px){
+  #cluesWrap{flex-direction:column;max-height:300px;overflow-y:auto;}
+  .clue-col{overflow-y:visible;}
+  .cell{width:52px;height:52px;}
+  .cell.white input{font-size:22px;}
+  .cell-num{font-size:18px;}
+}
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div class="logo">🔤 Fab Crossword</div>
+  <div id="levelBar">
+    <button class="lvl-btn active" onclick="setLevel('easy')">Easy</button>
+    <button class="lvl-btn" onclick="setLevel('medium')">Medium</button>
+    <button class="lvl-btn" onclick="setLevel('hard')">Hard</button>
+    <button class="lvl-btn expert" onclick="setLevel('expert')">Expert ⚡</button>
+  </div>
+</div>
+<div id="main">
+  <div id="btnBar">
+    <button class="btn btn-check" onclick="checkAll()">✓ Check</button>
+    <button class="btn btn-reveal" id="revealBtn" onclick="toggleReveal()">💡 Reveal</button>
+    <button class="btn btn-clear" onclick="clearAll()">✕ Clear</button>
+    <button class="btn btn-next" onclick="nextPuzzle()">Next →</button>
+    <span class="puzzle-title" id="ptitle"></span>
+  </div>
+  <div id="status"></div>
+  <div id="puzzleWrap">
+    <div id="gridWrap"><div id="grid"></div></div>
+    <div id="cluesWrap">
+      <div class="clue-col"><h3>ACROSS</h3><div id="acList"></div></div>
+      <div class="clue-col"><h3>DOWN</h3><div id="dnList"></div></div>
+    </div>
+  </div>
+</div>
+<div id="winOverlay">
+  <div class="win-box">
+    <div class="win-emoji">🎉</div>
+    <div class="win-title">Puzzle Solved!</div>
+    <div class="win-sub" id="winSub"></div>
+    <button class="btn btn-next" style="font-size:22px;padding:12px 28px;" onclick="nextPuzzle();document.getElementById('winOverlay').classList.remove('show');">Next Puzzle →</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// CROSSWORD AUTO-GENERATOR
+// Takes a list of {word, clue} pairs and builds a
+// proper interlocking crossword grid automatically.
+// ══════════════════════════════════════════════════
+
+// ── PUZZLE WORD BANKS ─────────────────────────────
+const WORD_BANKS = {
+easy:[
+ {title:"Animals",words:[
+  {w:"CAT",    c:"Small furry pet that purrs"},
+  {w:"DOG",    c:"Man's best friend"},
+  {w:"PIG",    c:"Farm animal that oinks"},
+  {w:"COW",    c:"Gives us milk on the farm"},
+  {w:"HEN",    c:"Female chicken"},
+  {w:"OWL",    c:"Wise bird active at night"},
+  {w:"FOX",    c:"Cunning red wild animal"},
+  {w:"ANT",    c:"Tiny insect in a colony"},
+  {w:"BEE",    c:"Insect that makes honey"},
+  {w:"RAT",    c:"Rodent with a long tail"},
+ ]},
+ {title:"Food",words:[
+  {w:"CAKE",   c:"Sweet baked treat for birthdays"},
+  {w:"RICE",   c:"Grain eaten across Asia"},
+  {w:"SOUP",   c:"Hot liquid food eaten with a spoon"},
+  {w:"MILK",   c:"White drink from a cow"},
+  {w:"EGGS",   c:"Laid by hens, used in baking"},
+  {w:"FISH",   c:"Caught in the sea, lives in water"},
+  {w:"MEAT",   c:"Beef, pork or chicken"},
+  {w:"BEAN",   c:"Small green vegetable pod"},
+  {w:"CORN",   c:"Yellow grain on a cob"},
+  {w:"PEAR",   c:"Green or yellow juicy fruit"},
+ ]},
+ {title:"Colours",words:[
+  {w:"RED",    c:"Colour of fire and roses"},
+  {w:"BLUE",   c:"Colour of the sky"},
+  {w:"PINK",   c:"Colour of flamingos"},
+  {w:"GOLD",   c:"Colour of the sun and treasure"},
+  {w:"GREY",   c:"Colour of clouds on a rainy day"},
+  {w:"TEAL",   c:"Blue-green colour"},
+  {w:"LIME",   c:"Bright yellow-green colour"},
+  {w:"NAVY",   c:"Dark blue, colour of the ocean depths"},
+  {w:"PLUM",   c:"Dark purple colour"},
+  {w:"ROSE",   c:"Pinkish-red colour"},
+ ]},
+ {title:"Sports",words:[
+  {w:"GOLF",   c:"Sport played with clubs on a course"},
+  {w:"POLO",   c:"Sport played on horseback"},
+  {w:"SWIM",   c:"Move through water"},
+  {w:"DIVE",   c:"Jump head-first into water"},
+  {w:"RACE",   c:"Compete to be fastest"},
+  {w:"KICK",   c:"Strike a ball with your foot"},
+  {w:"SPIN",   c:"Rotate quickly"},
+  {w:"JUMP",   c:"Leap into the air"},
+  {w:"ROPE",   c:"Skip ___ for exercise"},
+  {w:"BALL",   c:"Round object used in many sports"},
+ ]},
+ {title:"Body",words:[
+  {w:"ARM",    c:"Limb from shoulder to wrist"},
+  {w:"LEG",    c:"Limb you walk on"},
+  {w:"EAR",    c:"Organ of hearing"},
+  {w:"EYE",    c:"Organ of sight"},
+  {w:"LIP",    c:"Edge of the mouth"},
+  {w:"RIB",    c:"Curved bone protecting your chest"},
+  {w:"HIP",    c:"Joint between waist and thigh"},
+  {w:"TOE",    c:"One of five digits on your foot"},
+  {w:"JAW",    c:"Lower part of your face"},
+  {w:"GUM",    c:"Soft tissue around your teeth"},
+ ]},
+],
+medium:[
+ {title:"World Cities",words:[
+  {w:"PARIS",    c:"Capital of France, city of the Eiffel Tower"},
+  {w:"CAIRO",    c:"Capital of Egypt, near the pyramids"},
+  {w:"MILAN",    c:"Italian city famous for fashion"},
+  {w:"OSAKA",    c:"Japanese city famous for food"},
+  {w:"DELHI",    c:"Capital territory of India"},
+  {w:"LAGOS",    c:"Largest city in Nigeria"},
+  {w:"LIMA",     c:"Capital of Peru"},
+  {w:"OSLO",     c:"Capital of Norway"},
+  {w:"ROME",     c:"Eternal city of Italy"},
+  {w:"BALI",     c:"Indonesian island paradise"},
+ ]},
+ {title:"Ocean Life",words:[
+  {w:"WHALE",    c:"Largest animal ever to live on Earth"},
+  {w:"SHARK",    c:"Ocean predator with rows of sharp teeth"},
+  {w:"CORAL",    c:"Colourful reef-building sea creature"},
+  {w:"PRAWN",    c:"Small shellfish, pink when cooked"},
+  {w:"SQUID",    c:"Ten-armed sea creature that squirts ink"},
+  {w:"TROUT",    c:"Freshwater fish popular with anglers"},
+  {w:"ALGAE",    c:"Simple plant that grows in water"},
+  {w:"OTTER",    c:"Furry mammal that swims on its back"},
+  {w:"PERCH",    c:"Freshwater fish, also to sit up high"},
+  {w:"BREAM",    c:"Common freshwater fishing catch"},
+ ]},
+ {title:"Science",words:[
+  {w:"ATOM",     c:"Smallest unit of a chemical element"},
+  {w:"CELL",     c:"Basic unit of all living things"},
+  {w:"GENE",     c:"Unit of heredity in DNA"},
+  {w:"LENS",     c:"Curved glass that bends light"},
+  {w:"MASS",     c:"Amount of matter in an object"},
+  {w:"HEAT",     c:"Form of energy we feel as warmth"},
+  {w:"WAVE",     c:"How sound and light travel"},
+  {w:"ACID",     c:"Sour-tasting corrosive substance"},
+  {w:"BASE",     c:"Opposite of acid in chemistry"},
+  {w:"IRON",     c:"Magnetic metal element symbol Fe"},
+ ]},
+ {title:"Music",words:[
+  {w:"BEAT",     c:"Rhythm you tap your foot to"},
+  {w:"BASS",     c:"Low-pitched sound or instrument"},
+  {w:"TUNE",     c:"A melody or song"},
+  {w:"SOLO",     c:"A single performer plays alone"},
+  {w:"JAZZ",     c:"American music style born in New Orleans"},
+  {w:"FOLK",     c:"Traditional music of a country"},
+  {w:"HYMN",     c:"Religious song sung in church"},
+  {w:"LYRE",     c:"Ancient stringed instrument"},
+  {w:"FIFE",     c:"Small flute used in military bands"},
+  {w:"HARP",     c:"Large triangular stringed instrument"},
+ ]},
+ {title:"Countries",words:[
+  {w:"SPAIN",    c:"Country of flamenco and tapas"},
+  {w:"CHINA",    c:"Most populous country on Earth"},
+  {w:"INDIA",    c:"Country of the Taj Mahal"},
+  {w:"GHANA",    c:"West African nation, first to gain independence"},
+  {w:"CHILE",    c:"Long thin country along South Americas coast"},
+  {w:"ITALY",    c:"Boot-shaped country of pizza and pasta"},
+  {w:"JAPAN",    c:"Island nation of sushi and samurai"},
+  {w:"KENYA",    c:"East African nation famous for safaris"},
+  {w:"NEPAL",    c:"Himalayan nation home of Mount Everest"},
+  {w:"TONGA",    c:"Pacific island kingdom"},
+ ]},
+],
+hard:[
+ {title:"Space",words:[
+  {w:"ORBIT",      c:"Path of a planet around the sun"},
+  {w:"COMET",      c:"Icy body with a glowing tail"},
+  {w:"QUASAR",     c:"Extremely luminous galactic nucleus"},
+  {w:"NEBULA",     c:"Cloud of gas and dust where stars form"},
+  {w:"PULSAR",     c:"Rapidly rotating neutron star"},
+  {w:"ZENITH",     c:"Point directly above the observer in the sky"},
+  {w:"CORONA",     c:"Outer atmosphere of the sun"},
+  {w:"PHOTON",     c:"Particle of light"},
+  {w:"METEOR",     c:"Rock that burns in the atmosphere"},
+  {w:"SATURN",     c:"Ringed planet sixth from the sun"},
+ ]},
+ {title:"History",words:[
+  {w:"EMPIRE",     c:"Vast territory under one ruler"},
+  {w:"TREATY",     c:"Formal agreement between nations"},
+  {w:"FEUDAL",     c:"Medieval system of lords and serfs"},
+  {w:"SENATE",     c:"Upper house of the Roman legislature"},
+  {w:"PLAGUE",     c:"Deadly epidemic — the Black Death"},
+  {w:"CAESAR",     c:"Famous Roman general and dictator"},
+  {w:"THRONE",     c:"Ceremonial chair of a monarch"},
+  {w:"KNIGHT",     c:"Armoured warrior of the Middle Ages"},
+  {w:"HERALD",     c:"Messenger who announces royal news"},
+  {w:"TYRANT",     c:"Cruel and oppressive ruler"},
+ ]},
+ {title:"Literature",words:[
+  {w:"NOVEL",      c:"A long work of fiction"},
+  {w:"VERSE",      c:"A line or group of lines in a poem"},
+  {w:"IRONY",      c:"Saying the opposite of what you mean"},
+  {w:"THEME",      c:"Central idea of a literary work"},
+  {w:"PROSE",      c:"Ordinary written language, not poetry"},
+  {w:"SATIRE",     c:"Using humour to criticise society"},
+  {w:"SONNET",     c:"Fourteen-line poem by Shakespeare"},
+  {w:"STANZA",     c:"A group of lines forming a unit in a poem"},
+  {w:"SIMILE",     c:"Comparison using like or as"},
+  {w:"ALLUSION",   c:"Indirect reference to another work"},
+ ]},
+ {title:"Technology",words:[
+  {w:"PIXEL",      c:"Tiny dot that makes up a digital image"},
+  {w:"ROUTER",     c:"Device that directs internet traffic"},
+  {w:"CURSOR",     c:"Blinking pointer on a screen"},
+  {w:"KERNEL",     c:"Core of an operating system"},
+  {w:"CACHE",      c:"Temporary storage for quick access"},
+  {w:"SERVER",     c:"Computer that provides data to others"},
+  {w:"SYNTAX",     c:"Rules of a programming language"},
+  {w:"BINARY",     c:"Number system using only 0 and 1"},
+  {w:"PYTHON",     c:"Popular programming language named after a snake"},
+  {w:"VECTOR",     c:"Quantity with both magnitude and direction"},
+ ]},
+ {title:"Geography",words:[
+  {w:"STEPPE",     c:"Vast treeless plain in central Asia"},
+  {w:"TUNDRA",     c:"Frozen Arctic landscape"},
+  {w:"FJORD",      c:"Narrow sea inlet between cliffs in Norway"},
+  {w:"DELTA",      c:"Triangular landform at a rivers mouth"},
+  {w:"ATOLL",      c:"Ring-shaped coral island"},
+  {w:"GORGE",      c:"Narrow valley with steep rocky walls"},
+  {w:"MESA",       c:"Flat-topped hill with steep sides"},
+  {w:"BASIN",      c:"Low area of land surrounded by higher ground"},
+  {w:"RIDGE",      c:"Long narrow hilltop or mountain chain"},
+  {w:"ISTHMUS",    c:"Narrow strip of land connecting two larger areas"},
+ ]},
+],
+expert:[
+ {title:"Advanced Science",words:[
+  {w:"PHOTOSYNTHESIS",  c:"Process plants use to convert sunlight into food"},
+  {w:"MITOCHONDRIA",   c:"Powerhouse of the cell"},
+  {w:"CHROMOSOME",     c:"Thread-like structure carrying genetic information"},
+  {w:"THERMODYNAMICS", c:"Branch of physics dealing with heat and energy"},
+  {w:"ELECTROMAGNETIC", c:"Type of wave including light and radio"},
+  {w:"GRAVITATIONAL",  c:"Type of force pulling masses together"},
+  {w:"NEUTRON",        c:"Neutral particle in an atomic nucleus"},
+  {w:"PROTON",         c:"Positively charged particle in nucleus"},
+  {w:"ELECTRON",       c:"Negatively charged particle orbiting nucleus"},
+  {w:"CATALYST",       c:"Substance that speeds up a chemical reaction"},
+  {w:"ISOTOPE",        c:"Variant of an element with different neutron count"},
+  {w:"QUANTUM",        c:"Discrete unit of energy in physics"},
+ ]},
+ {title:"World History",words:[
+  {w:"RENAISSANCE",    c:"European cultural rebirth of the 14th-17th centuries"},
+  {w:"REVOLUTION",     c:"Overthrow of a government or social order"},
+  {w:"IMPERIALISM",    c:"Policy of extending power through colonisation"},
+  {w:"ARCHAEOLOGY",    c:"Study of human history through excavation"},
+  {w:"CONSTITUTION",   c:"Fundamental laws governing a nation"},
+  {w:"DEMOCRACY",      c:"Government by the people"},
+  {w:"DIPLOMATIC",     c:"Relating to relations between nations"},
+  {w:"COLONIALISM",    c:"Practice of acquiring colonies"},
+  {w:"PARLIAMENT",     c:"Legislative body of a country"},
+  {w:"MEDIEVAL",       c:"Relating to the Middle Ages"},
+  {w:"OTTOMAN",        c:"Empire that ruled much of Middle East until 1922"},
+  {w:"BYZANTINE",      c:"Eastern Roman Empire based in Constantinople"},
+ ]},
+ {title:"Philosophy",words:[
+  {w:"EXISTENTIALISM", c:"Philosophy focusing on individual freedom and choice"},
+  {w:"METAPHYSICS",    c:"Branch of philosophy exploring reality and existence"},
+  {w:"EPISTEMOLOGY",   c:"Study of the nature and scope of knowledge"},
+  {w:"DIALECTIC",      c:"Method of debate through contradictory ideas"},
+  {w:"EMPIRICISM",     c:"Theory that knowledge comes from experience"},
+  {w:"RATIONALISM",    c:"Belief that reason is the source of knowledge"},
+  {w:"UTILITARIANISM", c:"Ethics based on greatest good for greatest number"},
+  {w:"NIHILISM",       c:"Belief that life has no meaning or purpose"},
+  {w:"STOICISM",       c:"Ancient philosophy of enduring pain without complaint"},
+  {w:"HEDONISM",       c:"Pursuit of pleasure as the highest good"},
+  {w:"PARADOX",        c:"Statement that contradicts itself yet may be true"},
+  {w:"ZEITGEIST",      c:"Spirit or mood of a particular period in history"},
+ ]},
+ {title:"Advanced Literature",words:[
+  {w:"ONOMATOPOEIA",   c:"Word that imitates a sound: buzz, crash, splash"},
+  {w:"PROTAGONIST",    c:"Main character in a story"},
+  {w:"ANTAGONIST",     c:"Character who opposes the hero"},
+  {w:"FORESHADOWING",  c:"Hint at events that will happen later in a story"},
+  {w:"ALLITERATION",   c:"Repetition of the same consonant sound"},
+  {w:"HYPERBOLE",      c:"Extreme exaggeration for effect"},
+  {w:"JUXTAPOSITION",  c:"Placing contrasting elements side by side"},
+  {w:"SOLILOQUY",      c:"Character speaking thoughts aloud alone on stage"},
+  {w:"DENOUEMENT",     c:"Final resolution of a plot"},
+  {w:"ALLEGORY",       c:"Story with a hidden symbolic meaning"},
+  {w:"CATHARSIS",      c:"Emotional release through art or tragedy"},
+  {w:"MOTIF",          c:"Recurring element in a literary work"},
+ ]},
+ {title:"Global Geography",words:[
+  {w:"CIRCUMNAVIGATION",c:"Travelling all the way around the Earth"},
+  {w:"ARCHIPELAGO",    c:"Chain or group of islands"},
+  {w:"MEDITERRANEAN",  c:"Sea between Europe, Africa and Asia"},
+  {w:"TROPOSPHERE",    c:"Lowest layer of Earth's atmosphere"},
+  {w:"HYDROSPHERE",    c:"All the water on, above and below Earth's surface"},
+  {w:"STRATOSPHERE",   c:"Layer of atmosphere above the troposphere"},
+  {w:"CONTINENTAL",    c:"Relating to a large landmass"},
+  {w:"SUBTERRANEAN",   c:"Existing or happening underground"},
+  {w:"EQUATORIAL",     c:"Relating to the region near the equator"},
+  {w:"LONGITUDE",      c:"Distance east or west measured in degrees"},
+  {w:"LATITUDE",       c:"Distance north or south of the equator"},
+  {w:"ELEVATION",      c:"Height above sea level"},
+ ]},
+]};
+
+// ══════════════════════════════════════════════════
+// CROSSWORD GENERATOR ALGORITHM
+// ══════════════════════════════════════════════════
+function generateCrossword(wordList){
+  const GRID = 20; // working grid size
+  const grid = Array.from({length:GRID},()=>Array(GRID).fill(''));
+  const placed = []; // {word,clue,row,col,dir}
+
+  function canPlace(word, row, col, dir){
+    const rows=GRID, cols=GRID;
+    // Check BEFORE the word — must be empty
+    if(dir==='across'){
+      if(col>0 && grid[row][col-1]) return false;
+      if(row<0||row>=rows) return false;
+    } else {
+      if(row>0 && grid[row-1][col]) return false;
+      if(col<0||col>=cols) return false;
+    }
+    // Check AFTER the word — must be empty
+    if(dir==='across'){
+      if(col+word.length<cols && grid[row][col+word.length]) return false;
+    } else {
+      if(row+word.length<rows && grid[row+word.length][col]) return false;
+    }
+    for(let i=0;i<word.length;i++){
+      const r = dir==='across' ? row : row+i;
+      const c = dir==='across' ? col+i : col;
+      if(r<0||r>=rows||c<0||c>=cols) return false;
+      const cur = grid[r][c];
+      // Must be empty or exact match
+      if(cur && cur !== word[i]) return false;
+      if(!cur){
+        // Perpendicular neighbors: only allowed if they're part of an existing word
+        if(dir==='across'){
+          const above = r>0 ? grid[r-1][c] : '';
+          const below = r<rows-1 ? grid[r+1][c] : '';
+          if(above || below){
+            // Must intersect with a placed DOWN word at this cell
+            const ok = placed.some(p=>
+              p.dir==='down' && p.col===c && r>=p.row && r<p.row+p.word.length
+            );
+            if(!ok) return false;
+          }
+        } else {
+          const left  = c>0 ? grid[r][c-1] : '';
+          const right = c<cols-1 ? grid[r][c+1] : '';
+          if(left || right){
+            const ok = placed.some(p=>
+              p.dir==='across' && p.row===r && c>=p.col && c<p.col+p.word.length
+            );
+            if(!ok) return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  function placeWord(word, clue, row, col, dir){
+    for(let i=0;i<word.length;i++){
+      const r = dir==='across' ? row : row+i;
+      const c = dir==='across' ? col+i : col;
+      grid[r][c] = word[i];
+    }
+    placed.push({word,clue,row,col,dir});
+  }
+
+  function findPlacements(word){
+    const opts = [];
+    for(const p of placed){
+      for(let pi=0;pi<p.word.length;pi++){
+        for(let wi=0;wi<word.length;wi++){
+          if(p.word[pi] !== word[wi]) continue;
+          const newDir = p.dir==='across' ? 'down' : 'across';
+          let r,c;
+          if(p.dir==='across'){
+            r = p.row - wi;
+            c = p.col + pi;
+          } else {
+            r = p.row + pi;
+            c = p.col - wi;
+          }
+          if(canPlace(word,r,c,newDir)){
+            // Score: prefer more intersections
+            let score = 0;
+            for(let i=0;i<word.length;i++){
+              const tr=newDir==='across'?r:r+i;
+              const tc=newDir==='across'?c+i:c;
+              if(grid[tr][tc]) score++;
+            }
+            opts.push({r,c,dir:newDir,score});
+          }
+        }
+      }
+    }
+    opts.sort((a,b)=>b.score-a.score);
+    return opts;
+  }
+
+  // Place first word in center going across
+  const words = [...wordList].sort((a,b)=>b.w.length-a.w.length);
+  const first = words[0];
+  const startC = Math.floor((GRID - first.w.length)/2);
+  const startR = Math.floor(GRID/2);
+  placeWord(first.w, first.c, startR, startC, 'across');
+
+  // Place remaining words
+  for(let i=1;i<words.length;i++){
+    const {w,c} = words[i];
+    const opts = findPlacements(w);
+    if(opts.length>0){
+      const best = opts[0];
+      placeWord(w, c, best.r, best.c, best.dir);
+    }
+  }
+
+  // Trim grid to content
+  let minR=GRID,maxR=0,minC=GRID,maxC=0;
+  for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++){
+    if(grid[r][c]){minR=Math.min(minR,r);maxR=Math.max(maxR,r);minC=Math.min(minC,c);maxC=Math.max(maxC,c);}
+  }
+  const trimmed = [];
+  for(let r=minR;r<=maxR;r++){
+    const row=[];
+    for(let c=minC;c<=maxC;c++) row.push(grid[r][c]||'#');
+    trimmed.push(row);
+  }
+
+  // Adjust placed word positions
+  const adjustedPlaced = placed.map(p=>({
+    ...p,
+    row: p.row-minR,
+    col: p.col-minC
+  }));
+
+  return {grid:trimmed, placed:adjustedPlaced};
+}
+
+// Number the cells and build clue lists
+function numberGrid(grid, placed){
+  const rows=grid.length, cols=grid[0].length;
+  const nums={};
+  let n=1;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    if(grid[r][c]==='#') continue;
+    const sA=(c===0||grid[r][c-1]==='#')&&c+1<cols&&grid[r][c+1]!=='#';
+    const sD=(r===0||grid[r-1]===undefined||grid[r-1][c]==='#')&&r+1<rows&&grid[r+1][c]!=='#';
+    if(sA||sD) nums[`${r},${c}`]=n++;
+  }
+  const across=[], down=[];
+  for(const p of placed){
+    const num = nums[`${p.row},${p.col}`];
+    if(!num) continue;
+    (p.dir==='across'?across:down).push({
+      num, row:p.row, col:p.col, len:p.word.length,
+      clue:p.clue, word:p.word, dir:p.dir
+    });
+  }
+  across.sort((a,b)=>a.num-b.num);
+  down.sort((a,b)=>a.num-b.num);
+  return {nums, across, down};
+}
+
+// ── STATE ─────────────────────────────────────────
+let lv='easy', idx=0, puzData=null;
+let gr=[], nums={}, clues={across:[],down:[]};
+let selR=null,selC=null,dir='across',selClue=null;
+let revealed=false, savedAnswers=null;
+
+function setLevel(l){
+  lv=l; idx=0;
+  document.querySelectorAll('.lvl-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.lvl-btn[onclick="setLevel('${l}')"]`).classList.add('active');
+  loadPuzzle();
+}
+function nextPuzzle(){
+  idx=(idx+1)%WORD_BANKS[lv].length;
+  loadPuzzle();
+}
+
+function loadPuzzle(){
+  const bank = WORD_BANKS[lv][idx];
+  document.getElementById('ptitle').textContent = bank.title+' ('+(idx+1)+'/'+WORD_BANKS[lv].length+')';
+  document.getElementById('status').textContent = '⚙️ Generating puzzle...';
+  
+  // Generate with slight delay so UI updates
+  setTimeout(()=>{
+    puzData = generateCrossword(bank.words);
+    gr = puzData.grid;
+    const numbered = numberGrid(gr, puzData.placed);
+    nums = numbered.nums;
+    clues = {across:numbered.across, down:numbered.down};
+    
+    const placed = puzData.placed.length;
+    const total = bank.words.length;
+    document.getElementById('status').textContent = 
+      `✅ ${placed} of ${total} words placed • ${gr[0].length}×${gr.length} grid`;
+    
+    selR=null; selC=null; dir='across'; selClue=null;
+    revealed=false; savedAnswers=null;
+    resetRevBtn();
+    renderGrid();
+    renderClues();
+  }, 50);
+}
+
+function renderGrid(){
+  const g=document.getElementById('grid');
+  const rows=gr.length, cols=gr[0].length;
+  g.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  g.innerHTML='';
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const div=document.createElement('div');
+    const blk=gr[r][c]==='#';
+    div.className='cell '+(blk?'black':'white');
+    div.dataset.r=r; div.dataset.c=c;
+    if(!blk){
+      if(nums[`${r},${c}`]){
+        const ns=document.createElement('div');
+        ns.className='cell-num';
+        ns.textContent=nums[`${r},${c}`];
+        div.appendChild(ns);
+      }
+      const inp=document.createElement('input');
+      inp.maxLength=1; inp.dataset.r=r; inp.dataset.c=c;
+      inp.addEventListener('focus',()=>selectCell(r,c));
+      inp.addEventListener('keydown',e=>handleKey(e,r,c));
+      inp.addEventListener('input',e=>handleInput(e,r,c));
+      div.appendChild(inp);
+      div.addEventListener('click',()=>{
+        if(selR===r&&selC===c) toggleDir();
+        else selectCell(r,c);
+      });
+    }
+    g.appendChild(div);
+  }
+}
+
+function renderClues(){
+  ['across','down'].forEach(d=>{
+    const el=document.getElementById(d==='across'?'acList':'dnList');
+    el.innerHTML='';
+    clues[d].forEach(cl=>{
+      const div=document.createElement('div');
+      div.className='clue-item';
+      div.dataset.dir=d; div.dataset.num=cl.num;
+      div.innerHTML=`<span class="clue-num">${cl.num}${d==='across'?'A':'D'}</span>${cl.clue}`;
+      div.onclick=()=>jumpToClue(cl,d);
+      el.appendChild(div);
+    });
+  });
+}
+
+// ── SELECTION ─────────────────────────────────────
+function selectCell(r,c){
+  if(!gr[r]||gr[r][c]==='#') return;
+  selR=r; selC=c;
+  clearHighlights();
+  const cl=findClue(r,c,dir)||findClue(r,c,dir==='across'?'down':'across');
+  if(cl){ dir=cl._d; selClue=cl; highlightWord(cl); activateClue(cl.num,cl._d); }
+  document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`)?.classList.add('hi-cell');
+  document.querySelector(`input[data-r="${r}"][data-c="${c}"]`)?.focus();
+}
+function clearHighlights(){
+  document.querySelectorAll('.cell.white').forEach(el=>el.classList.remove('hi-cell','hi-word'));
+}
+function highlightWord(cl){
+  for(let i=0;i<cl.len;i++){
+    const r=cl._d==='across'?cl.row:cl.row+i;
+    const c=cl._d==='across'?cl.col+i:cl.col;
+    document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`)?.classList.add('hi-word');
+  }
+}
+function activateClue(num,d){
+  document.querySelectorAll('.clue-item').forEach(el=>{
+    el.classList.remove('active');
+    if(+el.dataset.num===num&&el.dataset.dir===d) el.classList.add('active');
+  });
+  document.querySelector('.clue-item.active')?.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function findClue(r,c,d){
+  for(const cl of clues[d]){
+    if(d==='across'&&cl.row===r&&c>=cl.col&&c<cl.col+cl.len) return{...cl,_d:d};
+    if(d==='down'&&cl.col===c&&r>=cl.row&&r<cl.row+cl.len) return{...cl,_d:d};
+  }
+  return null;
+}
+function toggleDir(){ dir=dir==='across'?'down':'across'; if(selR!==null)selectCell(selR,selC); }
+function jumpToClue(cl,d){ dir=d; selClue={...cl,_d:d}; selectCell(cl.row,cl.col); }
+
+// ── KEYBOARD ──────────────────────────────────────
+function handleKey(e,r,c){
+  const rows=gr.length,cols=gr[0].length;
+  if(e.key==='Backspace'){
+    e.preventDefault();
+    const inp=document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+    if(inp&&inp.value){ inp.value=''; checkWin(); return; }
+    moveCursor(r,c,-1); return;
+  }
+  const arrows={ArrowRight:[0,1,'across'],ArrowLeft:[0,-1,'across'],ArrowDown:[1,0,'down'],ArrowUp:[-1,0,'down']};
+  if(arrows[e.key]){
+    e.preventDefault();
+    const [dr,dc,nd]=arrows[e.key]; dir=nd;
+    const nr=r+dr,nc=c+dc;
+    if(nr>=0&&nr<rows&&nc>=0&&nc<cols&&gr[nr][nc]!=='#') selectCell(nr,nc);
+    return;
+  }
+  if(e.key==='Tab'){ e.preventDefault(); tabClue(e.shiftKey); }
+}
+function handleInput(e,r,c){
+  const inp=e.target;
+  inp.value=inp.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(-1);
+  if(inp.value) moveCursor(r,c,1);
+  checkWin();
+}
+function moveCursor(r,c,d){
+  const rows=gr.length,cols=gr[0].length;
+  let nr=r,nc=c;
+  if(dir==='across') nc+=d; else nr+=d;
+  if(nr<0||nr>=rows||nc<0||nc>=cols||gr[nr][nc]==='#') return;
+  selectCell(nr,nc);
+}
+function tabClue(prev){
+  const all=[...clues.across.map(cl=>({...cl,_d:'across'})),...clues.down.map(cl=>({...cl,_d:'down'}))];
+  const i=all.findIndex(cl=>cl.num===selClue?.num&&cl._d===dir);
+  const next=all[(i+(prev?-1:1)+all.length)%all.length];
+  dir=next._d; selClue=next; selectCell(next.row,next.col);
+}
+
+// ── CHECK / REVEAL / CLEAR ────────────────────────
+function checkAll(){
+  const rows=gr.length,cols=gr[0].length;
+  let correct=0,total=0;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    if(gr[r][c]==='#') continue; total++;
+    const inp=document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+    const cell=document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+    cell.classList.remove('correct','wrong');
+    if(!inp||!inp.value) continue;
+    if(inp.value===gr[r][c]){ cell.classList.add('correct'); correct++; }
+    else cell.classList.add('wrong');
+  }
+  document.getElementById('status').textContent=`✓ ${correct}/${total} letters correct`;
+}
+function toggleReveal(){
+  const rows=gr.length,cols=gr[0].length;
+  const btn=document.getElementById('revealBtn');
+  if(!revealed){
+    savedAnswers={};
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+      if(gr[r][c]==='#') continue;
+      const inp=document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+      if(inp) savedAnswers[`${r},${c}`]=inp.value;
+    }
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+      if(gr[r][c]==='#') continue;
+      const inp=document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+      const cell=document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+      if(inp){ inp.value=gr[r][c]; cell.classList.add('correct'); cell.classList.remove('wrong'); }
+    }
+    revealed=true;
+    btn.textContent='🙈 Hide Answers';
+    btn.style.cssText='background:rgba(150,80,255,0.25);color:#CC99FF;border:2px solid rgba(150,80,255,0.5);';
+  } else {
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+      if(gr[r][c]==='#') continue;
+      const inp=document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+      const cell=document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+      if(inp){ inp.value=savedAnswers?.[`${r},${c}`]||''; cell.classList.remove('correct','wrong'); }
+    }
+    revealed=false; savedAnswers=null; resetRevBtn();
+  }
+}
+function clearAll(){
+  document.querySelectorAll('#grid input').forEach(i=>i.value='');
+  document.querySelectorAll('.cell').forEach(el=>el.classList.remove('correct','wrong'));
+  revealed=false; savedAnswers=null; resetRevBtn();
+  document.getElementById('status').textContent='';
+}
+function resetRevBtn(){
+  const btn=document.getElementById('revealBtn');
+  if(btn){ btn.textContent='💡 Reveal'; btn.style.cssText=''; }
+}
+function checkWin(){
+  const rows=gr.length,cols=gr[0].length;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    if(gr[r][c]==='#') continue;
+    const inp=document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+    if(!inp||inp.value!==gr[r][c]) return;
+  }
+  const msgs=['Brilliant! 🌟','Amazing work! 🎯','You crushed it! 💪','Wordsmith! 📝','Genius! 🧠'];
+  document.getElementById('winSub').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+  document.getElementById('winOverlay').classList.add('show');
+}
+
+loadPuzzle();
+</script>
+</body>
+</html>
