@@ -586,8 +586,11 @@ footer{
   <style>
   @keyframes scrollCards{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
   #cardStrip:hover #cardTrack{animation-play-state:paused;}
-  .strip-card{width:270px;height:180px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.3;transition:opacity 0.3s,transform 0.3s;cursor:pointer;}
-  .strip-card:hover{opacity:1;transform:scale(1.06);}
+  .strip-card{width:270px;height:180px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.3;cursor:pointer;animation:cardRock 3s ease-in-out infinite;}
+  .strip-card:nth-child(even){animation-delay:-1.5s;}
+  .strip-card:nth-child(3n){animation-delay:-0.8s;}
+  .strip-card:hover{opacity:1;animation-play-state:paused;transform:scale(1.06);}
+  @keyframes cardRock{0%,100%{transform:rotate(-1.5deg);}50%{transform:rotate(1.5deg);}}
   .strip-card img{width:100%;height:100%;object-fit:cover;display:block;}
   </style>
   <script>
@@ -610,54 +613,11 @@ footer{
     <a href="/join" class="btn-secondary">🎁 Start Free Month</a>
     <a href="/join?tab=paid" class="btn-primary">Subscribe $4.99 / month</a>
   </div>
-  <div class="pillars-wrap">
-    <div class="pillar"><span class="p-emoji">💚</span> No Violence or Dark Content<div class="p-hearts"></div></div>
-    <div class="pillar"><span class="p-emoji">👨‍👩‍👧‍👦</span> Safe for All Ages<div class="p-hearts"></div></div>
-    <div class="pillar"><span class="p-emoji">🌺</span> Good Vibes Only<div class="p-hearts"></div></div>
-    <div class="pillar"><span class="p-emoji">🧠</span> Brain Friendly Games<div class="p-hearts"></div></div>
-  </div>
+
 </div>
-<!-- FAMILY SAFE SECTION -->
-<section style="text-align:center;padding:80px 48px;max-width:1000px;margin:0 auto;">
-  <div class="section-badge">— Safe for Everyone</div>
-  <h2 class="section-title">Games the <em>Whole Family</em><br>Can Love</h2>
-  <p class="section-sub" style="margin:0 auto 48px;">Every single game on fab.games is built around fun, creativity and kindness. No violence. No killing. No dark messages. Just pure, joyful play — the way games were meant to be.</p>
-  <div class="divider"></div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px;">
-    <div style="padding:36px 24px;background:#0d0d0f;">
-      <div style="font-size:36px;margin-bottom:12px;">💚</div>
-      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">No Violence</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.7;">Zero killing, zero weapons, zero dark content. Every game is gentle and positive.</div>
-    </div>
-    <div style="padding:36px 24px;background:#0d0d0f;">
-      <div style="font-size:36px;margin-bottom:12px;">👨‍👩‍👧‍👦</div>
-      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Family First</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.7;">Parents can hand their phone to any child and feel completely at ease. Always.</div>
-    </div>
-    <div style="padding:36px 24px;background:#0d0d0f;">
-      <div style="font-size:36px;margin-bottom:12px;">🧠</div>
-      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Brain Friendly</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.7;">Strategy, memory, creativity and trivia — games that actually make you smarter.</div>
-    </div>
-    <div style="padding:36px 24px;background:#0d0d0f;">
-      <div style="font-size:36px;margin-bottom:12px;">🌺</div>
-      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Good Vibes Only</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.7;">Inspired by the spirit of Aloha — kindness, joy and fun for everyone.</div>
-    </div>
-  </div>
-</section>
-<div style="display:none;">
-  <div class="scroll-indicator">
-    <span>Scroll</span>
-    <div class="scroll-line"></div>
-  </div>
-</div>
+
 <!-- GAMES SECTION -->
 <section id="games">
-  <div class="section-badge">— Games Collection</div>
-  <h2 class="section-title">Play the <em>World</em></h2>
-  <p class="section-sub">From addictive card games to volcanic arcade action, Hawaiian trivia to vintage film photography — something fabulous for everyone.</p>
-  <div class="divider"></div>
   <div class="games-grid" id="gamesGrid"></div>
 </section>
 <!-- PRICING -->
