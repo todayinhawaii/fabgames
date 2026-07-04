@@ -544,14 +544,17 @@ footer{
 
 <!-- SCROLLING GAME CARDS STRIP -->
 <div id="cardStrip" style="width:100%;overflow:hidden;background:rgba(0,0,0,0.4);padding:10px 0;border-top:1px solid rgba(255,215,0,0.1);border-bottom:1px solid rgba(255,215,0,0.1);">
-  <div id="cardTrack" style="display:flex;gap:12px;width:max-content;animation:scrollCards 45s linear infinite;padding:2px 0;">
+  <div id="cardTrack" style="display:flex;gap:22px;width:max-content;animation:scrollCards 45s linear infinite;padding:2px 0;">
   </div>
 </div>
 <style>
 @keyframes scrollCards{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
 #cardStrip:hover #cardTrack{animation-play-state:paused;}
-.strip-card{width:225px;height:150px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.3;transition:opacity 0.3s,transform 0.3s;cursor:pointer;}
-.strip-card:hover{opacity:1;transform:scale(1.06);}
+.strip-card{width:270px;height:180px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.3;cursor:pointer;animation:cardRock 3s ease-in-out infinite;transition:opacity 0.3s;}
+.strip-card:nth-child(even){animation-delay:-1.5s;}
+.strip-card:nth-child(3n){animation-delay:-0.8s;}
+.strip-card:hover{opacity:1;animation-play-state:paused;transform:scale(1.06);}
+@keyframes cardRock{0%,100%{transform:rotate(-1.5deg);}50%{transform:rotate(1.5deg);}}
 .strip-card img{width:100%;height:100%;object-fit:cover;display:block;}
 </style>
 <script>
@@ -577,13 +580,13 @@ footer{
   </div>
   <!-- SCROLLING GAME CARDS STRIP -->
   <div id="cardStrip" style="width:100vw;overflow:hidden;margin:0 0 28px;position:relative;left:50%;transform:translateX(-50%);">
-    <div id="cardTrack" style="display:flex;gap:12px;width:max-content;animation:scrollCards 45s linear infinite;padding:4px 0;">
+    <div id="cardTrack" style="display:flex;gap:22px;width:max-content;animation:scrollCards 45s linear infinite;padding:4px 0;">
     </div>
   </div>
   <style>
   @keyframes scrollCards{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
   #cardStrip:hover #cardTrack{animation-play-state:paused;}
-  .strip-card{width:225px;height:150px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.3;transition:opacity 0.3s,transform 0.3s;cursor:pointer;}
+  .strip-card{width:270px;height:180px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.3;transition:opacity 0.3s,transform 0.3s;cursor:pointer;}
   .strip-card:hover{opacity:1;transform:scale(1.06);}
   .strip-card img{width:100%;height:100%;object-fit:cover;display:block;}
   </style>
