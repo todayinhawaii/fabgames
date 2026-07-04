@@ -542,6 +542,30 @@ footer{
   </div>
 </div>
 
+<!-- SCROLLING GAME CARDS STRIP -->
+<div id="cardStrip" style="width:100%;overflow:hidden;background:rgba(0,0,0,0.4);padding:10px 0;border-top:1px solid rgba(255,215,0,0.1);border-bottom:1px solid rgba(255,215,0,0.1);">
+  <div id="cardTrack" style="display:flex;gap:12px;width:max-content;animation:scrollCards 45s linear infinite;padding:2px 0;">
+  </div>
+</div>
+<style>
+@keyframes scrollCards{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+#cardStrip:hover #cardTrack{animation-play-state:paused;}
+.strip-card{width:180px;height:120px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.5;transition:opacity 0.3s,transform 0.3s;cursor:pointer;}
+.strip-card:hover{opacity:1;transform:scale(1.06);}
+.strip-card img{width:100%;height:100%;object-fit:cover;display:block;}
+</style>
+<script>
+(function(){
+  const track=document.getElementById('cardTrack');
+  if(!track)return;
+  let html='';
+  for(let loop=0;loop<2;loop++)
+    for(let i=1;i<=19;i++)
+      html+=`<div class="strip-card"><img src="/${i}S.jpg" alt="Game ${i}" loading="lazy"></div>`;
+  track.innerHTML=html;
+})();
+</script>
+
 <!-- HERO -->
 <div class="hero">
   <div class="hero-bg"></div>
@@ -551,6 +575,30 @@ footer{
     <img src="/FAB.GAMES_LOGO.png" alt="fab.games" id="fabLogo" style="width:clamp(160px,28vw,320px);display:block;animation:fadeUp 0.8s 0.2s ease both,logoRock 4s 1.2s ease-in-out infinite;">
     <div id="heartsContainer" style="position:absolute;inset:0;pointer-events:none;overflow:visible;"></div>
   </div>
+  <!-- SCROLLING GAME CARDS STRIP -->
+  <div id="cardStrip" style="width:100vw;overflow:hidden;margin:0 0 28px;position:relative;left:50%;transform:translateX(-50%);">
+    <div id="cardTrack" style="display:flex;gap:12px;width:max-content;animation:scrollCards 45s linear infinite;padding:4px 0;">
+    </div>
+  </div>
+  <style>
+  @keyframes scrollCards{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+  #cardStrip:hover #cardTrack{animation-play-state:paused;}
+  .strip-card{width:180px;height:120px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.5;transition:opacity 0.3s,transform 0.3s;cursor:pointer;}
+  .strip-card:hover{opacity:1;transform:scale(1.06);}
+  .strip-card img{width:100%;height:100%;object-fit:cover;display:block;}
+  </style>
+  <script>
+  (function(){
+    const track=document.getElementById('cardTrack');
+    if(!track)return;
+    let html='';
+    for(let loop=0;loop<2;loop++)
+      for(let i=1;i<=19;i++)
+        html+=`<div class="strip-card" ><img src="/${i}S.jpg" alt="Game ${i}" loading="lazy"></div>`;
+    track.innerHTML=html;
+  })();
+  </script>
+
   <div class="hero-badge">Games · Family · World · Fun</div>
   <div class="hero-title">The World's Most <span>Fabulous</span></div>
   <div class="hero-title-games">Games</div>
@@ -601,45 +649,6 @@ footer{
     <div class="scroll-line"></div>
   </div>
 </div>
-<!-- SCROLLING CARDS STRIP -->
-<div id="cardStrip" style="width:100%;overflow:hidden;padding:24px 0 20px;background:transparent;position:relative;">
-  <div id="cardTrack" style="display:flex;gap:14px;width:max-content;animation:scrollCards 40s linear infinite;">
-  </div>
-</div>
-<style>
-@keyframes scrollCards{
-  0%{transform:translateX(0);}
-  100%{transform:translateX(-50%);}
-}
-#cardStrip:hover #cardTrack{animation-play-state:paused;}
-.strip-card{
-  width:120px;height:80px;
-  border-radius:10px;
-  overflow:hidden;
-  flex-shrink:0;
-  opacity:0.5;
-  transition:opacity 0.3s, transform 0.3s;
-  cursor:pointer;
-}
-.strip-card:hover{opacity:1;transform:scale(1.08);}
-.strip-card img{width:100%;height:100%;object-fit:cover;display:block;}
-</style>
-<script>
-(function(){
-  const track = document.getElementById('cardTrack');
-  if(!track) return;
-  const total = 19;
-  // Build cards x2 for seamless loop
-  let html = '';
-  for(let loop=0;loop<2;loop++){
-    for(let i=1;i<=total;i++){
-      html += `<div class="strip-card"><img src="/${i}S.jpg" alt="Game ${i}" loading="lazy"></div>`;
-    }
-  }
-  track.innerHTML = html;
-})();
-</script>
-
 <!-- GAMES SECTION -->
 <section id="games">
   <div class="section-badge">— Games Collection</div>
@@ -702,7 +711,7 @@ footer{
   </div>
   <div class="footer-copy">© 2026 fab.games — All rights reserved</div>
 </footer>
-<script src="/games.js"></script>
+<script src="/games.js"></script></script>
 <script>
 // ── CURSOR ────────────────────────────────────────
 const cursor=document.getElementById('cursor');
