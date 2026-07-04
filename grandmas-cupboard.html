@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Grandma's Cupboard 🧺 — fab.games</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --cream:#fdf6e3;
+  --wood:#8B5E3C;
+  --wood-dark:#5c3a1e;
+  --wood-light:#c8956c;
+  --gold:#FFD700;
+  --green:#4a7c59;
+  --bg:#1a0f08;
+  --text:#3d1f00;
+}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  overflow-x:hidden;
+}
+
+/* ── TOPBAR ── */
+#topbar{
+  width:100%;max-width:1100px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;
+  background:rgba(0,0,0,0.5);
+  border-bottom:2px solid rgba(255,215,0,0.2);
+  position:sticky;top:0;z-index:200;
+  backdrop-filter:blur(10px);
+}
+.logo{font-family:'Fredoka One',cursive;font-size:22px;color:var(--gold);}
+.logo span{font-size:13px;color:rgba(255,255,255,0.4);margin-left:4px;}
+#levelBar{display:flex;gap:6px;}
+.lvl-btn{font-family:'Fredoka One',cursive;font-size:12px;padding:5px 14px;border-radius:20px;border:2px solid rgba(255,255,255,0.2);cursor:pointer;background:transparent;color:rgba(255,255,255,0.5);transition:all 0.2s;}
+.lvl-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
+
+/* ── MAIN ── */
+#main{width:100%;max-width:1100px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px;}
+
+/* ── STATUS BAR ── */
+#statusBar{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;padding:10px 20px;
+  background:rgba(255,255,255,0.05);
+  border-radius:14px;border:1px solid rgba(255,215,0,0.2);
+}
+#statusMsg{font-family:'Fredoka One',cursive;font-size:18px;color:var(--gold);}
+#scoreDisplay{font-family:'Fredoka One',cursive;font-size:16px;color:rgba(255,255,255,0.6);}
+#timerDisplay{font-family:'Fredoka One',cursive;font-size:20px;color:#ff9966;}
+
+/* ── CUPBOARD IMAGE-BASED ── */
+#cupboardWrap{
+  position:relative;
+  width:100%;max-width:960px;
+  cursor:pointer;
+}
+/* The cupboard image — switches between open/closed */
+#cupboardImg{
+  width:100%;display:block;
+  border-radius:16px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.5);
+  transition:opacity 0.4s;
+  user-select:none;pointer-events:none;
+}
+/* Overlay for item slots — sits on top of the open cupboard image */
+#slotsOverlay{
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  display:grid;
+  /* 3 cupboards side by side, 2 rows of shelves */
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  /* Padding to align with the shelf areas in the image */
+  padding:12% 4% 8%;
+  gap:2% 3%;
+  pointer-events:none;
+}
+.shelf-zone{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+  pointer-events:all;
+}
+
+/* Slot where items go */
+.item-slot{
+  width:80px;height:80px;
+  border-radius:12px;
+  border:2px dashed rgba(255,200,100,0.25);
+  background:rgba(0,0,0,0.2);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  transition:all 0.2s;
+  flex-shrink:0;
+}
+.item-slot.correct{
+  border-color:rgba(80,220,80,0.6);
+  background:rgba(80,220,80,0.1);
+}
+.item-slot.wrong{
+  border-color:rgba(220,80,80,0.6);
+  background:rgba(220,80,80,0.1);
+  animation:shake 0.4s ease;
+}
+.item-slot.drag-over{
+  border-color:var(--gold);
+  background:rgba(255,215,0,0.1);
+  transform:scale(1.05);
+}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);};}
+
+/* ── ITEMS ── */
+.game-item{
+  width:76px;height:76px;
+  border-radius:10px;
+  cursor:grab;
+  user-select:none;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.15s,box-shadow 0.15s;
+  position:relative;
+  touch-action:none;
+}
+.game-item img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:8px;}
+.game-item:hover{transform:scale(1.08);box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.game-item.dragging{
+  opacity:0.5;
+  transform:scale(1.1);
+  cursor:grabbing;
+  z-index:1000;
+}
+.game-item.placed{opacity:0.3;cursor:default;}
+
+/* ── TABLE ── */
+#tableWrap{
+  width:100%;max-width:860px;
+  background:linear-gradient(180deg,#d4956a,#a0622e);
+  border-radius:18px;
+  border:5px solid #7a4520;
+  padding:20px;
+  box-shadow:0 6px 30px rgba(0,0,0,0.5);
+}
+#tableTitle{
+  font-family:'Fredoka One',cursive;
+  font-size:15px;color:rgba(255,255,255,0.5);
+  text-align:center;margin-bottom:14px;
+  letter-spacing:2px;text-transform:uppercase;
+}
+#tableItems{
+  display:flex;flex-wrap:wrap;gap:12px;
+  justify-content:center;
+  min-height:100px;
+}
+
+/* ── BUTTONS ── */
+#actionBtn{
+  font-family:'Fredoka One',cursive;font-size:18px;
+  padding:14px 36px;border-radius:16px;border:none;
+  cursor:pointer;transition:all 0.2s;
+  background:var(--gold);color:#000;
+  box-shadow:0 4px 20px rgba(255,215,0,0.3);
+}
+#actionBtn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(255,215,0,0.5);}
+#actionBtn.ready{background:linear-gradient(135deg,#ff9933,#ff6600);color:#fff;}
+#actionBtn.check{background:linear-gradient(135deg,#44cc66,#228833);color:#fff;}
+
+/* ── WIN OVERLAY ── */
+#winOverlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.88);z-index:500;
+  align-items:center;justify-content:center;
+}
+#winOverlay.show{display:flex;}
+.win-box{
+  background:linear-gradient(135deg,#2a1205,#1a0f08);
+  border:3px solid var(--gold);border-radius:28px;
+  padding:48px;text-align:center;max-width:420px;
+}
+.win-emoji{font-size:72px;margin-bottom:16px;}
+.win-title{font-family:'Fredoka One',cursive;font-size:40px;color:var(--gold);margin-bottom:8px;}
+.win-sub{font-size:16px;color:rgba(255,255,255,0.6);margin-bottom:28px;}
+.win-stats{display:flex;gap:24px;justify-content:center;margin-bottom:28px;}
+.win-stat{text-align:center;}
+.win-stat-num{font-family:'Fredoka One',cursive;font-size:36px;color:var(--gold);}
+.win-stat-label{font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;}
+
+/* ── PHASE INDICATOR ── */
+#phaseBar{
+  display:flex;gap:8px;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;font-size:13px;
+}
+.phase{padding:4px 12px;border-radius:20px;color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.1);}
+.phase.active{color:var(--gold);border-color:var(--gold);background:rgba(255,215,0,0.1);}
+.phase.done{color:rgba(255,255,255,0.5);border-color:rgba(255,255,255,0.2);text-decoration:line-through;}
+
+/* ── DRAG GHOST ── */
+#dragGhost{
+  position:fixed;pointer-events:none;z-index:9999;
+  width:80px;height:80px;opacity:0.85;
+  display:none;
+  transform:translate(-50%,-50%);
+}
+#dragGhost img{width:100%;height:100%;object-fit:contain;border-radius:10px;}
+
+@media(max-width:600px){
+  .game-item{width:60px;height:60px;}
+  .item-slot{width:62px;height:62px;}
+  .game-item img{width:58px;height:58px;}
+  .shelf{gap:10px;padding:12px 10px;min-height:86px;}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">🧺 Grandma's Cupboard <span>fab.games</span></div>
+  <div id="levelBar">
+    <button class="lvl-btn active" onclick="setLevel(1)">🥄 Easy</button>
+    <button class="lvl-btn" onclick="setLevel(2)">🍳 Medium</button>
+    <button class="lvl-btn" onclick="setLevel(3)">👑 Hard</button>
+  </div>
+</div>
+
+<div id="main">
+  <!-- Status -->
+  <div id="statusBar">
+    <div id="statusMsg">👀 Study the cupboard!</div>
+    <div id="phaseBar">
+      <div class="phase active" id="ph1">1 · Look</div>
+      <div style="color:rgba(255,255,255,0.2);">→</div>
+      <div class="phase" id="ph2">2 · Remember</div>
+      <div style="color:rgba(255,255,255,0.2);">→</div>
+      <div class="phase" id="ph3">3 · Restore</div>
+    </div>
+    <div id="scoreDisplay">⭐ 0 / 0</div>
+  </div>
+
+  <!-- Cupboard -->
+  <div id="cupboardWrap" onclick="handleDoorClick()">
+    <img id="cupboardImg" src="/kitchen_4.png" alt="Grandma's Cupboard">
+    <div id="slotsOverlay" style="display:none;">
+      <!-- Slots injected by JS into 6 zones: top-left, top-mid, top-right, bot-left, bot-mid, bot-right -->
+      <div class="shelf-zone" id="zone-0-0"></div>
+      <div class="shelf-zone" id="zone-0-1"></div>
+      <div class="shelf-zone" id="zone-0-2"></div>
+      <div class="shelf-zone" id="zone-1-0"></div>
+      <div class="shelf-zone" id="zone-1-1"></div>
+      <div class="shelf-zone" id="zone-1-2"></div>
+    </div>
+  </div>
+
+  <!-- Action Button -->
+  <button id="actionBtn" onclick="handleAction()">🚪 Open Cupboard</button>
+
+  <!-- Table -->
+  <div id="tableWrap" style="display:none;">
+    <div id="tableTitle">🍽️ Everything fell out! Put it all back in the right place</div>
+    <div id="tableItems"></div>
+  </div>
+</div>
+
+<!-- Win overlay -->
+<div id="winOverlay">
+  <div class="win-box">
+    <div class="win-emoji">🏆</div>
+    <div class="win-title">Well Done!</div>
+    <div class="win-sub" id="winSub">Grandma's cupboard is tidy again!</div>
+    <div class="win-stats">
+      <div class="win-stat"><div class="win-stat-num" id="winCorrect">0</div><div class="win-stat-label">Correct</div></div>
+      <div class="win-stat"><div class="win-stat-num" id="winTime">0s</div><div class="win-stat-label">Time</div></div>
+    </div>
+    <button class="btn" style="font-family:'Fredoka One',cursive;font-size:18px;padding:14px 32px;border-radius:14px;border:none;background:var(--gold);color:#000;cursor:pointer;margin-right:10px;" onclick="nextLevel()">Next Level →</button>
+    <button class="btn" style="font-family:'Fredoka One',cursive;font-size:18px;padding:14px 32px;border-radius:14px;border:none;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;" onclick="restartLevel()">Play Again ↺</button>
+  </div>
+</div>
+
+<!-- Drag ghost -->
+<div id="dragGhost"><img id="ghostImg" src="" alt=""></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────
+const LEVEL_CONFIG = {
+  1: {items:6,  shelves:2, title:"Easy — 6 items, 2 shelves"},
+  2: {items:10, shelves:2, title:"Medium — 10 items, 2 shelves"},
+  3: {items:16, shelves:3, title:"Hard — 16 items, 3 shelves"},
+};
+
+// All 56 product images k1.png to k56.png
+const ALL_ITEMS = Array.from({length:56},(_,i)=>({id:i+1, src:`/k${i+1}.png`}));
+
+// ── STATE ─────────────────────────────────────────
+let currentLevel = 1;
+let phase = 'closed'; // closed | open | remember | restore
+let selectedItems = [];  // items chosen for this round
+let slots = [];          // {id, row, col, itemId} — correct positions
+let placed = {};         // slotKey -> itemId placed there
+let startTime = null;
+let dragItem = null;     // {itemId, el}
+let correct = 0;
+
+// ── INIT ──────────────────────────────────────────
+function setLevel(lv){
+  currentLevel = lv;
+  document.querySelectorAll('.lvl-btn').forEach((b,i)=>b.classList.toggle('active',i+1===lv));
+  restartLevel();
+}
+
+function restartLevel(){
+  phase = 'closed';
+  placed = {};
+  correct = 0;
+  slots = [];
+  dragItem = null;
+
+  const cfg = LEVEL_CONFIG[currentLevel];
+  // Pick random items
+  const shuffled = [...ALL_ITEMS].sort(()=>Math.random()-0.5);
+  selectedItems = shuffled.slice(0, cfg.items);
+
+  // Build slots — distribute across shelves
+  buildSlots(cfg);
+  renderCupboard();
+  closeDoors(false); // instant close
+  setPhase('closed');
+  document.getElementById('tableWrap').style.display='none';
+  document.getElementById('tableItems').innerHTML='';
+  document.getElementById('actionBtn').textContent='🚪 Open Cupboard';
+  document.getElementById('actionBtn').className='';
+  updateScore();
+  document.getElementById('winOverlay').classList.remove('show');
+}
+
+function buildSlots(cfg){
+  slots = [];
+  // Distribute items across cupboards (cols 0,1,2) and rows (0=top, 1=bottom)
+  // Each cupboard has 2 rows, 3 cupboards = 6 zones
+  // Items per cupboard based on level
+  const itemsPerCupboard = Math.ceil(cfg.items / 3);
+  let idx = 0;
+  const cols = [0,1,2]; // 3 cupboards
+  for(let col of cols){
+    for(let row=0; row<2 && idx<cfg.items; row++){
+      // Put 1 item per zone for easy, more for harder levels
+      const itemsInZone = cfg.items <= 6 ? 1 : cfg.items <= 10 ? (row===0?2:1) : (row===0?3:2);
+      for(let i=0; i<itemsInZone && idx<cfg.items; i++){
+        slots.push({key:`${col}-${row}-${i}`, row, cupboard:col, itemId:selectedItems[idx].id});
+        idx++;
+      }
+    }
+  }
+}
+
+// ── RENDER CUPBOARD ───────────────────────────────
+function renderCupboard(){
+  // Clear all zones
+  document.querySelectorAll('.shelf-zone').forEach(z=>z.innerHTML='');
+
+  slots.forEach(sl=>{
+    // sl.shelf = row (0=top,1=bottom), sl.cupboard = column (0,1,2)
+    const zoneId = `zone-${sl.row}-${sl.cupboard}`;
+    const zone = document.getElementById(zoneId);
+    if(!zone) return;
+
+    const slot = document.createElement('div');
+    slot.className='item-slot';
+    slot.dataset.key=sl.key;
+    slot.dataset.itemId=sl.itemId;
+    slot.style.cssText='width:70px;height:70px;border-radius:10px;border:2px dashed rgba(255,200,100,0.3);background:rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;';
+
+    if(phase==='open'){
+      const item = selectedItems.find(it=>it.id===sl.itemId);
+      if(item){
+        const img=document.createElement('img');
+        img.src=item.src;
+        img.style.cssText='width:64px;height:64px;object-fit:contain;border-radius:8px;';
+        slot.appendChild(img);
+        slot.style.border='none';slot.style.background='none';
+      }
+    } else if(phase==='restore'){
+      if(placed[sl.key]!==undefined){
+        const placedId=placed[sl.key];
+        const item=selectedItems.find(it=>it.id===placedId);
+        if(item){
+          const img=document.createElement('img');
+          img.src=item.src;
+          img.style.cssText='width:64px;height:64px;object-fit:contain;border-radius:8px;';
+          slot.appendChild(img);
+          if(placedId===sl.itemId){slot.style.border='2px solid rgba(80,220,80,0.6)';slot.style.background='rgba(80,220,80,0.1)';}
+        }
+      }
+      slot.addEventListener('dragover',e=>{e.preventDefault();slot.style.borderColor='#FFD700';slot.style.background='rgba(255,215,0,0.15)';});
+      slot.addEventListener('dragleave',()=>{slot.style.borderColor='rgba(255,200,100,0.3)';slot.style.background='rgba(0,0,0,0.1)';});
+      slot.addEventListener('drop',e=>{e.preventDefault();slot.style.borderColor='rgba(255,200,100,0.3)';handleDrop(sl.key,slot);});
+      slot.addEventListener('touchend',e=>{e.preventDefault();handleTouchDrop(sl.key,slot);},{passive:false});
+    }
+    zone.appendChild(slot);
+  });
+}
+
+// ── DOOR CONTROL ──────────────────────────────────
+function openDoors(){
+  document.getElementById('cupboardImg').src='/kitchen_3.png';
+  document.getElementById('slotsOverlay').style.display='grid';
+}
+function closeDoors(animate=true){
+  document.getElementById('cupboardImg').src='/kitchen_4.png';
+  document.getElementById('slotsOverlay').style.display='none';
+}
+
+function handleDoorClick(){
+  if(phase==='closed') handleAction();
+}
+
+// ── PHASE CONTROL ─────────────────────────────────
+function setPhase(p){
+  phase=p;
+  document.getElementById('ph1').className='phase'+(p==='open'?' active':p==='remember'||p==='restore'?' done':'');
+  document.getElementById('ph2').className='phase'+(p==='remember'?' active':p==='restore'?' done':'');
+  document.getElementById('ph3').className='phase'+(p==='restore'?' active':'');
+
+  const msgs={
+    closed:'🚪 Click to open the cupboard!',
+    open:'👀 Study what\'s on each shelf...',
+    remember:'🧠 Got it? Click when you\'re ready!',
+    restore:'🧺 Drag everything back to its correct shelf!'
+  };
+  document.getElementById('statusMsg').textContent=msgs[p]||'';
+}
+
+function handleAction(){
+  if(phase==='closed'){
+    // Open doors
+    openDoors();
+    phase='open';
+    renderCupboard();
+    setPhase('open');
+    document.getElementById('actionBtn').textContent="✅ I've Got It!";
+    document.getElementById('actionBtn').className='ready';
+  } else if(phase==='open'){
+    // Close doors briefly so player can't see, then reopen empty
+    closeDoors();
+    phase='remember';
+    setPhase('remember');
+    document.getElementById('actionBtn').style.display='none';
+    setTimeout(()=>{
+      // Reopen doors to show empty shelves — items are on the table now
+      openDoors();
+      phase='restore';
+      setPhase('restore');
+      renderCupboard(); // renders empty slots
+      buildTable();
+      document.getElementById('tableWrap').style.display='block';
+      document.getElementById('actionBtn').style.display='block';
+      document.getElementById('actionBtn').textContent="✓ Check My Answers";
+      document.getElementById('actionBtn').className='check';
+      startTime=Date.now();
+    },1200);
+  } else if(phase==='restore'){
+    checkAnswers();
+  }
+}
+
+// ── TABLE ─────────────────────────────────────────
+function buildTable(){
+  const table=document.getElementById('tableItems');
+  table.innerHTML='';
+  const shuffled=[...selectedItems].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='game-item';
+    div.dataset.itemId=item.id;
+    div.draggable=true;
+    const img=document.createElement('img');
+    img.src=item.src;
+    img.alt='Item '+item.id;
+    div.appendChild(img);
+
+    // Desktop drag
+    div.addEventListener('dragstart',e=>{
+      dragItem={itemId:item.id, el:div};
+      div.classList.add('dragging');
+      e.dataTransfer.setData('text/plain',item.id);
+    });
+    div.addEventListener('dragend',()=>div.classList.remove('dragging'));
+
+    // Touch drag
+    div.addEventListener('touchstart',e=>startTouchDrag(e,item.id,div),{passive:false});
+    div.addEventListener('touchmove',moveTouchDrag,{passive:false});
+    div.addEventListener('touchend',e=>endTouchDrag(e),{passive:false});
+
+    table.appendChild(div);
+  });
+}
+
+// ── DRAG & DROP ───────────────────────────────────
+function handleDrop(slotKey, slotEl){
+  if(!dragItem) return;
+  placeItem(slotKey, slotEl, dragItem.itemId, dragItem.el);
+  dragItem=null;
+}
+
+function placeItem(slotKey, slotEl, itemId, sourceEl){
+  // If slot already has item, swap back to table
+  if(placed[slotKey]!==undefined){
+    const oldId=placed[slotKey];
+    const oldEl=document.querySelector(`#tableItems [data-item-id="${oldId}"]`);
+    if(oldEl) oldEl.classList.remove('placed');
+  }
+
+  placed[slotKey]=itemId;
+  // Mark source as placed
+  if(sourceEl){
+    sourceEl.classList.add('placed');
+    sourceEl.draggable=false;
+  }
+
+  // Show in slot
+  slotEl.innerHTML='';
+  const img=document.createElement('img');
+  img.src=selectedItems.find(it=>it.id===itemId).src;
+  img.style.cssText='width:72px;height:72px;object-fit:contain;border-radius:8px;';
+  slotEl.appendChild(img);
+
+  updateScore();
+}
+
+// ── TOUCH DRAG ────────────────────────────────────
+let touchDragItem=null, touchDragEl=null;
+function startTouchDrag(e,itemId,el){
+  if(el.classList.contains('placed')) return;
+  e.preventDefault();
+  touchDragItem=itemId; touchDragEl=el;
+  const ghost=document.getElementById('dragGhost');
+  const gImg=document.getElementById('ghostImg');
+  gImg.src=selectedItems.find(it=>it.id===itemId).src;
+  ghost.style.display='block';
+  const t=e.touches[0];
+  ghost.style.left=t.clientX+'px';
+  ghost.style.top=t.clientY+'px';
+}
+function moveTouchDrag(e){
+  if(!touchDragItem) return;
+  e.preventDefault();
+  const t=e.touches[0];
+  const ghost=document.getElementById('dragGhost');
+  ghost.style.left=t.clientX+'px';
+  ghost.style.top=t.clientY+'px';
+  // Highlight slot under finger
+  document.querySelectorAll('.item-slot').forEach(sl=>sl.classList.remove('drag-over'));
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  const slot=el?.closest('.item-slot');
+  if(slot) slot.classList.add('drag-over');
+}
+function handleTouchDrop(slotKey,slotEl){
+  if(!touchDragItem) return;
+  const sourceEl=touchDragEl;
+  placeItem(slotKey,slotEl,touchDragItem,sourceEl);
+  endTouchDrag(null);
+}
+function endTouchDrag(e){
+  if(e){
+    const t=e.changedTouches[0];
+    const el=document.elementFromPoint(t.clientX,t.clientY);
+    const slot=el?.closest('.item-slot');
+    if(slot&&touchDragItem){
+      const key=slot.dataset.key;
+      placeItem(key,slot,touchDragItem,touchDragEl);
+    }
+    document.querySelectorAll('.item-slot').forEach(sl=>sl.classList.remove('drag-over'));
+  }
+  document.getElementById('dragGhost').style.display='none';
+  touchDragItem=null; touchDragEl=null;
+}
+
+// ── SCORING ───────────────────────────────────────
+function updateScore(){
+  const total=slots.length;
+  const done=Object.keys(placed).length;
+  document.getElementById('scoreDisplay').textContent=`🧺 ${done} / ${total}`;
+}
+
+function checkAnswers(){
+  correct=0;
+  slots.forEach(sl=>{
+    const slotEl=document.querySelector(`.item-slot[data-key="${sl.key}"]`);
+    if(!slotEl) return;
+    if(placed[sl.key]===sl.itemId){
+      correct++;
+      slotEl.classList.add('correct');
+      slotEl.classList.remove('wrong');
+    } else if(placed[sl.key]!==undefined){
+      slotEl.classList.add('wrong');
+      slotEl.classList.remove('correct');
+      setTimeout(()=>slotEl.classList.remove('wrong'),500);
+    }
+  });
+
+  const total=slots.length;
+  const elapsed=Math.round((Date.now()-startTime)/1000);
+
+  if(correct===total){
+    // All correct — win!
+    const msgs=['Perfect memory! 🧠','Grandma is proud! 🌺','Amazing recall! ⭐','You never forget! 💫'];
+    document.getElementById('winSub').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+    document.getElementById('winCorrect').textContent=`${correct}/${total}`;
+    document.getElementById('winTime').textContent=elapsed+'s';
+    setTimeout(()=>document.getElementById('winOverlay').classList.add('show'),600);
+  } else {
+    document.getElementById('statusMsg').textContent=`✅ ${correct}/${total} correct — keep trying!`;
+  }
+}
+
+function nextLevel(){
+  const next=currentLevel<3?currentLevel+1:1;
+  setLevel(next);
+}
+
+setLevel(1);
+</script>
+</body>
+</html>
