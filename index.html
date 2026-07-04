@@ -601,6 +601,45 @@ footer{
     <div class="scroll-line"></div>
   </div>
 </div>
+<!-- SCROLLING CARDS STRIP -->
+<div id="cardStrip" style="width:100%;overflow:hidden;padding:24px 0 20px;background:transparent;position:relative;">
+  <div id="cardTrack" style="display:flex;gap:14px;width:max-content;animation:scrollCards 40s linear infinite;">
+  </div>
+</div>
+<style>
+@keyframes scrollCards{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-50%);}
+}
+#cardStrip:hover #cardTrack{animation-play-state:paused;}
+.strip-card{
+  width:120px;height:80px;
+  border-radius:10px;
+  overflow:hidden;
+  flex-shrink:0;
+  opacity:0.5;
+  transition:opacity 0.3s, transform 0.3s;
+  cursor:pointer;
+}
+.strip-card:hover{opacity:1;transform:scale(1.08);}
+.strip-card img{width:100%;height:100%;object-fit:cover;display:block;}
+</style>
+<script>
+(function(){
+  const track = document.getElementById('cardTrack');
+  if(!track) return;
+  const total = 19;
+  // Build cards x2 for seamless loop
+  let html = '';
+  for(let loop=0;loop<2;loop++){
+    for(let i=1;i<=total;i++){
+      html += `<div class="strip-card"><img src="/${i}S.jpg" alt="Game ${i}" loading="lazy"></div>`;
+    }
+  }
+  track.innerHTML = html;
+})();
+</script>
+
 <!-- GAMES SECTION -->
 <section id="games">
   <div class="section-badge">— Games Collection</div>
