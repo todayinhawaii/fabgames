@@ -314,7 +314,7 @@ body{
   </div>
 
   <!-- Buttons -->
-  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;margin-top:-240px;position:relative;z-index:10;">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;position:relative;z-index:10;margin-top:-60px;">
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
       <button id="actionBtn" onclick="handleAction()">🦛 Open Henry's Mouth!</button>
       <button id="nextBtn" onclick="nextRound()">▶ Next Game</button>
@@ -323,7 +323,7 @@ body{
   </div>
 
   <!-- Tray -->
-  <div id="trayWrap" style="display:none;margin-top:-48px;position:relative;z-index:10;">
+  <div id="trayWrap" style="display:none;position:relative;z-index:10;margin-top:8px;">
     <div id="trayTitle">🧁 Drag each cupcake back to where it was!</div>
     <div id="trayItems"></div>
   </div>
@@ -365,17 +365,15 @@ const CUPCAKES = Array.from({length:10},(_,i)=>({id:i+1,src:`/cupcake-${i+1}.png
 
 // ── STATE ────────────────────────────────────────
 let numItems = 5;
-let phase = 'closed'; // closed|open|restore
+let phase = 'closed';
 let selectedCupcakes = [];
-let slots = []; // {id, pos, cupcakeId}
-let placed = {}; // slotId -> cupcakeId
+let slots = [];
+let placed = {};
 let correct = 0;
 let roundNum = 1;
 let totalScore = 0;
 let bestScore = 0;
 let startTime = null;
-let dragItem = null;
-let animTimer = null;
 let validCupcakes = [];
 
 // ── PRELOAD ──────────────────────────────────────
@@ -403,66 +401,61 @@ function setItems(n){
 // ── RESTART ──────────────────────────────────────
 function restartRound(){
   phase='closed'; placed={}; correct=0; slots=[];
-  dragItem=null; clearInterval(animTimer);
+  clearInterval(window._animTimer);
 
-  const pool = validCupcakes.length>=numItems ? validCupcakes : CUPCAKES;
-  const shuffled=[...pool].sort(()=>Math.random()-0.5);
-  selectedCupcakes=shuffled.slice(0,numItems);
+  const pool=validCupcakes.length>=numItems?validCupcakes:CUPCAKES;
+  selectedCupcakes=[...pool].sort(()=>Math.random()-0.5).slice(0,numItems);
 
-  // Henry closed
   document.getElementById('henryImg').src='/Henry-2-mouth-closed.png';
   document.getElementById('mouthOverlay').innerHTML='';
   document.getElementById('mouthOverlay').classList.remove('active');
   document.getElementById('trayWrap').style.display='none';
   document.getElementById('trayItems').innerHTML='';
-  document.getElementById('actionBtn').textContent='🦛 Open Henry\'s Mouth!';
+  document.getElementById('actionBtn').innerHTML="🦛 Open Henry's Mouth!";
   document.getElementById('actionBtn').className='';
   document.getElementById('actionBtn').style.display='inline-block';
   document.getElementById('nextBtn').style.display='none';
   document.getElementById('winOverlay').classList.remove('show');
+  document.getElementById('henryWrap').onclick=handleHenryClick;
   const hint=document.getElementById('actionHint');
-  if(hint){hint.textContent='Click to open Henry\'s mouth and see the cupcakes inside!';hint.style.display='block';}
+  if(hint){hint.textContent="Click to open Henry's mouth and see the cupcakes inside!";hint.style.display='block';}
   setPhase('closed');
-  updateScore();
+  updateCount();
   updateScoreDisplay();
 }
 
 // ── PHASE ────────────────────────────────────────
 function setPhase(p){
   phase=p;
-  const msgs={
-    closed:"🦛 Open Henry's mouth!",
-    open:"👀 Study where each cupcake is!",
-    restore:"🧁 Drag the cupcakes back in!"
-  };
+  const msgs={closed:"🦛 Open Henry's mouth!",open:"👀 Study where each cupcake is!",restore:"🧁 Tap a cupcake then tap its spot!"};
   document.getElementById('statusMsg').textContent=msgs[p]||'';
-  const p1=document.getElementById('ph1');const p2=document.getElementById('ph2');const p3=document.getElementById('ph3');
+  const p1=document.getElementById('ph1'),p2=document.getElementById('ph2'),p3=document.getElementById('ph3');
   if(p1) p1.className='phase'+(p==='open'?' active':p==='restore'?' done':'');
   if(p2) p2.className='phase'+(p==='restore'?' active':'');
   if(p3) p3.className='phase'+(p==='restore'?' active':'');
 }
 
-// ── MOUTH OVERLAY ────────────────────────────────
+// ── DICE POSITIONS ───────────────────────────────
+const DICE_POS={
+  5:[[35,12],[60,12],[47,36],[35,60],[60,60]],
+  6:[[33,10],[60,10],[33,36],[60,36],[33,62],[60,62]],
+  7:[[30,10],[50,10],[68,10],[30,36],[50,36],[68,36],[50,62]],
+  8:[[30,8],[50,8],[68,8],[30,34],[68,34],[30,60],[50,60],[68,60]],
+  9:[[30,6],[50,6],[68,6],[30,32],[50,32],[68,32],[30,60],[50,60],[68,60]],
+  10:[[25,6],[42,6],[60,6],[76,6],[25,34],[50,34],[76,34],[25,62],[48,62],[70,62]]
+};
+
+// ── BUILD MOUTH SLOTS ────────────────────────────
 function buildMouthSlots(showItems){
   const overlay=document.getElementById('mouthOverlay');
   overlay.innerHTML='';
-  overlay.style.cssText='position:absolute;top:42%;left:22%;right:22%;bottom:8%;pointer-events:none;z-index:50;';
+  overlay.style.cssText='position:absolute;top:38%;left:20%;right:20%;bottom:12%;pointer-events:none;z-index:50;';
   overlay.classList.add('active');
   overlay.addEventListener('dragover',e=>e.preventDefault(),{passive:false});
 
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?62:139;
-
-  // Dice-style % positions [left%, top%] for each count
-  const posMaps={
-    5:[[35,12],[60,12],[47,36],[35,60],[60,60]],
-    6:[[33,10],[60,10],[33,36],[60,36],[33,62],[60,62]],
-    7:[[30,10],[50,10],[68,10],[30,36],[50,36],[68,36],[50,62]],
-    8:[[30,8],[50,8],[68,8],[30,34],[68,34],[30,60],[50,60],[68,60]],
-    9:[[30,6],[50,6],[68,6],[30,32],[50,32],[68,32],[30,60],[50,60],[68,60]],
-    10:[[25,6],[42,6],[60,6],[76,6],[25,34],[50,34],[76,34],[25,62],[48,62],[70,62]]
-  };
-  const pos=posMaps[numItems]||posMaps[5];
+  const slotSz=isMob?60:139;
+  const pos=DICE_POS[numItems]||DICE_POS[5];
 
   selectedCupcakes.forEach((cup,i)=>{
     const slot=document.createElement('div');
@@ -472,8 +465,8 @@ function buildMouthSlots(showItems){
     slot.style.cssText='position:absolute;width:'+slotSz+'px;height:'+slotSz+'px;z-index:51;'+
       'left:'+(pos[i]?pos[i][0]:50)+'%;top:'+(pos[i]?pos[i][1]:50)+'%;'+
       'transform:translate(-50%,-50%);border-radius:12px;'+
-      'border:2px dashed rgba(255,200,100,0.4);background:rgba(255,255,255,0.1);'+
-      'display:flex;align-items:center;justify-content:center;';
+      'border:2px dashed rgba(255,200,100,0.0);background:rgba(255,255,255,0.0);'+
+      'display:flex;align-items:center;justify-content:center;cursor:pointer;';
 
     if(showItems){
       const img=document.createElement('img');
@@ -481,67 +474,149 @@ function buildMouthSlots(showItems){
       img.style.cssText='width:'+(slotSz-8)+'px;height:'+(slotSz-8)+'px;object-fit:contain;border-radius:8px;';
       img.onerror=()=>img.style.display='none';
       slot.appendChild(img);
-      slot.style.border='none';slot.style.background='none';
     } else {
-      slot.addEventListener('dragover',e=>{e.preventDefault();slot.style.borderColor='#FFD700';slot.style.background='rgba(255,215,0,0.15)';});
-      slot.addEventListener('dragleave',()=>{slot.style.borderColor='rgba(255,200,100,0.4)';slot.style.background='rgba(255,255,255,0.1)';});
-      slot.addEventListener('drop',e=>{e.preventDefault();slot.style.borderColor='rgba(255,200,100,0.4)';handleDrop(i,slot);});
+      // In restore mode - show dashed border, click to place
+      slot.style.border='2px dashed rgba(255,200,100,0.5)';
+      slot.style.background='rgba(255,255,255,0.05)';
+      slot.style.pointerEvents='all';
+      slot.addEventListener('dragover',e=>{e.preventDefault();slot.classList.add('drag-over');});
+      slot.addEventListener('dragleave',()=>slot.classList.remove('drag-over'));
+      slot.addEventListener('drop',e=>{e.preventDefault();slot.classList.remove('drag-over');handleDrop(i,slot);});
       slot.addEventListener('touchend',e=>{e.preventDefault();handleTouchDrop(i,slot);},{passive:false});
+
       if(placed[i]!==undefined){
-        const cup2=selectedCupcakes.find(c=>c.id===placed[i]);
-        if(cup2){
-          const img=document.createElement('img');
-          img.src=cup2.src;
-          img.style.cssText='width:'+(slotSz-8)+'px;height:'+(slotSz-8)+'px;object-fit:contain;border-radius:8px;';
-          slot.appendChild(img);
-        }
+        renderPlacedInSlot(slot, placed[i], slotSz);
       }
     }
     overlay.appendChild(slot);
     slots[i]={id:i,cupcakeId:cup.id};
   });
+
+  // Enable pointer events on overlay in restore mode
+  if(!showItems) overlay.style.pointerEvents='all';
+}
+
+function renderPlacedInSlot(slot, cupcakeId, slotSz){
+  slot.innerHTML='';
+  const cup=selectedCupcakes.find(c=>c.id===cupcakeId);
+  if(!cup) return;
+  const img=document.createElement('img');
+  img.src=cup.src;
+  img.style.cssText='width:'+(slotSz-8)+'px;height:'+(slotSz-8)+'px;object-fit:contain;border-radius:8px;';
+  slot.appendChild(img);
+  // Show tick/X
+  const correctId=parseInt(slot.dataset.cupcakeId);
+  const isCorrect=cupcakeId===correctId;
+  slot.style.border=isCorrect?'2px solid rgba(80,220,80,0.6)':'2px solid rgba(220,80,80,0.6)';
+  slot.style.background=isCorrect?'rgba(80,220,80,0.1)':'rgba(220,80,80,0.1)';
+  const mark=document.createElement('div');
+  mark.className='check-mark';
+  mark.innerHTML=isCorrect
+    ?'<span style="font-size:28px;color:rgba(40,180,40,0.5);font-weight:bold;">✓</span>'
+    :'<span style="font-size:28px;color:rgba(200,40,40,0.5);font-weight:bold;">✗</span>';
+  slot.appendChild(mark);
+}
+
+// ── DRAG & DROP (same as Grandmas Cupboard) ──────
+let dragItem=null;
+
+function handleDrop(slotId, slotEl){
+  if(!dragItem) return;
+  placeItem(slotId, slotEl, dragItem.cupcakeId, dragItem.el);
+  dragItem=null;
+}
+
+function placeItem(slotId, slotEl, cupcakeId, sourceEl){
+  // Unplace from old slot if moved
+  for(const k in placed){ if(placed[k]===cupcakeId) delete placed[k]; }
+  placed[slotId]=cupcakeId;
+  if(sourceEl){ sourceEl.classList.add('placed'); sourceEl.style.opacity='0.2'; sourceEl.style.pointerEvents='none'; }
+
+  const isMob=window.innerWidth<=600;
+  const slotSz=isMob?60:139;
+  const correctId=parseInt(slotEl.dataset.cupcakeId);
+  const isCorrect=cupcakeId===correctId;
+
+  renderPlacedInSlot(slotEl, cupcakeId, slotSz);
+  if(isCorrect){ playRight(); showFeedback('right','Yesss Thats It!'); }
+  else { playWrong(); showFeedback('wrong','Oops Not Here!'); }
+  updateCount();
+  if(Object.keys(placed).length===numItems) setTimeout(checkAnswers,500);
+}
+
+// ── TOUCH DRAG ───────────────────────────────────
+let touchDragItem=null, touchDragEl=null;
+function startTouchDrag(e,cupcakeId,el){
+  if(el.classList.contains('placed')) return;
+  e.preventDefault();
+  touchDragItem=cupcakeId; touchDragEl=el;
+  const ghost=document.getElementById('dragGhost');
+  const gImg=document.getElementById('ghostImg');
+  const cup=selectedCupcakes.find(c=>c.id===cupcakeId);
+  if(cup) gImg.src=cup.src;
+  ghost.style.display='block';
+  const t=e.touches[0];
+  ghost.style.left=t.clientX+'px';
+  ghost.style.top=t.clientY+'px';
+}
+function moveTouchDrag(e){
+  if(!touchDragItem) return;
+  e.preventDefault();
+  const t=e.touches[0];
+  const ghost=document.getElementById('dragGhost');
+  ghost.style.left=t.clientX+'px';
+  ghost.style.top=t.clientY+'px';
+  document.querySelectorAll('.cupcake-slot').forEach(sl=>sl.classList.remove('drag-over'));
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  el?.closest('.cupcake-slot')?.classList.add('drag-over');
+}
+function handleTouchDrop(slotId,slotEl){
+  if(touchDragItem) placeItem(slotId,slotEl,touchDragItem,touchDragEl);
+  endTouchDrag(null);
+}
+function endTouchDrag(e){
+  if(e){
+    const t=e.changedTouches[0];
+    const el=document.elementFromPoint(t.clientX,t.clientY);
+    const slot=el?.closest('.cupcake-slot');
+    if(slot&&touchDragItem){
+      placeItem(parseInt(slot.dataset.slotId),slot,touchDragItem,touchDragEl);
+    }
+    document.querySelectorAll('.cupcake-slot').forEach(sl=>sl.classList.remove('drag-over'));
+  }
+  document.getElementById('dragGhost').style.display='none';
+  touchDragItem=null; touchDragEl=null;
 }
 
 // ── HENRY ANIMATION ──────────────────────────────
 function startHenryAnimation(){
   const allImgs=['/Henry-1-mouth-opened.png','/Henry-1-mouth-opened-eyes-ears-flop.png','/Henry-1-mouth-opened-eyes-ears-enlarge.png'];
-  // Pre-check which exist
-  const validImgs=['/Henry-1-mouth-opened.png']; // always include base
-  let checked=0;
+  const validImgs=['/Henry-1-mouth-opened.png'];
   allImgs.slice(1).forEach(src=>{
-    const t=new Image();
-    t.onload=()=>{ validImgs.push(src); };
-    t.onerror=()=>{}; // skip missing
-    t.src=src;
+    const t=new Image();t.onload=()=>validImgs.push(src);t.src=src;
   });
   let frame=0;
-  animTimer=setInterval(()=>{
+  window._animTimer=setInterval(()=>{
     frame=(frame+1)%Math.max(1,validImgs.length);
     document.getElementById('henryImg').src=validImgs[frame];
   },1200);
 }
 function stopHenryAnimation(){
-  clearInterval(animTimer);
+  clearInterval(window._animTimer);
   document.getElementById('henryImg').src='/Henry-1-mouth-opened.png';
 }
 
 // ── HANDLE ACTION ────────────────────────────────
 function handleAction(){
   if(phase==='closed'){
-    // Open mouth - show cupcakes
     document.getElementById('henryImg').src='/Henry-1-mouth-opened.png';
-    document.getElementById('mouthOverlay').innerHTML='';
-    setTimeout(()=>{
-      buildMouthSlots(true);
-      startHenryAnimation();
-    },200);
-    phase='open';
-    setPhase('open');
-    document.getElementById('actionBtn').textContent="✅ I've Got This!";
+    setTimeout(()=>{buildMouthSlots(true);startHenryAnimation();},200);
+    phase='open'; setPhase('open');
+    document.getElementById('actionBtn').innerHTML="✅ I've Got This!";
     document.getElementById('actionBtn').className='got-it';
-    document.getElementById('actionHint').textContent="Study where each cupcake sits in Henry's mouth!";
+    const hint=document.getElementById('actionHint');
+    if(hint) hint.textContent="Study where each cupcake sits in Henry's mouth!";
   } else if(phase==='open'){
-    // Close mouth briefly then reopen empty
     stopHenryAnimation();
     document.getElementById('henryImg').src='/Henry-2-mouth-closed.png';
     document.getElementById('mouthOverlay').innerHTML='';
@@ -550,137 +625,58 @@ function handleAction(){
     if(hint) hint.style.display='none';
     setTimeout(()=>{
       document.getElementById('henryImg').src='/Henry-1-mouth-opened.png';
-      document.getElementById('mouthOverlay').classList.add('active');
-      document.getElementById('mouthOverlay').style.zIndex='50';
-      document.getElementById('henryWrap').onclick=null; // disable hippo click during restore
+      phase='restore'; setPhase('restore');
       buildMouthSlots(false);
       buildTray();
       document.getElementById('trayWrap').style.display='block';
       document.getElementById('actionBtn').style.display='inline-block';
-      document.getElementById('actionBtn').textContent="✓ Check My Answers\nCalculate Your Score";
-      document.getElementById('actionBtn').innerHTML="✓ Check My Answers<br><span style='font-size:13px;opacity:0.7;'>Calculate Your Score</span>";
+      document.getElementById('actionBtn').innerHTML='✓ Check My Answers<br><span style="font-size:13px;opacity:0.7;">Calculate Your Score</span>';
       document.getElementById('actionBtn').className='check';
       document.getElementById('nextBtn').style.display='inline-block';
+      document.getElementById('henryWrap').onclick=null;
       startTime=Date.now();
-      phase='restore';
-      setPhase('restore');
     },1000);
   } else if(phase==='restore'){
     checkAnswers();
   }
 }
-function handleHenryClick(){
-  if(phase==='closed') handleAction();
-}
+function handleHenryClick(){ if(phase==='closed') handleAction(); }
 
 // ── BUILD TRAY ───────────────────────────────────
 function buildTray(){
   const tray=document.getElementById('trayItems');
   tray.innerHTML='';
   const isMob=window.innerWidth<=600;
-  const sz=isMob?52:70;
-  const shuffled=[...selectedCupcakes].sort(()=>Math.random()-0.5);
-  shuffled.forEach(cup=>{
+  const sz=isMob?56:90;
+  [...selectedCupcakes].sort(()=>Math.random()-0.5).forEach(cup=>{
     const div=document.createElement('div');
     div.className='game-item';
     div.dataset.cupcakeId=cup.id;
-    div.draggable=true;
-    div.style.cssText=`width:${sz}px;height:${sz}px;`;
+    div.style.cssText='width:'+sz+'px;height:'+sz+'px;cursor:pointer;';
     const img=document.createElement('img');
     img.src=cup.src;img.alt='Cupcake '+cup.id;
     img.onerror=()=>img.style.display='none';
     div.appendChild(img);
-    div.addEventListener('dragstart',e=>{dragItem={cupcakeId:cup.id,el:div};div.classList.add('dragging');e.dataTransfer.setData('text/plain',cup.id);});
+    // Desktop drag
+    div.draggable=true;
+    div.addEventListener('dragstart',e=>{
+      dragItem={cupcakeId:cup.id,el:div};
+      div.classList.add('dragging');
+      e.dataTransfer.setData('text/plain',cup.id);
+    });
     div.addEventListener('dragend',()=>div.classList.remove('dragging'));
-    div.addEventListener('touchstart',e=>startTouch(e,cup.id,div),{passive:false});
-    div.addEventListener('touchmove',moveTouch,{passive:false});
-    div.addEventListener('touchend',e=>endTouch(e),{passive:false});
+    // Touch drag
+    div.addEventListener('touchstart',e=>startTouchDrag(e,cup.id,div),{passive:false});
+    div.addEventListener('touchmove',moveTouchDrag,{passive:false});
+    div.addEventListener('touchend',e=>endTouchDrag(e),{passive:false});
     tray.appendChild(div);
   });
 }
 
-// ── DROP ─────────────────────────────────────────
-function handleDrop(slotId,slotEl){
-  if(!dragItem) return;
-  placeItem(slotId,slotEl,dragItem.cupcakeId,dragItem.el);
-  dragItem=null;
-}
-
-function placeItem(slotId,slotEl,cupcakeId,sourceEl){
-  // Unplace from old slot if moved
-  for(const k in placed){ if(placed[k]===cupcakeId) delete placed[k]; }
-  placed[slotId]=cupcakeId;
-  if(sourceEl) sourceEl.classList.add('placed');
-
-  // Render in slot
-  slotEl.innerHTML='';
-  slotEl.querySelectorAll('.check-mark').forEach(e=>e.remove());
-  slotEl.style.position='relative';
-  const sz=parseInt(slotEl.style.width)||80;
-  const img=document.createElement('img');
-  const cup=selectedCupcakes.find(c=>c.id===cupcakeId);
-  if(cup){ img.src=cup.src; img.onerror=()=>img.style.display='none'; }
-  img.style.cssText=`width:${sz-6}px;height:${sz-6}px;object-fit:contain;border-radius:8px;`;
-  slotEl.appendChild(img);
-
-  // Immediate tick/X
-  const correctId=parseInt(slotEl.dataset.cupcakeId);
-  const isCorrect=cupcakeId===correctId;
-  slotEl.classList.remove('correct','wrong');
-  const mark=document.createElement('div');
-  mark.className='check-mark';
-  if(isCorrect){
-    playRight(); showFeedback('right','Yesss Thats It!');
-    slotEl.classList.add('correct');
-    mark.innerHTML='<span style="font-size:28px;color:rgba(40,180,40,0.5);font-weight:bold;">✓</span>';
-  } else {
-    playWrong(); showFeedback('wrong','Oops Not Here!');
-    slotEl.classList.add('wrong');
-    mark.innerHTML='<span style="font-size:28px;color:rgba(200,40,40,0.5);font-weight:bold;">✗</span>';
-  }
-  slotEl.appendChild(mark);
-  updateScore();
-}
-
-// ── TOUCH DRAG ───────────────────────────────────
-let touchId=null,touchEl=null;
-function startTouch(e,id,el){
-  if(el.classList.contains('placed')) return;
-  e.preventDefault();
-  touchId=id;touchEl=el;
-  const gh=document.getElementById('dragGhost');
-  document.getElementById('ghostImg').src=selectedCupcakes.find(c=>c.id===id)?.src||'';
-  gh.style.cssText='display:block;width:80px;height:80px;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);';
-  const t=e.touches[0];
-  gh.style.left=t.clientX+'px';gh.style.top=t.clientY+'px';
-}
-function moveTouch(e){
-  if(!touchId) return;
-  e.preventDefault();
-  const t=e.touches[0];
-  const gh=document.getElementById('dragGhost');
-  gh.style.left=t.clientX+'px';gh.style.top=t.clientY+'px';
-  document.querySelectorAll('.cupcake-slot').forEach(s=>s.classList.remove('drag-over'));
-  const el=document.elementFromPoint(t.clientX,t.clientY);
-  el?.closest('.cupcake-slot')?.classList.add('drag-over');
-}
-function handleTouchDrop(slotId,slotEl){ if(touchId) placeItem(slotId,slotEl,touchId,touchEl); endTouch(null); }
-function endTouch(e){
-  if(e){
-    const t=e.changedTouches[0];
-    const el=document.elementFromPoint(t.clientX,t.clientY);
-    const slot=el?.closest('.cupcake-slot');
-    if(slot&&touchId) placeItem(parseInt(slot.dataset.slotId),slot,touchId,touchEl);
-    document.querySelectorAll('.cupcake-slot').forEach(s=>s.classList.remove('drag-over'));
-  }
-  document.getElementById('dragGhost').style.display='none';
-  touchId=null;touchEl=null;
-}
-
 // ── SCORE ─────────────────────────────────────────
-function updateScore(){
+function updateCount(){
   const done=Object.keys(placed).length;
-  document.getElementById('countDisplay').textContent=`🧁 ${done}/${numItems}`;
+  document.getElementById('countDisplay').textContent='🧁 '+done+'/'+numItems;
 }
 function updateScoreDisplay(){
   document.getElementById('roundNum').textContent=roundNum;
@@ -691,61 +687,42 @@ function updateScoreDisplay(){
 // ── CHECK ─────────────────────────────────────────
 function checkAnswers(){
   correct=0;
+  const isMob=window.innerWidth<=600;
+  const slotSz=isMob?60:139;
   document.querySelectorAll('.cupcake-slot').forEach(slot=>{
     const slotId=parseInt(slot.dataset.slotId);
-    const correctId=parseInt(slot.dataset.cupcakeId);
-    slot.querySelectorAll('.check-mark').forEach(e=>e.remove());
-    slot.style.position='relative';
-    if(placed[slotId]===correctId){
-      correct++;slot.classList.add('correct');slot.classList.remove('wrong');
-      const m=document.createElement('div');m.className='check-mark';
-      m.innerHTML='<span style="font-size:28px;color:rgba(40,180,40,0.5);font-weight:bold;">✓</span>';
-      slot.appendChild(m);
-    } else if(placed[slotId]!==undefined){
-      slot.classList.add('wrong');slot.classList.remove('correct');
-      const m=document.createElement('div');m.className='check-mark';
-      m.innerHTML='<span style="font-size:28px;color:rgba(200,40,40,0.5);font-weight:bold;">✗</span>';
-      slot.appendChild(m);
-    }
+    if(placed[slotId]!==undefined) renderPlacedInSlot(slot,placed[slotId],slotSz);
+    if(placed[slotId]===parseInt(slot.dataset.cupcakeId)) correct++;
   });
   const elapsed=Math.round((Date.now()-startTime)/1000);
   const speedBonus=correct===numItems?Math.max(0,20-elapsed):0;
   const pts=(correct*10)+speedBonus;
-  totalScore+=pts;if(totalScore>bestScore)bestScore=totalScore;
+  totalScore+=pts; if(totalScore>bestScore) bestScore=totalScore;
   updateScoreDisplay();
   if(correct===numItems){
     const msgs=["Henry is SO happy! 🦛","Nom nom nom! 🧁","Perfect memory! 🌟","Yummy yummy! 😋"];
     document.getElementById('winSub').textContent=msgs[Math.floor(Math.random()*msgs.length)];
-    document.getElementById('winCorrect').textContent=`${correct}/${numItems}`;
+    document.getElementById('winCorrect').textContent=correct+'/'+numItems;
     document.getElementById('winTime').textContent=elapsed+'s';
     document.getElementById('winPts').textContent='+'+pts;
     setTimeout(()=>document.getElementById('winOverlay').classList.add('show'),600);
   } else {
-    document.getElementById('statusMsg').textContent=`✅ ${correct}/${numItems} correct — keep trying!`;
+    document.getElementById('statusMsg').textContent='✅ '+correct+'/'+numItems+' correct — tap more cupcakes!';
   }
 }
 
 // ── NEXT / END ────────────────────────────────────
 function nextRound(){ roundNum++;updateScoreDisplay();restartRound(); }
 function endGame(){
-  alert(`Great game! You scored ${totalScore} points over ${roundNum} rounds!`);
-  roundNum=1;totalScore=0;
-  updateScoreDisplay();restartRound();
+  alert('Great game! You scored '+totalScore+' points over '+roundNum+' rounds!');
+  roundNum=1;totalScore=0;updateScoreDisplay();restartRound();
 }
 
 // ── SOUNDS ────────────────────────────────────────
 const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
 function playWrong(){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sawtooth';o.frequency.setValueAtTime(200,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(100,audioCtx.currentTime+0.3);g.gain.setValueAtTime(0.3,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3);}
 function playRight(){[523,659,784,1047].forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sine';o.frequency.value=f;const t=audioCtx.currentTime+i*0.1;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.3,t+0.05);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);o.start(t);o.stop(t+0.25);});}
-
-function showFeedback(type,msg){
-  const el=document.getElementById('feedbackMsg');
-  el.className='';el.textContent='';
-  void el.offsetWidth;
-  el.textContent=msg;
-  el.className=type+' show';
-  setTimeout(()=>el.classList.remove('show'),1400);
-}
+function showFeedback(type,msg){const el=document.getElementById('feedbackMsg');el.className='';el.textContent='';void el.offsetWidth;el.textContent=msg;el.className=type+' show';setTimeout(()=>el.classList.remove('show'),1400);}
 
 // ── INIT ──────────────────────────────────────────
 preload().then(()=>{
