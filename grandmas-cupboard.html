@@ -386,13 +386,23 @@ body{
       <div class="win-stat"><div class="win-stat-num" id="winRoundScore">+0</div><div class="win-stat-label">Points</div></div>
       <div class="win-stat"><div class="win-stat-num" id="winTotal">0</div><div class="win-stat-label">Total</div></div>
     </div>
-    <div style="font-family:'Fredoka One',cursive;font-size:16px;color:rgba(255,255,255,0.5);margin-bottom:10px;">Next round starting automatically...</div>
-    <button class="btn" onclick="nextLevel();document.getElementById('winOverlay').classList.remove('show');" 
-      style="font-family:'Fredoka One',cursive;font-size:18px;padding:14px 32px;border-radius:14px;border:none;
-      background:linear-gradient(180deg,#c8f0b0,#80b860);color:#2d6a2d;cursor:pointer;
-      box-shadow:0 4px 0 #5a8a3a;">
-      Next Round → (skip wait)
-    </button>
+    <div style="font-family:'Fredoka One',cursive;font-size:15px;color:rgba(255,255,255,0.4);margin-bottom:16px;">
+      🔄 Next round in <span id="countdown">3</span>s...
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button onclick="skipToNext();" 
+        style="font-family:'Fredoka One',cursive;font-size:18px;padding:14px 28px;border-radius:14px;border:none;
+        background:linear-gradient(180deg,#c8f0b0,#80b860);color:#2d6a2d;cursor:pointer;
+        box-shadow:0 4px 0 #5a8a3a;">
+        ▶ Next Round
+      </button>
+      <button onclick="endGame();" 
+        style="font-family:'Fredoka One',cursive;font-size:18px;padding:14px 28px;border-radius:14px;border:none;
+        background:linear-gradient(180deg,#ffb3b3,#ff6b6b);color:#fff;cursor:pointer;
+        box-shadow:0 4px 0 #cc3333;">
+        🏁 End Game
+      </button>
+    </div>
   </div>
 </div>
 
@@ -581,7 +591,11 @@ function renderCupboard(){
 // ── DOOR CONTROL ──────────────────────────────────
 function openDoors(){
   document.getElementById('cupboardImg').src='/kitchen_3.png';
-  document.getElementById('slotsOverlay').style.display='grid';
+  // Small delay so image switches before items appear
+  setTimeout(()=>{
+    document.getElementById('slotsOverlay').style.display='grid';
+    renderCupboard();
+  }, 300);
 }
 function closeDoors(animate=true){
   document.getElementById('cupboardImg').src='/kitchen_4.png';
@@ -610,10 +624,9 @@ function setPhase(p){
 
 function handleAction(){
   if(phase==='closed'){
-    openDoors();
     phase='open';
-    renderCupboard();
     setPhase('open');
+    openDoors(); // openDoors calls renderCupboard after delay
     document.getElementById('actionBtn').textContent="✅ I've Got This!";
     document.getElementById('actionBtn').className='ready';
     const hint=document.getElementById('actionHint');
@@ -776,6 +789,15 @@ function updateScore(){
   const total=slots.length;
   const done=Object.keys(placed).length;
   document.getElementById('scoreDisplay').textContent=`🧺 ${done} / ${total}`;
+  
+  // Auto-check when all slots filled
+  if(done===total && phase==='restore'){
+    // Count correct
+    const allCorrect=slots.every(sl=>placed[sl.key]===sl.itemId);
+    if(allCorrect){
+      setTimeout(()=>checkAnswers(),500);
+    }
+  }
 }
 function updateScoreDisplay(){
   document.getElementById('roundNum').textContent=roundNum;
@@ -816,27 +838,34 @@ function checkAnswers(){
     document.getElementById('winTime').textContent=elapsed+'s';
     document.getElementById('winRoundScore').textContent='+'+roundScore+' pts';
     document.getElementById('winTotal').textContent=totalScore+' total';
-    // Auto advance after showing win briefly
     setTimeout(()=>{
       document.getElementById('winOverlay').classList.add('show');
-      // Auto go to next round after 2.5 seconds
-      setTimeout(()=>{
-        document.getElementById('winOverlay').classList.remove('show');
-        roundNum++;
-        updateScoreDisplay();
-        restartLevel();
-      }, 2500);
+      // Countdown then auto-advance
+      let secs=3;
+      const cd=document.getElementById('countdown');
+      if(cd) cd.textContent=secs;
+      window._roundTimer=setInterval(()=>{
+        secs--;
+        if(cd) cd.textContent=secs;
+        if(secs<=0){
+          clearInterval(window._roundTimer);
+          skipToNext();
+        }
+      },1000);
     },600);
   } else {
     document.getElementById('statusMsg').textContent=`✅ ${correct}/${total} correct — keep trying!`;
   }
 }
 
-function nextLevel(){
+function skipToNext(){
+  clearInterval(window._roundTimer);
+  document.getElementById('winOverlay').classList.remove('show');
   roundNum++;
   updateScoreDisplay();
   restartLevel();
 }
+function nextLevel(){ skipToNext(); }
 
 function endGame(){
   // Show final score then reset
