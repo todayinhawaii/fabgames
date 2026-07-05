@@ -291,11 +291,57 @@ body{
 }
 #dragGhost img{width:100%;height:100%;object-fit:contain;border-radius:10px;}
 
-@media(max-width:600px){
-  .game-item{width:120px;height:120px;}
-  .item-slot{width:122px;height:122px;}
-  .game-item img{width:118px;height:118px;}
-  .shelf{gap:10px;padding:12px 10px;min-height:86px;}
+@media(max-width:768px){
+  /* Topbar */
+  #topbar{padding:8px 10px;flex-wrap:wrap;gap:6px;}
+  .logo{font-size:15px;padding:7px 16px;}
+  #scorePanel{gap:6px;}
+  #scorePanel > div{font-size:11px;padding:4px 10px;}
+  #scorePanel button{font-size:11px;padding:4px 10px;}
+
+  /* Status bar */
+  #statusBar{padding:8px 12px;border-radius:12px;}
+  #statusMsg{font-size:14px;}
+  #scoreDisplay{font-size:12px;}
+  #phaseBar{font-size:11px;}
+  .phase{padding:3px 8px;}
+
+  /* Cupboard */
+  #cupboardWrap{max-width:100%;}
+
+  /* Slots overlay - tune for mobile image */
+  #slotsOverlay{
+    padding-top:12%;
+    padding-bottom:6%;
+    padding-left:2%;
+    padding-right:2%;
+    gap:1% 1%;
+  }
+  .shelf-zone{gap:4px;}
+
+  /* Item slots - smaller on mobile */
+  .item-slot-inner{width:80px!important;height:80px!important;}
+
+  /* Action buttons */
+  #actionBtn{font-size:16px;padding:12px 24px;border-radius:30px;}
+  #nextBtn{font-size:16px!important;padding:12px 24px!important;border-radius:30px!important;}
+
+  /* Table */
+  #tableWrap{padding:12px;}
+  #tableTitle{font-size:12px;margin-bottom:8px;}
+  #tableItems{gap:8px;}
+
+  /* Table items - much smaller on mobile */
+  .game-item{width:72px;height:72px;}
+  .game-item img{width:70px;height:70px;}
+
+  /* Action hint */
+  #actionHint{font-size:12px;}
+
+  /* Win box */
+  .win-box{padding:24px 16px;}
+  .win-title{font-size:28px;}
+  .win-stat-num{font-size:26px;}
 }
 </style>
 </head>
@@ -566,14 +612,17 @@ function renderCupboard(){
     slot.className='item-slot';
     slot.dataset.key=sl.key;
     slot.dataset.itemId=sl.itemId;
-    slot.style.cssText='width:160px;height:160px;border-radius:10px;border:2px dashed rgba(255,200,100,0.4);background:rgba(255,200,100,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+    const _mob=window.innerWidth<=768;
+    const _sz=_mob?'70px':'160px';
+    slot.style.cssText='width:'+_sz+';height:'+_sz+';border-radius:10px;border:2px dashed rgba(255,200,100,0.4);background:rgba(255,200,100,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;';
 
     if(phase==='open'){
       const item = selectedItems.find(it=>it.id===sl.itemId);
       if(item){
         const img=document.createElement('img');
         img.src=item.src;
-        img.style.cssText='width:150px;height:150px;object-fit:contain;border-radius:8px;';
+        const imgSize=window.innerWidth<=768?'56px':'150px';
+        img.style.cssText='width:'+imgSize+';height:'+imgSize+';object-fit:contain;border-radius:8px;';
         img.onerror=()=>{img.style.display='none';}; // hide broken images
         slot.appendChild(img);
         slot.style.border='none';slot.style.background='none';
@@ -585,7 +634,8 @@ function renderCupboard(){
         if(item){
           const img=document.createElement('img');
           img.src=item.src;
-          img.style.cssText='width:150px;height:150px;object-fit:contain;border-radius:8px;';
+          const rImgSize=window.innerWidth<=768?'66px':'150px';
+          img.style.cssText='width:'+rImgSize+';height:'+rImgSize+';object-fit:contain;border-radius:8px;';
           slot.appendChild(img);
           if(placedId===sl.itemId){slot.style.border='2px solid rgba(80,220,80,0.6)';slot.style.background='rgba(80,220,80,0.1)';}
         }
