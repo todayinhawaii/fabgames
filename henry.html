@@ -9,7 +9,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
   font-family:'Nunito',sans-serif;
-  background:linear-gradient(160deg,#ffe0f0 0%,#ffc8e8 50%,#ffb0e0 100%);
+  background:linear-gradient(160deg,#7a6e3d 0%,#6c6235 50%,#5c5228 100%);
   min-height:100vh;
   display:flex;flex-direction:column;align-items:center;
   overflow-x:hidden;
@@ -446,13 +446,15 @@ function buildMouthSlots(showItems){
         }
       }
     }
-    if(positions && positions[i]){
-      // Dice-style absolute positioning
-      overlay.style.position='absolute';
+    if(dicePos && dicePos[i]){
       slot.style.position='absolute';
-      slot.style.left=positions[i][0]+'%';
-      slot.style.top=positions[i][1]+'%';
+      slot.style.left=dicePos[i][0]+'%';
+      slot.style.top=dicePos[i][1]+'%';
       slot.style.transform='translate(-50%,-50%)';
+    } else {
+      slot.style.position='relative';
+      slot.style.display='inline-flex';
+      slot.style.margin='4px';
     }
     overlay.appendChild(slot);
     slots[i]={id:i,cupcakeId:cup.id};
