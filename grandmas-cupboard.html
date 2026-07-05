@@ -347,9 +347,13 @@ body{
 </head>
 <body>
 
-<div id="topbar">
-  <div class="logo">🧺 Grandma's Cupboard <span>fab.games</span></div>
-  <div id="scorePanel" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+<div id="topbar" style="flex-direction:column;gap:10px;align-items:center;">
+  <!-- Row 1: Logo centered -->
+  <div style="display:flex;justify-content:center;width:100%;">
+    <div class="logo">🧺 Grandma's Cupboard</div>
+  </div>
+  <!-- Row 2: Score pills + End Game centered -->
+  <div style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;">
     <div style="font-family:'Fredoka One',cursive;font-size:14px;color:#2d6a2d;
       background:rgba(255,255,255,0.5);padding:6px 16px;border-radius:20px;
       border:2px solid rgba(100,150,80,0.3);">
@@ -367,7 +371,7 @@ body{
     </div>
     <button onclick="endGame()" style="
       font-family:'Fredoka One',cursive;font-size:13px;
-      padding:6px 16px;border-radius:20px;border:none;cursor:pointer;
+      padding:6px 20px;border-radius:20px;border:none;cursor:pointer;
       background:linear-gradient(180deg,#ffb3b3,#ff6b6b);
       color:#fff;
       box-shadow:0 4px 0 #cc3333, 0 6px 12px rgba(0,0,0,0.2);
