@@ -278,7 +278,7 @@ body{
   display:flex;gap:8px;align-items:center;justify-content:center;
   font-family:'Fredoka One',cursive;font-size:13px;
 }
-.phase{padding:4px 12px;border-radius:20px;color:rgba(100,80,60,0.4);border:1px solid rgba(100,80,60,0.15);}
+.phase{padding:3px 8px;border-radius:20px;color:rgba(100,80,60,0.4);border:1px solid rgba(100,80,60,0.15);font-size:12px;white-space:nowrap;}
 .phase.active{color:#2d6a2d;border-color:#2d6a2d;background:rgba(100,200,80,0.15);}
 .phase.done{color:rgba(100,80,60,0.3);border-color:rgba(100,80,60,0.1);text-decoration:line-through;}
 
@@ -303,8 +303,7 @@ body{
   #statusBar{padding:8px 12px;border-radius:12px;}
   #statusMsg{font-size:14px;}
   #scoreDisplay{font-size:12px;}
-  #phaseBar{font-size:11px;}
-  .phase{padding:3px 8px;}
+  #phaseBar{font-size:10px;}
 
   /* Cupboard */
   #cupboardWrap{max-width:100%;}
@@ -383,16 +382,16 @@ body{
 
 <div id="main">
   <!-- Status -->
-  <div id="statusBar">
+  <div id="statusBar" style="flex-wrap:wrap;gap:6px;">
     <div id="statusMsg">👀 Study the cupboard!</div>
-    <div id="phaseBar">
-      <div class="phase active" id="ph1">1 · Look</div>
-      <div style="color:rgba(255,255,255,0.2);">→</div>
-      <div class="phase" id="ph2">2 · Remember</div>
-      <div style="color:rgba(255,255,255,0.2);">→</div>
-      <div class="phase" id="ph3">3 · Restore</div>
+    <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+      <div class="phase active" id="ph1">Look</div>
+      <div style="color:rgba(100,150,80,0.4);font-size:10px;">→</div>
+      <div class="phase" id="ph2">Remember</div>
+      <div style="color:rgba(100,150,80,0.4);font-size:10px;">→</div>
+      <div class="phase" id="ph3">Restore</div>
+      <div id="scoreDisplay" style="margin-left:8px;white-space:nowrap;">🧺 0 / 0</div>
     </div>
-    <div id="scoreDisplay">⭐ 0 / 0</div>
   </div>
 
   <!-- Cupboard -->
@@ -674,9 +673,9 @@ function handleDoorClick(){
 // ── PHASE CONTROL ─────────────────────────────────
 function setPhase(p){
   phase=p;
-  document.getElementById('ph1').className='phase'+(p==='open'?' active':p==='remember'||p==='restore'?' done':'');
-  document.getElementById('ph2').className='phase'+(p==='remember'?' active':p==='restore'?' done':'');
-  document.getElementById('ph3').className='phase'+(p==='restore'?' active':'');
+  const _p1=document.getElementById('ph1'); if(_p1) _p1.className='phase'+(p==='open'?' active':p==='remember'||p==='restore'?' done':'');
+  const _p2=document.getElementById('ph2'); if(_p2) _p2.className='phase'+(p==='remember'?' active':p==='restore'?' done':'');
+  const _p3=document.getElementById('ph3'); if(_p3) _p3.className='phase'+(p==='restore'?' active':'');
 
   const msgs={
     closed:'🚪 Click to open the cupboard!',
