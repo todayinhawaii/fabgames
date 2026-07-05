@@ -43,23 +43,36 @@ body{
   backdrop-filter:blur(10px);
 }
 .logo{
-  font-family:'Fredoka One',cursive;font-size:22px;color:#2a7db5;
-  background:linear-gradient(180deg,#b8e4ff 0%,#7ec8f0 50%,#4aaad8 100%);
-  padding:10px 28px;border-radius:50px;
-  box-shadow:0 6px 0 #2a7db5, 0 10px 20px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.6);
-  color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.2);
+  font-family:'Fredoka One',cursive;font-size:24px;
+  background:linear-gradient(180deg,#ffe566 0%,#f5a800 40%,#c8760a 100%);
+  padding:12px 36px;border-radius:50px;
+  box-shadow:0 6px 0 #7a4400, 0 10px 30px rgba(200,120,0,0.4),
+    inset 0 2px 4px rgba(255,255,255,0.4),
+    0 0 20px rgba(255,200,0,0.3);
+  color:#3a1a00;text-shadow:0 1px 2px rgba(255,255,255,0.3);
+  letter-spacing:1px;
+  animation:vegasGlow 2s ease-in-out infinite;
+}
+@keyframes vegasGlow{
+  0%,100%{box-shadow:0 6px 0 #7a4400,0 10px 30px rgba(200,120,0,0.4),0 0 20px rgba(255,200,0,0.3);}
+  50%{box-shadow:0 6px 0 #7a4400,0 10px 30px rgba(200,120,0,0.6),0 0 40px rgba(255,200,0,0.6);}
 }
 #scorePanel{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;}
 .score-pill{
-  font-family:'Fredoka One',cursive;font-size:13px;color:#2a7db5;
-  background:rgba(255,255,255,0.7);padding:5px 14px;border-radius:20px;
-  border:2px solid rgba(100,180,220,0.4);white-space:nowrap;
+  font-family:'Fredoka One',cursive;font-size:13px;
+  color:#ffe566;
+  background:linear-gradient(180deg,#3a1a00,#2a1000);
+  padding:6px 16px;border-radius:20px;
+  border:2px solid #c8920a;
+  white-space:nowrap;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4),inset 0 1px 2px rgba(255,229,102,0.1);
 }
 #endBtn{
   font-family:'Fredoka One',cursive;font-size:13px;
-  padding:5px 14px;border-radius:20px;border:none;cursor:pointer;
-  background:linear-gradient(180deg,#ffb3b3,#ff6b6b);
-  color:#fff;box-shadow:0 3px 0 #cc3333;
+  padding:6px 16px;border-radius:20px;border:none;cursor:pointer;
+  background:linear-gradient(180deg,#cc2200,#880000);
+  color:#ffe566;box-shadow:0 3px 0 #550000,0 0 10px rgba(200,0,0,0.4);
+  border:1px solid #ff4400;
 }
 
 /* ── MAIN ── */
@@ -74,23 +87,28 @@ body{
 }
 #statusMsg{font-family:'Fredoka One',cursive;font-size:17px;color:#2a7db5;}
 .phase{padding:3px 10px;border-radius:20px;font-family:'Fredoka One',cursive;font-size:11px;
-  color:rgba(42,125,181,0.4);border:1px solid rgba(42,125,181,0.15);white-space:nowrap;}
-.phase.active{color:#2a7db5;border-color:#2a7db5;background:rgba(42,125,181,0.1);}
-.phase.done{color:rgba(42,125,181,0.3);text-decoration:line-through;}
-#countDisplay{font-family:'Fredoka One',cursive;font-size:14px;color:#2a7db5;white-space:nowrap;}
+  color:rgba(200,146,10,0.4);border:1px solid rgba(200,146,10,0.2);white-space:nowrap;}
+.phase.active{color:#ffe566;border-color:#c8920a;background:rgba(200,146,10,0.15);}
+.phase.done{color:rgba(200,146,10,0.3);text-decoration:line-through;}
+#countDisplay{font-family:'Fredoka One',cursive;font-size:14px;color:#ffe566;white-space:nowrap;}
 
 /* ── LEVEL SELECTOR ── */
 #levelBar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
 .lvl-btn{
   font-family:'Fredoka One',cursive;font-size:13px;
-  padding:6px 16px;border-radius:20px;border:2px solid rgba(42,125,181,0.3);
-  cursor:pointer;background:rgba(255,255,255,0.5);color:rgba(42,125,181,0.6);
+  padding:6px 16px;border-radius:20px;
+  border:2px solid rgba(200,146,10,0.3);
+  cursor:pointer;
+  background:linear-gradient(180deg,#2a1500,#1a0a00);
+  color:rgba(255,229,102,0.5);
   transition:all 0.2s;
 }
-.lvl-btn:hover{background:rgba(100,180,220,0.2);color:#2a7db5;}
+.lvl-btn:hover{border-color:#c8920a;color:#ffe566;}
 .lvl-btn.active{
-  background:linear-gradient(180deg,#b8e4ff,#4aaad8);color:#fff;
-  border-color:#2a7db5;box-shadow:0 3px 0 #1a5a8a;
+  background:linear-gradient(180deg,#ffe566,#f5a800,#c8760a);
+  color:#3a1a00;border-color:#7a4400;
+  box-shadow:0 4px 0 #7a4400,0 0 15px rgba(255,200,0,0.4);
+  font-size:14px;
 }
 
 /* ── HENRY ── */
@@ -165,16 +183,23 @@ body{
 #actionBtn{
   font-family:'Fredoka One',cursive;font-size:22px;
   padding:16px 48px;border-radius:50px;border:none;cursor:pointer;
-  background:linear-gradient(180deg,#b8e4ff 0%,#7ec8f0 50%,#4aaad8 100%);
-  color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.2);
-  box-shadow:0 8px 0 #2a7db5, 0 12px 20px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4);
+  background:linear-gradient(180deg,#ffe566 0%,#f5a800 50%,#c8760a 100%);
+  color:#3a1a00;text-shadow:0 1px 2px rgba(255,255,255,0.3);
+  box-shadow:0 8px 0 #7a4400, 0 12px 30px rgba(200,120,0,0.4),
+    inset 0 2px 4px rgba(255,255,255,0.4),0 0 20px rgba(255,200,0,0.3);
   animation:btnPulse 2s ease-in-out infinite;
-  transition:all 0.2s;
+  transition:all 0.2s;letter-spacing:1px;
 }
-#actionBtn:hover{transform:translateY(3px);box-shadow:0 5px 0 #2a7db5,0 8px 12px rgba(0,0,0,0.2);}
-#actionBtn:active{transform:translateY(8px);box-shadow:0 0px 0 #2a7db5;}
-#actionBtn.got-it{background:linear-gradient(180deg,#ffccd5,#FF69B4,#e0407a);box-shadow:0 8px 0 #a0205a,0 12px 20px rgba(0,0,0,0.2);}
-#actionBtn.check{background:linear-gradient(180deg,#c8ffc8,#44cc66,#228833);box-shadow:0 8px 0 #155522,0 12px 20px rgba(0,0,0,0.2);}
+#actionBtn:hover{transform:translateY(3px);box-shadow:0 5px 0 #7a4400,0 8px 20px rgba(200,120,0,0.3);}
+#actionBtn:active{transform:translateY(8px);box-shadow:0 0 0 #7a4400;}
+#actionBtn.got-it{background:linear-gradient(180deg,#cc2200,#880000);color:#ffe566;
+  box-shadow:0 8px 0 #440000,0 12px 20px rgba(0,0,0,0.3),0 0 20px rgba(200,0,0,0.4);}
+#actionBtn.check{background:linear-gradient(180deg,#44cc66,#228833);color:#fff;
+  box-shadow:0 8px 0 #155522,0 12px 20px rgba(0,0,0,0.2);}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 8px 0 #7a4400,0 12px 30px rgba(200,120,0,0.4),0 0 20px rgba(255,200,0,0.2);}
+  50%{box-shadow:0 8px 0 #7a4400,0 12px 30px rgba(200,120,0,0.5),0 0 40px rgba(255,200,0,0.6);}
+}
 #nextBtn{
   display:none;
   font-family:'Fredoka One',cursive;font-size:22px;
@@ -410,7 +435,7 @@ function setPhase(p){
 function buildMouthSlots(showItems){
   const overlay=document.getElementById('mouthOverlay');
   overlay.innerHTML='';
-  overlay.style.cssText='position:absolute;top:35%;left:8%;right:8%;bottom:5%;pointer-events:none;';
+  overlay.style.cssText='position:absolute;top:42%;left:22%;right:22%;bottom:8%;pointer-events:none;';
   overlay.classList.add('active');
 
   const isMob=window.innerWidth<=600;
