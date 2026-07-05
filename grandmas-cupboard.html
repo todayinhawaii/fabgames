@@ -780,7 +780,8 @@ function placeItem(slotKey, slotEl, itemId, sourceEl){
   slotEl.innerHTML='';
   const img=document.createElement('img');
   img.src=selectedItems.find(it=>it.id===itemId).src;
-  img.style.cssText='width:150px;height:150px;object-fit:contain;border-radius:8px;';
+  const _pImgSz=window.innerWidth<=768?'66px':'150px';
+  img.style.cssText='width:'+_pImgSz+';height:'+_pImgSz+';object-fit:contain;border-radius:8px;';
   slotEl.appendChild(img);
 
   // Remove old check marks
