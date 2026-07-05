@@ -439,11 +439,20 @@ function buildMouthSlots(showItems){
 
 // ── HENRY ANIMATION ──────────────────────────────
 function startHenryAnimation(){
-  const imgs=['/Henry-1-mouth-opened.png','/Henry-1-mouth-opened-eyes-ears-flop.png','/Henry-1-mouth-opened-eyes-ears-enlarge.png'];
+  const allImgs=['/Henry-1-mouth-opened.png','/Henry-1-mouth-opened-eyes-ears-flop.png','/Henry-1-mouth-opened-eyes-ears-enlarge.png'];
+  // Pre-check which exist
+  const validImgs=['/Henry-1-mouth-opened.png']; // always include base
+  let checked=0;
+  allImgs.slice(1).forEach(src=>{
+    const t=new Image();
+    t.onload=()=>{ validImgs.push(src); };
+    t.onerror=()=>{}; // skip missing
+    t.src=src;
+  });
   let frame=0;
   animTimer=setInterval(()=>{
-    frame=(frame+1)%imgs.length;
-    document.getElementById('henryImg').src=imgs[frame];
+    frame=(frame+1)%Math.max(1,validImgs.length);
+    document.getElementById('henryImg').src=validImgs[frame];
   },1200);
 }
 function stopHenryAnimation(){
