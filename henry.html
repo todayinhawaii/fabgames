@@ -95,7 +95,7 @@ body{
 
 /* ── HENRY ── */
 #henryWrap{
-  position:relative;width:100%;max-width:1000px;
+  position:relative;width:100%;max-width:1400px;
   cursor:pointer;
 }
 #henryImg{
@@ -107,11 +107,7 @@ body{
 /* Cupcake slots overlay inside Henry's mouth */
 #mouthOverlay{
   position:absolute;
-  /* These % values position over Henry's open mouth area */
   top:38%;left:12%;right:12%;bottom:8%;
-  display:flex;flex-wrap:wrap;
-  align-items:center;justify-content:center;
-  gap:8px;
   pointer-events:none;
 }
 #mouthOverlay.active{pointer-events:all;}
@@ -267,10 +263,11 @@ body{
 
   <!-- Level selector -->
   <div id="levelBar">
-    <button class="lvl-btn active" onclick="setItems(3)">3 🧁</button>
-    <button class="lvl-btn" onclick="setItems(4)">4 🧁</button>
+    <button class="lvl-btn active" onclick="setItems(5)">5 🧁</button>
     <button class="lvl-btn" onclick="setItems(6)">6 🧁</button>
+    <button class="lvl-btn" onclick="setItems(7)">7 🧁</button>
     <button class="lvl-btn" onclick="setItems(8)">8 🧁</button>
+    <button class="lvl-btn" onclick="setItems(9)">9 🧁</button>
     <button class="lvl-btn" onclick="setItems(10)">10 🧁</button>
   </div>
 
@@ -331,7 +328,7 @@ body{
 const CUPCAKES = Array.from({length:10},(_,i)=>({id:i+1,src:`/cupcake-${i+1}.png`}));
 
 // ── STATE ────────────────────────────────────────
-let numItems = 3;
+let numItems = 5;
 let phase = 'closed'; // closed|open|restore
 let selectedCupcakes = [];
 let slots = []; // {id, pos, cupcakeId}
@@ -362,7 +359,7 @@ function preload(){
 function setItems(n){
   numItems=n;
   document.querySelectorAll('.lvl-btn').forEach(b=>{
-    b.classList.toggle('active', b.textContent.trim().startsWith(n+''));
+    b.classList.toggle('active', b.textContent.trim().startsWith(n+' '));
   });
   restartRound();
 }
@@ -449,6 +446,14 @@ function buildMouthSlots(showItems){
         }
       }
     }
+    if(positions && positions[i]){
+      // Dice-style absolute positioning
+      overlay.style.position='absolute';
+      slot.style.position='absolute';
+      slot.style.left=positions[i][0]+'%';
+      slot.style.top=positions[i][1]+'%';
+      slot.style.transform='translate(-50%,-50%)';
+    }
     overlay.appendChild(slot);
     slots[i]={id:i,cupcakeId:cup.id};
   });
@@ -528,7 +533,7 @@ function buildTray(){
   const tray=document.getElementById('trayItems');
   tray.innerHTML='';
   const isMob=window.innerWidth<=600;
-  const sz=isMob?60:90;
+  const sz=isMob?52:70;
   const shuffled=[...selectedCupcakes].sort(()=>Math.random()-0.5);
   shuffled.forEach(cup=>{
     const div=document.createElement('div');
