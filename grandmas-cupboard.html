@@ -14,12 +14,28 @@
   --wood-light:#c8956c;
   --gold:#FFD700;
   --green:#4a7c59;
-  --bg:#1a0f08;
+  --bg:#f5e6c8;
   --text:#3d1f00;
 }
 body{
   font-family:'Nunito',sans-serif;
-  background:var(--bg);
+  background-color:#f0dfa8;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(180,130,60,0.04) 40px,
+      rgba(180,130,60,0.04) 41px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 60px,
+      rgba(160,110,40,0.03) 60px,
+      rgba(160,110,40,0.03) 62px
+    ),
+    linear-gradient(160deg,#f5e6c8 0%,#eedbb0 40%,#e8d4a0 100%);
   min-height:100vh;
   display:flex;flex-direction:column;align-items:center;
   overflow-x:hidden;
@@ -30,30 +46,38 @@ body{
   width:100%;max-width:1100px;
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 20px;
-  background:rgba(0,0,0,0.5);
-  border-bottom:2px solid rgba(255,182,193,0.3);
+  background:rgba(255,255,255,0.4);
+  border-bottom:2px solid rgba(100,150,80,0.3);
+  backdrop-filter:blur(10px);
   position:sticky;top:0;z-index:200;
   backdrop-filter:blur(10px);
 }
-.logo{font-family:'Fredoka One',cursive;font-size:24px;color:#FFB6C1;}
-.logo span{font-size:13px;color:rgba(255,255,255,0.4);margin-left:4px;}
+.logo{
+  font-family:'Fredoka One',cursive;font-size:20px;color:#2d6a2d;
+  background:linear-gradient(180deg,#c8f0b0 0%,#a8d890 50%,#80b860 100%);
+  padding:10px 24px;border-radius:50px;
+  box-shadow:0 6px 0 #5a8a3a, 0 10px 20px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.5);
+  letter-spacing:0.5px;
+  border:none;
+}
+.logo span{display:none;}
 #levelBar{display:flex;gap:8px;}
 .lvl-btn{
   font-family:'Fredoka One',cursive;font-size:15px;
   padding:8px 20px;border-radius:30px;
-  border:2px solid rgba(255,182,193,0.4);
+  border:2px solid rgba(100,150,80,0.3);
   cursor:pointer;
-  background:rgba(173,216,230,0.15);
-  color:rgba(255,182,193,0.7);
+  background:rgba(255,255,255,0.4);
+  color:rgba(80,120,60,0.7);
   transition:all 0.2s;
   letter-spacing:0.5px;
 }
-.lvl-btn:hover{background:rgba(173,216,230,0.3);color:#FFB6C1;border-color:#FFB6C1;}
+.lvl-btn:hover{background:rgba(200,240,180,0.5);color:#2d6a2d;border-color:#5a8a3a;}
 .lvl-btn.active{
-  background:linear-gradient(135deg,#87CEEB,#ADD8E6);
-  color:#FF69B4;
-  border-color:#87CEEB;
-  box-shadow:0 4px 15px rgba(135,206,235,0.4);
+  background:linear-gradient(180deg,#c8f0b0 0%,#a8d890 50%,#80b860 100%);
+  color:#2d6a2d;
+  border-color:#5a8a3a;
+  box-shadow:0 4px 0 #5a8a3a, 0 8px 15px rgba(0,0,0,0.15);
   font-size:16px;
 }
 
@@ -64,11 +88,11 @@ body{
 #statusBar{
   display:flex;align-items:center;justify-content:space-between;
   width:100%;padding:12px 24px;
-  background:rgba(135,206,235,0.08);
-  border-radius:20px;border:2px solid rgba(255,182,193,0.25);
+  background:rgba(255,255,255,0.4);
+  border-radius:20px;border:2px solid rgba(100,150,80,0.25);
 }
-#statusMsg{font-family:'Fredoka One',cursive;font-size:20px;color:#FFB6C1;}
-#scoreDisplay{font-family:'Fredoka One',cursive;font-size:18px;color:rgba(135,206,235,0.8);}
+#statusMsg{font-family:'Fredoka One',cursive;font-size:20px;color:#2d6a2d;}
+#scoreDisplay{font-family:'Fredoka One',cursive;font-size:18px;color:#6b4c2a;}
 #timerDisplay{font-family:'Fredoka One',cursive;font-size:20px;color:#FF69B4;}
 
 /* ── CUPBOARD IMAGE-BASED ── */
@@ -271,9 +295,9 @@ body{
   display:flex;gap:8px;align-items:center;justify-content:center;
   font-family:'Fredoka One',cursive;font-size:13px;
 }
-.phase{padding:4px 12px;border-radius:20px;color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.1);}
-.phase.active{color:#FFB6C1;border-color:#FFB6C1;background:rgba(255,182,193,0.1);}
-.phase.done{color:rgba(255,255,255,0.4);border-color:rgba(255,255,255,0.15);text-decoration:line-through;}
+.phase{padding:4px 12px;border-radius:20px;color:rgba(100,80,60,0.4);border:1px solid rgba(100,80,60,0.15);}
+.phase.active{color:#2d6a2d;border-color:#2d6a2d;background:rgba(100,200,80,0.15);}
+.phase.done{color:rgba(100,80,60,0.3);border-color:rgba(100,80,60,0.1);text-decoration:line-through;}
 
 /* ── DRAG GHOST ── */
 #dragGhost{
@@ -332,7 +356,12 @@ body{
   </div>
 
   <!-- Action Button -->
-  <button id="actionBtn" onclick="handleAction()">🚪 Open Cupboard</button>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+    <button id="actionBtn" onclick="handleAction()">🚪 Open Cupboard</button>
+    <div id="actionHint" style="font-family:'Fredoka One',cursive;font-size:15px;color:#6b4c2a;opacity:0.7;text-align:center;max-width:500px;line-height:1.5;">
+      Study what's in the cupboard and when you think you can remember them all, click <em>I've Got This!</em>
+    </div>
+  </div>
 
   <!-- Table -->
   <div id="tableWrap" style="display:none;">
@@ -552,13 +581,14 @@ function setPhase(p){
 
 function handleAction(){
   if(phase==='closed'){
-    // Open doors
     openDoors();
     phase='open';
     renderCupboard();
     setPhase('open');
-    document.getElementById('actionBtn').textContent="✅ I've Got It!";
+    document.getElementById('actionBtn').textContent="✅ I've Got This!";
     document.getElementById('actionBtn').className='ready';
+    const hint=document.getElementById('actionHint');
+    if(hint) hint.style.display='none';
   } else if(phase==='open'){
     // Close doors briefly so player can't see, then reopen empty
     closeDoors();
