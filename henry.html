@@ -129,7 +129,7 @@ body{
 /* Cupcake slots overlay inside Henry's mouth */
 #mouthOverlay{
   position:absolute;
-  top:38%;left:12%;right:12%;bottom:8%;
+  top:42%;left:22%;right:22%;bottom:8%;
   pointer-events:none;
 }
 #mouthOverlay.active{pointer-events:all;}
@@ -323,7 +323,7 @@ body{
   </div>
 
   <!-- Tray -->
-  <div id="trayWrap" style="display:none;">
+  <div id="trayWrap" style="display:none;margin-top:-48px;position:relative;z-index:10;">
     <div id="trayTitle">🧁 Drag each cupcake back to where it was!</div>
     <div id="trayItems"></div>
   </div>
@@ -446,8 +446,9 @@ function setPhase(p){
 function buildMouthSlots(showItems){
   const overlay=document.getElementById('mouthOverlay');
   overlay.innerHTML='';
-  overlay.style.cssText='position:absolute;top:42%;left:22%;right:22%;bottom:8%;pointer-events:none;';
+  overlay.style.cssText='position:absolute;top:42%;left:22%;right:22%;bottom:8%;pointer-events:none;z-index:50;';
   overlay.classList.add('active');
+  overlay.addEventListener('dragover',e=>e.preventDefault(),{passive:false});
 
   const isMob=window.innerWidth<=600;
   const slotSz=isMob?62:139;
@@ -468,7 +469,7 @@ function buildMouthSlots(showItems){
     slot.className='cupcake-slot';
     slot.dataset.slotId=i;
     slot.dataset.cupcakeId=cup.id;
-    slot.style.cssText='position:absolute;width:'+slotSz+'px;height:'+slotSz+'px;'+
+    slot.style.cssText='position:absolute;width:'+slotSz+'px;height:'+slotSz+'px;z-index:51;'+
       'left:'+(pos[i]?pos[i][0]:50)+'%;top:'+(pos[i]?pos[i][1]:50)+'%;'+
       'transform:translate(-50%,-50%);border-radius:12px;'+
       'border:2px dashed rgba(255,200,100,0.4);background:rgba(255,255,255,0.1);'+
@@ -550,6 +551,8 @@ function handleAction(){
     setTimeout(()=>{
       document.getElementById('henryImg').src='/Henry-1-mouth-opened.png';
       document.getElementById('mouthOverlay').classList.add('active');
+      document.getElementById('mouthOverlay').style.zIndex='50';
+      document.getElementById('henryWrap').onclick=null; // disable hippo click during restore
       buildMouthSlots(false);
       buildTray();
       document.getElementById('trayWrap').style.display='block';
