@@ -314,7 +314,7 @@ body{
   </div>
 
   <!-- Buttons -->
-  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;position:relative;z-index:10;margin-top:-60px;">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;position:relative;z-index:10;margin-top:-4px;">
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
       <button id="actionBtn" onclick="handleAction()">🦛 Open Henry's Mouth!</button>
       <button id="nextBtn" onclick="nextRound()">▶ Next Game</button>
@@ -454,7 +454,7 @@ function buildMouthSlots(showItems){
   overlay.addEventListener('dragover',e=>e.preventDefault(),{passive:false});
 
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?52:111;
+  const slotSz=isMob?50:105;
   const pos=DICE_POS[numItems]||DICE_POS[5];
 
   selectedCupcakes.forEach((cup,i)=>{
@@ -533,7 +533,7 @@ function placeItem(slotId, slotEl, cupcakeId, sourceEl){
   if(sourceEl){ sourceEl.classList.add('placed'); sourceEl.style.opacity='0.2'; sourceEl.style.pointerEvents='none'; }
 
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?52:111;
+  const slotSz=isMob?50:105;
   const correctId=parseInt(slotEl.dataset.cupcakeId);
   const isCorrect=cupcakeId===correctId;
 
@@ -688,7 +688,7 @@ function updateScoreDisplay(){
 function checkAnswers(){
   correct=0;
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?52:111;
+  const slotSz=isMob?50:105;
   document.querySelectorAll('.cupcake-slot').forEach(slot=>{
     const slotId=parseInt(slot.dataset.slotId);
     if(placed[slotId]!==undefined) renderPlacedInSlot(slot,placed[slotId],slotSz);
