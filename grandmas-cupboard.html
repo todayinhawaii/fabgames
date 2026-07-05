@@ -720,17 +720,31 @@ function placeItem(slotKey, slotEl, itemId, sourceEl){
   img.style.cssText='width:150px;height:150px;object-fit:contain;border-radius:8px;';
   slotEl.appendChild(img);
 
-  // Sound and feedback
+  // Remove old check marks
+  slotEl.querySelectorAll('.check-mark').forEach(e=>e.remove());
+  slotEl.style.position='relative';
+
+  // Sound, feedback and immediate tick/X
   if(isCorrect){
     playRight();
     showFeedback("right","Yesss Thats It!");
     slotEl.style.border='2px solid rgba(80,220,80,0.6)';
     slotEl.style.background='rgba(80,220,80,0.1)';
+    const tick=document.createElement('div');
+    tick.className='check-mark';
+    tick.innerHTML='<span style="font-size:50px;color:rgba(40,180,40,0.45);font-weight:bold;">✓</span>';
+    tick.style.cssText='position:absolute;top:2px;right:4px;pointer-events:none;line-height:1;z-index:10;';
+    slotEl.appendChild(tick);
   } else {
     playWrong();
     showFeedback("wrong","Oops Not Here!");
     slotEl.style.border='2px solid rgba(220,80,80,0.6)';
     slotEl.style.background='rgba(220,80,80,0.1)';
+    const cross=document.createElement('div');
+    cross.className='check-mark';
+    cross.innerHTML='<span style="font-size:50px;color:rgba(200,40,40,0.45);font-weight:bold;">✗</span>';
+    cross.style.cssText='position:absolute;top:2px;right:4px;pointer-events:none;line-height:1;z-index:10;';
+    slotEl.appendChild(cross);
   }
 
   updateScore();
