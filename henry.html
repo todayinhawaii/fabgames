@@ -76,7 +76,7 @@ body{
 }
 
 /* ── MAIN ── */
-#main{width:100%;max-width:1200px;padding:12px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+#main{width:100%;max-width:100%;padding:12px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;}
 
 /* ── STATUS ── */
 #statusBar{
@@ -87,10 +87,11 @@ body{
 }
 #statusMsg{font-family:'Fredoka One',cursive;font-size:17px;color:#2a7db5;}
 .phase{padding:3px 10px;border-radius:20px;font-family:'Fredoka One',cursive;font-size:11px;
-  color:rgba(200,146,10,0.4);border:1px solid rgba(200,146,10,0.2);white-space:nowrap;}
-.phase.active{color:#ffe566;border-color:#c8920a;background:rgba(200,146,10,0.15);}
-.phase.done{color:rgba(200,146,10,0.3);text-decoration:line-through;}
-#countDisplay{font-family:'Fredoka One',cursive;font-size:14px;color:#ffe566;white-space:nowrap;}
+  color:rgba(60,30,0,0.5);border:1px solid rgba(60,30,0,0.15);
+  background:rgba(255,235,180,0.08);white-space:nowrap;}
+.phase.active{color:#3a1800;border-color:rgba(60,30,0,0.4);background:rgba(255,235,180,0.12);}
+.phase.done{color:rgba(60,30,0,0.3);text-decoration:line-through;}
+#countDisplay{font-family:'Fredoka One',cursive;font-size:14px;color:#3a1800;white-space:nowrap;}
 
 /* ── LEVEL SELECTOR ── */
 #levelBar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
@@ -115,6 +116,9 @@ body{
 #henryWrap{
   position:relative;width:100%;max-width:100%;
   cursor:pointer;
+  transform:scale(1.5);
+  transform-origin:top center;
+  margin-bottom:50%;
 }
 #henryImg{
   width:100%;display:block;border-radius:20px;
@@ -443,12 +447,12 @@ function buildMouthSlots(showItems){
 
   // Dice-style % positions [left%, top%] for each count
   const posMaps={
-    5:[[20,22],[72,22],[46,50],[20,76],[72,76]],
-    6:[[20,18],[72,18],[20,50],[72,50],[20,80],[72,80]],
-    7:[[15,18],[55,18],[82,18],[15,52],[55,52],[82,52],[38,80]],
-    8:[[15,15],[50,15],[82,15],[15,50],[82,50],[15,82],[50,82],[82,82]],
-    9:[[15,12],[50,12],[82,12],[15,48],[50,48],[82,48],[15,82],[50,82],[82,82]],
-    10:[[10,12],[38,12],[65,12],[85,12],[10,48],[50,48],[85,48],[10,82],[38,82],[72,82]]
+    5:[[28,28],[65,28],[46,52],[28,74],[65,74]],
+    6:[[25,22],[65,22],[25,52],[65,52],[25,78],[65,78]],
+    7:[[22,20],[55,20],[78,20],[22,52],[55,52],[78,52],[46,78]],
+    8:[[22,18],[55,18],[78,18],[22,52],[78,52],[22,80],[55,80],[78,80]],
+    9:[[22,15],[50,15],[75,15],[22,48],[50,48],[75,48],[22,80],[50,80],[75,80]],
+    10:[[18,12],[42,12],[65,12],[82,12],[18,48],[50,48],[82,48],[18,82],[42,82],[70,82]]
   };
   const pos=posMaps[numItems]||posMaps[5];
 
