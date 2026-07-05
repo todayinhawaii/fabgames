@@ -9,19 +9,36 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
   font-family:'Nunito',sans-serif;
-  background:linear-gradient(160deg,#e8f4f8 0%,#d4ebf5 50%,#c8e6f0 100%);
+  background:linear-gradient(160deg,#ffe0f0 0%,#ffc8e8 50%,#ffb0e0 100%);
   min-height:100vh;
   display:flex;flex-direction:column;align-items:center;
   overflow-x:hidden;
+  position:relative;
 }
+
+/* Flying cupcake background */
+.bg-cupcake{
+  position:fixed;
+  font-size:52px;
+  pointer-events:none;
+  z-index:0;
+  animation:floatCupcake linear infinite;
+  opacity:0.18;
+  user-select:none;
+}
+@keyframes floatCupcake{
+  0%{transform:translateY(110vh) rotate(0deg);}
+  100%{transform:translateY(-20vh) rotate(360deg);}
+}
+#main,#topbar{position:relative;z-index:1;}
 
 /* ── TOPBAR ── */
 #topbar{
   width:100%;max-width:900px;
   display:flex;flex-direction:column;align-items:center;
   gap:8px;padding:12px 16px;
-  background:rgba(255,255,255,0.5);
-  border-bottom:2px solid rgba(100,180,220,0.3);
+  background:rgba(255,255,255,0.6);
+  border-bottom:2px solid rgba(255,150,200,0.3);
   position:sticky;top:0;z-index:200;
   backdrop-filter:blur(10px);
 }
@@ -51,8 +68,8 @@ body{
 /* ── STATUS ── */
 #statusBar{
   width:100%;padding:10px 16px;
-  background:rgba(255,255,255,0.5);border-radius:16px;
-  border:2px solid rgba(100,180,220,0.25);
+  background:rgba(255,255,255,0.6);border-radius:16px;
+  border:2px solid rgba(255,150,200,0.25);
   display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
 }
 #statusMsg{font-family:'Fredoka One',cursive;font-size:17px;color:#2a7db5;}
@@ -78,7 +95,7 @@ body{
 
 /* ── HENRY ── */
 #henryWrap{
-  position:relative;width:100%;max-width:700px;
+  position:relative;width:100%;max-width:1000px;
   cursor:pointer;
 }
 #henryImg{
@@ -685,6 +702,21 @@ preload().then(()=>{
   console.log('Cupcakes loaded:',validCupcakes.length);
   restartRound();
 });
+
+// Flying background cupcakes
+(function(){
+  const emojis=['🧁','🎂','🍰','🧁','🎀','🧁','🍭','🧁'];
+  for(let i=0;i<16;i++){
+    const el=document.createElement('div');
+    el.className='bg-cupcake';
+    el.textContent=emojis[i%emojis.length];
+    el.style.left=Math.random()*100+'vw';
+    el.style.animationDuration=(8+Math.random()*14)+'s';
+    el.style.animationDelay=-(Math.random()*20)+'s';
+    el.style.fontSize=(36+Math.random()*48)+'px';
+    document.body.appendChild(el);
+  }
+})();
 </script>
 </body>
 </html>
