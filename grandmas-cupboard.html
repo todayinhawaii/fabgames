@@ -62,24 +62,7 @@ body{
 }
 .logo span{display:none;}
 #levelBar{display:flex;gap:8px;}
-.lvl-btn{
-  font-family:'Fredoka One',cursive;font-size:15px;
-  padding:8px 20px;border-radius:30px;
-  border:2px solid rgba(100,150,80,0.3);
-  cursor:pointer;
-  background:rgba(255,255,255,0.4);
-  color:rgba(80,120,60,0.7);
-  transition:all 0.2s;
-  letter-spacing:0.5px;
-}
-.lvl-btn:hover{background:rgba(200,240,180,0.5);color:#2d6a2d;border-color:#5a8a3a;}
-.lvl-btn.active{
-  background:linear-gradient(180deg,#c8f0b0 0%,#a8d890 50%,#80b860 100%);
-  color:#2d6a2d;
-  border-color:#5a8a3a;
-  box-shadow:0 4px 0 #5a8a3a, 0 8px 15px rgba(0,0,0,0.15);
-  font-size:16px;
-}
+/* level buttons removed */
 
 /* ── MAIN ── */
 #main{width:100%;max-width:1100px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px;}
@@ -320,10 +303,22 @@ body{
 
 <div id="topbar">
   <div class="logo">🧺 Grandma's Cupboard <span>fab.games</span></div>
-  <div id="levelBar">
-    <button class="lvl-btn active" onclick="setLevel(1)">🥄 Easy</button>
-    <button class="lvl-btn" onclick="setLevel(2)">🍳 Medium</button>
-    <button class="lvl-btn" onclick="setLevel(3)">👑 Hard</button>
+  <div id="scorePanel" style="display:flex;gap:16px;align-items:center;">
+    <div style="font-family:'Fredoka One',cursive;font-size:15px;color:#2d6a2d;
+      background:rgba(255,255,255,0.5);padding:6px 18px;border-radius:20px;
+      border:2px solid rgba(100,150,80,0.3);">
+      🎯 Round <span id="roundNum">1</span>
+    </div>
+    <div style="font-family:'Fredoka One',cursive;font-size:15px;color:#2d6a2d;
+      background:rgba(255,255,255,0.5);padding:6px 18px;border-radius:20px;
+      border:2px solid rgba(100,150,80,0.3);">
+      ⭐ Score <span id="totalScore">0</span>
+    </div>
+    <div style="font-family:'Fredoka One',cursive;font-size:15px;color:#2d6a2d;
+      background:rgba(255,255,255,0.5);padding:6px 18px;border-radius:20px;
+      border:2px solid rgba(100,150,80,0.3);">
+      🏆 Best <span id="bestScore">0</span>
+    </div>
   </div>
 </div>
 
@@ -379,6 +374,8 @@ body{
     <div class="win-stats">
       <div class="win-stat"><div class="win-stat-num" id="winCorrect">0</div><div class="win-stat-label">Correct</div></div>
       <div class="win-stat"><div class="win-stat-num" id="winTime">0s</div><div class="win-stat-label">Time</div></div>
+      <div class="win-stat"><div class="win-stat-num" id="winRoundScore">+0</div><div class="win-stat-label">Points</div></div>
+      <div class="win-stat"><div class="win-stat-num" id="winTotal">0</div><div class="win-stat-label">Total</div></div>
     </div>
     <button class="btn" style="font-family:'Fredoka One',cursive;font-size:18px;padding:14px 32px;border-radius:14px;border:none;background:var(--gold);color:#000;cursor:pointer;margin-right:10px;" onclick="nextLevel()">Next Level →</button>
     <button class="btn" style="font-family:'Fredoka One',cursive;font-size:18px;padding:14px 32px;border-radius:14px;border:none;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;" onclick="restartLevel()">Play Again ↺</button>
@@ -394,9 +391,7 @@ body{
 <script>
 // ── CONFIG ────────────────────────────────────────
 const LEVEL_CONFIG = {
-  1: {items:6,  shelves:2, title:"Easy — 6 items, 2 shelves"},
-  2: {items:10, shelves:2, title:"Medium — 10 items, 2 shelves"},
-  3: {items:16, shelves:3, title:"Hard — 16 items, 3 shelves"},
+  1: {items:6, shelves:2, title:"6 items — can you remember them all?"},
 };
 
 // All 56 product images k1.png to k56.png
@@ -418,13 +413,17 @@ function preloadImages(){
 
 // ── STATE ─────────────────────────────────────────
 let currentLevel = 1;
-let phase = 'closed'; // closed | open | remember | restore
-let selectedItems = [];  // items chosen for this round
-let slots = [];          // {id, row, col, itemId} — correct positions
-let placed = {};         // slotKey -> itemId placed there
+let phase = 'closed';
+let selectedItems = [];
+let slots = [];
+let placed = {};
 let startTime = null;
-let dragItem = null;     // {itemId, el}
+let dragItem = null;
 let correct = 0;
+let roundNum = 1;
+let totalScore = 0;
+let bestScore = 0;
+let roundScore = 0;
 
 // ── INIT ──────────────────────────────────────────
 // ── SOUNDS ───────────────────────────────────────
@@ -465,8 +464,7 @@ function showFeedback(type, msg){
 }
 
 function setLevel(lv){
-  currentLevel = lv;
-  document.querySelectorAll('.lvl-btn').forEach((b,i)=>b.classList.toggle('active',i+1===lv));
+  currentLevel = 1; // always 1
   if(VALID_ITEMS.length>0){ restartLevel(); } else {
     preloadImages().then(()=>restartLevel());
   }
@@ -765,6 +763,11 @@ function updateScore(){
   const done=Object.keys(placed).length;
   document.getElementById('scoreDisplay').textContent=`🧺 ${done} / ${total}`;
 }
+function updateScoreDisplay(){
+  document.getElementById('roundNum').textContent=roundNum;
+  document.getElementById('totalScore').textContent=totalScore;
+  document.getElementById('bestScore').textContent=bestScore;
+}
 
 function checkAnswers(){
   correct=0;
@@ -785,12 +788,20 @@ function checkAnswers(){
   const total=slots.length;
   const elapsed=Math.round((Date.now()-startTime)/1000);
 
+  // Score: 10 points per correct, bonus for speed
+  const speedBonus = correct===total ? Math.max(0, 30-elapsed) : 0;
+  roundScore = (correct*10) + speedBonus;
+  totalScore += roundScore;
+  if(totalScore > bestScore) bestScore = totalScore;
+  updateScoreDisplay();
+
   if(correct===total){
-    // All correct — win!
     const msgs=['Perfect memory! 🧠','Grandma is proud! 🌺','Amazing recall! ⭐','You never forget! 💫'];
     document.getElementById('winSub').textContent=msgs[Math.floor(Math.random()*msgs.length)];
     document.getElementById('winCorrect').textContent=`${correct}/${total}`;
     document.getElementById('winTime').textContent=elapsed+'s';
+    document.getElementById('winRoundScore').textContent='+'+roundScore+' pts';
+    document.getElementById('winTotal').textContent=totalScore+' total';
     setTimeout(()=>document.getElementById('winOverlay').classList.add('show'),600);
   } else {
     document.getElementById('statusMsg').textContent=`✅ ${correct}/${total} correct — keep trying!`;
@@ -798,8 +809,9 @@ function checkAnswers(){
 }
 
 function nextLevel(){
-  const next=currentLevel<3?currentLevel+1:1;
-  setLevel(next);
+  roundNum++;
+  updateScoreDisplay();
+  restartLevel();
 }
 
 preloadImages().then(()=>{
