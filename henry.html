@@ -114,11 +114,11 @@ body{
 
 /* ── HENRY ── */
 #henryWrap{
-  position:relative;width:100%;max-width:100%;
+  position:relative;
+  width:86%;  /* 0.855 equivalent without transform */
+  max-width:1200px;
+  margin:0 auto;
   cursor:pointer;
-  transform:scale(0.855);
-  transform-origin:top center;
-  margin-bottom:5%;
 }
 #henryImg{
   width:100%;display:block;border-radius:20px;
@@ -314,7 +314,7 @@ body{
   </div>
 
   <!-- Buttons -->
-  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;margin-top:-192px;position:relative;z-index:10;">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;margin-top:-240px;position:relative;z-index:10;">
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
       <button id="actionBtn" onclick="handleAction()">🦛 Open Henry's Mouth!</button>
       <button id="nextBtn" onclick="nextRound()">▶ Next Game</button>
