@@ -402,6 +402,20 @@ const LEVEL_CONFIG = {
 // All 56 product images k1.png to k56.png
 const ALL_ITEMS = Array.from({length:56},(_,i)=>({id:i+1, src:`/K${i+1}.png`}));
 
+// Pre-check which images actually load
+const VALID_ITEMS = [];
+function preloadImages(){
+  return new Promise(resolve=>{
+    let loaded=0;
+    ALL_ITEMS.forEach(item=>{
+      const img=new Image();
+      img.onload=()=>{ VALID_ITEMS.push(item); if(++loaded===ALL_ITEMS.length) resolve(); };
+      img.onerror=()=>{ if(++loaded===ALL_ITEMS.length) resolve(); };
+      img.src=item.src;
+    });
+  });
+}
+
 // ── STATE ─────────────────────────────────────────
 let currentLevel = 1;
 let phase = 'closed'; // closed | open | remember | restore
@@ -453,7 +467,9 @@ function showFeedback(type, msg){
 function setLevel(lv){
   currentLevel = lv;
   document.querySelectorAll('.lvl-btn').forEach((b,i)=>b.classList.toggle('active',i+1===lv));
-  restartLevel();
+  if(VALID_ITEMS.length>0){ restartLevel(); } else {
+    preloadImages().then(()=>restartLevel());
+  }
 }
 
 function restartLevel(){
@@ -464,8 +480,9 @@ function restartLevel(){
   dragItem = null;
 
   const cfg = LEVEL_CONFIG[currentLevel];
-  // Pick random items
-  const shuffled = [...ALL_ITEMS].sort(()=>Math.random()-0.5);
+  // Pick random items from VALID ones only
+  const pool = VALID_ITEMS.length >= cfg.items ? VALID_ITEMS : ALL_ITEMS;
+  const shuffled = [...pool].sort(()=>Math.random()-0.5);
   selectedItems = shuffled.slice(0, cfg.items);
 
   // Build slots — distribute across shelves
@@ -785,7 +802,10 @@ function nextLevel(){
   setLevel(next);
 }
 
-setLevel(1);
+preloadImages().then(()=>{
+  console.log('Valid images:', VALID_ITEMS.length, 'of', ALL_ITEMS.length);
+  setLevel(1);
+});
 </script>
 </body>
 </html>
