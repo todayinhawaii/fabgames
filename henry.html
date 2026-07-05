@@ -437,12 +437,12 @@ function setPhase(p){
 
 // ── DICE POSITIONS ───────────────────────────────
 const DICE_POS={
-  5:[[35,12],[60,12],[47,36],[35,60],[60,60]],
-  6:[[33,10],[60,10],[33,36],[60,36],[33,62],[60,62]],
-  7:[[30,10],[50,10],[68,10],[30,36],[50,36],[68,36],[50,62]],
-  8:[[30,8],[50,8],[68,8],[30,34],[68,34],[30,60],[50,60],[68,60]],
-  9:[[30,6],[50,6],[68,6],[30,32],[50,32],[68,32],[30,60],[50,60],[68,60]],
-  10:[[25,6],[42,6],[60,6],[76,6],[25,34],[50,34],[76,34],[25,62],[48,62],[70,62]]
+  5:[[32,10],[63,10],[47,35],[32,60],[63,60]],
+  6:[[30,8],[63,8],[30,35],[63,35],[30,62],[63,62]],
+  7:[[27,8],[50,8],[70,8],[27,35],[50,35],[70,35],[50,62]],
+  8:[[27,6],[50,6],[70,6],[27,33],[70,33],[27,60],[50,60],[70,60]],
+  9:[[27,4],[50,4],[70,4],[27,31],[50,31],[70,31],[27,58],[50,58],[70,58]],
+  10:[[22,4],[42,4],[62,4],[78,4],[22,32],[50,32],[78,32],[22,60],[47,60],[70,60]]
 };
 
 // ── BUILD MOUTH SLOTS ────────────────────────────
@@ -454,7 +454,7 @@ function buildMouthSlots(showItems){
   overlay.addEventListener('dragover',e=>e.preventDefault(),{passive:false});
 
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?60:139;
+  const slotSz=isMob?52:111;
   const pos=DICE_POS[numItems]||DICE_POS[5];
 
   selectedCupcakes.forEach((cup,i)=>{
@@ -533,7 +533,7 @@ function placeItem(slotId, slotEl, cupcakeId, sourceEl){
   if(sourceEl){ sourceEl.classList.add('placed'); sourceEl.style.opacity='0.2'; sourceEl.style.pointerEvents='none'; }
 
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?60:139;
+  const slotSz=isMob?52:111;
   const correctId=parseInt(slotEl.dataset.cupcakeId);
   const isCorrect=cupcakeId===correctId;
 
@@ -688,7 +688,7 @@ function updateScoreDisplay(){
 function checkAnswers(){
   correct=0;
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?60:139;
+  const slotSz=isMob?52:111;
   document.querySelectorAll('.cupcake-slot').forEach(slot=>{
     const slotId=parseInt(slot.dataset.slotId);
     if(placed[slotId]!==undefined) renderPlacedInSlot(slot,placed[slotId],slotSz);
