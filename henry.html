@@ -63,7 +63,7 @@ body{
 }
 
 /* ── MAIN ── */
-#main{width:100%;max-width:900px;padding:12px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+#main{width:100%;max-width:1200px;padding:12px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;}
 
 /* ── STATUS ── */
 #statusBar{
@@ -95,7 +95,7 @@ body{
 
 /* ── HENRY ── */
 #henryWrap{
-  position:relative;width:100%;max-width:1400px;
+  position:relative;width:100%;max-width:100%;
   cursor:pointer;
 }
 #henryImg{
@@ -410,51 +410,55 @@ function setPhase(p){
 function buildMouthSlots(showItems){
   const overlay=document.getElementById('mouthOverlay');
   overlay.innerHTML='';
+  overlay.style.cssText='position:absolute;top:35%;left:8%;right:8%;bottom:5%;pointer-events:none;';
+  overlay.classList.add('active');
+
   const isMob=window.innerWidth<=600;
-  const sz=isMob ? Math.floor((window.innerWidth*0.7)/Math.ceil(numItems/2))-8 : Math.floor(500/Math.ceil(numItems/2))-12;
-  const slotSz=Math.max(isMob?44:60, Math.min(isMob?80:130, sz));
+  const slotSz=isMob?52:100;
+
+  // Dice-style % positions [left%, top%] for each count
+  const posMaps={
+    5:[[20,22],[72,22],[46,50],[20,76],[72,76]],
+    6:[[20,18],[72,18],[20,50],[72,50],[20,80],[72,80]],
+    7:[[15,18],[55,18],[82,18],[15,52],[55,52],[82,52],[38,80]],
+    8:[[15,15],[50,15],[82,15],[15,50],[82,50],[15,82],[50,82],[82,82]],
+    9:[[15,12],[50,12],[82,12],[15,48],[50,48],[82,48],[15,82],[50,82],[82,82]],
+    10:[[10,12],[38,12],[65,12],[85,12],[10,48],[50,48],[85,48],[10,82],[38,82],[72,82]]
+  };
+  const pos=posMaps[numItems]||posMaps[5];
 
   selectedCupcakes.forEach((cup,i)=>{
     const slot=document.createElement('div');
     slot.className='cupcake-slot';
     slot.dataset.slotId=i;
     slot.dataset.cupcakeId=cup.id;
-    slot.style.cssText=`width:${slotSz}px;height:${slotSz}px;`;
+    slot.style.cssText='position:absolute;width:'+slotSz+'px;height:'+slotSz+'px;'+
+      'left:'+(pos[i]?pos[i][0]:50)+'%;top:'+(pos[i]?pos[i][1]:50)+'%;'+
+      'transform:translate(-50%,-50%);border-radius:12px;'+
+      'border:2px dashed rgba(255,200,100,0.4);background:rgba(255,255,255,0.1);'+
+      'display:flex;align-items:center;justify-content:center;';
 
     if(showItems){
       const img=document.createElement('img');
       img.src=cup.src;
-      img.style.cssText=`width:${slotSz-6}px;height:${slotSz-6}px;object-fit:contain;border-radius:8px;`;
+      img.style.cssText='width:'+(slotSz-8)+'px;height:'+(slotSz-8)+'px;object-fit:contain;border-radius:8px;';
       img.onerror=()=>img.style.display='none';
       slot.appendChild(img);
       slot.style.border='none';slot.style.background='none';
     } else {
-      // Drop target
-      slot.addEventListener('dragover',e=>{e.preventDefault();slot.classList.add('drag-over');});
-      slot.addEventListener('dragleave',()=>slot.classList.remove('drag-over'));
-      slot.addEventListener('drop',e=>{e.preventDefault();slot.classList.remove('drag-over');handleDrop(i,slot);});
+      slot.addEventListener('dragover',e=>{e.preventDefault();slot.style.borderColor='#FFD700';slot.style.background='rgba(255,215,0,0.15)';});
+      slot.addEventListener('dragleave',()=>{slot.style.borderColor='rgba(255,200,100,0.4)';slot.style.background='rgba(255,255,255,0.1)';});
+      slot.addEventListener('drop',e=>{e.preventDefault();slot.style.borderColor='rgba(255,200,100,0.4)';handleDrop(i,slot);});
       slot.addEventListener('touchend',e=>{e.preventDefault();handleTouchDrop(i,slot);},{passive:false});
-
-      // Show already placed
       if(placed[i]!==undefined){
         const cup2=selectedCupcakes.find(c=>c.id===placed[i]);
         if(cup2){
           const img=document.createElement('img');
           img.src=cup2.src;
-          img.style.cssText=`width:${slotSz-6}px;height:${slotSz-6}px;object-fit:contain;border-radius:8px;`;
+          img.style.cssText='width:'+(slotSz-8)+'px;height:'+(slotSz-8)+'px;object-fit:contain;border-radius:8px;';
           slot.appendChild(img);
         }
       }
-    }
-    if(dicePos && dicePos[i]){
-      slot.style.position='absolute';
-      slot.style.left=dicePos[i][0]+'%';
-      slot.style.top=dicePos[i][1]+'%';
-      slot.style.transform='translate(-50%,-50%)';
-    } else {
-      slot.style.position='relative';
-      slot.style.display='inline-flex';
-      slot.style.margin='4px';
     }
     overlay.appendChild(slot);
     slots[i]={id:i,cupcakeId:cup.id};
