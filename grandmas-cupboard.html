@@ -600,12 +600,12 @@ function renderCupboard(){
 }
 
 // ── DOOR CONTROL ──────────────────────────────────
-function openDoors(){
+function openDoors(callback){
   document.getElementById('cupboardImg').src='/kitchen_3.png';
-  // Small delay so image switches before items appear
   setTimeout(()=>{
     document.getElementById('slotsOverlay').style.display='grid';
     renderCupboard();
+    if(callback) callback();
   }, 300);
 }
 function closeDoors(animate=true){
@@ -650,17 +650,18 @@ function handleAction(){
     document.getElementById('actionBtn').style.display='none';
     setTimeout(()=>{
       // Reopen doors to show empty shelves — items are on the table now
-      openDoors();
       phase='restore';
       setPhase('restore');
-      renderCupboard(); // renders empty slots
       buildTable();
       document.getElementById('tableWrap').style.display='block';
-      document.getElementById('actionBtn').style.display='block';
-      document.getElementById('actionBtn').textContent="✓ Check My Answers";
-      document.getElementById('actionBtn').className='check';
-      document.getElementById('nextBtn').style.display='inline-block';
       startTime=Date.now();
+      openDoors(()=>{
+        // Called AFTER openDoors renders — so nextBtn stays visible
+        document.getElementById('actionBtn').style.display='block';
+        document.getElementById('actionBtn').textContent="✓ Check My Answers";
+        document.getElementById('actionBtn').className='check';
+        document.getElementById('nextBtn').style.display='inline-block';
+      });
     },1200);
   } else if(phase==='restore'){
     checkAnswers();
