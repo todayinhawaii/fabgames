@@ -121,7 +121,7 @@ body{
   cursor:pointer;
 }
 @media(max-width:600px){
-  #henryWrap{width:100%;max-width:100%;}
+  #henryWrap{width:105%;max-width:105%;margin-left:-2.5%;}
 }
 #henryImg{
   width:100%;display:block;border-radius:20px;
@@ -272,7 +272,7 @@ body{
   .game-item{width:56px!important;height:56px!important;}
   #trayWrap{padding:10px;}
   /* Button overlap adjusted for bigger mobile hippo */
-  #btnWrap{margin-top:-50px!important;}
+  #btnWrap{margin-top:-2px!important;}
 }
 </style>
 </head>
@@ -455,12 +455,12 @@ function buildMouthSlots(showItems){
   const overlay=document.getElementById('mouthOverlay');
   overlay.innerHTML='';
   const isMobOv=window.innerWidth<=600;
-  overlay.style.cssText='position:absolute;top:38%;left:'+(isMobOv?'15%':'20%')+';right:'+(isMobOv?'15%':'20%')+';bottom:12%;pointer-events:none;z-index:50;';
+  overlay.style.cssText='position:absolute;top:38%;left:'+(isMobOv?'10%':'20%')+';right:'+(isMobOv?'10%':'20%')+';bottom:12%;pointer-events:none;z-index:50;';
   overlay.classList.add('active');
   overlay.addEventListener('dragover',e=>e.preventDefault(),{passive:false});
 
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?50:105;
+  const slotSz=isMob?47:105;
   const pos=DICE_POS[numItems]||DICE_POS[5];
 
   selectedCupcakes.forEach((cup,i)=>{
@@ -539,7 +539,7 @@ function placeItem(slotId, slotEl, cupcakeId, sourceEl){
   if(sourceEl){ sourceEl.classList.add('placed'); sourceEl.style.opacity='0.2'; sourceEl.style.pointerEvents='none'; }
 
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?50:105;
+  const slotSz=isMob?47:105;
   const correctId=parseInt(slotEl.dataset.cupcakeId);
   const isCorrect=cupcakeId===correctId;
 
@@ -694,7 +694,7 @@ function updateScoreDisplay(){
 function checkAnswers(){
   correct=0;
   const isMob=window.innerWidth<=600;
-  const slotSz=isMob?50:105;
+  const slotSz=isMob?47:105;
   document.querySelectorAll('.cupcake-slot').forEach(slot=>{
     const slotId=parseInt(slot.dataset.slotId);
     if(placed[slotId]!==undefined) renderPlacedInSlot(slot,placed[slotId],slotSz);
