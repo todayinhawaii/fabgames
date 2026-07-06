@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Henry the Hungry Hippo 🦛 — fab.games</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:linear-gradient(160deg,#7a6e3d 0%,#6c6235 50%,#5c5228 100%);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* Flying cupcake background */
+.bg-cupcake{
+  position:fixed;
+  font-size:52px;
+  pointer-events:none;
+  z-index:0;
+  animation:floatCupcake linear infinite;
+  opacity:0.18;
+  user-select:none;
+}
+@keyframes floatCupcake{
+  0%{transform:translateY(110vh) rotate(0deg);}
+  100%{transform:translateY(-20vh) rotate(360deg);}
+}
+#main,#topbar{position:relative;z-index:1;}
+
+/* ── TOPBAR ── */
+#topbar{
+  width:100%;max-width:900px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:8px;padding:12px 16px;
+  background:transparent;
+  border:none;
+  position:relative;
+  z-index:200;
+}
+.logo{
+  font-family:'Fredoka One',cursive;font-size:24px;
+  background:linear-gradient(180deg,#ffe566 0%,#f5a800 40%,#c8760a 100%);
+  padding:12px 36px;border-radius:50px;
+  box-shadow:0 6px 0 #7a4400, 0 10px 30px rgba(200,120,0,0.4),
+    inset 0 2px 4px rgba(255,255,255,0.4),
+    0 0 20px rgba(255,200,0,0.3);
+  color:#3a1a00;text-shadow:0 1px 2px rgba(255,255,255,0.3);
+  letter-spacing:1px;
+  animation:vegasGlow 2s ease-in-out infinite;
+}
+@keyframes vegasGlow{
+  0%,100%{box-shadow:0 6px 0 #7a4400,0 10px 30px rgba(200,120,0,0.4),0 0 20px rgba(255,200,0,0.3);}
+  50%{box-shadow:0 6px 0 #7a4400,0 10px 30px rgba(200,120,0,0.6),0 0 40px rgba(255,200,0,0.6);}
+}
+#scorePanel{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;}
+.score-pill{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  color:#ffe566;
+  background:linear-gradient(180deg,#3a1a00,#2a1000);
+  padding:6px 16px;border-radius:20px;
+  border:2px solid #c8920a;
+  white-space:nowrap;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4),inset 0 1px 2px rgba(255,229,102,0.1);
+}
+#endBtn{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  padding:6px 16px;border-radius:20px;border:none;cursor:pointer;
+  background:linear-gradient(180deg,#cc2200,#880000);
+  color:#ffe566;box-shadow:0 3px 0 #550000,0 0 10px rgba(200,0,0,0.4);
+  border:1px solid #ff4400;
+}
+
+/* ── MAIN ── */
+#main{width:100%;max-width:100%;padding:4px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+
+/* ── STATUS ── */
+#statusBar{
+  width:100%;padding:10px 16px;
+  background:rgba(255,235,180,0.10);border-radius:16px;
+  border:1px solid rgba(200,146,10,0.25);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
+}
+#statusMsg{font-family:'Fredoka One',cursive;font-size:17px;color:#ffe566;}
+.phase{padding:3px 10px;border-radius:20px;font-family:'Fredoka One',cursive;font-size:11px;
+  color:rgba(60,30,0,0.5);border:1px solid rgba(60,30,0,0.15);
+  background:rgba(255,235,180,0.08);white-space:nowrap;}
+.phase.active{color:#3a1800;border-color:rgba(60,30,0,0.4);background:rgba(255,235,180,0.12);}
+.phase.done{color:rgba(60,30,0,0.3);text-decoration:line-through;}
+#countDisplay{font-family:'Fredoka One',cursive;font-size:14px;color:#3a1800;white-space:nowrap;}
+
+/* ── LEVEL SELECTOR ── */
+#levelBar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.lvl-btn{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  padding:6px 16px;border-radius:20px;
+  border:2px solid rgba(200,146,10,0.3);
+  cursor:pointer;
+  background:linear-gradient(180deg,#2a1500,#1a0a00);
+  color:rgba(255,229,102,0.5);
+  transition:all 0.2s;
+}
+.lvl-btn:hover{border-color:#c8920a;color:#ffe566;}
+.lvl-btn.active{
+  background:linear-gradient(180deg,#ffe566,#f5a800,#c8760a);
+  color:#3a1a00;border-color:#7a4400;
+  box-shadow:0 4px 0 #7a4400,0 0 15px rgba(255,200,0,0.4);
+  font-size:14px;
+}
+
+/* ── HENRY ── */
+#henryWrap{
+  position:relative;
+  width:86%;
+  max-width:1200px;
+  margin:0 auto;
+  cursor:pointer;
+}
+@media(max-width:600px){
+  #henryWrap{width:105%;max-width:105%;margin-left:-2.5%;}
+}
+#henryImg{
+  width:100%;display:block;border-radius:20px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.15);
+  transition:opacity 0.3s;
+  user-select:none;pointer-events:none;
+}
+/* Cupcake slots overlay inside Henry's mouth */
+#mouthOverlay{
+  position:absolute;
+  top:42%;left:22%;right:22%;bottom:8%;
+  pointer-events:none;
+}
+#mouthOverlay.active{pointer-events:all;}
+
+/* ── CUPCAKE SLOTS ── */
+.cupcake-slot{
+  border-radius:12px;
+  border:2px dashed rgba(255,200,100,0.4);
+  background:rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  position:relative;
+  transition:all 0.2s;
+}
+.cupcake-slot.drag-over{
+  border-color:#FFD700;
+  background:rgba(255,215,0,0.15);
+  transform:scale(1.05);
+}
+.cupcake-slot.correct{border-color:rgba(80,220,80,0.5);background:rgba(80,220,80,0.1);}
+.cupcake-slot.wrong{border-color:rgba(220,80,80,0.5);background:rgba(220,80,80,0.1);}
+.check-mark{
+  position:absolute;top:2px;right:4px;
+  font-size:28px;font-weight:bold;line-height:1;
+  pointer-events:none;z-index:10;
+}
+
+/* ── TABLE / TRAY ── */
+#trayWrap{
+  width:100%;max-width:700px;
+  background:linear-gradient(180deg,#d4956a,#a0622e);
+  border-radius:16px;border:4px solid #7a4520;
+  padding:14px;box-shadow:0 6px 24px rgba(0,0,0,0.3);
+}
+#trayTitle{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  color:rgba(255,255,255,0.6);text-align:center;
+  margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;
+}
+#trayItems{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:80px;}
+
+/* ── GAME ITEMS ── */
+.game-item{
+  border-radius:10px;cursor:grab;user-select:none;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.15s,box-shadow 0.15s;
+  touch-action:none;flex-shrink:0;
+}
+.game-item img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:8px;}
+.game-item:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(0,0,0,0.3);}
+.game-item.dragging{opacity:0.4;cursor:grabbing;}
+.game-item.placed{opacity:0.2;cursor:default;pointer-events:none;}
+
+/* ── BUTTONS ── */
+#actionBtn{
+  font-family:'Fredoka One',cursive;font-size:22px;
+  padding:16px 48px;border-radius:50px;cursor:pointer;
+  background:linear-gradient(180deg,#2d5a1b 0%,#1a3a0a 100%);
+  color:#ffe566;text-shadow:0 1px 3px rgba(0,0,0,0.4);
+  border:2px solid #c8920a;
+  box-shadow:0 8px 0 #0a1a04,0 12px 20px rgba(0,0,0,0.4);
+  animation:btnPulse 2s ease-in-out infinite;
+  transition:all 0.2s;letter-spacing:1px;
+}
+#actionBtn:hover{transform:translateY(3px);box-shadow:0 5px 0 #0a1a04,0 8px 14px rgba(0,0,0,0.3);}
+#actionBtn:active{transform:translateY(8px);box-shadow:0 0 0 #0a1a04;}
+#actionBtn.got-it{
+  background:linear-gradient(180deg,#3a7020,#1a4008);color:#ffe566;
+  border:2px solid #c8920a;
+  box-shadow:0 8px 0 #0a1a04,0 12px 20px rgba(0,0,0,0.3);
+}
+#actionBtn.check{
+  background:linear-gradient(180deg,#44cc66,#228833);color:#ffe566;
+  border:2px solid #c8920a;
+  box-shadow:0 8px 0 #155522,0 12px 20px rgba(0,0,0,0.2);
+}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 8px 0 #0a1a04,0 12px 20px rgba(0,0,0,0.3);}
+  50%{box-shadow:0 8px 0 #0a1a04,0 14px 28px rgba(0,0,0,0.4);}
+}
+#nextBtn{
+  display:none;
+  font-family:'Fredoka One',cursive;font-size:22px;
+  padding:16px 48px;border-radius:50px;cursor:pointer;
+  background:linear-gradient(180deg,#2d5a1b 0%,#1a3a0a 100%);
+  color:#ffe566;
+  border:2px solid #c8920a;
+  box-shadow:0 8px 0 #0a1a04,0 12px 20px rgba(0,0,0,0.3),0 0 20px rgba(200,146,10,0.3);
+  animation:btnPulse 2s ease-in-out infinite;
+}
+#actionHint{
+  font-family:'Fredoka One',cursive;font-size:14px;
+  color:#ffe566;opacity:0.8;text-align:center;max-width:500px;line-height:1.5;
+}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 8px 0 #0a1a04,0 12px 20px rgba(0,0,0,0.3);}
+  50%{box-shadow:0 8px 0 #0a1a04,0 14px 28px rgba(0,0,0,0.4);}
+}
+
+/* ── HENRY ANIMATION ── */
+#henryImg.flop{animation:henryFlop 0.8s ease-in-out;}
+@keyframes henryFlop{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* ── FEEDBACK ── */
+#feedbackMsg{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-family:'Fredoka One',cursive;font-size:42px;
+  padding:18px 40px;border-radius:28px;z-index:999;
+  pointer-events:none;opacity:0;transition:transform 0.15s,opacity 0.3s;text-align:center;
+}
+#feedbackMsg.wrong{background:linear-gradient(135deg,#ff6b6b,#ee0979);color:#fff;box-shadow:0 8px 40px rgba(238,9,121,0.5);}
+#feedbackMsg.right{background:linear-gradient(135deg,#a8edea,#fed6e3);color:#FF69B4;box-shadow:0 8px 40px rgba(168,237,234,0.6);}
+#feedbackMsg.show{transform:translate(-50%,-50%) scale(1);opacity:1;}
+
+/* ── DRAG GHOST ── */
+#dragGhost{position:fixed;pointer-events:none;z-index:9999;display:none;transform:translate(-50%,-50%);}
+#dragGhost img{width:80px;height:80px;object-fit:contain;border-radius:10px;}
+
+/* ── WIN OVERLAY ── */
+#winOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;}
+#winOverlay.show{display:flex;}
+.win-box{background:linear-gradient(135deg,#2a1500,#1a0a00);border:3px solid #c8920a;border-radius:28px;padding:40px;text-align:center;max-width:420px;}
+.win-emoji{font-size:72px;margin-bottom:12px;}
+.win-title{font-family:'Fredoka One',cursive;font-size:38px;color:#ffe566;margin-bottom:8px;}
+.win-sub{font-size:15px;color:rgba(42,125,181,0.7);margin-bottom:20px;}
+.win-stats{display:flex;gap:20px;justify-content:center;margin-bottom:24px;}
+.win-stat-num{font-family:'Fredoka One',cursive;font-size:32px;color:#ffe566;}
+.win-stat-label{font-size:11px;color:rgba(42,125,181,0.5);text-transform:uppercase;letter-spacing:1px;}
+
+/* ── MOBILE ── */
+@media(max-width:600px){
+  .logo{font-size:16px;padding:8px 18px;}
+  .score-pill{font-size:11px;padding:4px 10px;}
+  #actionBtn,#nextBtn{font-size:17px;padding:12px 28px;}
+  #statusMsg{font-size:14px;}
+  .game-item{width:56px!important;height:56px!important;}
+  #trayWrap{padding:10px;}
+  /* Button overlap adjusted for bigger mobile hippo */
+  #btnWrap{margin-top:-2px!important;}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">🦛 Henry the Hungry Hippo</div>
+  <div id="scorePanel">
+    <div class="score-pill">🎯 Round <span id="roundNum">1</span></div>
+    <div class="score-pill">⭐ <span id="totalScore">0</span> pts</div>
+    <div class="score-pill">🏆 Best <span id="bestScore">0</span></div>
+    <button id="endBtn" onclick="endGame()">🏁 End Game</button>
+  </div>
+</div>
+
+<div id="main">
+  <!-- Status -->
+  <div id="statusBar">
+    <div id="statusMsg">🦛 Open Henry's mouth!</div>
+    <div style="display:flex;gap:4px;align-items:center;">
+      <div class="phase active" id="ph1">Look</div>
+      <div style="color:rgba(42,125,181,0.3);font-size:10px;">→</div>
+      <div class="phase" id="ph2">Remember</div>
+      <div style="color:rgba(42,125,181,0.3);font-size:10px;">→</div>
+      <div class="phase" id="ph3">Restore</div>
+      <div id="countDisplay" style="margin-left:8px;">🧁 0/0</div>
+    </div>
+  </div>
+
+  <!-- Level selector -->
+  <div id="levelBar">
+    <button class="lvl-btn active" onclick="setItems(5)">5 🧁</button>
+    <button class="lvl-btn" onclick="setItems(6)">6 🧁</button>
+    <button class="lvl-btn" onclick="setItems(7)">7 🧁</button>
+    <button class="lvl-btn" onclick="setItems(8)">8 🧁</button>
+    <button class="lvl-btn" onclick="setItems(9)">9 🧁</button>
+    <button class="lvl-btn" onclick="setItems(10)">10 🧁</button>
+  </div>
+
+  <!-- Henry -->
+  <div id="henryWrap" onclick="handleHenryClick()">
+    <img id="henryImg" src="/Henry-2-mouth-closed.png" alt="Henry">
+    <div id="mouthOverlay"></div>
+  </div>
+
+  <!-- Buttons -->
+  <div id="btnWrap" style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;position:relative;z-index:10;margin-top:-4px;">
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <button id="actionBtn" onclick="handleAction()">🦛 Open Henry's Mouth!</button>
+      <button id="nextBtn" onclick="nextRound()">▶ Next Game</button>
+    </div>
+    <div id="actionHint">Click to open Henry's mouth and see the cupcakes inside!</div>
+  </div>
+
+  <!-- Tray -->
+  <div id="trayWrap" style="display:none;position:relative;z-index:10;margin-top:8px;">
+    <div id="trayTitle">🧁 Drag each cupcake back to where it was!</div>
+    <div id="trayItems"></div>
+  </div>
+</div>
+
+<!-- Feedback -->
+<div id="feedbackMsg"></div>
+<!-- Drag ghost -->
+<div id="dragGhost"><img id="ghostImg" src="" alt=""></div>
+<!-- Win -->
+<div id="winOverlay">
+  <div class="win-box">
+    <div class="win-emoji">🦛</div>
+    <div class="win-title">Yummy!!</div>
+    <div class="win-sub" id="winSub">Henry is happy!</div>
+    <div class="win-stats">
+      <div class="win-stat"><div class="win-stat-num" id="winCorrect">0</div><div class="win-stat-label">Correct</div></div>
+      <div class="win-stat"><div class="win-stat-num" id="winTime">0s</div><div class="win-stat-label">Time</div></div>
+      <div class="win-stat"><div class="win-stat-num" id="winPts">+0</div><div class="win-stat-label">Points</div></div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button onclick="nextRound();document.getElementById('winOverlay').classList.remove('show');"
+        style="font-family:'Fredoka One',cursive;font-size:18px;padding:12px 28px;border-radius:14px;border:none;
+        background:linear-gradient(180deg,#2d5a1b,#1a3a0a);color:#ffe566;cursor:pointer;box-shadow:0 4px 0 #0a1a04;border:2px solid #c8920a;">
+        ▶ Next Round
+      </button>
+      <button onclick="endGame();"
+        style="font-family:'Fredoka One',cursive;font-size:18px;padding:12px 28px;border-radius:14px;border:none;
+        background:linear-gradient(180deg,#ffb3b3,#ff6b6b);color:#fff;cursor:pointer;box-shadow:0 4px 0 #cc3333;">
+        🏁 End Game
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── ALL 10 CUPCAKES ──────────────────────────────
+const CUPCAKES = Array.from({length:10},(_,i)=>({id:i+1,src:`/cupcake-${i+1}.png`}));
+
+// ── STATE ────────────────────────────────────────
+let numItems = 5;
+let phase = 'closed';
+let selectedCupcakes = [];
+let slots = [];
+let placed = {};
+let correct = 0;
+let roundNum = 1;
+let totalScore = 0;
+let bestScore = 0;
+let startTime = null;
+let validCupcakes = [];
+
+// ── PRELOAD ──────────────────────────────────────
+function preload(){
+  return new Promise(resolve=>{
+    let loaded=0;
+    CUPCAKES.forEach(c=>{
+      const img=new Image();
+      img.onload=()=>{validCupcakes.push(c);if(++loaded===CUPCAKES.length)resolve();};
+      img.onerror=()=>{if(++loaded===CUPCAKES.length)resolve();};
+      img.src=c.src;
+    });
+  });
+}
+
+// ── LEVEL ────────────────────────────────────────
+function setItems(n){
+  numItems=n;
+  document.querySelectorAll('.lvl-btn').forEach(b=>{
+    b.classList.toggle('active', b.textContent.trim().startsWith(n+' '));
+  });
+  restartRound();
+}
+
+// ── RESTART ──────────────────────────────────────
+function restartRound(){
+  phase='closed'; placed={}; correct=0; slots=[];
+  clearInterval(window._animTimer);
+
+  const pool=validCupcakes.length>=numItems?validCupcakes:CUPCAKES;
+  selectedCupcakes=[...pool].sort(()=>Math.random()-0.5).slice(0,numItems);
+
+  document.getElementById('henryImg').src='/Henry-2-mouth-closed.png';
+  document.getElementById('mouthOverlay').innerHTML='';
+  document.getElementById('mouthOverlay').classList.remove('active');
+  document.getElementById('trayWrap').style.display='none';
+  document.getElementById('trayItems').innerHTML='';
+  document.getElementById('actionBtn').innerHTML="🦛 Open Henry's Mouth!";
+  document.getElementById('actionBtn').className='';
+  document.getElementById('actionBtn').style.display='inline-block';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('winOverlay').classList.remove('show');
+  document.getElementById('henryWrap').onclick=handleHenryClick;
+  const hint=document.getElementById('actionHint');
+  if(hint){hint.textContent="Click to open Henry's mouth and see the cupcakes inside!";hint.style.display='block';}
+  setPhase('closed');
+  updateCount();
+  updateScoreDisplay();
+}
+
+// ── PHASE ────────────────────────────────────────
+function setPhase(p){
+  phase=p;
+  const msgs={closed:"🦛 Open Henry's mouth!",open:"👀 Study where each cupcake is!",restore:"🧁 Tap a cupcake then tap its spot!"};
+  document.getElementById('statusMsg').textContent=msgs[p]||'';
+  const p1=document.getElementById('ph1'),p2=document.getElementById('ph2'),p3=document.getElementById('ph3');
+  if(p1) p1.className='phase'+(p==='open'?' active':p==='restore'?' done':'');
+  if(p2) p2.className='phase'+(p==='restore'?' active':'');
+  if(p3) p3.className='phase'+(p==='restore'?' active':'');
+}
+
+// ── DICE POSITIONS ───────────────────────────────
+const DICE_POS={
+  5:[[32,10],[63,10],[47,35],[32,60],[63,60]],
+  6:[[30,8],[63,8],[30,35],[63,35],[30,62],[63,62]],
+  7:[[27,8],[50,8],[70,8],[27,35],[50,35],[70,35],[50,62]],
+  8:[[27,6],[50,6],[70,6],[27,33],[70,33],[27,60],[50,60],[70,60]],
+  9:[[27,4],[50,4],[70,4],[27,31],[50,31],[70,31],[27,58],[50,58],[70,58]],
+  10:[[22,4],[42,4],[62,4],[78,4],[22,32],[50,32],[78,32],[22,60],[47,60],[70,60]]
+};
+
+// ── BUILD MOUTH SLOTS ────────────────────────────
+function buildMouthSlots(showItems){
+  const overlay=document.getElementById('mouthOverlay');
+  overlay.innerHTML='';
+  const isMobOv=window.innerWidth<=600;
+  overlay.style.cssText='position:absolute;top:38%;left:'+(isMobOv?'10%':'20%')+';right:'+(isMobOv?'10%':'20%')+';bottom:12%;pointer-events:none;z-index:50;';
+  overlay.classList.add('active');
+  overlay.addEventListener('dragover',e=>e.preventDefault(),{passive:false});
+
+  const isMob=window.innerWidth<=600;
+  const slotSz=isMob?47:105;
+  const pos=DICE_POS[numItems]||DICE_POS[5];
+
+  selectedCupcakes.forEach((cup,i)=>{
+    const slot=document.createElement('div');
+    slot.className='cupcake-slot';
+    slot.dataset.slotId=i;
+    slot.dataset.cupcakeId=cup.id;
+    slot.style.cssText='position:absolute;width:'+slotSz+'px;height:'+slotSz+'px;z-index:51;'+
+      'left:'+(pos[i]?pos[i][0]:50)+'%;top:'+(pos[i]?pos[i][1]:50)+'%;'+
+      'transform:translate(-50%,-50%);border-radius:12px;'+
+      'border:2px dashed rgba(255,200,100,0.0);background:rgba(255,255,255,0.0);'+
+      'display:flex;align-items:center;justify-content:center;cursor:pointer;';
+
+    if(showItems){
+      const img=document.createElement('img');
+      img.src=cup.src;
+      img.style.cssText='width:'+(slotSz-8)+'px;height:'+(slotSz-8)+'px;object-fit:contain;border-radius:8px;';
+      img.onerror=()=>img.style.display='none';
+      slot.appendChild(img);
+    } else {
+      // In restore mode - show dashed border, click to place
+      slot.style.border='2px dashed rgba(255,200,100,0.5)';
+      slot.style.background='rgba(255,255,255,0.05)';
+      slot.style.pointerEvents='all';
+      slot.addEventListener('dragover',e=>{e.preventDefault();slot.classList.add('drag-over');});
+      slot.addEventListener('dragleave',()=>slot.classList.remove('drag-over'));
+      slot.addEventListener('drop',e=>{e.preventDefault();slot.classList.remove('drag-over');handleDrop(i,slot);});
+      slot.addEventListener('touchend',e=>{e.preventDefault();handleTouchDrop(i,slot);},{passive:false});
+
+      if(placed[i]!==undefined){
+        renderPlacedInSlot(slot, placed[i], slotSz);
+      }
+    }
+    overlay.appendChild(slot);
+    slots[i]={id:i,cupcakeId:cup.id};
+  });
+
+  // Enable pointer events on overlay in restore mode
+  if(!showItems) overlay.style.pointerEvents='all';
+}
+
+function renderPlacedInSlot(slot, cupcakeId, slotSz){
+  slot.innerHTML='';
+  const cup=selectedCupcakes.find(c=>c.id===cupcakeId);
+  if(!cup) return;
+  const img=document.createElement('img');
+  img.src=cup.src;
+  img.style.cssText='width:'+(slotSz-8)+'px;height:'+(slotSz-8)+'px;object-fit:contain;border-radius:8px;';
+  slot.appendChild(img);
+  // Show tick/X
+  const correctId=parseInt(slot.dataset.cupcakeId);
+  const isCorrect=cupcakeId===correctId;
+  slot.style.border=isCorrect?'2px solid rgba(80,220,80,0.6)':'2px solid rgba(220,80,80,0.6)';
+  slot.style.background=isCorrect?'rgba(80,220,80,0.1)':'rgba(220,80,80,0.1)';
+  const mark=document.createElement('div');
+  mark.className='check-mark';
+  mark.innerHTML=isCorrect
+    ?'<span style="font-size:28px;color:rgba(40,180,40,0.5);font-weight:bold;">✓</span>'
+    :'<span style="font-size:28px;color:rgba(200,40,40,0.5);font-weight:bold;">✗</span>';
+  slot.appendChild(mark);
+}
+
+// ── DRAG & DROP (same as Grandmas Cupboard) ──────
+let dragItem=null;
+
+function handleDrop(slotId, slotEl){
+  if(!dragItem) return;
+  placeItem(slotId, slotEl, dragItem.cupcakeId, dragItem.el);
+  dragItem=null;
+}
+
+function placeItem(slotId, slotEl, cupcakeId, sourceEl){
+  // Unplace from old slot if moved
+  for(const k in placed){ if(placed[k]===cupcakeId) delete placed[k]; }
+  placed[slotId]=cupcakeId;
+  if(sourceEl){ sourceEl.classList.add('placed'); sourceEl.style.opacity='0.2'; sourceEl.style.pointerEvents='none'; }
+
+  const isMob=window.innerWidth<=600;
+  const slotSz=isMob?47:105;
+  const correctId=parseInt(slotEl.dataset.cupcakeId);
+  const isCorrect=cupcakeId===correctId;
+
+  renderPlacedInSlot(slotEl, cupcakeId, slotSz);
+  if(isCorrect){ playRight(); showFeedback('right','Yesss Thats It!'); }
+  else { playWrong(); showFeedback('wrong','Oops Not Here!'); }
+  updateCount();
+  if(Object.keys(placed).length===numItems) setTimeout(checkAnswers,500);
+}
+
+// ── TOUCH DRAG ───────────────────────────────────
+let touchDragItem=null, touchDragEl=null;
+function startTouchDrag(e,cupcakeId,el){
+  if(el.classList.contains('placed')) return;
+  e.preventDefault();
+  touchDragItem=cupcakeId; touchDragEl=el;
+  const ghost=document.getElementById('dragGhost');
+  const gImg=document.getElementById('ghostImg');
+  const cup=selectedCupcakes.find(c=>c.id===cupcakeId);
+  if(cup) gImg.src=cup.src;
+  ghost.style.display='block';
+  const t=e.touches[0];
+  ghost.style.left=t.clientX+'px';
+  ghost.style.top=t.clientY+'px';
+}
+function moveTouchDrag(e){
+  if(!touchDragItem) return;
+  e.preventDefault();
+  const t=e.touches[0];
+  const ghost=document.getElementById('dragGhost');
+  ghost.style.left=t.clientX+'px';
+  ghost.style.top=t.clientY+'px';
+  document.querySelectorAll('.cupcake-slot').forEach(sl=>sl.classList.remove('drag-over'));
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  el?.closest('.cupcake-slot')?.classList.add('drag-over');
+}
+function handleTouchDrop(slotId,slotEl){
+  if(touchDragItem) placeItem(slotId,slotEl,touchDragItem,touchDragEl);
+  endTouchDrag(null);
+}
+function endTouchDrag(e){
+  if(e){
+    const t=e.changedTouches[0];
+    const el=document.elementFromPoint(t.clientX,t.clientY);
+    const slot=el?.closest('.cupcake-slot');
+    if(slot&&touchDragItem){
+      placeItem(parseInt(slot.dataset.slotId),slot,touchDragItem,touchDragEl);
+    }
+    document.querySelectorAll('.cupcake-slot').forEach(sl=>sl.classList.remove('drag-over'));
+  }
+  document.getElementById('dragGhost').style.display='none';
+  touchDragItem=null; touchDragEl=null;
+}
+
+// ── HENRY ANIMATION ──────────────────────────────
+function startHenryAnimation(){
+  const allImgs=['/Henry-1-mouth-opened.png','/Henry-1-mouth-opened-eyes-ears-flop.png','/Henry-1-mouth-opened-eyes-ears-enlarge.png'];
+  const validImgs=['/Henry-1-mouth-opened.png'];
+  allImgs.slice(1).forEach(src=>{
+    const t=new Image();t.onload=()=>validImgs.push(src);t.src=src;
+  });
+  let frame=0;
+  window._animTimer=setInterval(()=>{
+    frame=(frame+1)%Math.max(1,validImgs.length);
+    document.getElementById('henryImg').src=validImgs[frame];
+  },1200);
+}
+function stopHenryAnimation(){
+  clearInterval(window._animTimer);
+  document.getElementById('henryImg').src='/Henry-1-mouth-opened.png';
+}
+
+// ── HANDLE ACTION ────────────────────────────────
+function handleAction(){
+  if(phase==='closed'){
+    document.getElementById('henryImg').src='/Henry-1-mouth-opened.png';
+    setTimeout(()=>{buildMouthSlots(true);startHenryAnimation();},200);
+    phase='open'; setPhase('open');
+    document.getElementById('actionBtn').innerHTML="✅ I've Got This!";
+    document.getElementById('actionBtn').className='got-it';
+    const hint=document.getElementById('actionHint');
+    if(hint) hint.textContent="Study where each cupcake sits in Henry's mouth!";
+  } else if(phase==='open'){
+    stopHenryAnimation();
+    document.getElementById('henryImg').src='/Henry-2-mouth-closed.png';
+    document.getElementById('mouthOverlay').innerHTML='';
+    document.getElementById('actionBtn').style.display='none';
+    const hint=document.getElementById('actionHint');
+    if(hint) hint.style.display='none';
+    setTimeout(()=>{
+      document.getElementById('henryImg').src='/Henry-1-mouth-opened.png';
+      phase='restore'; setPhase('restore');
+      buildMouthSlots(false);
+      buildTray();
+      document.getElementById('trayWrap').style.display='block';
+      document.getElementById('actionBtn').style.display='inline-block';
+      document.getElementById('actionBtn').innerHTML='✓ Check My Answers<br><span style="font-size:13px;opacity:0.7;">Calculate Your Score</span>';
+      document.getElementById('actionBtn').className='check';
+      document.getElementById('nextBtn').style.display='inline-block';
+      document.getElementById('henryWrap').onclick=null;
+      startTime=Date.now();
+    },1000);
+  } else if(phase==='restore'){
+    checkAnswers();
+  }
+}
+function handleHenryClick(){ if(phase==='closed') handleAction(); }
+
+// ── BUILD TRAY ───────────────────────────────────
+function buildTray(){
+  const tray=document.getElementById('trayItems');
+  tray.innerHTML='';
+  const isMob=window.innerWidth<=600;
+  const sz=isMob?56:90;
+  [...selectedCupcakes].sort(()=>Math.random()-0.5).forEach(cup=>{
+    const div=document.createElement('div');
+    div.className='game-item';
+    div.dataset.cupcakeId=cup.id;
+    div.style.cssText='width:'+sz+'px;height:'+sz+'px;cursor:pointer;';
+    const img=document.createElement('img');
+    img.src=cup.src;img.alt='Cupcake '+cup.id;
+    img.onerror=()=>img.style.display='none';
+    div.appendChild(img);
+    // Desktop drag
+    div.draggable=true;
+    div.addEventListener('dragstart',e=>{
+      dragItem={cupcakeId:cup.id,el:div};
+      div.classList.add('dragging');
+      e.dataTransfer.setData('text/plain',cup.id);
+    });
+    div.addEventListener('dragend',()=>div.classList.remove('dragging'));
+    // Touch drag
+    div.addEventListener('touchstart',e=>startTouchDrag(e,cup.id,div),{passive:false});
+    div.addEventListener('touchmove',moveTouchDrag,{passive:false});
+    div.addEventListener('touchend',e=>endTouchDrag(e),{passive:false});
+    tray.appendChild(div);
+  });
+}
+
+// ── SCORE ─────────────────────────────────────────
+function updateCount(){
+  const done=Object.keys(placed).length;
+  document.getElementById('countDisplay').textContent='🧁 '+done+'/'+numItems;
+}
+function updateScoreDisplay(){
+  document.getElementById('roundNum').textContent=roundNum;
+  document.getElementById('totalScore').textContent=totalScore;
+  document.getElementById('bestScore').textContent=bestScore;
+}
+
+// ── CHECK ─────────────────────────────────────────
+function checkAnswers(){
+  correct=0;
+  const isMob=window.innerWidth<=600;
+  const slotSz=isMob?47:105;
+  document.querySelectorAll('.cupcake-slot').forEach(slot=>{
+    const slotId=parseInt(slot.dataset.slotId);
+    if(placed[slotId]!==undefined) renderPlacedInSlot(slot,placed[slotId],slotSz);
+    if(placed[slotId]===parseInt(slot.dataset.cupcakeId)) correct++;
+  });
+  const elapsed=Math.round((Date.now()-startTime)/1000);
+  const speedBonus=correct===numItems?Math.max(0,20-elapsed):0;
+  const pts=(correct*10)+speedBonus;
+  totalScore+=pts; if(totalScore>bestScore) bestScore=totalScore;
+  updateScoreDisplay();
+  if(correct===numItems){
+    const msgs=["Henry is SO happy! 🦛","Nom nom nom! 🧁","Perfect memory! 🌟","Yummy yummy! 😋"];
+    document.getElementById('winSub').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+    document.getElementById('winCorrect').textContent=correct+'/'+numItems;
+    document.getElementById('winTime').textContent=elapsed+'s';
+    document.getElementById('winPts').textContent='+'+pts;
+    setTimeout(()=>document.getElementById('winOverlay').classList.add('show'),600);
+  } else {
+    document.getElementById('statusMsg').textContent='✅ '+correct+'/'+numItems+' correct — tap more cupcakes!';
+  }
+}
+
+// ── NEXT / END ────────────────────────────────────
+function nextRound(){ roundNum++;updateScoreDisplay();restartRound(); }
+function endGame(){
+  alert('Great game! You scored '+totalScore+' points over '+roundNum+' rounds!');
+  roundNum=1;totalScore=0;updateScoreDisplay();restartRound();
+}
+
+// ── SOUNDS ────────────────────────────────────────
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+function playWrong(){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sawtooth';o.frequency.setValueAtTime(200,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(100,audioCtx.currentTime+0.3);g.gain.setValueAtTime(0.3,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3);}
+function playRight(){[523,659,784,1047].forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sine';o.frequency.value=f;const t=audioCtx.currentTime+i*0.1;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.3,t+0.05);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);o.start(t);o.stop(t+0.25);});}
+function showFeedback(type,msg){const el=document.getElementById('feedbackMsg');el.className='';el.textContent='';void el.offsetWidth;el.textContent=msg;el.className=type+' show';setTimeout(()=>el.classList.remove('show'),1400);}
+
+// ── INIT ──────────────────────────────────────────
+preload().then(()=>{
+  console.log('Cupcakes loaded:',validCupcakes.length);
+  restartRound();
+});
+
+// Flying background cupcakes
+(function(){
+  const emojis=['🧁','🎂','🍰','🧁','🎀','🧁','🍭','🧁'];
+  for(let i=0;i<16;i++){
+    const el=document.createElement('div');
+    el.className='bg-cupcake';
+    el.textContent=emojis[i%emojis.length];
+    el.style.left=Math.random()*100+'vw';
+    el.style.animationDuration=(8+Math.random()*14)+'s';
+    el.style.animationDelay=-(Math.random()*20)+'s';
+    el.style.fontSize=(36+Math.random()*48)+'px';
+    document.body.appendChild(el);
+  }
+})();
+</script>
+</body>
+</html>

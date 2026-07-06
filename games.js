@@ -4,6 +4,10 @@
 
 const GAMES=[
   // ── ROW 1 ──
+  {id:'henry',emoji:'🦛',cat:'Memory · Fun',title:"Henry the Hungry Hippo",
+   desc:"Open Henry's mouth and study where each cupcake sits — then remember it all! Drag them back in the right place. 3 to 10 cupcakes — endless fun!!",
+   color:'rgba(100,180,220,0.15)',href:'/henry'},
+
   {id:'grandmas-cupboard',emoji:'🧺',cat:'Memory · Fun',title:"Grandma's Cupboard",
    desc:"Open the cupboard and study what's inside — then close it! Can you remember where everything goes? Drag it all back in the right place. Easy, Medium and Hard!!",
    color:'rgba(180,120,80,0.15)',href:'/grandmas-cupboard'},
@@ -52,9 +56,6 @@ const GAMES=[
    desc:'Six fantastic squishy art buttons with cool sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
    color:'rgba(200,100,255,0.15)',href:'/happy-buttons-6'},
 
-  {id:'happy-buttons-2',emoji:'🎨',cat:'ASMR · Creative',title:'Happy Buttons 2',
-   desc:'Six gorgeous big squishy buttons with slime sounds — press them in, pop them out! Satisfying ASMR fun for all ages. Pure joy in every press!!',
-   color:'rgba(255,100,200,0.15)',href:'/happy-buttons-2'},
 
   {id:'happy-buttons',emoji:'🐾',cat:'ASMR · Relaxation',title:'Happy Buttons',
    desc:'Press the adorable squishy animal buttons for a satisfying ASMR experience!! 10 different sounds - pop, squish, boing and more. Just press and relax!!',
