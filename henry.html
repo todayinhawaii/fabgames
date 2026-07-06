@@ -115,10 +115,13 @@ body{
 /* ── HENRY ── */
 #henryWrap{
   position:relative;
-  width:86%;  /* 0.855 equivalent without transform */
+  width:86%;
   max-width:1200px;
   margin:0 auto;
   cursor:pointer;
+}
+@media(max-width:600px){
+  #henryWrap{width:100%;max-width:100%;}
 }
 #henryImg{
   width:100%;display:block;border-radius:20px;
@@ -266,8 +269,10 @@ body{
   .score-pill{font-size:11px;padding:4px 10px;}
   #actionBtn,#nextBtn{font-size:17px;padding:12px 28px;}
   #statusMsg{font-size:14px;}
-  .game-item{width:60px!important;height:60px!important;}
+  .game-item{width:56px!important;height:56px!important;}
   #trayWrap{padding:10px;}
+  /* Button overlap adjusted for bigger mobile hippo */
+  #btnWrap{margin-top:-50px!important;}
 }
 </style>
 </head>
@@ -314,7 +319,7 @@ body{
   </div>
 
   <!-- Buttons -->
-  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;position:relative;z-index:10;margin-top:-4px;">
+  <div id="btnWrap" style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;position:relative;z-index:10;margin-top:-4px;">
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
       <button id="actionBtn" onclick="handleAction()">🦛 Open Henry's Mouth!</button>
       <button id="nextBtn" onclick="nextRound()">▶ Next Game</button>
@@ -449,7 +454,8 @@ const DICE_POS={
 function buildMouthSlots(showItems){
   const overlay=document.getElementById('mouthOverlay');
   overlay.innerHTML='';
-  overlay.style.cssText='position:absolute;top:38%;left:20%;right:20%;bottom:12%;pointer-events:none;z-index:50;';
+  const isMobOv=window.innerWidth<=600;
+  overlay.style.cssText='position:absolute;top:38%;left:'+(isMobOv?'15%':'20%')+';right:'+(isMobOv?'15%':'20%')+';bottom:12%;pointer-events:none;z-index:50;';
   overlay.classList.add('active');
   overlay.addEventListener('dragover',e=>e.preventDefault(),{passive:false});
 
