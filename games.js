@@ -4,6 +4,9 @@
 
 const GAMES=[
   // ── ROW 1 ──
+  {id:'animal-discovery',emoji:'🐾',cat:'Discovery · Kids',title:'Animal Discovery',
+   desc:'Drag each animal into its silhouette on the habitat board! Barn, Forest, Ocean and Jungle — discover 30 amazing animals across 5 beautiful habitats!!',
+   color:'rgba(80,180,80,0.15)',href:'/animal-discovery'},
   {id:'henry',emoji:'🦛',cat:'Memory · Fun',title:"Henry the Hungry Hippo",
    desc:"Open Henry's mouth and study where each cupcake sits — then remember it all! Drag them back in the right place. 3 to 10 cupcakes — endless fun!!",
    color:'rgba(100,180,220,0.15)',href:'/henry'},
