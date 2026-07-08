@@ -297,7 +297,6 @@ body{
         ondragend="onDragEnd(event)">
         <img id="currentAnimalImg" src="" alt="">
       </div>
-      <div id="animalName"></div>
       <div id="animalHint">Drag me to my spot on the board!</div>
     </div>
 
@@ -365,7 +364,7 @@ const HABITATS = [
     name:'Ocean', emoji:'🌊',
     art:'/ART-OCEAN.png',
     animals:[
-      {id:'dolphin',    name:'Dolphin',      src:'/OCEAN-DOLPHIN.png',    x:9,  y:7,  w:24, h:37},
+      {id:'dolphin',    name:'Dolphin',      src:'/OCEAN-DOLPHIIN.png',    x:9,  y:7,  w:24, h:37},
       {id:'seaturtle',  name:'Sea Turtle',   src:'/OCEAN-SEA-TURTLE.png', x:35, y:10, w:28, h:30},
       {id:'whale',      name:'Whale',        src:'/OCEAN-WHALE.png',      x:68, y:3,  w:30, h:37},
       {id:'clownfish',  name:'Clown Fish',   src:'/OCEAN-CLOWNFISH.png',  x:6,  y:55, w:25, h:27},
@@ -377,7 +376,7 @@ const HABITATS = [
     name:'Jungle 1', emoji:'🌿',
     art:'/ART-JUNGLE.1.png',
     animals:[
-      {id:'toucan',      name:'Toucan',      src:'/JUNGLE-1-TOUCAN.png',      x:3,  y:12, w:27, h:32},
+      {id:'toucan',      name:'Toucan',      src:'/JUNGLE-2-TOUCAN.png',      x:3,  y:12, w:27, h:32},
       {id:'elephant',    name:'Elephant',    src:'/JUNGLE-1-ELEPHANT.png',    x:34, y:14, w:29, h:30},
       {id:'giraffe',     name:'Giraffe',     src:'/JUNGLE-1-GIRAFFE.png',     x:66, y:2,  w:20, h:48},
       {id:'moose',       name:'Moose',       src:'/JUNGLE-1-MOOSE.png',       x:4,  y:50, w:26, h:39},
@@ -473,7 +472,6 @@ function showCurrentAnimal(){
   img.src = animal.src;
   img.onerror = ()=>img.style.opacity='0.3';
   img.onload = ()=>img.style.opacity='1';
-  document.getElementById('animalName').textContent = animal.name;
   document.getElementById('currentAnimal').style.opacity='1';
   document.getElementById('currentAnimal').style.pointerEvents='all';
 
