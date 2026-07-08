@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Animal Discovery 🐾 — fab.games</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --sky:#1a3a5c;
+  --gold:#FFD700;
+  --amber:#f5a800;
+  --green:#3a7d2c;
+  --cream:#fdf6e3;
+}
+body{
+  font-family:'Nunito',sans-serif;
+  background:linear-gradient(160deg,#0d2137 0%,#1a3a5c 60%,#0d2137 100%);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  overflow-x:hidden;
+}
+
+/* ── TOPBAR ── */
+#topbar{
+  width:100%;max-width:1100px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:8px;padding:14px 16px;
+  background:transparent;
+  position:relative;z-index:100;
+}
+.logo{
+  font-family:'Fredoka One',cursive;font-size:26px;
+  background:linear-gradient(180deg,#ffe566,#f5a800,#c87600);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 2px 8px rgba(245,168,0,0.4));
+  letter-spacing:1px;
+}
+#scorePanel{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;}
+.score-pill{
+  font-family:'Fredoka One',cursive;font-size:13px;color:#ffe566;
+  background:rgba(0,0,0,0.35);padding:6px 16px;border-radius:20px;
+  border:1px solid rgba(255,215,0,0.3);white-space:nowrap;
+}
+#endBtn{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  padding:6px 16px;border-radius:20px;border:1px solid rgba(255,80,80,0.5);
+  cursor:pointer;background:rgba(180,0,0,0.5);color:#ffaaaa;
+}
+
+/* ── HABITAT SELECTOR ── */
+#habitatBar{
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+  padding:0 16px;
+}
+.hab-btn{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  padding:7px 18px;border-radius:24px;border:2px solid rgba(255,215,0,0.25);
+  cursor:pointer;background:rgba(0,0,0,0.3);color:rgba(255,215,0,0.5);
+  transition:all 0.2s;
+}
+.hab-btn:hover{border-color:var(--gold);color:var(--gold);}
+.hab-btn.active{
+  background:linear-gradient(180deg,#ffe566,#f5a800);
+  color:#1a0800;border-color:#c87600;
+  box-shadow:0 4px 0 #7a3e00,0 0 16px rgba(245,168,0,0.4);
+}
+
+/* ── MAIN ── */
+#main{width:100%;max-width:1100px;padding:12px 16px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+
+/* ── STATUS ── */
+#statusBar{
+  width:100%;padding:10px 18px;
+  background:rgba(0,0,0,0.3);border-radius:16px;
+  border:1px solid rgba(255,215,0,0.2);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
+}
+#statusMsg{font-family:'Fredoka One',cursive;font-size:17px;color:#ffe566;}
+#progressBar{
+  display:flex;gap:6px;align-items:center;
+}
+.prog-dot{
+  width:12px;height:12px;border-radius:50%;
+  border:2px solid rgba(255,215,0,0.3);
+  background:transparent;transition:all 0.3s;
+}
+.prog-dot.done{background:var(--gold);border-color:var(--gold);}
+.prog-dot.current{background:rgba(255,215,0,0.3);border-color:var(--gold);animation:dotPulse 1s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+#countDisplay{font-family:'Fredoka One',cursive;font-size:14px;color:rgba(255,215,0,0.7);}
+
+/* ── PUZZLE AREA ── */
+#puzzleArea{
+  width:100%;
+  display:flex;flex-direction:column;align-items:center;
+  gap:16px;
+}
+
+/* ── ARTBOARD ── */
+#artboardWrap{
+  position:relative;
+  width:100%;max-width:900px;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 12px 48px rgba(0,0,0,0.5);
+  border:3px solid rgba(255,215,0,0.2);
+}
+#artboardImg{
+  width:100%;display:block;
+  user-select:none;pointer-events:none;
+}
+/* Animal silhouette slots overlay */
+#slotsLayer{
+  position:absolute;inset:0;
+  pointer-events:none;
+}
+.animal-slot{
+  position:absolute;
+  cursor:pointer;
+  border-radius:8px;
+  transition:all 0.2s;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:all;
+}
+.animal-slot.waiting{
+  background:rgba(255,255,255,0.08);
+  border:2px dashed rgba(255,215,0,0.3);
+}
+.animal-slot.drag-over{
+  background:rgba(255,215,0,0.15);
+  border:2px solid var(--gold);
+  transform:scale(1.05);
+}
+.animal-slot.correct{
+  background:rgba(80,220,80,0.15);
+  border:2px solid rgba(80,220,80,0.6);
+}
+.animal-slot.wrong{
+  background:rgba(220,80,80,0.15);
+  border:2px solid rgba(220,80,80,0.5);
+  animation:wrongShake 0.4s ease;
+}
+.animal-slot img{
+  width:90%;height:90%;
+  object-fit:contain;
+  border-radius:6px;
+  pointer-events:none;
+}
+.slot-check{
+  position:absolute;top:2px;right:4px;
+  font-size:24px;font-weight:bold;
+  pointer-events:none;z-index:5;
+}
+@keyframes wrongShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+/* ── ANIMAL CARD (one at a time) ── */
+#animalCard{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+#currentAnimal{
+  width:160px;height:160px;
+  border-radius:20px;
+  background:rgba(0,0,0,0.3);
+  border:3px solid rgba(255,215,0,0.4);
+  display:flex;align-items:center;justify-content:center;
+  cursor:grab;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  transition:transform 0.15s,box-shadow 0.15s;
+  position:relative;
+  touch-action:none;
+}
+#currentAnimal:hover{transform:scale(1.05);box-shadow:0 12px 40px rgba(0,0,0,0.5);}
+#currentAnimal.dragging{opacity:0.5;cursor:grabbing;}
+#currentAnimalImg{
+  width:140px;height:140px;
+  object-fit:contain;border-radius:12px;
+  pointer-events:none;
+  user-select:none;
+}
+#animalName{
+  font-family:'Fredoka One',cursive;font-size:20px;color:#ffe566;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  letter-spacing:1px;
+}
+#animalHint{
+  font-size:13px;color:rgba(255,215,0,0.5);
+  font-family:'Fredoka One',cursive;
+}
+
+/* ── BUTTONS ── */
+#actionBtn{
+  font-family:'Fredoka One',cursive;font-size:20px;
+  padding:14px 44px;border-radius:50px;border:none;cursor:pointer;
+  background:linear-gradient(180deg,#ffe566,#f5a800,#c87600);
+  color:#1a0800;
+  box-shadow:0 8px 0 #7a3e00,0 12px 24px rgba(0,0,0,0.3);
+  animation:goldPulse 2s ease-in-out infinite;
+  transition:all 0.2s;letter-spacing:1px;
+}
+#actionBtn:hover{transform:translateY(3px);box-shadow:0 5px 0 #7a3e00,0 8px 16px rgba(0,0,0,0.3);}
+#actionBtn:active{transform:translateY(8px);box-shadow:0 0 0 #7a3e00;}
+@keyframes goldPulse{
+  0%,100%{box-shadow:0 8px 0 #7a3e00,0 12px 24px rgba(0,0,0,0.3),0 0 0 rgba(255,215,0,0);}
+  50%{box-shadow:0 8px 0 #7a3e00,0 12px 24px rgba(0,0,0,0.3),0 0 30px rgba(255,215,0,0.4);}
+}
+
+/* ── DRAG GHOST ── */
+#dragGhost{position:fixed;pointer-events:none;z-index:9999;display:none;transform:translate(-50%,-50%);}
+#dragGhost img{width:100px;height:100px;object-fit:contain;border-radius:12px;}
+
+/* ── FEEDBACK ── */
+#feedbackMsg{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-family:'Fredoka One',cursive;font-size:44px;
+  padding:20px 44px;border-radius:28px;z-index:999;
+  pointer-events:none;opacity:0;
+  transition:transform 0.15s,opacity 0.3s;text-align:center;
+}
+#feedbackMsg.wrong{background:linear-gradient(135deg,#cc2200,#880000);color:#ffaaaa;box-shadow:0 8px 40px rgba(200,0,0,0.5);}
+#feedbackMsg.right{background:linear-gradient(135deg,#ffe566,#f5a800);color:#1a0800;box-shadow:0 8px 40px rgba(255,200,0,0.5);}
+#feedbackMsg.show{transform:translate(-50%,-50%) scale(1);opacity:1;}
+
+/* ── WIN OVERLAY ── */
+#winOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;}
+#winOverlay.show{display:flex;}
+.win-box{
+  background:linear-gradient(135deg,#0d2137,#1a3a5c);
+  border:3px solid var(--gold);border-radius:28px;
+  padding:44px;text-align:center;max-width:440px;
+}
+.win-emoji{font-size:72px;margin-bottom:14px;}
+.win-title{font-family:'Fredoka One',cursive;font-size:40px;color:var(--gold);margin-bottom:8px;}
+.win-sub{font-size:15px;color:rgba(255,215,0,0.6);margin-bottom:22px;}
+.win-stats{display:flex;gap:24px;justify-content:center;margin-bottom:24px;}
+.win-stat-num{font-family:'Fredoka One',cursive;font-size:34px;color:var(--gold);}
+.win-stat-label{font-size:11px;color:rgba(255,215,0,0.4);text-transform:uppercase;letter-spacing:1px;}
+.win-btn{
+  font-family:'Fredoka One',cursive;font-size:18px;
+  padding:12px 28px;border-radius:14px;border:none;cursor:pointer;
+  background:linear-gradient(180deg,#ffe566,#f5a800);
+  color:#1a0800;box-shadow:0 4px 0 #7a3e00;margin:0 6px;
+}
+.win-btn.red{background:linear-gradient(180deg,#cc4422,#880000);color:#ffaaaa;box-shadow:0 4px 0 #440000;}
+
+@media(max-width:600px){
+  .logo{font-size:20px;}
+  #currentAnimal{width:110px;height:110px;}
+  #currentAnimalImg{width:96px;height:96px;}
+  #animalName{font-size:16px;}
+  #actionBtn{font-size:17px;padding:12px 28px;}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">🐾 Animal Discovery</div>
+  <div id="scorePanel">
+    <div class="score-pill">🗺️ <span id="habitatName">Barn</span></div>
+    <div class="score-pill">⭐ <span id="totalScore">0</span> pts</div>
+    <div class="score-pill">🏆 Best <span id="bestScore">0</span></div>
+    <button id="endBtn" onclick="endGame()">🏁 End Game</button>
+  </div>
+</div>
+
+<div id="habitatBar">
+  <button class="hab-btn active" onclick="setHabitat(0)">🐄 Barn</button>
+  <button class="hab-btn" onclick="setHabitat(1)">🌲 Forest</button>
+  <button class="hab-btn" onclick="setHabitat(2)">🌊 Ocean</button>
+  <button class="hab-btn" onclick="setHabitat(3)">🌿 Jungle 1</button>
+  <button class="hab-btn" onclick="setHabitat(4)">🐯 Jungle 2</button>
+</div>
+
+<div id="main">
+  <!-- Status -->
+  <div id="statusBar">
+    <div id="statusMsg">🐾 Find where each animal belongs!</div>
+    <div id="progressBar"></div>
+    <div id="countDisplay">0 / 6</div>
+  </div>
+
+  <!-- Puzzle -->
+  <div id="puzzleArea">
+    <div id="artboardWrap">
+      <img id="artboardImg" src="" alt="Habitat">
+      <div id="slotsLayer"></div>
+    </div>
+
+    <!-- Current animal to place -->
+    <div id="animalCard">
+      <div id="currentAnimal"
+        draggable="true"
+        ondragstart="onDragStart(event)"
+        ondragend="onDragEnd(event)">
+        <img id="currentAnimalImg" src="" alt="">
+      </div>
+      <div id="animalName"></div>
+      <div id="animalHint">Drag me to my spot on the board!</div>
+    </div>
+
+    <button id="actionBtn" onclick="nextPuzzle()">🗺️ Next Habitat →</button>
+  </div>
+</div>
+
+<!-- Drag ghost -->
+<div id="dragGhost"><img id="ghostImg" src="" alt=""></div>
+<!-- Feedback -->
+<div id="feedbackMsg"></div>
+<!-- Win -->
+<div id="winOverlay">
+  <div class="win-box">
+    <div class="win-emoji" id="winEmoji">🎉</div>
+    <div class="win-title">Amazing!</div>
+    <div class="win-sub" id="winSub">All animals found!</div>
+    <div class="win-stats">
+      <div class="win-stat">
+        <div class="win-stat-num" id="winPts">+0</div>
+        <div class="win-stat-label">Points</div>
+      </div>
+      <div class="win-stat">
+        <div class="win-stat-num" id="winTime">0s</div>
+        <div class="win-stat-label">Time</div>
+      </div>
+      <div class="win-stat">
+        <div class="win-stat-num" id="winTotal">0</div>
+        <div class="win-stat-label">Total</div>
+      </div>
+    </div>
+    <button class="win-btn" onclick="nextPuzzle();document.getElementById('winOverlay').classList.remove('show');">▶ Next Habitat</button>
+    <button class="win-btn red" onclick="endGame()">🏁 End Game</button>
+  </div>
+</div>
+
+<script>
+// ── HABITAT DATA ─────────────────────────────────
+const HABITATS = [
+  {
+    name:'Barn', emoji:'🐄',
+    art:'/ART-BARN.png',
+    animals:[
+      {id:'cow',     name:'Cow',     src:'/BARN-COW.png',     x:5,  y:10, w:28, h:42},
+      {id:'horse',   name:'Horse',   src:'/BARN-HORES.png',   x:36, y:8,  w:28, h:44},
+      {id:'dog',     name:'Dog',     src:'/BARN-DOG.png',     x:68, y:12, w:26, h:40},
+      {id:'rooster', name:'Rooster', src:'/BARN-ROOSTER.png', x:5,  y:55, w:26, h:38},
+      {id:'pig',     name:'Pig',     src:'/BARN-PIG.png',     x:36, y:56, w:28, h:36},
+      {id:'sheep',   name:'Sheep',   src:'/BARN-SHEEP.png',   x:68, y:55, w:26, h:38},
+    ]
+  },
+  {
+    name:'Forest', emoji:'🌲',
+    art:'/ART-FORREST.png',
+    animals:[
+      {id:'hedgehog', name:'Hedgehog', src:'/FORREST-HEDGEHOG.png', x:4,  y:8,  w:28, h:40},
+      {id:'meerkat',  name:'Meerkat',  src:'/FORREST-MEERKAT.png',  x:36, y:8,  w:28, h:40},
+      {id:'otter',    name:'Otter',    src:'/FORREST-OTTER.png',    x:68, y:8,  w:28, h:40},
+      {id:'raccoon',  name:'Raccoon',  src:'/FORREST-RACCOON.png',  x:4,  y:54, w:28, h:40},
+      {id:'sloth',    name:'Sloth',    src:'/FOREST-SLOTH.png',     x:36, y:54, w:28, h:40},
+      {id:'wombat',   name:'Wombat',   src:'/FORREST-WOMBAT.png',   x:68, y:54, w:28, h:40},
+    ]
+  },
+  {
+    name:'Ocean', emoji:'🌊',
+    art:'/ART-OCEAN.png',
+    animals:[
+      {id:'clownfish',  name:'Clown Fish',   src:'/OCEAN-CLOWNFISH.png',  x:4,  y:8,  w:28, h:40},
+      {id:'dolphin',    name:'Dolphin',      src:'/OCEAN-DOLPHIN.png',    x:36, y:8,  w:28, h:40},
+      {id:'mantaray',   name:'Manta Ray',    src:'/OCEAN-MANTA-RAY.png',  x:68, y:8,  w:28, h:40},
+      {id:'octopus',    name:'Octopus',      src:'/OCEAN-OCTOPUS.png',    x:4,  y:54, w:28, h:40},
+      {id:'seaturtle',  name:'Sea Turtle',   src:'/OCEAN-SEA-TURTLE.png', x:36, y:54, w:28, h:40},
+      {id:'whale',      name:'Whale',        src:'/OCEAN-WHALE.png',      x:68, y:54, w:28, h:40},
+    ]
+  },
+  {
+    name:'Jungle 1', emoji:'🌿',
+    art:'/ART-JUNGLE.1.png',
+    animals:[
+      {id:'elephant',    name:'Elephant',    src:'/JUNGLE-1-ELEPHANT.png',    x:4,  y:8,  w:28, h:40},
+      {id:'giraffe',     name:'Giraffe',     src:'/JUNGLE-1-GIRAFFE.png',     x:36, y:8,  w:28, h:40},
+      {id:'hippo',       name:'Hippo',       src:'/JUNGLE-1-HIPPOPOTAMUS.png',x:68, y:8,  w:28, h:40},
+      {id:'moose',       name:'Moose',       src:'/JUNGLE-1-MOOSE.png',       x:4,  y:54, w:28, h:40},
+      {id:'rhino',       name:'Rhino',       src:'/JUNGLE-1-RHINOCEROS.png',  x:36, y:54, w:28, h:40},
+      {id:'toucan',      name:'Toucan',      src:'/JUNGLE-2-TOUCON.png',      x:68, y:54, w:28, h:40},
+    ]
+  },
+  {
+    name:'Jungle 2', emoji:'🐯',
+    art:'/ART-JUNGLE.2.png',
+    animals:[
+      {id:'crocodile', name:'Crocodile', src:'/JUNGLE-2-CROCODILE.png', x:4,  y:8,  w:28, h:40},
+      {id:'elephant2', name:'Elephant',  src:'/JUNGLE-2-ELEPHANT.png',  x:36, y:8,  w:28, h:40},
+      {id:'lion',      name:'Lion',      src:'/JUNGLE-2-LION.png',      x:68, y:8,  w:28, h:40},
+      {id:'monkey',    name:'Monkey',    src:'/JUNGLE-2-MONKEY.png',    x:4,  y:54, w:28, h:40},
+      {id:'panda',     name:'Panda',     src:'/JUNGLE-2-PANDA.png',     x:36, y:54, w:28, h:40},
+      {id:'tiger',     name:'Tiger',     src:'/JUNGLE-2-TIGER.png',     x:68, y:54, w:28, h:40},
+    ]
+  },
+];
+
+// ── STATE ─────────────────────────────────────────
+let habitatIdx = 0;
+let currentHabitat = null;
+let animalQueue = []; // shuffled order to present animals
+let currentAnimalIdx = 0;
+let placed = {}; // animalId -> true if placed correctly
+let totalScore = 0;
+let bestScore = 0;
+let startTime = null;
+let dragAnimalId = null;
+
+// ── INIT ─────────────────────────────────────────
+function setHabitat(idx){
+  habitatIdx = idx;
+  document.querySelectorAll('.hab-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  loadHabitat();
+}
+
+function loadHabitat(){
+  currentHabitat = HABITATS[habitatIdx];
+  placed = {};
+  currentAnimalIdx = 0;
+  animalQueue = [...currentHabitat.animals].sort(()=>Math.random()-0.5);
+  startTime = Date.now();
+
+  document.getElementById('habitatName').textContent = currentHabitat.name;
+  document.getElementById('artboardImg').src = currentHabitat.art;
+  document.getElementById('winOverlay').classList.remove('show');
+  document.getElementById('statusMsg').textContent = '🐾 Find where each animal belongs!';
+
+  buildSlots();
+  buildProgress();
+  showCurrentAnimal();
+}
+
+function buildSlots(){
+  const layer = document.getElementById('slotsLayer');
+  layer.innerHTML = '';
+  currentHabitat.animals.forEach(a=>{
+    const slot = document.createElement('div');
+    slot.className = 'animal-slot waiting';
+    slot.dataset.animalId = a.id;
+    slot.style.cssText = `left:${a.x}%;top:${a.y}%;width:${a.w}%;height:${a.h}%;`;
+
+    slot.addEventListener('dragover', e=>{e.preventDefault();slot.classList.add('drag-over');});
+    slot.addEventListener('dragleave', ()=>slot.classList.remove('drag-over'));
+    slot.addEventListener('drop', e=>{e.preventDefault();slot.classList.remove('drag-over');handleDrop(a.id, slot);});
+    // Touch
+    slot.addEventListener('touchend', e=>{e.preventDefault();handleTouchDrop(a.id, slot);},{passive:false});
+
+    layer.appendChild(slot);
+  });
+  document.getElementById('slotsLayer').style.pointerEvents='all';
+}
+
+function buildProgress(){
+  const bar = document.getElementById('progressBar');
+  bar.innerHTML = '';
+  currentHabitat.animals.forEach((_,i)=>{
+    const dot = document.createElement('div');
+    dot.className = 'prog-dot' + (i===0?' current':'');
+    dot.id = 'dot-'+i;
+    bar.appendChild(dot);
+  });
+  updateCount();
+}
+
+function showCurrentAnimal(){
+  if(currentAnimalIdx >= animalQueue.length) return;
+  const animal = animalQueue[currentAnimalIdx];
+  const img = document.getElementById('currentAnimalImg');
+  img.src = animal.src;
+  img.onerror = ()=>img.style.opacity='0.3';
+  img.onload = ()=>img.style.opacity='1';
+  document.getElementById('animalName').textContent = animal.name;
+  document.getElementById('currentAnimal').style.opacity='1';
+  document.getElementById('currentAnimal').style.pointerEvents='all';
+
+  // Update progress dots
+  currentHabitat.animals.forEach((_,i)=>{
+    const dot = document.getElementById('dot-'+i);
+    if(!dot) return;
+    const placedCount = Object.keys(placed).length;
+    if(i < placedCount) dot.className='prog-dot done';
+    else if(i === placedCount) dot.className='prog-dot current';
+    else dot.className='prog-dot';
+  });
+}
+
+function updateCount(){
+  const done = Object.keys(placed).length;
+  const total = currentHabitat.animals.length;
+  document.getElementById('countDisplay').textContent = done+' / '+total;
+}
+
+// ── DRAG (DESKTOP) ────────────────────────────────
+function onDragStart(e){
+  const animal = animalQueue[currentAnimalIdx];
+  if(!animal) return;
+  dragAnimalId = animal.id;
+  e.dataTransfer.setData('text/plain', animal.id);
+  document.getElementById('currentAnimal').classList.add('dragging');
+}
+function onDragEnd(e){
+  document.getElementById('currentAnimal').classList.remove('dragging');
+}
+
+// ── TOUCH DRAG ────────────────────────────────────
+let touchActive = false;
+document.getElementById('currentAnimal').addEventListener('touchstart', e=>{
+  const animal = animalQueue[currentAnimalIdx];
+  if(!animal) return;
+  e.preventDefault();
+  touchActive = true;
+  dragAnimalId = animal.id;
+  const ghost = document.getElementById('dragGhost');
+  document.getElementById('ghostImg').src = animal.src;
+  ghost.style.display='block';
+  const t = e.touches[0];
+  ghost.style.left=t.clientX+'px';ghost.style.top=t.clientY+'px';
+},{passive:false});
+
+document.addEventListener('touchmove', e=>{
+  if(!touchActive) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  const ghost = document.getElementById('dragGhost');
+  ghost.style.left=t.clientX+'px';ghost.style.top=t.clientY+'px';
+  document.querySelectorAll('.animal-slot').forEach(s=>s.classList.remove('drag-over'));
+  const el = document.elementFromPoint(t.clientX,t.clientY);
+  el?.closest('.animal-slot')?.classList.add('drag-over');
+},{passive:false});
+
+document.addEventListener('touchend', e=>{
+  if(!touchActive) return;
+  const t = e.changedTouches[0];
+  const el = document.elementFromPoint(t.clientX,t.clientY);
+  const slot = el?.closest('.animal-slot');
+  document.getElementById('dragGhost').style.display='none';
+  document.querySelectorAll('.animal-slot').forEach(s=>s.classList.remove('drag-over'));
+  if(slot && dragAnimalId){
+    handleDrop(slot.dataset.animalId, slot);
+  }
+  touchActive=false; dragAnimalId=null;
+},{passive:false});
+
+// ── DROP HANDLER ──────────────────────────────────
+function handleDrop(targetAnimalId, slotEl){
+  const animal = animalQueue[currentAnimalIdx];
+  if(!animal) return;
+
+  const isCorrect = animal.id === targetAnimalId;
+
+  if(isCorrect){
+    // Place animal in correct slot
+    placed[animal.id] = true;
+    slotEl.classList.remove('waiting','drag-over');
+    slotEl.classList.add('correct');
+    const img = document.createElement('img');
+    img.src = animal.src;
+    slotEl.appendChild(img);
+    const check = document.createElement('div');
+    check.className='slot-check';
+    check.innerHTML='<span style="color:rgba(80,220,80,0.7)">✓</span>';
+    slotEl.appendChild(check);
+    slotEl.style.pointerEvents='none';
+
+    playRight();
+    showFeedback('right','Great Find! 🐾');
+    updateCount();
+
+    // Move to next animal
+    currentAnimalIdx++;
+    if(currentAnimalIdx >= animalQueue.length){
+      // All placed!
+      setTimeout(()=>showWin(), 800);
+    } else {
+      setTimeout(()=>showCurrentAnimal(), 500);
+    }
+  } else {
+    // Wrong slot
+    slotEl.classList.add('wrong');
+    setTimeout(()=>slotEl.classList.remove('wrong'),500);
+    playWrong();
+    showFeedback('wrong','Not Quite! Try Again');
+  }
+}
+
+function handleTouchDrop(targetAnimalId, slotEl){
+  handleDrop(targetAnimalId, slotEl);
+}
+
+// ── WIN ───────────────────────────────────────────
+function showWin(){
+  const elapsed = Math.round((Date.now()-startTime)/1000);
+  const speedBonus = Math.max(0, 60-elapsed);
+  const pts = (currentHabitat.animals.length * 10) + speedBonus;
+  totalScore += pts;
+  if(totalScore > bestScore) bestScore = totalScore;
+  document.getElementById('totalScore').textContent = totalScore;
+  document.getElementById('bestScore').textContent = bestScore;
+  document.getElementById('winPts').textContent = '+'+pts;
+  document.getElementById('winTime').textContent = elapsed+'s';
+  document.getElementById('winTotal').textContent = totalScore;
+  document.getElementById('winEmoji').textContent = currentHabitat.emoji;
+  document.getElementById('winSub').textContent = 'You found all '+currentHabitat.animals.length+' '+currentHabitat.name+' animals!';
+  document.getElementById('winOverlay').classList.add('show');
+}
+
+function nextPuzzle(){
+  habitatIdx = (habitatIdx+1) % HABITATS.length;
+  document.querySelectorAll('.hab-btn').forEach((b,i)=>b.classList.toggle('active',i===habitatIdx));
+  loadHabitat();
+  document.getElementById('winOverlay').classList.remove('show');
+}
+
+function endGame(){
+  alert('Amazing explorer! You scored '+totalScore+' points discovering animals!');
+  totalScore=0; habitatIdx=0;
+  document.querySelectorAll('.hab-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  loadHabitat();
+  document.getElementById('winOverlay').classList.remove('show');
+}
+
+// ── SOUNDS ────────────────────────────────────────
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+function playWrong(){
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.type='sawtooth';o.frequency.setValueAtTime(200,audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(100,audioCtx.currentTime+0.3);
+  g.gain.setValueAtTime(0.3,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.3);
+  o.start();o.stop(audioCtx.currentTime+0.3);
+}
+function playRight(){
+  [523,659,784,1047].forEach((f,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    o.type='sine';o.frequency.value=f;
+    const t=audioCtx.currentTime+i*0.1;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.25,t+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+    o.start(t);o.stop(t+0.25);
+  });
+}
+function showFeedback(type,msg){
+  const el=document.getElementById('feedbackMsg');
+  el.className='';el.textContent='';
+  void el.offsetWidth;
+  el.textContent=msg;
+  el.className=type+' show';
+  setTimeout(()=>el.classList.remove('show'),1400);
+}
+
+// ── START ─────────────────────────────────────────
+loadHabitat();
+</script>
+</body>
+</html>
