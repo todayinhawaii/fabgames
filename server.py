@@ -518,10 +518,6 @@ def henry():
 def animal_discovery():
     return send_from_directory('.', 'animal-discovery.html')
 
-@app.route('/crossword')
-def crossword():
-    return send_from_directory('.', 'crossword.html')
-
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
