@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Strawberry Farm 🍓 — fab.games</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#FFD700;
+  --amber:#f5a800;
+  --cream:#f8e5bb;
+  --wood:#6b3400;
+  --woodlight:#8a4a00;
+}
+body{
+  font-family:'Nunito',sans-serif;
+  background:linear-gradient(160deg,#2b1500 0%,#1a0d00 100%);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  overflow-x:hidden;
+}
+#topbar{
+  width:100%;max-width:1100px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:8px;padding:14px 16px;
+}
+.logo{
+  font-family:'Fredoka One',cursive;font-size:26px;
+  background:linear-gradient(180deg,#ff8a8a,#d8203a,#7a0014);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 2px 8px rgba(216,32,58,0.4));
+  letter-spacing:1px;
+}
+#scorePanel{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;}
+.score-pill{
+  font-family:'Fredoka One',cursive;font-size:13px;color:#ffe566;
+  background:rgba(0,0,0,0.35);padding:6px 16px;border-radius:20px;
+  border:1px solid rgba(255,215,0,0.3);white-space:nowrap;
+}
+#endBtn{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  padding:6px 16px;border-radius:20px;border:1px solid rgba(255,80,80,0.5);
+  cursor:pointer;background:rgba(180,0,0,0.5);color:#ffaaaa;
+}
+#main{width:100%;max-width:900px;padding:0 16px 20px;display:flex;flex-direction:column;align-items:center;gap:0;}
+#statusBar{
+  width:100%;padding:10px 18px;margin-bottom:12px;
+  background:rgba(0,0,0,0.35);border-radius:16px;
+  border:1px solid rgba(255,215,0,0.2);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
+}
+#statusMsg{font-family:'Fredoka One',cursive;font-size:16px;color:#ffe566;}
+#progressBar{display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:220px;}
+.prog-dot{
+  width:11px;height:11px;border-radius:50%;
+  border:2px solid rgba(255,215,0,0.3);
+  background:transparent;transition:all 0.3s;
+}
+.prog-dot.done{background:var(--gold);border-color:var(--gold);}
+.prog-dot.current{background:rgba(255,215,0,0.3);border-color:var(--gold);animation:dotPulse 1s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+#farmScene{
+  position:relative;
+  width:100%;
+  border-radius:20px 20px 0 0;
+  overflow:hidden;
+  box-shadow:0 12px 48px rgba(0,0,0,0.5);
+  line-height:0;
+}
+#farmSceneImg{width:100%;display:block;user-select:none;pointer-events:none;}
+.num-overlay{
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--cream);
+  border-radius:8%;
+  font-family:'Fredoka One',cursive;
+  font-weight:400;
+}
+#pickNumOverlay{
+  left:86.5%; top:33%; width:10%; height:9.5%;
+  color:#c81b32;
+  font-size:min(6vw,54px);
+}
+#countNumOverlay{
+  left:90.2%; top:57.6%; width:7.8%; height:8%;
+  color:#1f7a00;
+  font-size:min(4.8vw,42px);
+}
+#basketDropZone{
+  position:absolute;
+  left:29%; top:52%; width:42%; height:32%;
+  border-radius:20px;
+}
+#basketDropZone.drag-over{
+  background:rgba(255,215,0,0.18);
+  box-shadow:inset 0 0 0 4px rgba(255,215,0,0.7);
+}
+#basketFill{
+  position:absolute; inset:0;
+  pointer-events:none;
+}
+.fill-berry{
+  position:absolute;width:11%;height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35));
+  animation:berryDrop 0.35s ease;
+}
+@keyframes berryDrop{
+  0%{transform:translateY(-40px) scale(0.5) rotate(0deg);opacity:0;}
+  100%{transform:translateY(0) scale(1) rotate(var(--rot,0deg));opacity:1;}
+}
+#tray{
+  width:100%;
+  display:flex;flex-wrap:wrap;gap:10px;
+  align-items:center;justify-content:center;
+  padding:18px 16px;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0 2px, transparent 2px 60px),
+    linear-gradient(180deg,#7a3c00,#5a2900);
+  border-radius:0 0 20px 20px;
+  border:3px solid rgba(255,215,0,0.15);border-top:none;
+  min-height:100px;
+  box-shadow:0 12px 30px rgba(0,0,0,0.4);
+  position:relative;
+}
+#tray::before{
+  content:'';
+  position:absolute;inset:8px;
+  border:3px dashed rgba(255,255,255,0.55);
+  border-radius:14px;
+  pointer-events:none;
+}
+.tray-berry{
+  width:64px;height:64px;
+  cursor:grab;
+  touch-action:none;
+  transition:transform 0.15s,opacity 0.15s;
+  z-index:1;
+}
+.tray-berry img{
+  width:100%;height:100%;object-fit:contain;
+  user-select:none;pointer-events:none;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+}
+.tray-berry:hover{transform:scale(1.1) translateY(-4px);}
+.tray-berry.dragging{opacity:0.35;}
+.tray-berry.placed{display:none;}
+#dragGhost{position:fixed;pointer-events:none;z-index:9999;display:none;transform:translate(-50%,-50%);}
+#dragGhost img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.4));}
+#feedbackMsg{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-family:'Fredoka One',cursive;font-size:38px;
+  padding:16px 36px;border-radius:28px;z-index:999;
+  pointer-events:none;opacity:0;
+  transition:transform 0.15s,opacity 0.3s;text-align:center;
+  background:linear-gradient(135deg,#ffe566,#f5a800);
+  color:#1a0800;box-shadow:0 8px 40px rgba(255,200,0,0.5);
+}
+#feedbackMsg.show{transform:translate(-50%,-50%) scale(1);opacity:1;}
+#winOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;}
+#winOverlay.show{display:flex;}
+.win-box{
+  background:linear-gradient(135deg,#2b1500,#4a2500);
+  border:3px solid var(--gold);border-radius:28px;
+  padding:44px;text-align:center;max-width:440px;
+}
+.win-emoji{font-size:72px;margin-bottom:14px;}
+.win-title{font-family:'Fredoka One',cursive;font-size:36px;color:var(--gold);margin-bottom:8px;}
+.win-sub{font-size:15px;color:rgba(255,215,0,0.6);margin-bottom:22px;}
+.win-stats{display:flex;gap:24px;justify-content:center;margin-bottom:24px;}
+.win-stat-num{font-family:'Fredoka One',cursive;font-size:34px;color:var(--gold);}
+.win-stat-label{font-size:11px;color:rgba(255,215,0,0.4);text-transform:uppercase;letter-spacing:1px;}
+.win-btn{
+  font-family:'Fredoka One',cursive;font-size:18px;
+  padding:12px 28px;border-radius:14px;border:none;cursor:pointer;
+  background:linear-gradient(180deg,#ffe566,#f5a800);
+  color:#1a0800;box-shadow:0 4px 0 #7a3e00;margin:0 6px;
+}
+.win-btn.red{background:linear-gradient(180deg,#cc4422,#880000);color:#ffaaaa;box-shadow:0 4px 0 #440000;}
+@media(max-width:600px){
+  .logo{font-size:20px;}
+  .tray-berry{width:52px;height:52px;}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">🍓 Strawberry Farm</div>
+  <div id="scorePanel">
+    <div class="score-pill">⭐ <span id="totalScore">0</span> pts</div>
+    <div class="score-pill">🏆 Best <span id="bestScore">0</span></div>
+    <div class="score-pill">🧺 Round <span id="roundNum">1</span></div>
+    <button id="endBtn" onclick="endGame()">🏁 End Game</button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="statusBar">
+    <div id="statusMsg">🍓 Drag 5 strawberries into the basket!</div>
+    <div id="progressBar"></div>
+  </div>
+
+  <div id="farmScene">
+    <img id="farmSceneImg" src="/farm-scene-a.png" alt="Strawberry Farm">
+    <div class="num-overlay" id="pickNumOverlay">5</div>
+    <div class="num-overlay" id="countNumOverlay">0</div>
+    <div id="basketDropZone">
+      <div id="basketFill"></div>
+    </div>
+  </div>
+
+  <div id="tray"></div>
+</div>
+
+<div id="dragGhost"><img id="ghostImg" src="/strawberry.png" alt=""></div>
+<div id="feedbackMsg"></div>
+<div id="winOverlay">
+  <div class="win-box">
+    <div class="win-emoji" id="winEmoji">🎉</div>
+    <div class="win-title">Basket Full!</div>
+    <div class="win-sub" id="winSub">You picked all the strawberries!</div>
+    <div class="win-stats">
+      <div class="win-stat">
+        <div class="win-stat-num" id="winPts">+0</div>
+        <div class="win-stat-label">Points</div>
+      </div>
+      <div class="win-stat">
+        <div class="win-stat-num" id="winTime">0s</div>
+        <div class="win-stat-label">Time</div>
+      </div>
+      <div class="win-stat">
+        <div class="win-stat-num" id="winTotal">0</div>
+        <div class="win-stat-label">Total</div>
+      </div>
+    </div>
+    <button class="win-btn" onclick="nextRound()">▶ Next Round</button>
+    <button class="win-btn red" onclick="endGame()">🏁 End Game</button>
+  </div>
+</div>
+
+<script>
+let round = 1;
+let target = 5;
+let placedCount = 0;
+let totalScore = 0;
+let bestScore = 0;
+let startTime = null;
+let dragBerryId = null;
+
+function blinkLoop(){
+  const img = document.getElementById('farmSceneImg');
+  const blinkSrc = '/farm-scene-b.png';
+  const test = new Image();
+  test.onload = ()=>{
+    img.src = blinkSrc;
+    setTimeout(()=>{ img.src = '/farm-scene-a.png'; }, 180);
+  };
+  test.onerror = ()=>{};
+  test.src = blinkSrc;
+  setTimeout(blinkLoop, 2400 + Math.random()*2200);
+}
+setTimeout(blinkLoop, 2000);
+
+function randomTarget(){
+  const min = Math.min(3 + Math.floor(round/2), 8);
+  const max = Math.min(5 + Math.floor(round/2), 10);
+  return min + Math.floor(Math.random()*(max-min+1));
+}
+
+function startRound(){
+  target = randomTarget();
+  placedCount = 0;
+  startTime = Date.now();
+
+  document.getElementById('statusMsg').textContent = '🍓 Drag '+target+' strawberries into the basket!';
+  document.getElementById('roundNum').textContent = round;
+  document.getElementById('pickNumOverlay').textContent = target;
+  document.getElementById('countNumOverlay').textContent = '0';
+  document.getElementById('basketFill').innerHTML = '';
+  document.getElementById('winOverlay').classList.remove('show');
+  buildProgress();
+  buildTray();
+}
+
+function buildProgress(){
+  const bar = document.getElementById('progressBar');
+  bar.innerHTML = '';
+  for(let i=0;i<target;i++){
+    const dot = document.createElement('div');
+    dot.className = 'prog-dot' + (i===0?' current':'');
+    dot.id = 'dot-'+i;
+    bar.appendChild(dot);
+  }
+}
+
+function updateProgress(){
+  for(let i=0;i<target;i++){
+    const dot = document.getElementById('dot-'+i);
+    if(!dot) continue;
+    if(i < placedCount) dot.className='prog-dot done';
+    else if(i === placedCount) dot.className='prog-dot current';
+    else dot.className='prog-dot';
+  }
+}
+
+function buildTray(){
+  const tray = document.getElementById('tray');
+  tray.innerHTML = '';
+  for(let i=0;i<target;i++){
+    const berry = document.createElement('div');
+    berry.className = 'tray-berry';
+    berry.id = 'berry-'+i;
+    berry.draggable = true;
+    berry.innerHTML = '<img src="/strawberry.png" alt="Strawberry">';
+
+    berry.addEventListener('dragstart', e=>{
+      dragBerryId = i;
+      e.dataTransfer.setData('text/plain', i);
+      berry.classList.add('dragging');
+    });
+    berry.addEventListener('dragend', ()=>berry.classList.remove('dragging'));
+
+    berry.addEventListener('touchstart', e=>{
+      e.preventDefault();
+      dragBerryId = i;
+      const ghost = document.getElementById('dragGhost');
+      ghost.style.display='block';
+      const t = e.touches[0];
+      ghost.style.left=t.clientX+'px';ghost.style.top=t.clientY+'px';
+      berry.classList.add('dragging');
+    },{passive:false});
+
+    tray.appendChild(berry);
+  }
+}
+
+const dropZone = document.getElementById('basketDropZone');
+dropZone.addEventListener('dragover', e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e=>{
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  handleDrop(dragBerryId);
+});
+
+document.addEventListener('touchmove', e=>{
+  if(dragBerryId===null) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  const ghost = document.getElementById('dragGhost');
+  ghost.style.left=t.clientX+'px';ghost.style.top=t.clientY+'px';
+  const el = document.elementFromPoint(t.clientX,t.clientY);
+  dropZone.classList.toggle('drag-over', !!el?.closest('#basketDropZone'));
+},{passive:false});
+
+document.addEventListener('touchend', e=>{
+  if(dragBerryId===null) return;
+  const t = e.changedTouches[0];
+  const el = document.elementFromPoint(t.clientX,t.clientY);
+  document.getElementById('dragGhost').style.display='none';
+  dropZone.classList.remove('drag-over');
+  if(el?.closest('#basketDropZone')){
+    handleDrop(dragBerryId);
+  } else {
+    const berry = document.getElementById('berry-'+dragBerryId);
+    berry?.classList.remove('dragging');
+  }
+  dragBerryId=null;
+},{passive:false});
+
+function handleDrop(berryId){
+  if(berryId===null || berryId===undefined) return;
+  const berry = document.getElementById('berry-'+berryId);
+  if(!berry || berry.classList.contains('placed')) return;
+
+  berry.classList.add('placed');
+  placedCount++;
+
+  const fill = document.getElementById('basketFill');
+  const img = document.createElement('img');
+  img.src = '/strawberry.png';
+  img.className = 'fill-berry';
+  const rot = (Math.random()*50-25).toFixed(0)+'deg';
+  img.style.setProperty('--rot', rot);
+  img.style.left = (10 + Math.random()*70)+'%';
+  img.style.top = (Math.max(0, 55 - placedCount*6) + Math.random()*10)+'%';
+  img.style.zIndex = placedCount;
+  fill.appendChild(img);
+
+  document.getElementById('countNumOverlay').textContent = placedCount;
+  playRight();
+  showFeedback('🍓 +1!');
+  updateProgress();
+
+  dragBerryId = null;
+
+  if(placedCount >= target){
+    setTimeout(()=>showWin(), 700);
+  }
+}
+
+function showWin(){
+  const elapsed = Math.round((Date.now()-startTime)/1000);
+  const speedBonus = Math.max(0, 60-elapsed);
+  const pts = (target * 10) + speedBonus;
+  totalScore += pts;
+  if(totalScore > bestScore) bestScore = totalScore;
+  document.getElementById('totalScore').textContent = totalScore;
+  document.getElementById('bestScore').textContent = bestScore;
+  document.getElementById('winPts').textContent = '+'+pts;
+  document.getElementById('winTime').textContent = elapsed+'s';
+  document.getElementById('winTotal').textContent = totalScore;
+  document.getElementById('winSub').textContent = 'You picked all '+target+' strawberries!';
+  document.getElementById('winOverlay').classList.add('show');
+  playCelebrate();
+}
+
+function nextRound(){
+  round++;
+  startRound();
+}
+
+function endGame(){
+  alert('Great picking! You scored '+totalScore+' points on Strawberry Farm!');
+  totalScore=0; round=1;
+  document.getElementById('totalScore').textContent = 0;
+  startRound();
+  document.getElementById('winOverlay').classList.remove('show');
+}
+
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+function playRight(){
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.type='sine';o.frequency.setValueAtTime(700,audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(1100,audioCtx.currentTime+0.15);
+  g.gain.setValueAtTime(0.25,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.2);
+  o.start();o.stop(audioCtx.currentTime+0.2);
+}
+function playCelebrate(){
+  [523,659,784,1047,1319].forEach((f,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    o.type='sine';o.frequency.value=f;
+    const t=audioCtx.currentTime+i*0.09;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.25,t+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+    o.start(t);o.stop(t+0.3);
+  });
+}
+function showFeedback(msg){
+  const el=document.getElementById('feedbackMsg');
+  el.className='';el.textContent='';
+  void el.offsetWidth;
+  el.textContent=msg;
+  el.className='show';
+  setTimeout(()=>el.classList.remove('show'),700);
+}
+
+startRound();
+</script>
+</body>
+</html>
