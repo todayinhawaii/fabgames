@@ -79,12 +79,12 @@ body{
   font-weight:400;
 }
 #pickNumOverlay{
-  left:86.5%; top:33%; width:10%; height:9.5%;
+  left:85%; top:31.5%; width:13%; height:12.5%;
   color:#c81b32;
   font-size:min(6vw,54px);
 }
 #countNumOverlay{
-  left:90.2%; top:57.6%; width:7.8%; height:8%;
+  left:88.8%; top:56.2%; width:10.8%; height:11%;
   color:#1f7a00;
   font-size:min(4.8vw,42px);
 }
@@ -102,7 +102,7 @@ body{
   pointer-events:none;
 }
 .fill-berry{
-  position:absolute;width:16%;height:auto;
+  position:absolute;width:6.5%;height:auto;
   object-fit:contain;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35));
   animation:berryDrop 0.35s ease;
@@ -387,16 +387,16 @@ function handleDrop(berryId){
   img.style.setProperty('--rot', rot);
 
   // pack berries into a rising mound inside the basket bowl (absolute % of the full scene image)
-  const perRow = 3;
+  const perRow = 4;
   const i = placedCount - 1; // 0-indexed
   const row = Math.floor(i / perRow);
   const col = i % perRow;
-  const cols = [36, 49, 62]; // column centers (% of scene width), basket spans roughly x:30-70%
-  const rowOffset = (row % 2 === 0) ? 0 : 7; // stagger alternate rows
-  const leftPct = cols[col] + rowOffset + (Math.random()*4-2) - 8; // -8 to convert center to left-edge for 16%-wide berry
-  const topPct = 62 - row*11 + (Math.random()*3-1.5); // start inside the bowl, rise upward each row
+  const cols = [37, 44, 51, 58]; // column centers (% of scene width), basket spans roughly x:30-70%
+  const rowOffset = (row % 2 === 0) ? 0 : 3.5; // stagger alternate rows
+  const leftPct = cols[col] + rowOffset + (Math.random()*3-1.5) - 3.25; // -3.25 to convert center to left-edge for 6.5%-wide berry
+  const topPct = 62 - row*7 + (Math.random()*2-1); // start inside the bowl, rise upward each row
   img.style.left = leftPct+'%';
-  img.style.top = Math.max(20, topPct)+'%';
+  img.style.top = Math.max(25, topPct)+'%';
   img.style.zIndex = 10 + placedCount;
   fill.appendChild(img);
 
