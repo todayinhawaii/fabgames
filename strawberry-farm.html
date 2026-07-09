@@ -191,7 +191,22 @@ body{
 }
 .quiz-emoji{font-size:60px;margin-bottom:10px;}
 .quiz-title{font-family:'Fredoka One',cursive;font-size:26px;color:var(--gold);margin-bottom:6px;}
-.quiz-sub{font-size:14px;color:rgba(255,215,0,0.65);margin-bottom:26px;}
+.quiz-sub{font-size:22px;font-weight:800;color:#ffe9b3;margin-bottom:26px;line-height:1.4;}
+.quiz-num{
+  display:inline-block;
+  color:#8dd93a;
+  font-family:'Fredoka One',cursive;
+  font-size:1.25em;
+  text-shadow:0 0 10px rgba(141,217,58,0.8);
+  animation:swayFlash 1.1s ease-in-out infinite;
+}
+@keyframes swayFlash{
+  0%{transform:rotate(-9deg);opacity:1;}
+  25%{opacity:0.55;}
+  50%{transform:rotate(9deg);opacity:1;}
+  75%{opacity:0.55;}
+  100%{transform:rotate(-9deg);opacity:1;}
+}
 .quiz-options{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
 .quiz-opt{
   font-family:'Fredoka One',cursive;font-size:32px;
@@ -489,8 +504,8 @@ function showQuiz(){
   quizLocked = true;
   const correct = poolRemaining - roundTarget;
 
-  document.getElementById('quizSub').textContent =
-    'We had '+poolRemaining+', and put '+roundTarget+' in the basket...';
+  document.getElementById('quizSub').innerHTML =
+    'We had <span class="quiz-num">'+poolRemaining+'</span>, and put <span class="quiz-num">'+roundTarget+'</span> in the basket...';
   document.getElementById('quizResult').textContent = '';
   document.getElementById('quizResult').className = 'quiz-result';
 
