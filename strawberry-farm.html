@@ -123,7 +123,7 @@ body{
   pointer-events:none;
 }
 .fill-berry{
-  position:absolute;width:6.5%;height:auto;
+  position:absolute;width:6%;height:auto;
   object-fit:contain;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35));
   animation:berryDrop 0.35s ease;
@@ -168,7 +168,7 @@ body{
 .tray-berry.dragging{opacity:0.35;}
 .tray-berry.placed{display:none;}
 #dragGhost{position:fixed;pointer-events:none;z-index:9999;display:none;transform:translate(-50%,-50%);}
-#dragGhost img{width:128px;height:128px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.4));}
+#dragGhost img{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.4));}
 #feedbackMsg{
   position:fixed;top:50%;left:50%;
   transform:translate(-50%,-50%) scale(0);
@@ -180,29 +180,59 @@ body{
   color:#1a0800;box-shadow:0 8px 40px rgba(255,200,0,0.5);
 }
 #feedbackMsg.show{transform:translate(-50%,-50%) scale(1);opacity:1;}
-#winOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;}
-#winOverlay.show{display:flex;}
-.win-box{
+
+/* ── QUIZ OVERLAY ── */
+#quizOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;}
+#quizOverlay.show{display:flex;}
+.quiz-box{
   background:linear-gradient(135deg,#2b1500,#4a2500);
   border:3px solid var(--gold);border-radius:28px;
-  padding:44px;text-align:center;max-width:440px;
+  padding:40px;text-align:center;max-width:480px;width:90%;
 }
-.win-emoji{font-size:72px;margin-bottom:14px;}
-.win-title{font-family:'Fredoka One',cursive;font-size:36px;color:var(--gold);margin-bottom:8px;}
-.win-sub{font-size:15px;color:rgba(255,215,0,0.6);margin-bottom:22px;}
-.win-stats{display:flex;gap:24px;justify-content:center;margin-bottom:24px;}
-.win-stat-num{font-family:'Fredoka One',cursive;font-size:34px;color:var(--gold);}
-.win-stat-label{font-size:11px;color:rgba(255,215,0,0.4);text-transform:uppercase;letter-spacing:1px;}
-.win-btn{
-  font-family:'Fredoka One',cursive;font-size:18px;
-  padding:12px 28px;border-radius:14px;border:none;cursor:pointer;
-  background:linear-gradient(180deg,#ffe566,#f5a800);
-  color:#1a0800;box-shadow:0 4px 0 #7a3e00;margin:0 6px;
+.quiz-emoji{font-size:60px;margin-bottom:10px;}
+.quiz-title{font-family:'Fredoka One',cursive;font-size:26px;color:var(--gold);margin-bottom:6px;}
+.quiz-sub{font-size:14px;color:rgba(255,215,0,0.65);margin-bottom:26px;}
+.quiz-options{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.quiz-opt{
+  font-family:'Fredoka One',cursive;font-size:32px;
+  width:96px;height:96px;border-radius:20px;border:3px solid rgba(255,215,0,0.4);
+  cursor:pointer;background:rgba(255,255,255,0.06);color:var(--gold);
+  transition:transform 0.15s, background 0.15s, border-color 0.15s;
 }
-.win-btn.red{background:linear-gradient(180deg,#cc4422,#880000);color:#ffaaaa;box-shadow:0 4px 0 #440000;}
+.quiz-opt:hover:not(:disabled){transform:scale(1.08);background:rgba(255,215,0,0.15);}
+.quiz-opt:disabled{cursor:default;}
+.quiz-opt.correct{background:#1f7a00;border-color:#3fce00;color:#eaffea;}
+.quiz-opt.wrong{background:#7a0000;border-color:#ce3f00;color:#ffeaea;}
+.quiz-result{
+  font-family:'Fredoka One',cursive;font-size:18px;min-height:28px;margin-top:6px;
+}
+.quiz-result.good{color:#7dffb0;}
+.quiz-result.bad{color:#ff9a9a;}
+
+/* ── CELEBRATION BURST ── */
+#celebrationLayer{position:fixed;inset:0;z-index:600;pointer-events:none;overflow:hidden;}
+.confetti-piece{
+  position:absolute;top:50%;left:50%;
+  font-size:28px;
+  will-change:transform,opacity;
+  animation:confettiBurst 1.4s ease-out forwards;
+}
+@keyframes confettiBurst{
+  0%{transform:translate(-50%,-50%) scale(0.4) rotate(0deg);opacity:1;}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.1) rotate(var(--rot));opacity:0;}
+}
+#flashLayer{
+  position:fixed;inset:0;z-index:590;pointer-events:none;
+  background:radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,215,0,0) 60%);
+  opacity:0;
+}
+#flashLayer.flash{animation:flashPop 0.5s ease-out;}
+@keyframes flashPop{0%{opacity:0.9;}100%{opacity:0;}}
+
 @media(max-width:600px){
   .logo{font-size:20px;}
   .tray-berry{width:75px;height:75px;}
+  .quiz-opt{width:78px;height:78px;font-size:26px;}
 }
 </style>
 </head>
@@ -233,7 +263,7 @@ body{
 
 <div id="main">
   <div id="statusBar">
-    <div id="statusMsg">🍓 Drag 5 strawberries into the basket!</div>
+    <div id="statusMsg">🍓 We have 35 strawberries! Put 5 in the basket.</div>
     <div id="progressBar"></div>
   </div>
 
@@ -250,39 +280,35 @@ body{
 
 <div id="dragGhost"><img id="ghostImg" src="/strawberry.png" alt=""></div>
 <div id="feedbackMsg"></div>
-<div id="winOverlay">
-  <div class="win-box">
-    <div class="win-emoji" id="winEmoji">🎉</div>
-    <div class="win-title">Basket Full!</div>
-    <div class="win-sub" id="winSub">You picked all the strawberries!</div>
-    <div class="win-stats">
-      <div class="win-stat">
-        <div class="win-stat-num" id="winPts">+0</div>
-        <div class="win-stat-label">Points</div>
-      </div>
-      <div class="win-stat">
-        <div class="win-stat-num" id="winTime">0s</div>
-        <div class="win-stat-label">Time</div>
-      </div>
-      <div class="win-stat">
-        <div class="win-stat-num" id="winTotal">0</div>
-        <div class="win-stat-label">Total</div>
-      </div>
-    </div>
-    <button class="win-btn" onclick="nextRound()">▶ Next Round</button>
-    <button class="win-btn red" onclick="endGame()">🏁 End Game</button>
+
+<div id="quizOverlay">
+  <div class="quiz-box">
+    <div class="quiz-emoji">🤔</div>
+    <div class="quiz-title">How many strawberries do we have left?</div>
+    <div class="quiz-sub" id="quizSub">We had 35, and put 5 in the basket...</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-result" id="quizResult"></div>
   </div>
 </div>
 
+<div id="flashLayer"></div>
+<div id="celebrationLayer"></div>
+
 <script>
+// ── STATE ─────────────────────────────────────────
+const POOL_START = 35;
+let poolRemaining = POOL_START;
+let totalPlaced = 0;     // cumulative berries placed in the basket this cycle (0..35), drives pile position
 let round = 1;
-let target = 5;
-let placedCount = 0;
+let roundTarget = 5;
+let roundPlaced = 0;
 let totalScore = 0;
 let bestScore = 0;
 let startTime = null;
 let dragBerryId = null;
+let quizLocked = false;
 
+// ── SCENE BLINK LOOP ──
 function blinkLoop(){
   const img = document.getElementById('farmSceneImg');
   const blinkSrc = '/farm-scene-b.png';
@@ -297,33 +323,38 @@ function blinkLoop(){
 }
 setTimeout(blinkLoop, 2000);
 
-const POOL_SIZE = 30; // tray always shows a full pool; player drags exactly `target` of them
+// ── CYCLE / ROUND SETUP ─────────────────────────────
+function startCycle(){
+  poolRemaining = POOL_START;
+  totalPlaced = 0;
+  document.getElementById('basketFill').innerHTML = '';
+  buildTray();
+  startRound();
+}
 
-function randomTarget(){
-  const min = Math.min(5 + round, 25);
-  const max = Math.min(min + 5, 30);
-  return min + Math.floor(Math.random()*(max-min+1));
+function pickRoundTarget(){
+  const cap = Math.min(8, poolRemaining);
+  return 1 + Math.floor(Math.random()*cap);
 }
 
 function startRound(){
-  target = randomTarget();
-  placedCount = 0;
+  roundTarget = pickRoundTarget();
+  roundPlaced = 0;
   startTime = Date.now();
 
-  document.getElementById('statusMsg').textContent = '🍓 Drag '+target+' strawberries into the basket!';
+  document.getElementById('statusMsg').textContent =
+    '🍓 We have '+poolRemaining+' strawberries! Put '+roundTarget+' in the basket.';
   document.getElementById('roundNum').textContent = round;
-  document.getElementById('pickNumOverlay').textContent = target;
+  document.getElementById('pickNumOverlay').textContent = roundTarget;
   document.getElementById('countNumOverlay').textContent = '0';
-  document.getElementById('basketFill').innerHTML = '';
-  document.getElementById('winOverlay').classList.remove('show');
+  document.getElementById('quizOverlay').classList.remove('show');
   buildProgress();
-  buildTray();
 }
 
 function buildProgress(){
   const bar = document.getElementById('progressBar');
   bar.innerHTML = '';
-  for(let i=0;i<target;i++){
+  for(let i=0;i<roundTarget;i++){
     const dot = document.createElement('div');
     dot.className = 'prog-dot' + (i===0?' current':'');
     dot.id = 'dot-'+i;
@@ -332,19 +363,20 @@ function buildProgress(){
 }
 
 function updateProgress(){
-  for(let i=0;i<target;i++){
+  for(let i=0;i<roundTarget;i++){
     const dot = document.getElementById('dot-'+i);
     if(!dot) continue;
-    if(i < placedCount) dot.className='prog-dot done';
-    else if(i === placedCount) dot.className='prog-dot current';
+    if(i < roundPlaced) dot.className='prog-dot done';
+    else if(i === roundPlaced) dot.className='prog-dot current';
     else dot.className='prog-dot';
   }
 }
 
+// ── TRAY (full 35-strawberry pool, built once per cycle) ──
 function buildTray(){
   const tray = document.getElementById('tray');
   tray.innerHTML = '';
-  for(let i=0;i<POOL_SIZE;i++){
+  for(let i=0;i<POOL_START;i++){
     const berry = document.createElement('div');
     berry.className = 'tray-berry';
     berry.id = 'berry-'+i;
@@ -372,6 +404,7 @@ function buildTray(){
   }
 }
 
+// ── DROP HANDLING ──────────────────────────────────
 const dropZone = document.getElementById('basketDropZone');
 dropZone.addEventListener('dragover', e=>{e.preventDefault();dropZone.classList.add('drag-over');});
 dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag-over'));
@@ -408,12 +441,13 @@ document.addEventListener('touchend', e=>{
 
 function handleDrop(berryId){
   if(berryId===null || berryId===undefined) return;
-  if(placedCount>=target) return;
+  if(roundPlaced>=roundTarget || quizLocked) return;
   const berry = document.getElementById('berry-'+berryId);
   if(!berry || berry.classList.contains('placed')) return;
 
   berry.classList.add('placed');
-  placedCount++;
+  roundPlaced++;
+  totalPlaced++;
 
   const fill = document.getElementById('basketFill');
   const img = document.createElement('img');
@@ -423,60 +457,142 @@ function handleDrop(berryId){
   img.style.setProperty('--rot', rot);
 
   // pack berries into a rising mound inside the basket bowl (absolute % of the full scene image)
-  const perRow = 4;
-  const i = placedCount - 1; // 0-indexed
+  const perRow = 5;
+  const i = totalPlaced - 1; // 0-indexed, cumulative across the whole 35-pool cycle
   const row = Math.floor(i / perRow);
   const col = i % perRow;
-  const cols = [37, 44, 51, 58]; // column centers (% of scene width), basket spans roughly x:30-70%
-  const rowOffset = (row % 2 === 0) ? 0 : 3.5; // stagger alternate rows
-  const leftPct = cols[col] + rowOffset + (Math.random()*3-1.5) - 3.25; // -3.25 to convert center to left-edge for 6.5%-wide berry
-  const topPct = 62 - row*7 + (Math.random()*2-1); // start inside the bowl, rise upward each row
+  const cols = [34, 41, 48, 55, 62]; // column centers (% of scene width)
+  const rowOffset = (row % 2 === 0) ? 0 : 3; // stagger alternate rows
+  const leftPct = cols[col] + rowOffset + (Math.random()*2.5-1.25) - 3; // convert center to left-edge
+  const topPct = 64 - row*6.5 + (Math.random()*2-1); // start inside the bowl, rise upward each row
   img.style.left = leftPct+'%';
-  img.style.top = Math.max(25, topPct)+'%';
-  img.style.zIndex = 10 + placedCount;
+  img.style.top = Math.max(8, topPct)+'%';
+  img.style.zIndex = 10 + totalPlaced;
   fill.appendChild(img);
 
-  document.getElementById('countNumOverlay').textContent = placedCount;
+  document.getElementById('countNumOverlay').textContent = roundPlaced;
   playRight();
   showFeedback('🍓 +1!');
   updateProgress();
 
   dragBerryId = null;
 
-  if(placedCount >= target){
-    setTimeout(()=>showWin(), 700);
+  if(roundPlaced >= roundTarget){
+    setTimeout(()=>showQuiz(), 600);
   }
 }
 
-function showWin(){
-  const elapsed = Math.round((Date.now()-startTime)/1000);
-  const speedBonus = Math.max(0, 60-elapsed);
-  const pts = (target * 10) + speedBonus;
-  totalScore += pts;
-  if(totalScore > bestScore) bestScore = totalScore;
-  document.getElementById('totalScore').textContent = totalScore;
-  document.getElementById('bestScore').textContent = bestScore;
-  document.getElementById('winPts').textContent = '+'+pts;
-  document.getElementById('winTime').textContent = elapsed+'s';
-  document.getElementById('winTotal').textContent = totalScore;
-  document.getElementById('winSub').textContent = 'You picked all '+target+' strawberries!';
-  document.getElementById('winOverlay').classList.add('show');
-  playCelebrate();
+// ── QUIZ ──────────────────────────────────────────
+function showQuiz(){
+  quizLocked = true;
+  const correct = poolRemaining - roundTarget;
+
+  document.getElementById('quizSub').textContent =
+    'We had '+poolRemaining+', and put '+roundTarget+' in the basket...';
+  document.getElementById('quizResult').textContent = '';
+  document.getElementById('quizResult').className = 'quiz-result';
+
+  // build 2 distinct, plausible wrong answers
+  const options = new Set([correct]);
+  const spread = Math.max(3, Math.round(roundTarget*0.8));
+  while(options.size < 3){
+    const delta = (Math.floor(Math.random()*spread)+1) * (Math.random()<0.5?-1:1);
+    const val = correct + delta;
+    if(val >= 0 && val <= POOL_START) options.add(val);
+  }
+  const shuffled = [...options].sort(()=>Math.random()-0.5);
+
+  const optWrap = document.getElementById('quizOptions');
+  optWrap.innerHTML = '';
+  shuffled.forEach(val=>{
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = val;
+    btn.onclick = ()=>answerQuiz(val, correct, btn);
+    optWrap.appendChild(btn);
+  });
+
+  document.getElementById('quizOverlay').classList.add('show');
 }
 
-function nextRound(){
+function answerQuiz(selected, correct, btnEl){
+  document.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+  const allBtns = [...document.querySelectorAll('.quiz-opt')];
+  const correctBtn = allBtns.find(b=>parseInt(b.textContent,10)===correct);
+
+  if(selected === correct){
+    btnEl.classList.add('correct');
+    document.getElementById('quizResult').textContent = '✅ Yes! That\'s right!';
+    document.getElementById('quizResult').className = 'quiz-result good';
+    const elapsed = Math.round((Date.now()-startTime)/1000);
+    const pts = 25 + Math.max(0, 30-elapsed);
+    totalScore += pts;
+    if(totalScore > bestScore) bestScore = totalScore;
+    document.getElementById('totalScore').textContent = totalScore;
+    document.getElementById('bestScore').textContent = bestScore;
+    bigCelebration();
+    setTimeout(()=>advance(correct), 1900);
+  } else {
+    btnEl.classList.add('wrong');
+    if(correctBtn) correctBtn.classList.add('correct');
+    document.getElementById('quizResult').textContent = '❌ No — we have '+correct+' left.';
+    document.getElementById('quizResult').className = 'quiz-result bad';
+    playWrong();
+    setTimeout(()=>advance(correct), 2400);
+  }
+}
+
+function advance(newPoolRemaining){
+  quizLocked = false;
+  document.getElementById('quizOverlay').classList.remove('show');
+  poolRemaining = newPoolRemaining;
   round++;
-  startRound();
+  if(poolRemaining <= 0){
+    showFeedback('🧺 Basket full — new batch!');
+    setTimeout(startCycle, 900);
+  } else {
+    startRound();
+  }
 }
 
 function endGame(){
   alert('Great picking! You scored '+totalScore+' points on Strawberry Farm!');
   totalScore=0; round=1;
   document.getElementById('totalScore').textContent = 0;
-  startRound();
-  document.getElementById('winOverlay').classList.remove('show');
+  document.getElementById('quizOverlay').classList.remove('show');
+  quizLocked = false;
+  startCycle();
 }
 
+// ── VEGAS-STYLE CELEBRATION ─────────────────────────
+function bigCelebration(){
+  const flash = document.getElementById('flashLayer');
+  flash.classList.remove('flash'); void flash.offsetWidth; flash.classList.add('flash');
+
+  const layer = document.getElementById('celebrationLayer');
+  const emojis = ['⭐','🍓','✨','🎉','💛','🌟'];
+  const count = 46;
+  for(let i=0;i<count;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    const angle = Math.random()*Math.PI*2;
+    const dist = 220 + Math.random()*380;
+    const dx = Math.cos(angle)*dist;
+    const dy = Math.sin(angle)*dist;
+    piece.style.setProperty('--dx', dx+'px');
+    piece.style.setProperty('--dy', dy+'px');
+    piece.style.setProperty('--rot', (Math.random()*720-360)+'deg');
+    piece.style.left = '50%'; piece.style.top='40%';
+    piece.style.fontSize = (18+Math.random()*22)+'px';
+    piece.style.animationDelay = (Math.random()*0.15)+'s';
+    layer.appendChild(piece);
+    setTimeout(()=>piece.remove(), 1700);
+  }
+  playCelebrate();
+}
+
+// ── SOUNDS ────────────────────────────────────────
 const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
 function playRight(){
   const o=audioCtx.createOscillator(),g=audioCtx.createGain();
@@ -487,13 +603,22 @@ function playRight(){
   g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.2);
   o.start();o.stop(audioCtx.currentTime+0.2);
 }
+function playWrong(){
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.type='sawtooth';o.frequency.setValueAtTime(220,audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(120,audioCtx.currentTime+0.35);
+  g.gain.setValueAtTime(0.2,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.4);
+  o.start();o.stop(audioCtx.currentTime+0.4);
+}
 function playCelebrate(){
-  [523,659,784,1047,1319].forEach((f,i)=>{
+  [523,659,784,1047,1319,1568].forEach((f,i)=>{
     const o=audioCtx.createOscillator(),g=audioCtx.createGain();
     o.connect(g);g.connect(audioCtx.destination);
     o.type='sine';o.frequency.value=f;
-    const t=audioCtx.currentTime+i*0.09;
-    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.25,t+0.05);
+    const t=audioCtx.currentTime+i*0.08;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.28,t+0.05);
     g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
     o.start(t);o.stop(t+0.3);
   });
@@ -507,7 +632,8 @@ function showFeedback(msg){
   setTimeout(()=>el.classList.remove('show'),700);
 }
 
-startRound();
+// ── START ─────────────────────────────────────────
+startCycle();
 </script>
 </body>
 </html>
