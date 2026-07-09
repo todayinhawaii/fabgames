@@ -79,14 +79,18 @@ body{
   font-weight:400;
 }
 #pickNumOverlay{
-  left:85%; top:31.5%; width:13%; height:12.5%;
+  left:85%; top:31.5%; width:13%; height:16%;
   color:#c81b32;
   font-size:min(6vw,54px);
+  align-items:flex-start;
+  padding-top:1%;
 }
 #countNumOverlay{
-  left:88.8%; top:56.2%; width:10.8%; height:11%;
+  left:88.8%; top:56.2%; width:10.8%; height:14.5%;
   color:#1f7a00;
   font-size:min(4.8vw,42px);
+  align-items:flex-start;
+  padding-top:1%;
 }
 #basketDropZone{
   position:absolute;
@@ -115,20 +119,19 @@ body{
   width:100%;
   display:flex;flex-wrap:wrap;gap:10px;
   align-items:center;justify-content:center;
-  padding:18px 16px;
-  background:
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0 2px, transparent 2px 60px),
-    linear-gradient(180deg,#7a3c00,#5a2900);
+  align-content:flex-start;
+  padding:22px 16px;
+  background:var(--cream);
   border-radius:0 0 20px 20px;
   border:3px solid rgba(255,215,0,0.15);border-top:none;
-  min-height:100px;
+  min-height:260px;
   box-shadow:0 12px 30px rgba(0,0,0,0.4);
   position:relative;
 }
 #tray::before{
   content:'';
   position:absolute;inset:8px;
-  border:3px dashed rgba(255,255,255,0.55);
+  border:3px dashed rgba(120,70,10,0.4);
   border-radius:14px;
   pointer-events:none;
 }
@@ -265,8 +268,8 @@ function blinkLoop(){
 setTimeout(blinkLoop, 2000);
 
 function randomTarget(){
-  const min = Math.min(3 + Math.floor(round/2), 8);
-  const max = Math.min(5 + Math.floor(round/2), 10);
+  const min = Math.min(5 + Math.floor(round/2), 15);
+  const max = Math.min(9 + Math.floor(round/2), 20);
   return min + Math.floor(Math.random()*(max-min+1));
 }
 
