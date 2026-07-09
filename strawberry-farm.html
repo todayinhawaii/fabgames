@@ -90,7 +90,7 @@ body{
 }
 #basketDropZone{
   position:absolute;
-  left:29%; top:52%; width:42%; height:32%;
+  left:26%; top:40%; width:48%; height:56%;
   border-radius:20px;
 }
 #basketDropZone.drag-over{
@@ -102,7 +102,7 @@ body{
   pointer-events:none;
 }
 .fill-berry{
-  position:absolute;width:11%;height:auto;
+  position:absolute;width:22%;height:auto;
   object-fit:contain;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35));
   animation:berryDrop 0.35s ease;
@@ -133,7 +133,7 @@ body{
   pointer-events:none;
 }
 .tray-berry{
-  width:64px;height:64px;
+  width:128px;height:128px;
   cursor:grab;
   touch-action:none;
   transition:transform 0.15s,opacity 0.15s;
@@ -148,7 +148,7 @@ body{
 .tray-berry.dragging{opacity:0.35;}
 .tray-berry.placed{display:none;}
 #dragGhost{position:fixed;pointer-events:none;z-index:9999;display:none;transform:translate(-50%,-50%);}
-#dragGhost img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.4));}
+#dragGhost img{width:128px;height:128px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.4));}
 #feedbackMsg{
   position:fixed;top:50%;left:50%;
   transform:translate(-50%,-50%) scale(0);
@@ -182,7 +182,7 @@ body{
 .win-btn.red{background:linear-gradient(180deg,#cc4422,#880000);color:#ffaaaa;box-shadow:0 4px 0 #440000;}
 @media(max-width:600px){
   .logo{font-size:20px;}
-  .tray-berry{width:52px;height:52px;}
+  .tray-berry{width:100px;height:100px;}
 }
 </style>
 </head>
@@ -384,11 +384,20 @@ function handleDrop(berryId){
   const img = document.createElement('img');
   img.src = '/strawberry.png';
   img.className = 'fill-berry';
-  const rot = (Math.random()*50-25).toFixed(0)+'deg';
+  const rot = (Math.random()*40-20).toFixed(0)+'deg';
   img.style.setProperty('--rot', rot);
-  img.style.left = (10 + Math.random()*70)+'%';
-  img.style.top = (Math.max(0, 55 - placedCount*6) + Math.random()*10)+'%';
-  img.style.zIndex = placedCount;
+
+  // pack berries into a rising mound: 3 per row, each row higher and narrower
+  const perRow = 3;
+  const i = placedCount - 1; // 0-indexed
+  const row = Math.floor(i / perRow);
+  const col = i % perRow;
+  const rowOffset = (row % 2 === 0) ? 0 : 11; // stagger alternate rows
+  const leftPct = 14 + col*26 + rowOffset + (Math.random()*6-3);
+  const topPct = 74 - row*20 + (Math.random()*4-2);
+  img.style.left = leftPct+'%';
+  img.style.top = Math.max(2, topPct)+'%';
+  img.style.zIndex = 10 + placedCount;
   fill.appendChild(img);
 
   document.getElementById('countNumOverlay').textContent = placedCount;
