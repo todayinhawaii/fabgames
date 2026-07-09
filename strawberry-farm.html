@@ -102,7 +102,7 @@ body{
   pointer-events:none;
 }
 .fill-berry{
-  position:absolute;width:22%;height:auto;
+  position:absolute;width:16%;height:auto;
   object-fit:contain;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35));
   animation:berryDrop 0.35s ease;
@@ -208,9 +208,8 @@ body{
     <img id="farmSceneImg" src="/farm-scene-a.png" alt="Strawberry Farm">
     <div class="num-overlay" id="pickNumOverlay">5</div>
     <div class="num-overlay" id="countNumOverlay">0</div>
-    <div id="basketDropZone">
-      <div id="basketFill"></div>
-    </div>
+    <div id="basketDropZone"></div>
+    <div id="basketFill"></div>
   </div>
 
   <div id="tray"></div>
@@ -387,16 +386,17 @@ function handleDrop(berryId){
   const rot = (Math.random()*40-20).toFixed(0)+'deg';
   img.style.setProperty('--rot', rot);
 
-  // pack berries into a rising mound: 3 per row, each row higher and narrower
+  // pack berries into a rising mound inside the basket bowl (absolute % of the full scene image)
   const perRow = 3;
   const i = placedCount - 1; // 0-indexed
   const row = Math.floor(i / perRow);
   const col = i % perRow;
-  const rowOffset = (row % 2 === 0) ? 0 : 11; // stagger alternate rows
-  const leftPct = 14 + col*26 + rowOffset + (Math.random()*6-3);
-  const topPct = 74 - row*20 + (Math.random()*4-2);
+  const cols = [36, 49, 62]; // column centers (% of scene width), basket spans roughly x:30-70%
+  const rowOffset = (row % 2 === 0) ? 0 : 7; // stagger alternate rows
+  const leftPct = cols[col] + rowOffset + (Math.random()*4-2) - 8; // -8 to convert center to left-edge for 16%-wide berry
+  const topPct = 62 - row*11 + (Math.random()*3-1.5); // start inside the bowl, rise upward each row
   img.style.left = leftPct+'%';
-  img.style.top = Math.max(2, topPct)+'%';
+  img.style.top = Math.max(20, topPct)+'%';
   img.style.zIndex = 10 + placedCount;
   fill.appendChild(img);
 
