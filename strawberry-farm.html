@@ -16,11 +16,32 @@
 }
 body{
   font-family:'Nunito',sans-serif;
-  background:linear-gradient(160deg,#2b1500 0%,#1a0d00 100%);
+  background:linear-gradient(160deg,#a8d84a 0%,#7ab82e 50%,#5c9c1e 100%);
   min-height:100vh;
   display:flex;flex-direction:column;align-items:center;
   overflow-x:hidden;
+  position:relative;
 }
+#topbar,#main{position:relative;z-index:2;}
+#floatingBerries{
+  position:fixed;inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
+}
+#floatingBerries img{
+  position:absolute;
+  width:70px;height:70px;
+  object-fit:contain;
+  opacity:0.85;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
+}
+@keyframes floatA{0%{transform:translate(-15vw,110vh) rotate(0deg);}100%{transform:translate(115vw,-15vh) rotate(360deg);}}
+@keyframes floatB{0%{transform:translate(115vw,105vh) rotate(0deg);}100%{transform:translate(-15vw,-10vh) rotate(-360deg);}}
+@keyframes floatC{0%{transform:translate(-15vw,-10vh) rotate(0deg);}100%{transform:translate(115vw,105vh) rotate(360deg);}}
+@keyframes floatD{0%{transform:translate(115vw,-15vh) rotate(0deg);}100%{transform:translate(-15vw,110vh) rotate(-360deg);}}
 #topbar{
   width:100%;max-width:1100px;
   display:flex;flex-direction:column;align-items:center;
@@ -52,7 +73,7 @@ body{
   display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
 }
 #statusMsg{font-family:'Fredoka One',cursive;font-size:16px;color:#ffe566;}
-#progressBar{display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:220px;}
+#progressBar{display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:340px;}
 .prog-dot{
   width:11px;height:11px;border-radius:50%;
   border:2px solid rgba(255,215,0,0.3);
@@ -82,15 +103,11 @@ body{
   left:85%; top:31.5%; width:13%; height:16%;
   color:#c81b32;
   font-size:min(6vw,54px);
-  align-items:flex-start;
-  padding-top:1%;
 }
 #countNumOverlay{
   left:88.8%; top:56.2%; width:10.8%; height:14.5%;
   color:#1f7a00;
   font-size:min(4.8vw,42px);
-  align-items:flex-start;
-  padding-top:1%;
 }
 #basketDropZone{
   position:absolute;
@@ -136,7 +153,7 @@ body{
   pointer-events:none;
 }
 .tray-berry{
-  width:128px;height:128px;
+  width:96px;height:96px;
   cursor:grab;
   touch-action:none;
   transition:transform 0.15s,opacity 0.15s;
@@ -185,11 +202,24 @@ body{
 .win-btn.red{background:linear-gradient(180deg,#cc4422,#880000);color:#ffaaaa;box-shadow:0 4px 0 #440000;}
 @media(max-width:600px){
   .logo{font-size:20px;}
-  .tray-berry{width:100px;height:100px;}
+  .tray-berry{width:75px;height:75px;}
 }
 </style>
 </head>
 <body>
+
+<div id="floatingBerries">
+  <img src="/strawberry.png" style="width:60px;height:60px;animation:floatA 22s linear infinite;animation-delay:-2s;">
+  <img src="/strawberry.png" style="width:85px;height:85px;animation:floatB 28s linear infinite;animation-delay:-9s;">
+  <img src="/strawberry.png" style="width:50px;height:50px;animation:floatC 18s linear infinite;animation-delay:-4s;">
+  <img src="/strawberry.png" style="width:75px;height:75px;animation:floatD 25s linear infinite;animation-delay:-14s;">
+  <img src="/strawberry.png" style="width:65px;height:65px;animation:floatA 20s linear infinite;animation-delay:-11s;">
+  <img src="/strawberry.png" style="width:90px;height:90px;animation:floatB 32s linear infinite;animation-delay:-3s;">
+  <img src="/strawberry.png" style="width:55px;height:55px;animation:floatC 24s linear infinite;animation-delay:-17s;">
+  <img src="/strawberry.png" style="width:80px;height:80px;animation:floatD 21s linear infinite;animation-delay:-6s;">
+  <img src="/strawberry.png" style="width:45px;height:45px;animation:floatA 26s linear infinite;animation-delay:-19s;">
+  <img src="/strawberry.png" style="width:70px;height:70px;animation:floatB 19s linear infinite;animation-delay:-8s;">
+</div>
 
 <div id="topbar">
   <div class="logo">🍓 Strawberry Farm</div>
@@ -267,9 +297,11 @@ function blinkLoop(){
 }
 setTimeout(blinkLoop, 2000);
 
+const POOL_SIZE = 30; // tray always shows a full pool; player drags exactly `target` of them
+
 function randomTarget(){
-  const min = Math.min(5 + Math.floor(round/2), 15);
-  const max = Math.min(9 + Math.floor(round/2), 20);
+  const min = Math.min(5 + round, 25);
+  const max = Math.min(min + 5, 30);
   return min + Math.floor(Math.random()*(max-min+1));
 }
 
@@ -312,7 +344,7 @@ function updateProgress(){
 function buildTray(){
   const tray = document.getElementById('tray');
   tray.innerHTML = '';
-  for(let i=0;i<target;i++){
+  for(let i=0;i<POOL_SIZE;i++){
     const berry = document.createElement('div');
     berry.className = 'tray-berry';
     berry.id = 'berry-'+i;
@@ -376,6 +408,7 @@ document.addEventListener('touchend', e=>{
 
 function handleDrop(berryId){
   if(berryId===null || berryId===undefined) return;
+  if(placedCount>=target) return;
   const berry = document.getElementById('berry-'+berryId);
   if(!berry || berry.classList.contains('placed')) return;
 
