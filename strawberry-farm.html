@@ -239,16 +239,16 @@ body{
 <body>
 
 <div id="floatingBerries">
-  <img src="/strawberry.png" style="width:60px;height:60px;animation:floatA 22s linear infinite;animation-delay:-2s;">
-  <img src="/strawberry.png" style="width:85px;height:85px;animation:floatB 28s linear infinite;animation-delay:-9s;">
-  <img src="/strawberry.png" style="width:50px;height:50px;animation:floatC 18s linear infinite;animation-delay:-4s;">
-  <img src="/strawberry.png" style="width:75px;height:75px;animation:floatD 25s linear infinite;animation-delay:-14s;">
-  <img src="/strawberry.png" style="width:65px;height:65px;animation:floatA 20s linear infinite;animation-delay:-11s;">
-  <img src="/strawberry.png" style="width:90px;height:90px;animation:floatB 32s linear infinite;animation-delay:-3s;">
-  <img src="/strawberry.png" style="width:55px;height:55px;animation:floatC 24s linear infinite;animation-delay:-17s;">
-  <img src="/strawberry.png" style="width:80px;height:80px;animation:floatD 21s linear infinite;animation-delay:-6s;">
-  <img src="/strawberry.png" style="width:45px;height:45px;animation:floatA 26s linear infinite;animation-delay:-19s;">
-  <img src="/strawberry.png" style="width:70px;height:70px;animation:floatB 19s linear infinite;animation-delay:-8s;">
+  <img src="/strawberry.webp" style="width:60px;height:60px;animation:floatA 22s linear infinite;animation-delay:-2s;">
+  <img src="/strawberry.webp" style="width:85px;height:85px;animation:floatB 28s linear infinite;animation-delay:-9s;">
+  <img src="/strawberry.webp" style="width:50px;height:50px;animation:floatC 18s linear infinite;animation-delay:-4s;">
+  <img src="/strawberry.webp" style="width:75px;height:75px;animation:floatD 25s linear infinite;animation-delay:-14s;">
+  <img src="/strawberry.webp" style="width:65px;height:65px;animation:floatA 20s linear infinite;animation-delay:-11s;">
+  <img src="/strawberry.webp" style="width:90px;height:90px;animation:floatB 32s linear infinite;animation-delay:-3s;">
+  <img src="/strawberry.webp" style="width:55px;height:55px;animation:floatC 24s linear infinite;animation-delay:-17s;">
+  <img src="/strawberry.webp" style="width:80px;height:80px;animation:floatD 21s linear infinite;animation-delay:-6s;">
+  <img src="/strawberry.webp" style="width:45px;height:45px;animation:floatA 26s linear infinite;animation-delay:-19s;">
+  <img src="/strawberry.webp" style="width:70px;height:70px;animation:floatB 19s linear infinite;animation-delay:-8s;">
 </div>
 
 <div id="topbar">
@@ -268,7 +268,7 @@ body{
   </div>
 
   <div id="farmScene">
-    <img id="farmSceneImg" src="/farm-scene-a.png" alt="Strawberry Farm">
+    <img id="farmSceneImg" src="/farm-scene-a.jpg" alt="Strawberry Farm">
     <div class="num-overlay" id="pickNumOverlay">5</div>
     <div class="num-overlay" id="countNumOverlay">0</div>
     <div id="basketDropZone"></div>
@@ -278,7 +278,7 @@ body{
   <div id="tray"></div>
 </div>
 
-<div id="dragGhost"><img id="ghostImg" src="/strawberry.png" alt=""></div>
+<div id="dragGhost"><img id="ghostImg" src="/strawberry.webp" alt=""></div>
 <div id="feedbackMsg"></div>
 
 <div id="quizOverlay">
@@ -311,11 +311,11 @@ let quizLocked = false;
 // ── SCENE BLINK LOOP ──
 function blinkLoop(){
   const img = document.getElementById('farmSceneImg');
-  const blinkSrc = '/farm-scene-b.png';
+  const blinkSrc = '/farm-scene-b.jpg';
   const test = new Image();
   test.onload = ()=>{
     img.src = blinkSrc;
-    setTimeout(()=>{ img.src = '/farm-scene-a.png'; }, 180);
+    setTimeout(()=>{ img.src = '/farm-scene-a.jpg'; }, 180);
   };
   test.onerror = ()=>{};
   test.src = blinkSrc;
@@ -340,8 +340,10 @@ function pickRoundTarget(){
 function startRound(){
   roundTarget = pickRoundTarget();
   roundPlaced = 0;
+  totalPlaced = 0;
   startTime = Date.now();
 
+  document.getElementById('basketFill').innerHTML = '';
   document.getElementById('statusMsg').textContent =
     '🍓 We have '+poolRemaining+' strawberries! Put '+roundTarget+' in the basket.';
   document.getElementById('roundNum').textContent = round;
@@ -381,7 +383,7 @@ function buildTray(){
     berry.className = 'tray-berry';
     berry.id = 'berry-'+i;
     berry.draggable = true;
-    berry.innerHTML = '<img src="/strawberry.png" alt="Strawberry">';
+    berry.innerHTML = '<img src="/strawberry.webp" alt="Strawberry">';
 
     berry.addEventListener('dragstart', e=>{
       dragBerryId = i;
@@ -451,7 +453,7 @@ function handleDrop(berryId){
 
   const fill = document.getElementById('basketFill');
   const img = document.createElement('img');
-  img.src = '/strawberry.png';
+  img.src = '/strawberry.webp';
   img.className = 'fill-berry';
   const rot = (Math.random()*40-20).toFixed(0)+'deg';
   img.style.setProperty('--rot', rot);
