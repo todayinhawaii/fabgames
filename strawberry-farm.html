@@ -347,9 +347,22 @@ function startCycle(){
   startRound();
 }
 
+let recentTargets = [];
+
 function pickRoundTarget(){
-  const cap = Math.min(8, poolRemaining);
-  return 1 + Math.floor(Math.random()*cap);
+  const cap = Math.min(15, poolRemaining);
+  if(cap <= 1) return cap; // no room to vary, just take what's left
+
+  let val;
+  let attempts = 0;
+  do{
+    val = 1 + Math.floor(Math.random()*cap);
+    attempts++;
+  } while(recentTargets.includes(val) && attempts < 12);
+
+  recentTargets.push(val);
+  if(recentTargets.length > 3) recentTargets.shift(); // remember last 3 to avoid repeats
+  return val;
 }
 
 function startRound(){
