@@ -514,6 +514,18 @@ def grandmas_cupboard():
 def henry():
     return send_from_directory('.', 'henry.html')
 
+@app.route('/animal-discovery')
+def animal_discovery():
+    return send_from_directory('.', 'animal-discovery.html')
+
+@app.route('/strawberry-farm')
+def strawberry_farm():
+    return send_from_directory('.', 'strawberry-farm.html')
+
+@app.route('/spelling-game')
+def spelling_game():
+    return send_from_directory('.', 'spelling-game.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')

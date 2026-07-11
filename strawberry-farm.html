@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Strawberry Farm 🍓 — fab.games</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#FFD700;
+  --amber:#f5a800;
+  --cream:#f8e5bb;
+  --wood:#6b3400;
+  --woodlight:#8a4a00;
+}
+body{
+  font-family:'Nunito',sans-serif;
+  background:linear-gradient(160deg,#a8d84a 0%,#7ab82e 50%,#5c9c1e 100%);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  overflow-x:hidden;
+  position:relative;
+}
+#topbar,#main{position:relative;z-index:2;}
+#floatingBerries{
+  position:fixed;inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
+}
+#floatingBerries img{
+  position:absolute;
+  width:70px;height:70px;
+  object-fit:contain;
+  opacity:0.85;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
+}
+@keyframes floatA{0%{transform:translate(-15vw,110vh) rotate(0deg);}100%{transform:translate(115vw,-15vh) rotate(360deg);}}
+@keyframes floatB{0%{transform:translate(115vw,105vh) rotate(0deg);}100%{transform:translate(-15vw,-10vh) rotate(-360deg);}}
+@keyframes floatC{0%{transform:translate(-15vw,-10vh) rotate(0deg);}100%{transform:translate(115vw,105vh) rotate(360deg);}}
+@keyframes floatD{0%{transform:translate(115vw,-15vh) rotate(0deg);}100%{transform:translate(-15vw,110vh) rotate(-360deg);}}
+#topbar{
+  width:100%;max-width:1100px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:8px;padding:14px 16px;
+}
+.logo{
+  font-family:'Fredoka One',cursive;font-size:26px;
+  background:linear-gradient(180deg,#ff8a8a,#d8203a,#7a0014);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 2px 8px rgba(216,32,58,0.4));
+  letter-spacing:1px;
+}
+#scorePanel{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;}
+.score-pill{
+  font-family:'Fredoka One',cursive;font-size:16px;color:#ffe566;
+  background:rgba(0,0,0,0.35);padding:8px 20px;border-radius:24px;
+  border:1px solid rgba(255,215,0,0.3);white-space:nowrap;
+}
+#endBtn{
+  font-family:'Fredoka One',cursive;font-size:16px;
+  padding:8px 20px;border-radius:24px;border:1px solid rgba(255,80,80,0.5);
+  cursor:pointer;background:rgba(180,0,0,0.5);color:#ffaaaa;
+}
+#main{width:100%;max-width:900px;padding:0 16px 20px;display:flex;flex-direction:column;align-items:center;gap:0;}
+#statusBar{
+  width:100%;padding:10px 18px;margin-bottom:12px;
+  background:rgba(0,0,0,0.35);border-radius:16px;
+  border:1px solid rgba(255,215,0,0.2);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
+}
+#statusMsg{font-family:'Fredoka One',cursive;font-size:16px;color:#ffe566;}
+#progressBar{display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:340px;}
+.prog-dot{
+  width:11px;height:11px;border-radius:50%;
+  border:2px solid rgba(255,215,0,0.3);
+  background:transparent;transition:all 0.3s;
+}
+.prog-dot.done{background:var(--gold);border-color:var(--gold);}
+.prog-dot.current{background:rgba(255,215,0,0.3);border-color:var(--gold);animation:dotPulse 1s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+#farmScene{
+  position:relative;
+  width:100%;
+  border-radius:20px 20px 0 0;
+  overflow:hidden;
+  box-shadow:0 12px 48px rgba(0,0,0,0.5);
+  line-height:0;
+}
+#farmSceneImg{width:100%;display:block;user-select:none;pointer-events:none;}
+.num-overlay{
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--cream);
+  border-radius:8%;
+  font-family:'Fredoka One',cursive;
+  font-weight:400;
+}
+#pickNumOverlay{
+  left:85%; top:31.5%; width:13%; height:16%;
+  color:#c81b32;
+  font-size:min(6vw,54px);
+}
+#countNumOverlay{
+  left:88.8%; top:56.2%; width:10.8%; height:14.5%;
+  color:#1f7a00;
+  font-size:min(4.8vw,42px);
+}
+#basketDropZone{
+  position:absolute;
+  left:26%; top:40%; width:48%; height:56%;
+  border-radius:20px;
+}
+#basketDropZone.drag-over{
+  background:rgba(255,215,0,0.18);
+  box-shadow:inset 0 0 0 4px rgba(255,215,0,0.7);
+}
+#basketFill{
+  position:absolute; inset:0;
+  pointer-events:none;
+}
+.fill-berry{
+  position:absolute;width:6%;height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35));
+  animation:berryDrop 0.35s ease;
+}
+@keyframes berryDrop{
+  0%{transform:translateY(-40px) scale(0.5) rotate(0deg);opacity:0;}
+  100%{transform:translateY(0) scale(1) rotate(var(--rot,0deg));opacity:1;}
+}
+#tray{
+  width:100%;
+  display:flex;flex-wrap:wrap;gap:10px;
+  align-items:center;justify-content:center;
+  align-content:flex-start;
+  padding:22px 16px;
+  background:var(--cream);
+  border-radius:0 0 20px 20px;
+  border:3px solid rgba(255,215,0,0.15);border-top:none;
+  min-height:260px;
+  box-shadow:0 12px 30px rgba(0,0,0,0.4);
+  position:relative;
+}
+#tray::before{
+  content:'';
+  position:absolute;inset:8px;
+  border:3px dashed rgba(120,70,10,0.4);
+  border-radius:14px;
+  pointer-events:none;
+}
+.tray-berry{
+  width:96px;height:96px;
+  cursor:grab;
+  touch-action:none;
+  transition:transform 0.15s,opacity 0.15s;
+  z-index:1;
+}
+.tray-berry img{
+  width:100%;height:100%;object-fit:contain;
+  user-select:none;pointer-events:none;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+}
+.tray-berry:hover{transform:scale(1.1) translateY(-4px);}
+.tray-berry.dragging{opacity:0.35;}
+.tray-berry.placed{display:none;}
+#dragGhost{position:fixed;pointer-events:none;z-index:9999;display:none;transform:translate(-50%,-50%);}
+#dragGhost img{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.4));}
+#feedbackMsg{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-family:'Fredoka One',cursive;font-size:38px;
+  padding:16px 36px;border-radius:28px;z-index:999;
+  pointer-events:none;opacity:0;
+  transition:transform 0.15s,opacity 0.3s;text-align:center;
+  background:linear-gradient(135deg,#ffe566,#f5a800);
+  color:#1a0800;box-shadow:0 8px 40px rgba(255,200,0,0.5);
+}
+#feedbackMsg.show{transform:translate(-50%,-50%) scale(1);opacity:1;}
+
+/* ── QUIZ OVERLAY ── */
+#quizOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;}
+#quizOverlay.show{display:flex;}
+.quiz-box{
+  background:linear-gradient(135deg,#2b1500,#4a2500);
+  border:3px solid var(--gold);border-radius:28px;
+  padding:40px;text-align:center;max-width:480px;width:90%;
+}
+.quiz-emoji{font-size:60px;margin-bottom:10px;}
+.quiz-title{font-family:'Fredoka One',cursive;font-size:26px;color:var(--gold);margin-bottom:6px;}
+.quiz-sub{font-size:22px;font-weight:800;color:#ffe9b3;margin-bottom:26px;line-height:1.4;}
+.quiz-num{
+  display:inline-block;
+  color:#8dd93a;
+  font-family:'Fredoka One',cursive;
+  font-size:1.5em;
+  text-shadow:0 0 10px rgba(141,217,58,0.8);
+  animation:swayFlash 1.1s ease-in-out infinite;
+}
+@keyframes swayFlash{
+  0%{transform:rotate(-9deg);opacity:1;}
+  25%{opacity:0.55;}
+  50%{transform:rotate(9deg);opacity:1;}
+  75%{opacity:0.55;}
+  100%{transform:rotate(-9deg);opacity:1;}
+}
+.quiz-options{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.quiz-opt{
+  font-family:'Fredoka One',cursive;font-size:32px;
+  width:96px;height:96px;border-radius:20px;border:3px solid rgba(255,215,0,0.4);
+  cursor:pointer;background:rgba(255,255,255,0.06);color:var(--gold);
+  transition:transform 0.15s, background 0.15s, border-color 0.15s;
+}
+.quiz-opt:hover:not(:disabled){transform:scale(1.08);background:rgba(255,215,0,0.15);}
+.quiz-opt:disabled{cursor:default;}
+.quiz-opt.correct{background:#1f7a00;border-color:#3fce00;color:#eaffea;}
+.quiz-opt.wrong{background:#7a0000;border-color:#ce3f00;color:#ffeaea;}
+.quiz-result{
+  font-family:'Fredoka One',cursive;font-size:18px;min-height:28px;margin-top:6px;
+}
+.quiz-result.good{color:#7dffb0;}
+.quiz-result.bad{color:#ff9a9a;}
+
+/* ── CELEBRATION BURST ── */
+#celebrationLayer{position:fixed;inset:0;z-index:600;pointer-events:none;overflow:hidden;}
+.confetti-piece{
+  position:absolute;top:50%;left:50%;
+  font-size:28px;
+  will-change:transform,opacity;
+  animation:confettiBurst 1.4s ease-out forwards;
+}
+@keyframes confettiBurst{
+  0%{transform:translate(-50%,-50%) scale(0.4) rotate(0deg);opacity:1;}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.1) rotate(var(--rot));opacity:0;}
+}
+#flashLayer{
+  position:fixed;inset:0;z-index:590;pointer-events:none;
+  background:radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,215,0,0) 60%);
+  opacity:0;
+}
+#flashLayer.flash{animation:flashPop 0.5s ease-out;}
+@keyframes flashPop{0%{opacity:0.9;}100%{opacity:0;}}
+
+@media(max-width:600px){
+  .logo{font-size:20px;}
+  .tray-berry{width:75px;height:75px;}
+  .quiz-opt{width:78px;height:78px;font-size:26px;}
+}
+</style>
+</head>
+<body>
+
+<div id="floatingBerries">
+  <img src="/strawberry.webp" style="width:60px;height:60px;animation:floatA 22s linear infinite;animation-delay:-2s;">
+  <img src="/strawberry.webp" style="width:85px;height:85px;animation:floatB 28s linear infinite;animation-delay:-9s;">
+  <img src="/strawberry.webp" style="width:50px;height:50px;animation:floatC 18s linear infinite;animation-delay:-4s;">
+  <img src="/strawberry.webp" style="width:75px;height:75px;animation:floatD 25s linear infinite;animation-delay:-14s;">
+  <img src="/strawberry.webp" style="width:65px;height:65px;animation:floatA 20s linear infinite;animation-delay:-11s;">
+  <img src="/strawberry.webp" style="width:90px;height:90px;animation:floatB 32s linear infinite;animation-delay:-3s;">
+  <img src="/strawberry.webp" style="width:55px;height:55px;animation:floatC 24s linear infinite;animation-delay:-17s;">
+  <img src="/strawberry.webp" style="width:80px;height:80px;animation:floatD 21s linear infinite;animation-delay:-6s;">
+  <img src="/strawberry.webp" style="width:45px;height:45px;animation:floatA 26s linear infinite;animation-delay:-19s;">
+  <img src="/strawberry.webp" style="width:70px;height:70px;animation:floatB 19s linear infinite;animation-delay:-8s;">
+</div>
+
+<div id="topbar">
+  <div class="logo">🍓 Strawberry Farm</div>
+  <div id="scorePanel">
+    <div class="score-pill">⭐ <span id="totalScore">0</span> pts</div>
+    <div class="score-pill">🏆 Best <span id="bestScore">0</span></div>
+    <div class="score-pill">🧺 Round <span id="roundNum">1</span></div>
+    <button id="endBtn" onclick="endGame()">🏁 End Game</button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="statusBar">
+    <div id="statusMsg">🍓 We have 35 strawberries! Put 5 in the basket.</div>
+    <div id="progressBar"></div>
+  </div>
+
+  <div id="farmScene">
+    <img id="farmSceneImg" src="/farm-scene-a.jpg" alt="Strawberry Farm">
+    <div class="num-overlay" id="pickNumOverlay">5</div>
+    <div class="num-overlay" id="countNumOverlay">0</div>
+    <div id="basketDropZone"></div>
+    <div id="basketFill"></div>
+  </div>
+
+  <div id="tray"></div>
+</div>
+
+<div id="dragGhost"><img id="ghostImg" src="/strawberry.webp" alt=""></div>
+<div id="feedbackMsg"></div>
+
+<div id="quizOverlay">
+  <div class="quiz-box">
+    <div class="quiz-emoji">🤔</div>
+    <div class="quiz-title">How many strawberries do we have left?</div>
+    <div class="quiz-sub" id="quizSub">We had 35, and put 5 in the basket...</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-result" id="quizResult"></div>
+  </div>
+</div>
+
+<div id="flashLayer"></div>
+<div id="celebrationLayer"></div>
+
+<script>
+// ── STATE ─────────────────────────────────────────
+const POOL_START = 35;
+let poolRemaining = POOL_START;
+let totalPlaced = 0;     // cumulative berries placed in the basket this cycle (0..35), drives pile position
+let round = 1;
+let roundTarget = 5;
+let roundPlaced = 0;
+let totalScore = 0;
+let bestScore = 0;
+let startTime = null;
+let dragBerryId = null;
+let quizLocked = false;
+
+// ── SCENE BLINK LOOP ──
+function blinkLoop(){
+  const img = document.getElementById('farmSceneImg');
+  const blinkSrc = '/farm-scene-b.jpg';
+  const test = new Image();
+  test.onload = ()=>{
+    img.src = blinkSrc;
+    setTimeout(()=>{ img.src = '/farm-scene-a.jpg'; }, 180);
+  };
+  test.onerror = ()=>{};
+  test.src = blinkSrc;
+  setTimeout(blinkLoop, 2400 + Math.random()*2200);
+}
+setTimeout(blinkLoop, 2000);
+
+// ── CYCLE / ROUND SETUP ─────────────────────────────
+function startCycle(){
+  poolRemaining = POOL_START;
+  totalPlaced = 0;
+  document.getElementById('basketFill').innerHTML = '';
+  buildTray();
+  startRound();
+}
+
+let recentTargets = [];
+
+function pickRoundTarget(){
+  const cap = Math.min(15, poolRemaining);
+  if(cap <= 1) return cap; // no room to vary, just take what's left
+
+  let val;
+  let attempts = 0;
+  do{
+    val = 1 + Math.floor(Math.random()*cap);
+    attempts++;
+  } while(recentTargets.includes(val) && attempts < 12);
+
+  recentTargets.push(val);
+  if(recentTargets.length > 3) recentTargets.shift(); // remember last 3 to avoid repeats
+  return val;
+}
+
+function startRound(){
+  roundTarget = pickRoundTarget();
+  roundPlaced = 0;
+  totalPlaced = 0;
+  startTime = Date.now();
+
+  document.getElementById('basketFill').innerHTML = '';
+  document.getElementById('statusMsg').textContent =
+    '🍓 We have '+poolRemaining+' strawberries! Put '+roundTarget+' in the basket.';
+  document.getElementById('roundNum').textContent = round;
+  document.getElementById('pickNumOverlay').textContent = roundTarget;
+  document.getElementById('countNumOverlay').textContent = '0';
+  document.getElementById('quizOverlay').classList.remove('show');
+  buildProgress();
+}
+
+function buildProgress(){
+  const bar = document.getElementById('progressBar');
+  bar.innerHTML = '';
+  for(let i=0;i<roundTarget;i++){
+    const dot = document.createElement('div');
+    dot.className = 'prog-dot' + (i===0?' current':'');
+    dot.id = 'dot-'+i;
+    bar.appendChild(dot);
+  }
+}
+
+function updateProgress(){
+  for(let i=0;i<roundTarget;i++){
+    const dot = document.getElementById('dot-'+i);
+    if(!dot) continue;
+    if(i < roundPlaced) dot.className='prog-dot done';
+    else if(i === roundPlaced) dot.className='prog-dot current';
+    else dot.className='prog-dot';
+  }
+}
+
+// ── TRAY (full 35-strawberry pool, built once per cycle) ──
+function buildTray(){
+  const tray = document.getElementById('tray');
+  tray.innerHTML = '';
+  for(let i=0;i<POOL_START;i++){
+    const berry = document.createElement('div');
+    berry.className = 'tray-berry';
+    berry.id = 'berry-'+i;
+    berry.draggable = true;
+    berry.innerHTML = '<img src="/strawberry.webp" alt="Strawberry">';
+
+    berry.addEventListener('dragstart', e=>{
+      dragBerryId = i;
+      e.dataTransfer.setData('text/plain', i);
+      berry.classList.add('dragging');
+    });
+    berry.addEventListener('dragend', ()=>berry.classList.remove('dragging'));
+
+    berry.addEventListener('touchstart', e=>{
+      e.preventDefault();
+      dragBerryId = i;
+      const ghost = document.getElementById('dragGhost');
+      ghost.style.display='block';
+      const t = e.touches[0];
+      ghost.style.left=t.clientX+'px';ghost.style.top=t.clientY+'px';
+      berry.classList.add('dragging');
+    },{passive:false});
+
+    tray.appendChild(berry);
+  }
+}
+
+// ── DROP HANDLING ──────────────────────────────────
+const dropZone = document.getElementById('basketDropZone');
+dropZone.addEventListener('dragover', e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e=>{
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  handleDrop(dragBerryId);
+});
+
+document.addEventListener('touchmove', e=>{
+  if(dragBerryId===null) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  const ghost = document.getElementById('dragGhost');
+  ghost.style.left=t.clientX+'px';ghost.style.top=t.clientY+'px';
+  const el = document.elementFromPoint(t.clientX,t.clientY);
+  dropZone.classList.toggle('drag-over', !!el?.closest('#basketDropZone'));
+},{passive:false});
+
+document.addEventListener('touchend', e=>{
+  if(dragBerryId===null) return;
+  const t = e.changedTouches[0];
+  const el = document.elementFromPoint(t.clientX,t.clientY);
+  document.getElementById('dragGhost').style.display='none';
+  dropZone.classList.remove('drag-over');
+  if(el?.closest('#basketDropZone')){
+    handleDrop(dragBerryId);
+  } else {
+    const berry = document.getElementById('berry-'+dragBerryId);
+    berry?.classList.remove('dragging');
+  }
+  dragBerryId=null;
+},{passive:false});
+
+function handleDrop(berryId){
+  if(berryId===null || berryId===undefined) return;
+  if(roundPlaced>=roundTarget || quizLocked) return;
+  const berry = document.getElementById('berry-'+berryId);
+  if(!berry || berry.classList.contains('placed')) return;
+
+  berry.classList.add('placed');
+  roundPlaced++;
+  totalPlaced++;
+
+  const fill = document.getElementById('basketFill');
+  const img = document.createElement('img');
+  img.src = '/strawberry.webp';
+  img.className = 'fill-berry';
+  const rot = (Math.random()*40-20).toFixed(0)+'deg';
+  img.style.setProperty('--rot', rot);
+
+  // pack berries into a rising mound inside the basket bowl (absolute % of the full scene image)
+  const perRow = 5;
+  const i = totalPlaced - 1; // 0-indexed, cumulative across the whole 35-pool cycle
+  const row = Math.floor(i / perRow);
+  const col = i % perRow;
+  const cols = [34, 41, 48, 55, 62]; // column centers (% of scene width)
+  const rowOffset = (row % 2 === 0) ? 0 : 3; // stagger alternate rows
+  const leftPct = cols[col] + rowOffset + (Math.random()*2.5-1.25) - 3; // convert center to left-edge
+  const topPct = 64 - row*6.5 + (Math.random()*2-1); // start inside the bowl, rise upward each row
+  img.style.left = leftPct+'%';
+  img.style.top = Math.max(8, topPct)+'%';
+  img.style.zIndex = 10 + totalPlaced;
+  fill.appendChild(img);
+
+  document.getElementById('countNumOverlay').textContent = roundPlaced;
+  playRight();
+  showFeedback('🍓 +1!');
+  updateProgress();
+
+  dragBerryId = null;
+
+  if(roundPlaced >= roundTarget){
+    setTimeout(()=>showQuiz(), 600);
+  }
+}
+
+// ── QUIZ ──────────────────────────────────────────
+function showQuiz(){
+  quizLocked = true;
+  const correct = poolRemaining - roundTarget;
+
+  document.getElementById('quizSub').innerHTML =
+    'We had <span class="quiz-num">'+poolRemaining+'</span>, and put <span class="quiz-num">'+roundTarget+'</span> in the basket...';
+  document.getElementById('quizResult').textContent = '';
+  document.getElementById('quizResult').className = 'quiz-result';
+
+  // build 2 distinct, plausible wrong answers
+  const options = new Set([correct]);
+  const spread = Math.max(3, Math.round(roundTarget*0.8));
+  while(options.size < 3){
+    const delta = (Math.floor(Math.random()*spread)+1) * (Math.random()<0.5?-1:1);
+    const val = correct + delta;
+    if(val >= 0 && val <= POOL_START) options.add(val);
+  }
+  const shuffled = [...options].sort(()=>Math.random()-0.5);
+
+  const optWrap = document.getElementById('quizOptions');
+  optWrap.innerHTML = '';
+  shuffled.forEach(val=>{
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = val;
+    btn.onclick = ()=>answerQuiz(val, correct, btn);
+    optWrap.appendChild(btn);
+  });
+
+  document.getElementById('quizOverlay').classList.add('show');
+}
+
+function answerQuiz(selected, correct, btnEl){
+  document.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+  const allBtns = [...document.querySelectorAll('.quiz-opt')];
+  const correctBtn = allBtns.find(b=>parseInt(b.textContent,10)===correct);
+
+  if(selected === correct){
+    btnEl.classList.add('correct');
+    document.getElementById('quizResult').textContent = '✅ Yes! That\'s right!';
+    document.getElementById('quizResult').className = 'quiz-result good';
+    const elapsed = Math.round((Date.now()-startTime)/1000);
+    const pts = 25 + Math.max(0, 30-elapsed);
+    totalScore += pts;
+    if(totalScore > bestScore) bestScore = totalScore;
+    document.getElementById('totalScore').textContent = totalScore;
+    document.getElementById('bestScore').textContent = bestScore;
+    bigCelebration();
+    setTimeout(()=>advance(correct), 1900);
+  } else {
+    btnEl.classList.add('wrong');
+    if(correctBtn) correctBtn.classList.add('correct');
+    document.getElementById('quizResult').textContent = '❌ No — we have '+correct+' left.';
+    document.getElementById('quizResult').className = 'quiz-result bad';
+    playWrong();
+    setTimeout(()=>advance(correct), 2400);
+  }
+}
+
+function advance(newPoolRemaining){
+  quizLocked = false;
+  document.getElementById('quizOverlay').classList.remove('show');
+  poolRemaining = newPoolRemaining;
+  round++;
+  if(poolRemaining <= 0){
+    showFeedback('🧺 Basket full — new batch!');
+    setTimeout(startCycle, 900);
+  } else {
+    startRound();
+  }
+}
+
+function endGame(){
+  alert('Great picking! You scored '+totalScore+' points on Strawberry Farm!');
+  totalScore=0; round=1;
+  document.getElementById('totalScore').textContent = 0;
+  document.getElementById('quizOverlay').classList.remove('show');
+  quizLocked = false;
+  startCycle();
+}
+
+// ── VEGAS-STYLE CELEBRATION ─────────────────────────
+function bigCelebration(){
+  const flash = document.getElementById('flashLayer');
+  flash.classList.remove('flash'); void flash.offsetWidth; flash.classList.add('flash');
+
+  const layer = document.getElementById('celebrationLayer');
+  const emojis = ['⭐','🍓','✨','🎉','💛','🌟'];
+  const count = 46;
+  for(let i=0;i<count;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    const angle = Math.random()*Math.PI*2;
+    const dist = 220 + Math.random()*380;
+    const dx = Math.cos(angle)*dist;
+    const dy = Math.sin(angle)*dist;
+    piece.style.setProperty('--dx', dx+'px');
+    piece.style.setProperty('--dy', dy+'px');
+    piece.style.setProperty('--rot', (Math.random()*720-360)+'deg');
+    piece.style.left = '50%'; piece.style.top='40%';
+    piece.style.fontSize = (18+Math.random()*22)+'px';
+    piece.style.animationDelay = (Math.random()*0.15)+'s';
+    layer.appendChild(piece);
+    setTimeout(()=>piece.remove(), 1700);
+  }
+  playCelebrate();
+}
+
+// ── SOUNDS ────────────────────────────────────────
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+function playRight(){
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.type='sine';o.frequency.setValueAtTime(700,audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(1100,audioCtx.currentTime+0.15);
+  g.gain.setValueAtTime(0.25,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.2);
+  o.start();o.stop(audioCtx.currentTime+0.2);
+}
+function playWrong(){
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.type='sawtooth';o.frequency.setValueAtTime(220,audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(120,audioCtx.currentTime+0.35);
+  g.gain.setValueAtTime(0.2,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.4);
+  o.start();o.stop(audioCtx.currentTime+0.4);
+}
+function playCelebrate(){
+  [523,659,784,1047,1319,1568].forEach((f,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    o.type='sine';o.frequency.value=f;
+    const t=audioCtx.currentTime+i*0.08;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.28,t+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+    o.start(t);o.stop(t+0.3);
+  });
+}
+function showFeedback(msg){
+  const el=document.getElementById('feedbackMsg');
+  el.className='';el.textContent='';
+  void el.offsetWidth;
+  el.textContent=msg;
+  el.className='show';
+  setTimeout(()=>el.classList.remove('show'),700);
+}
+
+// ── START ─────────────────────────────────────────
+startCycle();
+</script>
+</body>
+</html>
