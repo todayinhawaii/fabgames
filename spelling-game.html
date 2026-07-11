@@ -175,6 +175,7 @@ body{
   <div id="artPanel">
     <img id="artFruit" src="/fruit.jpg" class="active" alt="Fruit art">
     <img id="artVeg" src="/veg.jpg" alt="Vegetable art">
+    <img id="artAnimal" src="/animals.jpg" alt="Animal art">
     <div id="artOverlay">
       <div id="categoryLabel">FRUIT</div>
       <div id="clueEmoji">🍓</div>
@@ -208,17 +209,46 @@ const WORDS = [
   {word:'BANANA', cat:'FRUIT', emoji:'🍌'},
   {word:'PEPPER', cat:'VEGETABLE', emoji:'🫑'},
   {word:'LETTUCE', cat:'VEGETABLE', emoji:'🥬'},
-  {word:'SPINACH', cat:'VEGETABLE', emoji:'🥬'},
   {word:'BROCCOLI', cat:'VEGETABLE', emoji:'🥦'},
   {word:'CUCUMBER', cat:'VEGETABLE', emoji:'🥒'},
-  {word:'ZUCCHINI', cat:'VEGETABLE', emoji:'🥒'},
   {word:'EGGPLANT', cat:'VEGETABLE', emoji:'🍆'},
   {word:'BLUEBERRY', cat:'FRUIT', emoji:'🫐'},
   {word:'PINEAPPLE', cat:'FRUIT', emoji:'🍍'},
   {word:'STRAWBERRY', cat:'FRUIT', emoji:'🍓'},
   {word:'WATERMELON', cat:'FRUIT', emoji:'🍉'},
-  {word:'DRAGONFRUIT', cat:'FRUIT', emoji:'🐉'},
-  {word:'CAULIFLOWER', cat:'VEGETABLE', emoji:'🥦'},
+
+  // ── ANIMALS & PETS ──
+  {word:'CAT', cat:'ANIMAL', emoji:'🐱'},
+  {word:'DOG', cat:'ANIMAL', emoji:'🐶'},
+  {word:'PIG', cat:'ANIMAL', emoji:'🐷'},
+  {word:'COW', cat:'ANIMAL', emoji:'🐮'},
+  {word:'FOX', cat:'ANIMAL', emoji:'🦊'},
+  {word:'LION', cat:'ANIMAL', emoji:'🦁'},
+  {word:'FROG', cat:'ANIMAL', emoji:'🐸'},
+  {word:'DUCK', cat:'ANIMAL', emoji:'🦆'},
+  {word:'BEAR', cat:'ANIMAL', emoji:'🐻'},
+  {word:'GOAT', cat:'ANIMAL', emoji:'🐐'},
+  {word:'WOLF', cat:'ANIMAL', emoji:'🐺'},
+  {word:'OWL', cat:'ANIMAL', emoji:'🦉'},
+  {word:'HORSE', cat:'ANIMAL', emoji:'🐴'},
+  {word:'PANDA', cat:'ANIMAL', emoji:'🐼'},
+  {word:'TIGER', cat:'ANIMAL', emoji:'🐯'},
+  {word:'SHEEP', cat:'ANIMAL', emoji:'🐑'},
+  {word:'MOUSE', cat:'ANIMAL', emoji:'🐭'},
+  {word:'ZEBRA', cat:'ANIMAL', emoji:'🦓'},
+  {word:'WHALE', cat:'ANIMAL', emoji:'🐳'},
+  {word:'SNAKE', cat:'ANIMAL', emoji:'🐍'},
+  {word:'RABBIT', cat:'ANIMAL', emoji:'🐰'},
+  {word:'HAMSTER', cat:'ANIMAL', emoji:'🐹'},
+  {word:'PARROT', cat:'ANIMAL', emoji:'🦜'},
+  {word:'MONKEY', cat:'ANIMAL', emoji:'🐵'},
+  {word:'TURTLE', cat:'ANIMAL', emoji:'🐢'},
+  {word:'PENGUIN', cat:'ANIMAL', emoji:'🐧'},
+  {word:'GIRAFFE', cat:'ANIMAL', emoji:'🦒'},
+  {word:'DOLPHIN', cat:'ANIMAL', emoji:'🐬'},
+  {word:'ELEPHANT', cat:'ANIMAL', emoji:'🐘'},
+  {word:'KANGAROO', cat:'ANIMAL', emoji:'🦘'},
+  {word:'CROCODILE', cat:'ANIMAL', emoji:'🐊'},
 ];
 
 function tierFor(round){
@@ -238,12 +268,20 @@ let draggedLetter = null;
 let recentWords = [];
 
 // ── ART CROSSFADE ──
+const ART_IDS = { FRUIT:'artFruit', VEGETABLE:'artVeg', ANIMAL:'artAnimal' };
+const ART_ORDER = ['FRUIT','VEGETABLE','ANIMAL'];
+let artIndex = 0;
+
+function showArt(cat){
+  ART_ORDER.forEach(k=>{
+    document.getElementById(ART_IDS[k]).classList.toggle('active', k===cat);
+  });
+  artIndex = ART_ORDER.indexOf(cat);
+}
+
 function artCrossfadeLoop(){
-  const fruit = document.getElementById('artFruit');
-  const veg = document.getElementById('artVeg');
-  const showFruit = !fruit.classList.contains('active');
-  fruit.classList.toggle('active', showFruit);
-  veg.classList.toggle('active', !showFruit);
+  artIndex = (artIndex+1) % ART_ORDER.length;
+  showArt(ART_ORDER[artIndex]);
   setTimeout(artCrossfadeLoop, 6000);
 }
 setTimeout(artCrossfadeLoop, 6000);
@@ -338,9 +376,7 @@ function startRound(){
     'Spell a '+currentWord.cat.toLowerCase()+' '+posPhrase+' "'+currentWord.hintLetter+'"';
 
   // show the relevant art immediately for context
-  const showFruit = currentWord.cat === 'FRUIT';
-  document.getElementById('artFruit').classList.toggle('active', showFruit);
-  document.getElementById('artVeg').classList.toggle('active', !showFruit);
+  showArt(currentWord.cat);
 
   buildSlots();
 }
