@@ -45,7 +45,7 @@ body{
 #artPanel{
   position:relative;
   width:100%;
-  max-width:400px;
+  max-width:600px;
   aspect-ratio:941/1672;
   border-radius:22px;
   overflow:hidden;
@@ -83,7 +83,7 @@ body{
   width:100%;max-width:640px;
 }
 .letter-slot{
-  width:56px;height:56px;
+  width:62px;height:62px;
   border-radius:12px;
   background:rgba(255,255,255,0.08);
   border:3px solid rgba(255,215,0,0.35);
@@ -114,7 +114,7 @@ body{
   box-shadow:0 10px 30px rgba(0,0,0,0.35);
 }
 .letter-tile{
-  width:56px;height:56px;
+  width:62px;height:62px;
   cursor:grab;
   touch-action:none;
   animation:letterSway 2.6s ease-in-out infinite;
@@ -126,7 +126,7 @@ body{
 @keyframes letterSway{0%,100%{transform:rotate(-7deg);}50%{transform:rotate(7deg);}}
 
 #dragGhost{position:fixed;pointer-events:none;z-index:9999;display:none;transform:translate(-50%,-50%);}
-#dragGhost img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.4));}
+#dragGhost img{width:62px;height:62px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.4));}
 
 #feedbackMsg{
   position:fixed;top:50%;left:50%;
@@ -153,9 +153,9 @@ body{
 
 @media(max-width:640px){
   .logo{font-size:20px;}
-  .letter-slot{width:44px;height:44px;}
-  .letter-tile{width:44px;height:44px;}
-  #dragGhost img{width:44px;height:44px;}
+  .letter-slot{width:48px;height:48px;}
+  .letter-tile{width:48px;height:48px;}
+  #dragGhost img{width:48px;height:48px;}
 }
 </style>
 </head>
