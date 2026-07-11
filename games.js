@@ -11,7 +11,7 @@ const GAMES=[
    desc:'Help the farmer fill the basket! Drag the exact number of strawberries you\'re told into the basket — count carefully and watch the basket fill up!!',
    color:'rgba(216,32,58,0.15)',href:'/strawberry-farm'},
   {id:'spelling-game',emoji:'🔤',cat:'Educational · Kids',title:'Spelling Game',
-   desc:'Drag the swaying letters to spell fruits and vegetables! Colourful art, growing difficulty, and big celebrations when you get it right!!',
+   desc:'Drag the swaying letters to spell fruits, vegetables, animals and pets! Colourful art, levels that get trickier, and big celebrations when you get it right!!',
    color:'rgba(139,95,230,0.15)',href:'/spelling-game'},
   {id:'henry',emoji:'🦛',cat:'Memory · Fun',title:"Henry the Hungry Hippo",
    desc:"Open Henry's mouth and study where each cupcake sits — then remember it all! Drag them back in the right place. 3 to 10 cupcakes — endless fun!!",
