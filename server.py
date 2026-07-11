@@ -522,6 +522,10 @@ def animal_discovery():
 def strawberry_farm():
     return send_from_directory('.', 'strawberry-farm.html')
 
+@app.route('/spelling-game')
+def spelling_game():
+    return send_from_directory('.', 'spelling-game.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
