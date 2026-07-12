@@ -55,6 +55,16 @@ body{
   background:transparent;transition:all 0.3s;
 }
 .prog-dot.done{background:#c8206e;border-color:#c8206e;}
+#playBtn{
+  font-family:'Fredoka One',cursive;font-size:19px;
+  padding:10px 30px;border-radius:29px;border:none;cursor:pointer;
+  background:linear-gradient(180deg,#ffe566,#f5a800);
+  color:#4a2500;box-shadow:0 4px 0 #a06a00;
+  margin-top:4px;
+  transition:transform 0.15s, opacity 0.2s;
+}
+#playBtn:hover{transform:scale(1.05);}
+#playBtn.hidden{display:none;}
 
 /* ── SCENE ── */
 #scene{
@@ -212,6 +222,7 @@ body{
   <div id="statusBar">
     <div id="statusMsg">🫖 Click each teapot to meet everyone!</div>
     <div id="progressBar"></div>
+    <button id="playBtn" onclick="startQuizPhase()">▶ Play!</button>
   </div>
 
   <div id="scene">
@@ -280,6 +291,7 @@ function newGame(){
   preloadAllPigs();
   document.getElementById('statusMsg').textContent = '🫖 Click each teapot to meet everyone!';
   document.getElementById('promptPill').textContent = 'Click each teapot!';
+  document.getElementById('playBtn').classList.remove('hidden');
   buildProgress(0, 12);
   document.getElementById('winOverlay').classList.remove('show');
 }
@@ -367,16 +379,15 @@ function handleRevealClick(i){
     buildProgress(visited.size, 12);
   }
   if(visited.size >= 12){
-    setTimeout(()=>{
-      document.getElementById('statusMsg').textContent = "Great! Now let's see if you remember!";
-      document.getElementById('promptPill').textContent = "Let's see if you remember!";
-      setTimeout(startQuizPhase, 1600);
-    }, 900);
+    document.getElementById('statusMsg').textContent = "You've met everyone! Tap Play when you're ready!";
+    document.getElementById('promptPill').textContent = "Tap Play when ready!";
   }
 }
 
 function startQuizPhase(){
+  if(phase === 'quiz') return; // already in quiz, ignore duplicate clicks
   phase = 'quiz';
+  document.getElementById('playBtn').classList.add('hidden');
   if(openCell !== null) closeCellAt(openCell);
   quizPool = shuffle(NAMES);
   buildProgress(0, 12);
