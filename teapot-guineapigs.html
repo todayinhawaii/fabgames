@@ -220,7 +220,7 @@ body{
 
 <div id="main">
   <div id="statusBar">
-    <div id="statusMsg">🫖 Click each teapot to meet everyone!</div>
+    <div id="statusMsg">🫖 To improve memory, study each guinea pig and what teapot they are hiding behind. When you are ready, click Play!</div>
     <div id="progressBar"></div>
     <button id="playBtn" onclick="startQuizPhase()">▶ Play!</button>
   </div>
@@ -228,7 +228,7 @@ body{
   <div id="scene">
     <img id="sceneBg" src="/teapot-background.jpg" alt="Teapot garden">
     <div id="sceneOverlay"></div>
-    <div id="promptPill">Click each teapot!</div>
+    <div id="promptPill">Study, then click Play!</div>
     <div id="grid"></div>
   </div>
 </div>
@@ -289,8 +289,8 @@ function newGame(){
   openCell = null;
   buildGrid();
   preloadAllPigs();
-  document.getElementById('statusMsg').textContent = '🫖 Click each teapot to meet everyone!';
-  document.getElementById('promptPill').textContent = 'Click each teapot!';
+  document.getElementById('statusMsg').textContent = '🫖 To improve memory, study each guinea pig and what teapot they are hiding behind. When you are ready, click Play!';
+  document.getElementById('promptPill').textContent = 'Study, then click Play!';
   document.getElementById('playBtn').classList.remove('hidden');
   buildProgress(0, 12);
   document.getElementById('winOverlay').classList.remove('show');
