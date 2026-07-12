@@ -526,6 +526,10 @@ def strawberry_farm():
 def spelling_game():
     return send_from_directory('.', 'spelling-game.html')
 
+@app.route('/teapot-guineapigs')
+def teapot_guineapigs():
+    return send_from_directory('.', 'teapot-guineapigs.html')
+
 @app.route('/freegames')
 def freegames():
     return send_from_directory('.', 'freegames.html')
