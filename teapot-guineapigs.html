@@ -71,8 +71,8 @@ body{
   position:absolute;
   left:6%; top:20%; width:88%; height:64%;
   display:grid;
-  grid-template-columns:repeat(4, 1fr);
-  grid-template-rows:repeat(3, 1fr);
+  grid-template-columns:repeat(3, 1fr);
+  grid-template-rows:repeat(4, 1fr);
   gap:2%;
 }
 .cell{
@@ -87,7 +87,7 @@ body{
   user-select:none;pointer-events:none;
 }
 .teapot-img{
-  width:115%;height:115%;
+  width:172%;height:172%;
   transform:translate(-50%,-50%);
   transition:transform 0.55s cubic-bezier(.4,.2,.2,1), opacity 0.55s;
   filter:drop-shadow(0 6px 8px rgba(0,0,0,0.3));
@@ -266,16 +266,6 @@ function buildGrid(){
 
     cell.addEventListener('click', ()=>onCellClick(i));
     grid.appendChild(cell);
-
-    // gentle blink/talk animation once a pig is visible
-    blinkTimers[i] = setInterval(()=>{
-      const img = document.getElementById('pig-'+i);
-      if(!img) return;
-      const cellEl = document.getElementById('cell-'+i);
-      if(!cellEl.classList.contains('open')) return;
-      img.src = '/'+name.toLowerCase()+'.2.png';
-      setTimeout(()=>{ if(img) img.src = '/'+name.toLowerCase()+'.1.png'; }, 220);
-    }, 2200 + i*137);
   }
 }
 
@@ -298,14 +288,37 @@ function onCellClick(i){
 function openCellAt(i){
   if(openCell !== null && openCell !== i){
     document.getElementById('cell-'+openCell)?.classList.remove('open');
+    stopBlink(openCell);
   }
   document.getElementById('cell-'+i).classList.add('open');
   openCell = i;
+  startBlink(i);
 }
 
 function closeCellAt(i){
   document.getElementById('cell-'+i)?.classList.remove('open');
+  stopBlink(i);
   if(openCell === i) openCell = null;
+}
+
+function startBlink(i){
+  stopBlink(i);
+  const name = assignment[i];
+  const doBlink = ()=>{
+    const img = document.getElementById('pig-'+i);
+    if(!img) return;
+    img.src = '/'+name.toLowerCase()+'.2.png';
+    setTimeout(()=>{
+      const img2 = document.getElementById('pig-'+i);
+      if(img2) img2.src = '/'+name.toLowerCase()+'.1.png';
+    }, 250);
+  };
+  setTimeout(doBlink, 280); // near-immediate so short reveals still show it
+  blinkTimers[i] = setInterval(doBlink, 950);
+}
+
+function stopBlink(i){
+  if(blinkTimers[i]){ clearInterval(blinkTimers[i]); delete blinkTimers[i]; }
 }
 
 function handleRevealClick(i){
