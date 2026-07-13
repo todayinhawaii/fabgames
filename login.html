@@ -80,7 +80,10 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2)
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <input class="form-input" id="loginPassword" type="password" placeholder="Your password">
+        <div style="position:relative;">
+          <input class="form-input" id="loginPassword" type="password" placeholder="Your password" style="padding-right:44px;">
+          <span onclick="togglePw('loginPassword',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--muted);user-select:none;">👁</span>
+        </div>
         <span class="forgot-link" onclick="showForgot()">Forgot password?</span>
       </div>
       <button class="main-btn" id="loginBtn" onclick="signIn()">Sign In →</button>
@@ -104,6 +107,17 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2)
 
 <script>
 let sbClient;
+
+function togglePw(id, el){
+  const input = document.getElementById(id);
+  if(input.type === 'password'){
+    input.type = 'text';
+    el.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    el.textContent = '👁';
+  }
+}
 
 async function init(){
   try{
