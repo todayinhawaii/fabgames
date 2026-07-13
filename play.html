@@ -12,6 +12,7 @@
 <title>Play — fab.games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,600&family=Inter:wght@300;400;600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{--black:#050506;--card:#111114;--border:rgba(255,255,255,0.07);--gold:#c9a84c;--gold2:#e8c96a;--gold3:#fff3b0;--white:#f0efe8;--muted:rgba(240,239,232,0.45);}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -24,6 +25,23 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
 .nav-welcome{font-size:13px;font-weight:600;color:var(--muted);}
 .nav-welcome span{color:var(--gold2);}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.nav-crosslink{
+  display:none;padding:9px 18px;border-radius:8px;
+  background:linear-gradient(135deg,var(--gold),#a87d2a);
+  color:#000;font-size:12px;font-weight:800;letter-spacing:1px;
+  text-decoration:none;white-space:nowrap;transition:transform 0.15s;
+}
+.nav-crosslink:hover{transform:translateY(-1px);}
+.nav-signout{
+  padding:9px 20px;border-radius:8px;cursor:pointer;
+  border:1px solid rgba(255,90,90,0.4);
+  background:rgba(180,0,0,0.25);color:#ffb3b3;
+  font-size:12px;font-weight:800;letter-spacing:1px;
+  font-family:'Inter',sans-serif;white-space:nowrap;
+  transition:all 0.15s;
+}
+.nav-signout:hover{background:rgba(200,0,0,0.4);border-color:rgba(255,90,90,0.7);}
 .hero{text-align:center;padding:60px 20px 50px;position:relative;z-index:2;}
 .hero-badge{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
 .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(48px,10vw,96px);font-weight:300;line-height:0.95;margin-bottom:16px;}
@@ -247,7 +265,11 @@ footer{text-align:center;padding:40px;border-top:1px solid rgba(201,168,76,0.1);
 
 <nav>
   <a href="/" class="nav-logo">fab.games</a>
-  <div class="nav-welcome">Welcome <span id="welcomeName">Player</span>! 🌺</div>
+  <div class="nav-right">
+    <div class="nav-welcome">Welcome <span id="welcomeName">Player</span>! 🌺</div>
+    <a id="jigsawCrossLink" class="nav-crosslink" href="#">🧩 jigsaw.games →</a>
+    <button id="signOutBtn" class="nav-signout">Sign Out</button>
+  </div>
 </nav>
 
 <div class="hero">
@@ -360,6 +382,45 @@ GAMES.forEach(function(g,i){
 const email=localStorage.getItem('fabEmail');
 const premium=localStorage.getItem('fabPremium');
 if(!email && !premium){ window.location.href='/login'; }
+
+// ── SESSION, BUNDLE CROSS-LINK, SIGN OUT ──────────
+(async function(){
+  try{
+    const cfgRes = await fetch('/api/config');
+    const cfg = await cfgRes.json();
+    const sbClient = window.supabase.createClient(cfg.supabase_url, cfg.supabase_anon_key);
+
+    const {data:{session}} = await sbClient.auth.getSession();
+
+    if(session){
+      // Look up this member's plan to decide whether to show the jigsaw.games button
+      try{
+        const planRes = await fetch('/api/get-plan?email='+encodeURIComponent(session.user.email));
+        const planData = await planRes.json();
+        if(planData.ok && planData.plan === 'bundle'){
+          const link = document.getElementById('jigsawCrossLink');
+          link.style.display = 'inline-block';
+          link.onclick = function(e){
+            e.preventDefault();
+            const at = encodeURIComponent(session.access_token);
+            const rt = encodeURIComponent(session.refresh_token);
+            window.location.href = 'https://www.jigsaw.games/#fab_at='+at+'&fab_rt='+rt;
+          };
+        }
+      }catch(e){ console.log('Plan lookup error:', e.message||e); }
+    }
+
+    // Sign Out — always wired up regardless of plan
+    document.getElementById('signOutBtn').onclick = async function(){
+      try{ await sbClient.auth.signOut(); }catch(e){}
+      localStorage.removeItem('fabEmail');
+      localStorage.removeItem('fabName');
+      localStorage.removeItem('fabPremium');
+      window.location.href = '/';
+    };
+
+  }catch(e){ console.log('Session/plan check error:', e.message||e); }
+})();
 </script>
 
 <!-- PWA Install Bar -->
