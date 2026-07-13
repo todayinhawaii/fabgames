@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="fab.games">
   <link rel="apple-touch-icon" href="/icon-192.png">
@@ -12,7 +13,7 @@
 <title>Sign In — fab.games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{--black:#070708;--gold:#c9a84c;--gold2:#e8c96a;--white:#f0efe8;--muted:rgba(240,239,232,0.5);--border:rgba(255,255,255,0.07);}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -102,16 +103,16 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(240,239,232,0.2)
 <footer>© 2026 fab.games — Made with 🌺 in Hawaii</footer>
 
 <script>
-let supabase;
+let sbClient;
 
 async function init(){
   try{
     const res=await fetch('/api/config');
     const config=await res.json();
-    supabase=window.supabase.createClient(config.supabase_url,config.supabase_anon_key);
+    sbClient=window.supabase.createClient(config.supabase_url,config.supabase_anon_key);
 
     // Already logged in? Go to play
-    const { data:{ session } }=await supabase.auth.getSession();
+    const { data:{ session } }=await sbClient.auth.getSession();
     if(session){
       localStorage.setItem('fabEmail',session.user.email);
       localStorage.setItem('fabName',session.user.user_metadata?.name||session.user.email.split('@')[0]);
@@ -160,7 +161,7 @@ async function signIn(){
   showMsg('Checking your account...','info');
 
   try{
-    const { data, error }=await supabase.auth.signInWithPassword({ email, password });
+    const { data, error }=await sbClient.auth.signInWithPassword({ email, password });
 
     if(error){
       if(error.message.includes('Invalid login credentials')){
@@ -200,7 +201,7 @@ async function resetPassword(){
   showMsg('Sending reset link...','info');
 
   try{
-    const { error }=await supabase.auth.resetPasswordForEmail(email,{
+    const { error }=await sbClient.auth.resetPasswordForEmail(email,{
       redirectTo:'https://www.fab.games/reset-password'
     });
 
