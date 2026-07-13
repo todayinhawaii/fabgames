@@ -233,6 +233,8 @@ def create_checkout():
     try:
         # Build metadata so webhook knows which plan was purchased
         metadata = {'plan': plan, 'name': name}
+        origin = request.headers.get('Origin') or request.headers.get('Referer') or 'https://www.fab.games'
+        origin = origin.rstrip('/').split('/join')[0]  # strip any path, keep just the domain
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             mode='subscription',
@@ -242,8 +244,8 @@ def create_checkout():
                 'trial_period_days': 30,
                 'metadata': metadata,
             },
-            success_url='https://www.fab.games/success?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url='https://www.fab.games/join',
+            success_url=origin+'/success?session_id={CHECKOUT_SESSION_ID}&plan='+plan,
+            cancel_url=origin+'/join',
             allow_promotion_codes=True,
             metadata=metadata,
         )
