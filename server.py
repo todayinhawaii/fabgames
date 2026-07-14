@@ -35,6 +35,28 @@ def supabase_request(method, path, data=None, use_service_key=False):
     except urllib.error.HTTPError as e:
         print(f"Supabase error: {e.read().decode()}")
         return None
+
+def serve_game(filename):
+    """Serve a game HTML file with the shared 60-second free-preview
+    paywall timer script injected automatically. This means individual
+    game files never need to be edited by hand — the check/timer/overlay
+    logic lives in one shared file (paywall-timer.js) and gets added to
+    every game as it's served."""
+    try:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+        with open(path, 'r', encoding='utf-8') as f:
+            html = f.read()
+        snippet = '<script src="/paywall-timer.js"></script>'
+        if snippet not in html:
+            if '</body>' in html:
+                html = html.replace('</body>', snippet + '\n</body>')
+            else:
+                html += snippet
+        return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except Exception as e:
+        print(f'serve_game error for {filename}: {e}', flush=True)
+        return send_from_directory('.', filename)
+
 # ── PAGES ────────────────────────────────────────
 @app.route('/')
 def index():
@@ -68,16 +90,16 @@ def account():
     return send_from_directory('.', 'fab_account.html')
 @app.route('/veggies')
 def veggies():
-    return send_from_directory('.', 'veggies.html')
+    return serve_game('veggies.html')
 @app.route('/pinball')
 def pinball():
-    return send_from_directory('.', 'pinball.html')
+    return serve_game('pinball.html')
 @app.route('/games.js')
 def games_js():
     return send_from_directory('.', 'games.js', mimetype='application/javascript')
 @app.route('/artlab')
 def artlab():
-    return send_from_directory('.', 'artlab_v2.html')
+    return serve_game('artlab_v2.html')
 @app.route('/reset-password')
 def reset_password():
     return send_from_directory('.', 'reset_password.html')
@@ -422,168 +444,200 @@ def wordsearch_scores():
 # ── CAPITAL CITY CHALLENGE ──────────────────────
 @app.route('/capitals')
 def capitals():
-    return send_from_directory('.', 'capitals.html')
+    return serve_game('capitals.html')
 # ── JIGSAW PUZZLE GALLERY ────────────────────────
 @app.route('/jigsaw')
 def jigsaw():
-    return send_from_directory('.', 'jigsaw.html')
+    return serve_game('jigsaw.html')
 @app.route('/<path:filename>')
 def static_files(filename):
-    return send_from_directory('.', filename)
+    # Universal safety net: ANY .html file request that isn't one of the
+    # known utility/account pages automatically gets the free-preview
+    # timer injected — even if a future game's route is added without
+    # remembering to use serve_game() directly. Non-game utility pages
+    # (login, join, account, etc.) are explicitly excluded since they
+    # already have their own dedicated routes above, but this catches
+    # them too just in case, so they're never accidentally timer-gated.
+    NON_GAME_PAGES = {
+        'index.html','join.html','play.html','success.html','login.html',
+        'account.html','fab_account.html','reset_password.html','reset-password.html',
+        'about.html','privacy.html','terms.html','contact.html',
+    }
+
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    exact_path = os.path.join(base_dir, filename)
+
+    # If the exact file exists (games.js, images, css, an explicit .html
+    # request, etc.) serve it the normal way — or with the timer if it's
+    # an un-excluded .html file.
+    if os.path.isfile(exact_path):
+        if filename.endswith('.html') and filename not in NON_GAME_PAGES:
+            return serve_game(filename)
+        return send_from_directory('.', filename)
+
+    # Otherwise, try it as a clean-URL game: does "<name>.html" exist?
+    # This means a BRAND NEW game needs NO route added here at all —
+    # just add its entry to games.js (with href:'/new-game') and upload
+    # new-game.html, and it works immediately, timer included.
+    html_guess = filename + '.html'
+    if html_guess not in NON_GAME_PAGES and os.path.isfile(os.path.join(base_dir, html_guess)):
+        return serve_game(html_guess)
+
+    return send_from_directory('.', filename)  # will 404 naturally if truly missing
 
 @app.route('/donut')
 def donut():
-    return send_from_directory('.', 'donut.html')
+    return serve_game('donut.html')
 
 
 @app.route('/blob')
 def blob():
-    return send_from_directory('.', 'blob.html')
+    return serve_game('blob.html')
 
 @app.route('/spinme')
 def spinme():
-    return send_from_directory('.', 'spinme.html')
+    return serve_game('spinme.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
 # ── MIGRATED GAMES FROM TODAYINHAWAII ──────────────
 @app.route('/dolphins')
 def dolphins():
-    return send_from_directory('.', 'dolphin.html')
+    return serve_game('dolphin.html')
 @app.route('/peles-fury')
 def peles_fury():
-    return send_from_directory('.', 'lava.html')
+    return serve_game('lava.html')
 @app.route('/turtle-checkers')
 def turtle_checkers():
-    return send_from_directory('.', 'turtles.html')
+    return serve_game('turtles.html')
 @app.route('/mermaid-chess')
 def mermaid_chess():
-    return send_from_directory('.', 'chess.html')
+    return serve_game('chess.html')
 @app.route('/trivia')
 def trivia():
-    return send_from_directory('.', 'trivia.html')
+    return serve_game('trivia.html')
 @app.route('/word-search')
 def word_search():
-    return send_from_directory('.', 'wordsearch.html')
+    return serve_game('wordsearch.html')
 @app.route('/balloons')
 def balloons():
-    return send_from_directory('.', 'balloons.html')
+    return serve_game('balloons.html')
 @app.route('/fortune')
 def fortune():
-    return send_from_directory('.', 'fortune.html')
+    return serve_game('fortune.html')
 @app.route('/slime')
 def slime():
-    return send_from_directory('.', 'slime.html')
+    return serve_game('slime.html')
 @app.route('/film-lab')
 def film_lab():
-    return send_from_directory('.', 'camera.html')
+    return serve_game('camera.html')
 @app.route('/memory')
 def memory():
-    return send_from_directory('.', 'hulaCrush.html')
+    return serve_game('hulaCrush.html')
 @app.route('/aloha-letters')
 def aloha_letters():
-    return send_from_directory('.', 'scrabble.html')
+    return serve_game('scrabble.html')
 @app.route('/who-are-you')
 def who_are_you():
-    return send_from_directory('.', 'humor.html')
+    return serve_game('humor.html')
 
 @app.route('/trash')
 def trash():
-    return send_from_directory('.', 'trash.html')
+    return serve_game('trash.html')
 
 @app.route('/coloring')
 def coloring():
-    return send_from_directory('.', 'coloring_book.html')
+    return serve_game('coloring_book.html')
 
 
 @app.route('/learn-the-body')
 def learn_the_body():
-    return send_from_directory('.', 'learn_the_body.html')
+    return serve_game('learn_the_body.html')
 
 @app.route('/happy-buttons')
 def happy_buttons():
-    return send_from_directory('.', 'happy_buttons.html')
+    return serve_game('happy_buttons.html')
 
 @app.route('/happy-buttons-2')
 def happy_buttons_2():
-    return send_from_directory('.', 'happy-buttons-2.html')
+    return serve_game('happy-buttons-2.html')
 
 @app.route('/happy-buttons-3')
 def happy_buttons_3():
-    return send_from_directory('.', 'happy-buttons-3.html')
+    return serve_game('happy-buttons-3.html')
 
 @app.route('/happy-buttons-4')
 def happy_buttons_4():
-    return send_from_directory('.', 'happy-buttons-4.html')
+    return serve_game('happy-buttons-4.html')
 
 @app.route('/happy-buttons-5')
 def happy_buttons_5():
-    return send_from_directory('.', 'happy-buttons-5.html')
+    return serve_game('happy-buttons-5.html')
 
 @app.route('/happy-buttons-6')
 def happy_buttons_6():
-    return send_from_directory('.', 'happy-buttons-6.html')
+    return serve_game('happy-buttons-6.html')
 
 
 @app.route('/fun-with-numbers')
 def fun_with_numbers():
-    return send_from_directory('.', 'fun-with-numbers.html')
+    return serve_game('fun-with-numbers.html')
 
 @app.route('/fun-with-shapes')
 def fun_with_shapes():
-    return send_from_directory('.', 'fun-with-shapes.html')
+    return serve_game('fun-with-shapes.html')
 
 @app.route('/magic-sound-keys')
 def magic_sound_keys():
-    return send_from_directory('.', 'magic-sound-keys.html')
+    return serve_game('magic-sound-keys.html')
 
 @app.route('/street-hustler')
 def street_hustler():
-    return send_from_directory('.', 'street-hustler.html')
+    return serve_game('street-hustler.html')
 
 @app.route('/mystery-phrase')
 def mystery_phrase():
-    return send_from_directory('.', 'mystery-phrase.html')
+    return serve_game('mystery-phrase.html')
 
 @app.route('/tic-tac-toe')
 def tic_tac_toe():
-    return send_from_directory('.', 'tic-tac-toe.html')
+    return serve_game('tic-tac-toe.html')
 
 @app.route('/galaxy-explorer')
 def galaxy_explorer():
-    return send_from_directory('.', 'galaxy-explorer.html')
+    return serve_game('galaxy-explorer.html')
 
 @app.route('/fab-house')
 def fab_house():
-    return send_from_directory('.', 'fab-house.html')
+    return serve_game('fab-house.html')
 
 @app.route('/crossword')
 def crossword():
-    return send_from_directory('.', 'crossword.html')
+    return serve_game('crossword.html')
 
 @app.route('/grandmas-cupboard')
 def grandmas_cupboard():
-    return send_from_directory('.', 'grandmas-cupboard.html')
+    return serve_game('grandmas-cupboard.html')
 
 @app.route('/henry')
 def henry():
-    return send_from_directory('.', 'henry.html')
+    return serve_game('henry.html')
 
 @app.route('/animal-discovery')
 def animal_discovery():
-    return send_from_directory('.', 'animal-discovery.html')
+    return serve_game('animal-discovery.html')
 
 @app.route('/strawberry-farm')
 def strawberry_farm():
-    return send_from_directory('.', 'strawberry-farm.html')
+    return serve_game('strawberry-farm.html')
 
 @app.route('/spelling-game')
 def spelling_game():
-    return send_from_directory('.', 'spelling-game.html')
+    return serve_game('spelling-game.html')
 
 @app.route('/teapot-guineapigs')
 def teapot_guineapigs():
-    return send_from_directory('.', 'teapot-guineapigs.html')
+    return serve_game('teapot-guineapigs.html')
 
 @app.route('/freegames')
 def freegames():
