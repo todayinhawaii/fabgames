@@ -37,21 +37,25 @@ def supabase_request(method, path, data=None, use_service_key=False):
         return None
 
 def serve_game(filename):
-    """Serve a game HTML file with the shared 60-second free-preview
-    paywall timer script injected automatically. This means individual
-    game files never need to be edited by hand — the check/timer/overlay
-    logic lives in one shared file (paywall-timer.js) and gets added to
+    """Serve a game HTML file with two shared scripts injected automatically:
+    the 60-second free-preview paywall timer, and the always-visible
+    'More Games' back-button. Individual game files never need to be
+    edited by hand — both live in one shared file each and get added to
     every game as it's served."""
     try:
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
         with open(path, 'r', encoding='utf-8') as f:
             html = f.read()
-        snippet = '<script src="/paywall-timer.js"></script>'
-        if snippet not in html:
-            if '</body>' in html:
-                html = html.replace('</body>', snippet + '\n</body>')
-            else:
-                html += snippet
+        snippets = [
+            '<script src="/paywall-timer.js"></script>',
+            '<script src="/more-games-button.js"></script>',
+        ]
+        for snippet in snippets:
+            if snippet not in html:
+                if '</body>' in html:
+                    html = html.replace('</body>', snippet + '\n</body>')
+                else:
+                    html += snippet
         return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
     except Exception as e:
         print(f'serve_game error for {filename}: {e}', flush=True)
