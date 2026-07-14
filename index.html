@@ -936,7 +936,7 @@ window.addEventListener('beforeinstallprompt', function(e){
 const grid=document.getElementById('gamesGrid');
 GAMES.forEach(function(g,i){
   const card=document.createElement('a');
-  card.href='/join';
+  card.href=g.href;
   card.className='game-card';
   card.style.textDecoration='none';
   const bg=document.createElement('div');

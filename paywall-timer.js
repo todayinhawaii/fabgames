@@ -101,8 +101,14 @@
     // calls can silently swallow on touch devices).
     const blockEvents = ['click','mousedown','mouseup','touchstart','touchend','touchmove','pointerdown','pointerup'];
     blockEvents.forEach(function(evt){
-      overlay.addEventListener(evt, function(e){ e.stopPropagation(); }, true);
-      overlay.addEventListener(evt, function(e){ e.stopPropagation(); }, false);
+      overlay.addEventListener(evt, function(e){
+        if(e.target && e.target.id === '__pwSignupBtn') return; // let the button's own handler fire
+        e.stopPropagation();
+      }, true);
+      overlay.addEventListener(evt, function(e){
+        if(e.target && e.target.id === '__pwSignupBtn') return;
+        e.stopPropagation();
+      }, false);
     });
 
     const goToJoin = function(e){
