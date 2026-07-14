@@ -234,11 +234,11 @@ section{padding:100px 48px;max-width:1600px;margin:0 auto;}
 .games-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:28px;
+  gap:40px;
   padding:8px 0;
 }
 @media(max-width:600px){
-  .games-grid{grid-template-columns:repeat(1,1fr);gap:36px;}
+  .games-grid{grid-template-columns:repeat(1,1fr);gap:46px;}
 }
 /* ── GLASS CARD 9×16 ── */
 .game-card{
@@ -324,7 +324,7 @@ transition:opacity 0.8s;z-index:1;}
   border:1px solid rgba(201,168,76,0.5);
   border-radius:8px;
   color:#c9a84c;
-  font-size:10px;font-weight:700;letter-spacing:2.5px;
+  font-size:12px;font-weight:700;letter-spacing:2.5px;
   text-transform:uppercase;
   font-family:'Inter',sans-serif;cursor:pointer;
   box-shadow:0 1px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.06);
@@ -346,13 +346,32 @@ transition:opacity 0.8s;z-index:1;}
   border:1px solid rgba(201,168,76,0.4);
   border-radius:8px;
   color:#c9a84c;
-  font-size:9px;font-weight:700;letter-spacing:1.5px;
+  font-size:11px;font-weight:700;letter-spacing:1.5px;
   text-transform:uppercase;
   font-family:'Inter',sans-serif;cursor:pointer;width:100%;
   transition:all 0.2s;
   backdrop-filter:blur(4px);
 }
 .game-dl-btn:hover{
+  background:rgba(60,30,10,0.88);
+  border-color:rgba(255,215,0,0.65);
+  color:#ffd700;
+  box-shadow:0 2px 10px rgba(201,168,76,0.15);
+}
+.game-share-btn{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:8px 0;margin-top:6px;
+  background:rgba(45,22,8,0.75);
+  border:1px solid rgba(201,168,76,0.4);
+  border-radius:8px;
+  color:#c9a84c;
+  font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;cursor:pointer;width:100%;
+  transition:all 0.2s;
+  backdrop-filter:blur(4px);
+}
+.game-share-btn:hover{
   background:rgba(60,30,10,0.88);
   border-color:rgba(255,215,0,0.65);
   color:#ffd700;
@@ -908,6 +927,12 @@ window.addEventListener('scroll',()=>{
   GAMES.forEach(g => track.appendChild(makeVid(g)));
 })();
 // ── GAMES DATA ────────────────────────────────────
+window.deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  window.deferredPrompt = e;
+});
+
 const grid=document.getElementById('gamesGrid');
 GAMES.forEach(function(g,i){
   const card=document.createElement('a');
@@ -953,8 +978,9 @@ GAMES.forEach(function(g,i){
         window.deferredPrompt=null;
       });
     } else {
-      dl.innerHTML='✓ Use browser + menu';
-      setTimeout(()=>{dl.innerHTML='⊕ Add to Home Screen';},2500);
+      const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+      dl.innerHTML=isIOS?'⎋ Tap Share → Add to Home Screen':'✓ Use browser menu → Install app';
+      setTimeout(()=>{dl.innerHTML='⊕ Add to Home Screen';},3200);
     }
   };
   overlay.appendChild(cat);
@@ -962,6 +988,31 @@ GAMES.forEach(function(g,i){
   overlay.appendChild(dsc);
   overlay.appendChild(btn);
   overlay.appendChild(dl);
+
+  const shareBtn=document.createElement('button');
+  shareBtn.className='game-share-btn';
+  shareBtn.innerHTML='⤴ Share This Game';
+  shareBtn.onclick=function(e){
+    e.preventDefault();e.stopPropagation();
+    const shareUrl=location.origin+g.href;
+    const shareData={
+      title:g.title+' — fab.games',
+      text:'Check out '+g.title+' on fab.games!! '+(g.desc||''),
+      url:shareUrl
+    };
+    if(navigator.share){
+      navigator.share(shareData).catch(()=>{});
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(function(){
+        shareBtn.innerHTML='✓ Link Copied!!';
+        setTimeout(()=>{shareBtn.innerHTML='⤴ Share This Game';},2000);
+      }).catch(function(){
+        shareBtn.innerHTML='✓ '+shareUrl;
+        setTimeout(()=>{shareBtn.innerHTML='⤴ Share This Game';},3000);
+      });
+    }
+  };
+  overlay.appendChild(shareBtn);
 // Video background
   const vid=document.createElement('video');
   vid.muted=true;vid.loop=true;vid.playsInline=true;

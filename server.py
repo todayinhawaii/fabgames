@@ -89,6 +89,24 @@ def config():
         'supabase_anon_key': SUPABASE_ANON_KEY,
         'stripe_publishable_key': STRIPE_PUBLISHABLE_KEY,
     })
+
+# ── GET PLAN (used to decide whether to show the bundle cross-site button) ──
+@app.route('/api/get-plan')
+def get_plan():
+    email = request.args.get('email', '').strip().lower()
+    if not email:
+        return jsonify({'ok': False, 'error': 'Missing email'})
+    members = supabase_request('GET',
+        f"members?email=eq.{urllib.parse.quote(email)}&select=plan,status,subscription_status",
+        use_service_key=True)
+    if not members or len(members) == 0:
+        return jsonify({'ok': False, 'error': 'No member found'})
+    return jsonify({
+        'ok': True,
+        'plan': members[0].get('plan'),
+        'status': members[0].get('status'),
+        'subscription_status': members[0].get('subscription_status'),
+    })
 # ── FREE TRIAL SIGNUP ────────────────────────────
 @app.route('/api/free-trial', methods=['POST'])
 def free_trial():
@@ -215,6 +233,8 @@ def create_checkout():
     try:
         # Build metadata so webhook knows which plan was purchased
         metadata = {'plan': plan, 'name': name}
+        origin = request.headers.get('Origin') or request.headers.get('Referer') or 'https://www.fab.games'
+        origin = origin.rstrip('/').split('/join')[0]  # strip any path, keep just the domain
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             mode='subscription',
@@ -224,8 +244,8 @@ def create_checkout():
                 'trial_period_days': 30,
                 'metadata': metadata,
             },
-            success_url='https://www.fab.games/success?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url='https://www.fab.games/join',
+            success_url=origin+'/success?session_id={CHECKOUT_SESSION_ID}&plan='+plan,
+            cancel_url=origin+'/join',
             allow_promotion_codes=True,
             metadata=metadata,
         )

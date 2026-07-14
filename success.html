@@ -6,8 +6,9 @@
 <title>Welcome to fab.games! 🎉</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600&family=Inter:wght@300;400;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
-:root{--black:#070708;--gold:#c9a84c;--gold2:#e8c96a;--white:#f0efe8;--muted:rgba(240,239,232,0.5);--border:rgba(255,255,255,0.07);}
+:root{--black:#070708;--gold:#c9a84c;--gold2:#e8c96a;--white:#f0efe8;--muted:rgba(240,239,232,0.5);--border:rgba(255,255,255,0.07);--purple:#8b5cf6;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(201,168,76,0.08),transparent);pointer-events:none;}
@@ -16,18 +17,25 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 @keyframes pop{0%{transform:scale(0);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
 h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,7vw,64px);font-weight:300;margin-bottom:16px;}
 h1 em{font-style:italic;color:var(--gold);}
-p{font-size:16px;color:var(--muted);max-width:400px;line-height:1.8;margin-bottom:40px;}
+p{font-size:16px;color:var(--muted);max-width:440px;line-height:1.8;margin-bottom:40px;}
+.btn-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
 .btn{
-  padding:16px 48px;
-  background:linear-gradient(135deg,var(--gold),#a87d2a);
+  padding:16px 40px;
   color:#000;font-size:13px;font-weight:600;
   letter-spacing:2px;text-transform:uppercase;
   border:none;border-radius:2px;cursor:pointer;
   text-decoration:none;display:inline-block;
-  box-shadow:0 0 40px rgba(201,168,76,0.3);
   transition:all 0.2s;font-family:'Inter',sans-serif;
 }
-.btn:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(201,168,76,0.5);}
+.btn-fab{background:linear-gradient(135deg,var(--gold),#a87d2a);box-shadow:0 0 40px rgba(201,168,76,0.3);}
+.btn-fab:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(201,168,76,0.5);}
+.btn-jigsaw{background:linear-gradient(135deg,var(--purple),#6d28d9);color:#fff;box-shadow:0 0 40px rgba(139,92,246,0.3);}
+.btn-jigsaw:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(139,92,246,0.5);}
+.bundle-badge{
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--purple);
+  background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);
+  padding:6px 18px;border-radius:20px;margin-bottom:20px;
+}
 .confetti-wrap{position:fixed;inset:0;pointer-events:none;overflow:hidden;}
 .c{position:absolute;width:8px;height:8px;border-radius:2px;animation:fall linear forwards;}
 @keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
@@ -37,9 +45,15 @@ p{font-size:16px;color:var(--muted);max-width:400px;line-height:1.8;margin-botto
 <div class="confetti-wrap" id="confetti"></div>
 <div class="logo">fab.games</div>
 <div class="emoji">🎉</div>
+
+<div id="bundleBadge" style="display:none;" class="bundle-badge">🧩 Bundle Unlocked</div>
 <h1>You're <em>In!</em></h1>
-<p>Welcome to fab.games Premium! Every game, every tool — all yours. Let's play!</p>
-<a href="/play" class="btn">Let's Play!! →</a>
+<p id="welcomeMsg">Welcome to fab.games Premium! Every game, every tool — all yours. Let's play!</p>
+
+<div class="btn-row">
+  <a href="/play" class="btn btn-fab">Play fab.games →</a>
+  <a href="#" id="jigsawBtn" class="btn btn-jigsaw" style="display:none;">Play jigsaw.games →</a>
+</div>
 
 <script>
 // Confetti!
@@ -51,11 +65,47 @@ for(let i=0;i<80;i++){
   c.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*1.5}s;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;`;
   wrap.appendChild(c);
 }
+
 // Save to localStorage
 const params = new URLSearchParams(window.location.search);
 if(params.get('session_id')){
   localStorage.setItem('fabPremium','true');
 }
+
+// ── BUNDLE-AWARE WELCOME ───────────────────────────
+(async function(){
+  const plan = params.get('plan');
+  if(plan !== 'bundle') return; // single-site plan — default messaging above is correct
+
+  document.getElementById('bundleBadge').style.display = 'inline-block';
+  document.getElementById('welcomeMsg').textContent =
+    "Congratulations! You're now able to play fab.games AND jigsaw.games — every game, every puzzle, all yours!";
+
+  const jigsawBtn = document.getElementById('jigsawBtn');
+  jigsawBtn.style.display = 'inline-block';
+  jigsawBtn.textContent = 'Play jigsaw.games →';
+  jigsawBtn.href = 'https://www.jigsaw.games/';
+
+  // If a live session already exists in this browser, hand it off so
+  // clicking the jigsaw.games button logs them straight in — no extra
+  // sign-in step needed. If no session exists yet, the plain link above
+  // still works fine; they'll just sign in there once with the same
+  // email/password they just created.
+  try{
+    const cfgRes = await fetch('/api/config');
+    const cfg = await cfgRes.json();
+    const sbClient = window.supabase.createClient(cfg.supabase_url, cfg.supabase_anon_key);
+    const {data:{session}} = await sbClient.auth.getSession();
+    if(session){
+      jigsawBtn.onclick = function(e){
+        e.preventDefault();
+        const at = encodeURIComponent(session.access_token);
+        const rt = encodeURIComponent(session.refresh_token);
+        window.location.href = 'https://www.jigsaw.games/#fab_at='+at+'&fab_rt='+rt;
+      };
+    }
+  }catch(e){ console.log('Session check error:', e.message||e); }
+})();
 </script>
 </body>
 </html>

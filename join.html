@@ -418,18 +418,18 @@ const PLAN_PRICES = {
 };
 
 var selectedPlan = null;
-var supabase = null;
+var sbClient = null;
 
 // Init supabase
 window.addEventListener('load', function(){
   try{
     const SB = window.supabase || window.Supabase;
     const createClient = SB.createClient;
-    supabase = createClient(
+    sbClient = createClient(
       'https://xbzeakoypdyslnnriaef.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiemVha295cGR5c2xubnJpYWVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDI5MzIsImV4cCI6MjA5NjIxODkzMn0.-pS2FE-Q-_EetM5ONbJycZWFm336wJ-z4MTOGCdA1LE'
     );
-    supabase.auth.getSession().then(({data:{session}})=>{
+    sbClient.auth.getSession().then(({data:{session}})=>{
       if(session) window.location.href='/play';
     });
   }catch(e){ console.log('Supabase init error:', e); }
@@ -512,6 +512,14 @@ async function startSignup(){
       body:JSON.stringify({ name, email, password, plan:selectedPlan })
     });
     const regData = await regRes.json();
+
+    // Step 1b — Sign in client-side so a REAL session exists in this browser.
+    // Without this, fab.games' own /play page still works (via a simpler
+    // "paid" flag), but jigsaw.games has no session to recognize at all,
+    // since it can only trust a genuine login, not that flag.
+    try{
+      await sbClient.auth.signInWithPassword({ email, password });
+    }catch(e){ console.log('Post-signup sign-in error:', e.message||e); }
 
     // Step 2 — Stripe checkout
     showMsg('Account created!! Redirecting to secure payment...', 'info');
