@@ -268,6 +268,7 @@ footer{text-align:center;padding:40px;border-top:1px solid rgba(201,168,76,0.1);
   <div class="nav-right">
     <div class="nav-welcome">Welcome <span id="welcomeName">Player</span>! 🌺</div>
     <a id="jigsawCrossLink" class="nav-crosslink" href="#">🧩 jigsaw.games →</a>
+    <button id="accountBtn" class="nav-signout" style="background:rgba(201,168,76,0.15);border-color:rgba(201,168,76,0.4);color:var(--gold2);" onclick="location.href='/account'">👤 My Account</button>
     <button id="signOutBtn" class="nav-signout">Sign Out</button>
   </div>
 </nav>
@@ -377,13 +378,7 @@ GAMES.forEach(function(g,i){
   grid.appendChild(card);
 });
 
-// Auth check AFTER games are rendered
-// Accept either key - login.html sets fabEmail, success.html sets fabPremium
-const email=localStorage.getItem('fabEmail');
-const premium=localStorage.getItem('fabPremium');
-if(!email && !premium){ window.location.href='/login'; }
-
-// ── SESSION, BUNDLE CROSS-LINK, SIGN OUT ──────────
+// ── SESSION, PLAN CHECK, BUNDLE CROSS-LINK, SIGN OUT ──
 (async function(){
   try{
     const cfgRes = await fetch('/api/config');
@@ -392,25 +387,50 @@ if(!email && !premium){ window.location.href='/login'; }
 
     const {data:{session}} = await sbClient.auth.getSession();
 
-    if(session){
-      // Look up this member's plan to decide whether to show the jigsaw.games button
-      try{
-        const planRes = await fetch('/api/get-plan?email='+encodeURIComponent(session.user.email));
-        const planData = await planRes.json();
-        if(planData.ok && planData.plan === 'bundle'){
-          const link = document.getElementById('jigsawCrossLink');
-          link.style.display = 'inline-block';
-          link.onclick = function(e){
-            e.preventDefault();
-            const at = encodeURIComponent(session.access_token);
-            const rt = encodeURIComponent(session.refresh_token);
-            window.location.href = 'https://www.jigsaw.games/#fab_at='+at+'&fab_rt='+rt;
-          };
-        }
-      }catch(e){ console.log('Plan lookup error:', e.message||e); }
+    if(!session){
+      window.location.href = '/login';
+      return;
     }
 
-    // Sign Out — always wired up regardless of plan
+    // CRITICAL: must actually have paid for fab.games specifically —
+    // either the 'fab' single-site plan or the 'bundle' plan. Being
+    // logged in and "active" isn't enough on its own, since a
+    // jigsaw.games-only subscriber's account is also "active" — just
+    // not for THIS site.
+    let planData = null;
+    try{
+      const planRes = await fetch('/api/get-plan?email='+encodeURIComponent(session.user.email));
+      planData = await planRes.json();
+    }catch(e){ console.log('Plan lookup error:', e.message||e); }
+
+    const now = new Date();
+    const hasRightPlan = planData && planData.ok && (planData.plan==='fab' || planData.plan==='bundle');
+    const isActive = planData && (
+      planData.subscription_status==='active' ||
+      planData.plan==='free_trial' ||
+      (planData.trial_end && new Date(planData.trial_end) > now)
+    );
+
+    if(!hasRightPlan || !isActive){
+      window.location.href = '/join'; // logged in, but wrong plan or expired — send to upgrade
+      return;
+    }
+
+    localStorage.setItem('fabEmail', session.user.email);
+
+    // Show the jigsaw.games cross-link only for bundle subscribers
+    if(planData.plan === 'bundle'){
+      const link = document.getElementById('jigsawCrossLink');
+      link.style.display = 'inline-block';
+      link.onclick = function(e){
+        e.preventDefault();
+        const at = encodeURIComponent(session.access_token);
+        const rt = encodeURIComponent(session.refresh_token);
+        window.location.href = 'https://www.jigsaw.games/#fab_at='+at+'&fab_rt='+rt;
+      };
+    }
+
+    // Sign Out
     document.getElementById('signOutBtn').onclick = async function(){
       try{ await sbClient.auth.signOut(); }catch(e){}
       localStorage.removeItem('fabEmail');
