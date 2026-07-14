@@ -64,14 +64,14 @@
     const badge = document.createElement('div');
     badge.id = '__pwBadge';
     badge.innerHTML =
-      '<div class="__pwBadgeMain">⏱ <span id="__pwBadgeText">Free preview: '+remaining+'s</span></div>' +
-      '<div class="__pwBadgeSub">Don\u2019t worry — become a member to keep playing this game (and every game!) forever 💛</div>';
+      '<div class="__pwBadgeMain">🎬 <span id="__pwBadgeText">Sneak peek: '+remaining+'s</span></div>' +
+      '<div class="__pwBadgeSub">Just a taste! Become a member to enjoy this game (and every game!) forever 💛</div>';
     document.body.appendChild(badge);
   }
 
   function updateBadge(){
     const el = document.getElementById('__pwBadgeText');
-    if(el) el.textContent = 'Free preview: '+remaining+'s';
+    if(el) el.textContent = 'Sneak peek: '+remaining+'s';
     const badge = document.getElementById('__pwBadge');
     if(badge) badge.classList.toggle('__pwUrgent', remaining<=10);
   }
@@ -86,9 +86,9 @@
     overlay.id = '__paywallOverlay';
     overlay.innerHTML =
       '<div id="__paywallBox">' +
-        '<div class="__pwEmoji">🎮</div>' +
-        '<h2>Time is up!</h2>' +
-        '<p>Loving it so far? Sign up free to keep playing this game and unlock every game on fab.games — no credit card needed for your first 30 days.</p>' +
+        '<div class="__pwEmoji">🍫</div>' +
+        '<h2>Liked that taste?</h2>' +
+        '<p>That was just a sneak peek! Sign up free to unlock the whole game — and every game on fab.games — no credit card needed for your first 30 days.</p>' +
         '<button id="__pwSignupBtn" type="button">Sign Up Free →</button>' +
       '</div>';
     document.body.appendChild(overlay);
