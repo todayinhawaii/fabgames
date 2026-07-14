@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="fab.games">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <meta name="theme-color" content="#070708">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>fab.games — The World's Most Fabulous Games</title>
+<meta name="description" content="Fun, addictive games for the whole family — from anywhere in the world. New games every month. $4.99/month.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300;1,600&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#070708;
+  --dark:#0d0d0f;
+  --card:#131316;
+  --border:rgba(255,255,255,0.07);
+  --gold:#c9a84c;
+  --gold2:#e8c96a;
+  --white:#f0efe8;
+  --muted:rgba(240,239,232,0.45);
+  --accent:#c9a84c;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:'Inter',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:default;
+}
+/* ── GRAIN OVERLAY ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:1000;opacity:0.4;
+}
+/* ── CUSTOM CURSOR ── */
+*{cursor:none !important;}
+.cursor{
+  position:fixed;width:8px;height:8px;
+  background:var(--gold);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width 0.2s,height 0.2s,background 0.2s;
+  mix-blend-mode:difference;
+}
+.cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(201,168,76,0.5);
+  border-radius:50%;pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:all 0.15s ease;
+}
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 48px;
+  background:linear-gradient(180deg,rgba(7,7,8,0.95),transparent);
+  backdrop-filter:blur(0px);
+  transition:all 0.4s;
+}
+nav.scrolled{
+  background:rgba(7,7,8,0.97);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:14px 48px;
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-links{
+  display:flex;gap:36px;align-items:center;
+  list-style:none;
+}
+.nav-links a{
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--white);}
+.nav-cta{
+  padding:10px 24px;
+  border:1px solid rgba(201,168,76,0.4);
+  border-radius:2px;
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold) !important;
+  transition:all 0.2s !important;
+}
+.nav-cta:hover{
+  background:rgba(201,168,76,0.1) !important;
+  border-color:var(--gold) !important;
+  color:var(--gold2) !important;
+}
+.nav-mobile-btn{display:none;background:none;border:none;color:var(--white);font-size:22px;}
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:120px 24px 80px;
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:none;
+}
+.hero-line{
+  width:1px;height:80px;
+  background:linear-gradient(180deg,transparent,var(--gold),transparent);
+  margin:0 auto 40px;
+  animation:lineGrow 1.5s ease forwards;
+}
+@keyframes lineGrow{0%{height:0;opacity:0;}100%{height:80px;opacity:1;}}
+.hero-badge{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:24px;
+  animation:fadeUp 0.8s 0.3s ease both;
+}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(52px,10vw,120px);
+  font-weight:300;line-height:0.95;
+  letter-spacing:-2px;
+  margin-bottom:8px;
+  animation:fadeUp 0.8s 0.5s ease both;
+}
+.hero-title span{
+  font-style:italic;
+  background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-title-games{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,10vw,120px);
+  letter-spacing:8px;
+  color:var(--white);
+  animation:fadeUp 0.8s 0.6s ease both;
+}
+.hero-sub{
+  font-size:clamp(13px,2vw,16px);
+  color:var(--muted);
+  max-width:500px;
+  line-height:1.8;
+  margin:24px auto 48px;
+  animation:fadeUp 0.8s 0.7s ease both;
+}
+.hero-btns{
+  display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp 0.8s 0.9s ease both;
+}
+.btn-primary{
+  padding:16px 40px;
+  background:linear-gradient(135deg,var(--gold),#a87d2a);
+  color:#000;
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  font-weight:600;border:none;border-radius:2px;
+  box-shadow:0 0 40px rgba(201,168,76,0.25);
+  transition:all 0.2s;text-decoration:none;
+  display:inline-block;
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  box-shadow:0 0 60px rgba(201,168,76,0.4);
+  transform:translateY(-2px);
+}
+.btn-secondary{
+  padding:16px 40px;
+  background:transparent;
+  color:var(--white);
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,0.2);border-radius:2px;
+  transition:all 0.2s;text-decoration:none;
+  display:inline-block;
+}
+.btn-secondary:hover{
+  border-color:rgba(255,255,255,0.5);
+  background:rgba(255,255,255,0.04);
+}
+@keyframes fadeUp{
+  0%{opacity:0;transform:translateY(24px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+@keyframes logoRock{
+  0%{transform:rotate(0deg);}
+  20%{transform:rotate(6deg);}
+  40%{transform:rotate(-5deg);}
+  60%{transform:rotate(4deg);}
+  80%{transform:rotate(-3deg);}
+  100%{transform:rotate(0deg);}
+}
+@keyframes heartFloat{
+  0%{transform:translateY(0) scale(1);opacity:var(--ho);}
+  100%{transform:translateY(-180px) scale(0.4);opacity:0;}
+}
+.heart{
+  position:absolute;
+  font-size:22px;
+  animation:heartFloat var(--hd) ease-out forwards;
+  pointer-events:none;
+}
+/* ── SECTION COMMON ── */
+section{padding:100px 48px;max-width:1600px;margin:0 auto;}
+.section-badge{
+  font-size:9px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,6vw,72px);
+  font-weight:300;line-height:1.05;
+  margin-bottom:16px;
+}
+.section-title em{font-style:italic;color:var(--gold);}
+.section-sub{
+  font-size:15px;color:var(--muted);
+  max-width:560px;line-height:1.8;
+  margin-bottom:60px;
+}
+/* ── GAMES GRID ── */
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:40px;
+  padding:8px 0;
+}
+@media(max-width:600px){
+  .games-grid{grid-template-columns:repeat(1,1fr);gap:46px;}
+}
+/* ── GLASS CARD 9×16 ── */
+.game-card{
+  position:relative;overflow:hidden;
+  aspect-ratio:9/16;
+  text-decoration:none;display:block;
+  border-radius:16px;
+  background:linear-gradient(
+    145deg,
+    rgba(255,255,255,0.10) 0%,
+    rgba(180,160,255,0.05) 40%,
+    rgba(100,180,255,0.04) 70%,
+    rgba(255,255,255,0.06) 100%
+  );
+  border:1px solid rgba(255,255,255,0.13);
+  border-top:1px solid rgba(255,255,255,0.22);
+  border-left:1px solid rgba(255,255,255,0.16);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.1);
+  transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
+}
+/* Per-card warm glow behind */
+.game-card::before{
+  content:'';
+  position:absolute;inset:-20px;
+  background:none;
+  z-index:0;
+  pointer-events:none;
+}
+.game-card:hover{
+  transform:translateY(-6px) scale(1.02);
+  border-color:rgba(255,255,255,0.22);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+}
+/* Background emoji */
+.game-card-bg{
+  position:absolute;inset:0;z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  font-size:80px;
+  opacity:0.15;
+  transition:all 0.5s ease;
+  filter:blur(1px);
+transition:opacity 0.8s;z-index:1;}
+.game-card:hover .game-card-bg{opacity:0.25;transform:scale(1.08);filter:blur(0);}
+/* Gradient overlay */
+.game-card-overlay{
+  position:absolute;inset:0;z-index:2;
+  background:linear-gradient(
+    to bottom,
+    rgba(4,4,8,0) 0%,
+    rgba(4,4,8,0.45) 45%,
+    rgba(4,4,8,0.92) 100%
+  );
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:16px 14px 14px;
+}
+.game-card-cat{
+  font-size:8px;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(201,168,76,0.7);margin-bottom:5px;font-weight:600;
+}
+.game-card-title{
+  font-family:'Inter',sans-serif;
+  font-size:16px;font-weight:700;line-height:1.3;
+  color:#fff;margin-bottom:7px;
+}
+.game-card-desc{
+  font-size:14px;color:rgba(255,255,255,0.80);
+  line-height:1.5;margin-bottom:12px;
+  display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+/* PLAY button — muted green, gold font, gold rim */
+.play-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 0;
+  background:rgba(30,80,50,0.55);
+  border:1px solid rgba(201,168,76,0.5);
+  border-radius:8px;
+  color:#c9a84c;
+  font-size:12px;font-weight:700;letter-spacing:2.5px;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;cursor:pointer;
+  box-shadow:0 1px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.06);
+  transition:all 0.22s;width:100%;margin-bottom:7px;
+  backdrop-filter:blur(4px);
+}
+.play-btn:hover{
+  background:rgba(40,100,60,0.7);
+  border-color:rgba(255,215,0,0.7);
+  color:#ffd700;
+  box-shadow:0 3px 14px rgba(0,0,0,0.3),0 0 10px rgba(201,168,76,0.15);
+  transform:translateY(-1px);
+}
+/* Add to Home Screen */
+.game-dl-btn{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:8px 0;
+  background:rgba(45,22,8,0.75);
+  border:1px solid rgba(201,168,76,0.4);
+  border-radius:8px;
+  color:#c9a84c;
+  font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;cursor:pointer;width:100%;
+  transition:all 0.2s;
+  backdrop-filter:blur(4px);
+}
+.game-dl-btn:hover{
+  background:rgba(60,30,10,0.88);
+  border-color:rgba(255,215,0,0.65);
+  color:#ffd700;
+  box-shadow:0 2px 10px rgba(201,168,76,0.15);
+}
+.game-share-btn{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:8px 0;margin-top:6px;
+  background:rgba(45,22,8,0.75);
+  border:1px solid rgba(201,168,76,0.4);
+  border-radius:8px;
+  color:#c9a84c;
+  font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;cursor:pointer;width:100%;
+  transition:all 0.2s;
+  backdrop-filter:blur(4px);
+}
+.game-share-btn:hover{
+  background:rgba(60,30,10,0.88);
+  border-color:rgba(255,215,0,0.65);
+  color:#ffd700;
+  box-shadow:0 2px 10px rgba(201,168,76,0.15);
+}
+/* Live badge */
+.live-badge{
+  position:absolute;top:10px;right:10px;z-index:3;
+  font-size:7px;letter-spacing:1.5px;text-transform:uppercase;
+  padding:3px 8px;
+  background:rgba(201,168,76,0.12);
+  border:1px solid rgba(201,168,76,0.3);
+  border-radius:20px;color:rgba(201,168,76,0.8);
+  font-weight:600;
+}
+/* ── PRICING ── */
+.pricing-wrap{
+  display:flex;gap:20px;justify-content:center;flex-wrap:wrap;
+  max-width:700px;margin:0 auto;
+}
+.price-card{
+  flex:1;min-width:260px;max-width:320px;
+  background:linear-gradient(145deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.12);
+  border-top:1px solid rgba(255,255,255,0.2);
+  border-radius:16px;
+  padding:32px 28px;
+  backdrop-filter:blur(16px);
+  text-align:left;
+  box-shadow:0 8px 32px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.price-card.featured{
+  border-color:rgba(201,168,76,0.35);
+  border-top-color:rgba(255,215,0,0.4);
+  background:linear-gradient(145deg,rgba(201,168,76,0.08),rgba(255,255,255,0.03));
+  box-shadow:0 8px 32px rgba(0,0,0,0.4),0 0 30px rgba(201,168,76,0.08),inset 0 1px 0 rgba(255,215,0,0.15);
+}
+.price-featured-badge{
+  font-size:8px;letter-spacing:3px;text-transform:uppercase;
+  color:#c9a84c;margin-bottom:12px;opacity:0.8;
+}
+.price-tier{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,0.45);margin-bottom:16px;
+}
+.price-amount{
+  font-family:'Cormorant Garamond',serif;
+  font-size:52px;font-weight:300;line-height:1;
+  color:#fff;margin-bottom:16px;
+}
+.price-amount span{font-size:22px;vertical-align:top;margin-top:10px;display:inline-block;color:rgba(255,255,255,0.5);}
+.price-amount small{font-size:14px;color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;}
+.price-desc{
+  font-size:13px;color:rgba(255,255,255,0.6);
+  line-height:1.6;margin-bottom:24px;
+}
+.price-features{
+  list-style:none;margin-bottom:28px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.price-features li{
+  font-size:12px;color:rgba(255,255,255,0.55);
+  padding-left:18px;position:relative;
+}
+.price-features li::before{content:'✦';position:absolute;left:0;color:#c9a84c;font-size:8px;top:2px;}
+.price-features li.active{color:rgba(255,255,255,0.8);}
+/* ── FOOTER ── */
+footer{
+  text-align:center;
+  padding:60px 40px 40px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  position:relative;z-index:2;
+}
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:32px;letter-spacing:4px;
+  background:linear-gradient(135deg,#c9a84c,#e8c96a);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:8px;
+}
+.footer-tagline{
+  font-size:12px;color:rgba(255,255,255,0.25);
+  font-style:italic;letter-spacing:1px;
+  margin-bottom:28px;
+}
+.footer-links{
+  display:flex;gap:24px;justify-content:center;
+  flex-wrap:wrap;margin-bottom:28px;
+}
+.footer-links a{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,0.25);text-decoration:none;
+  transition:color 0.2s;
+}
+.footer-links a:hover{color:rgba(201,168,76,0.7);}
+.footer-copy{
+  font-size:10px;color:rgba(255,255,255,0.15);
+  letter-spacing:1px;
+}
+
+/* ── VIDEO STRIP ─────────────────────────────────── */
+#videoStrip{
+  position:relative;width:100%;height:304px;
+  overflow:hidden;background:#000;flex-shrink:0;
+}
+#videoTrack{
+  display:flex;gap:6px;height:100%;
+  animation:stripScroll 90s linear infinite;
+  width:max-content;
+}
+#videoTrack video{
+  height:304px;width:auto;
+  object-fit:cover;flex-shrink:0;
+  opacity:0.24;
+  min-width:120px;
+}
+@keyframes stripScroll{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-50%);}
+}
+#videoStrip:hover #videoTrack{animation-play-state:paused;}
+#stripTitle{
+  position:absolute;inset:0;z-index:3;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  pointer-events:none;
+}
+#stripTitle .st-main{
+  font-size:clamp(22px,5vw,52px);
+  font-weight:900;
+  color:#fff;
+  letter-spacing:0.06em;
+  text-align:center;
+  line-height:1.1;
+  text-shadow:0 2px 20px rgba(0,0,0,0.8),0 0 40px rgba(0,0,0,0.5);
+  font-family:'Inter',sans-serif;
+}
+#stripTitle .st-main span{
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+#stripTitle .st-block{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:8px;
+  padding:0 24px;
+  max-width:900px;
+}
+#stripTitle .st-title{
+  font-size:clamp(20px,4.2vw,44px);
+  font-weight:900;
+  color:#fff;
+  letter-spacing:0.04em;
+  line-height:1.15;
+  text-transform:uppercase;
+  text-shadow:0 2px 20px rgba(0,0,0,0.8),0 0 40px rgba(0,0,0,0.5);
+  font-family:'Inter',sans-serif;
+}
+#stripTitle .st-sub{
+  font-size:clamp(14px,2.4vw,24px);
+  font-weight:800;
+  letter-spacing:0.05em;
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  text-shadow:0 2px 14px rgba(0,0,0,0.6);
+  font-family:'Inter',sans-serif;
+}
+#stripTitle .st-desc{
+  font-size:clamp(11px,1.6vw,17px);
+  font-weight:500;
+  color:#f0f0f0;
+  line-height:1.4;
+  text-shadow:0 2px 12px rgba(0,0,0,0.8);
+  font-family:'Inter',sans-serif;
+  max-width:640px;
+}
+#stripTitle .st-safety{
+  font-size:clamp(13px,2vw,18px);
+  font-weight:700;
+  color:#fff;
+  letter-spacing:0.05em;
+  line-height:1.3;
+  text-shadow:0 1px 6px rgba(0,0,0,0.5);
+  font-family:'Inter',sans-serif;
+  max-width:820px;
+  display:inline-block;
+  background:rgba(15,10,5,0.32);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(255,215,0,0.35);
+  border-radius:999px;
+  padding:10px 26px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+#stripTitle .st-safety span{
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  font-weight:900;
+}
+/* left/right fade edges */
+#videoStrip::before,#videoStrip::after{
+  content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;
+}
+#videoStrip::before{left:0;background:linear-gradient(to right,rgba(0,0,0,0.6),transparent);}
+#videoStrip::after{right:0;background:linear-gradient(to left,rgba(0,0,0,0.6),transparent);}
+/* ── PILLARS ── */
+.pillars-wrap{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:28px;padding:24px 0;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);}
+.pillar{position:relative;display:inline-flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:rgba(240,239,232,0.92);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);border-radius:40px;padding:11px 20px;animation:pillarRock 3.5s ease-in-out infinite;}
+.pillar:nth-child(2){animation-delay:0.5s;}
+.pillar:nth-child(3){animation-delay:1.0s;}
+.pillar:nth-child(4){animation-delay:1.5s;}
+.p-emoji{font-size:20px;}
+.p-hearts{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+.p-heart{position:absolute;font-size:15px;pointer-events:none;animation:pHeartFloat var(--phd) ease-out forwards;}
+@keyframes pillarRock{0%{transform:rotate(0deg);}20%{transform:rotate(2deg);}40%{transform:rotate(-1.5deg);}60%{transform:rotate(1deg);}80%{transform:rotate(-0.5deg);}100%{transform:rotate(0deg);}}
+@keyframes pHeartFloat{0%{opacity:var(--pho);transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-110px) scale(0.3);}}
+@media(max-width:600px){.pillar{font-size:12px;padding:9px 14px;}.p-emoji{font-size:17px;}}
+</style>
+<!-- ══ SEO & SOCIAL ══════════════════════════════════ -->
+
+<!-- Primary Meta -->
+<meta name="title" content="fab.games — The World's Most Fabulous Games">
+<meta name="description" content="Fun, safe, family-friendly online games for all ages. Brain games, word puzzles, trivia, crosswords, 3D builders and more. No violence, no dark content — pure fun for everyone.">
+<meta name="keywords" content="
+  free online games, family games, safe games for kids, brain games, fun games,
+  word games, puzzle games, crossword puzzle, crossword game online, free crossword,
+  3D building game, house builder game, home design game, creative games,
+  games for children, educational games, learning games, games that make you smarter,
+  family friendly games, safe games for families, games for all ages, games for kids and adults,
+  no violence games, positive games, wholesome games, clean games,
+  online puzzle games, trivia games, memory games, strategy games,
+  hawaiian games, aloha games, relaxing games, calming games,
+  games for parents and kids, games to play together, multiplayer family games,
+  free browser games, mobile games, games on phone, games no download,
+  best free games 2024, best family games 2025, new games online,
+  word puzzle, brain teaser, mind games, IQ games, cognitive games,
+  spelling games, vocabulary games, geography games, science games,
+  animal games, colour games, music games, sports games,
+  easy games, medium difficulty games, hard games, expert games,
+  fab games, fabgames, fab.games, jigsaw games, jigsawgames,
+  games for bored people, games to pass time, fun things to do online,
+  creative building game, design your own house, home decoration game,
+  crossword for beginners, crossword for experts, daily crossword,
+  fun crossword puzzles, crossword with clues, crossword generator,
+  games subscription, family subscription games, $4.99 games,
+  games for grandparents and grandchildren, multigenerational games,
+  games for school, classroom games, educational browser games
+">
+<meta name="author" content="fab.games">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="language" content="English">
+<meta name="revisit-after" content="7 days">
+<link rel="canonical" href="https://www.fab.games/">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.fab.games/">
+<meta property="og:title" content="fab.games — The World's Most Fabulous Games">
+<meta property="og:description" content="Fun, safe, family-friendly online games for all ages. Crosswords, 3D builders, trivia and more. No violence — pure joy for everyone.">
+<meta property="og:image" content="https://www.fab.games/FAB.GAMES_LOGO.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="fab.games">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://www.fab.games/">
+<meta name="twitter:title" content="fab.games — The World's Most Fabulous Games">
+<meta name="twitter:description" content="Fun, safe, family-friendly online games for all ages. Crosswords, 3D builders, trivia and more!">
+<meta name="twitter:image" content="https://www.fab.games/FAB.GAMES_LOGO.png">
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://www.fab.games/#website",
+      "url": "https://www.fab.games/",
+      "name": "fab.games",
+      "description": "The World's Most Fabulous Games — fun, safe, family-friendly online games for all ages",
+      "publisher": {"@id": "https://www.fab.games/#organization"},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.fab.games/games?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.fab.games/#organization",
+      "name": "fab.games",
+      "url": "https://www.fab.games/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.fab.games/FAB.GAMES_LOGO.png",
+        "width": 320,
+        "height": 320
+      },
+      "sameAs": []
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.fab.games/#webpage",
+      "url": "https://www.fab.games/",
+      "name": "fab.games — The World's Most Fabulous Games",
+      "description": "Fun, safe, family-friendly online games for all ages. Brain games, word puzzles, crosswords, 3D builders and more.",
+      "isPartOf": {"@id": "https://www.fab.games/#website"},
+      "about": {"@id": "https://www.fab.games/#organization"},
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.fab.games/"}]
+      }
+    },
+    {
+      "@type": "ItemList",
+      "name": "fab.games Game Collection",
+      "description": "A collection of fun, safe, family-friendly online games",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Fab Crossword", "url": "https://www.fab.games/crossword", "description": "Classic crossword puzzles — Easy to Expert difficulty"},
+        {"@type": "ListItem", "position": 2, "name": "Fab House", "url": "https://www.fab.games/fab-house", "description": "3D home builder and interior design game"}
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "fab.games",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "4.99",
+        "priceCurrency": "USD",
+        "priceValidUntil": "2026-12-31"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "128"
+      },
+      "description": "Fun, safe, family-friendly online games. No violence, no dark content — pure joy for all ages.",
+      "url": "https://www.fab.games/"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-logo">fab.games</div>
+  <ul class="nav-links">
+    <li><a href="#games">Games</a></li>
+    <li><a href="#world">World</a></li>
+    <li><a href="/about">About</a></li>
+    <li id="signInLi"><a href="/login">Sign In</a></li>
+    <li id="accountLi" style="display:none;"><a href="/account">My Account</a></li>
+    <li><a href="/join?tab=paid" class="nav-cta">Join · $4.99</a></li>
+  </ul>
+  <button class="nav-mobile-btn">☰</button>
+</nav>
+<!-- ── VIDEO STRIP ────────────────────────────── -->
+<div id="videoStrip">
+  <div id="videoTrack">
+    <!-- populated by JS from GAMES array in games.js -->
+  </div>
+  <div id="stripTitle">
+    <div class="st-main st-block">
+      <div class="st-title">Gentle Games For Every Generation</div>
+      <div class="st-safety">No Guns. No Knives. No Violence. No Stranger Chat.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCROLLING GAME CARDS STRIP -->
+<div id="cardStrip" style="width:100%;overflow:hidden;background:rgba(0,0,0,0.4);padding:10px 0;border-top:1px solid rgba(255,215,0,0.1);border-bottom:1px solid rgba(255,215,0,0.1);">
+  <div id="cardTrack" style="display:flex;gap:22px;width:max-content;animation:scrollCards 45s linear infinite;padding:2px 0;">
+  </div>
+</div>
+<style>
+@keyframes scrollCards{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
+#cardStrip:hover #cardTrack{animation-play-state:paused;}
+.strip-card{width:270px;height:180px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.3;cursor:pointer;animation:cardRock 3s ease-in-out infinite;transition:opacity 0.3s;}
+.strip-card:nth-child(even){animation-delay:-1.5s;}
+.strip-card:nth-child(3n){animation-delay:-0.8s;}
+.strip-card:hover{opacity:1;animation-play-state:paused;transform:scale(1.06);}
+@keyframes cardRock{0%,100%{transform:rotate(-1.5deg);}50%{transform:rotate(1.5deg);}}
+.strip-card img{width:100%;height:100%;object-fit:cover;display:block;}
+</style>
+<script>
+(function(){
+  const track=document.getElementById('cardTrack');
+  if(!track)return;
+  let html='';
+  for(let loop=0;loop<2;loop++)
+    for(let i=1;i<=19;i++)
+      html+=`<div class="strip-card"><img src="/${i}S.jpg" alt="Game ${i}" loading="lazy"></div>`;
+  track.innerHTML=html;
+})();
+</script>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <!-- LOGO + HEARTS -->
+  <div id="logoWrap" style="position:relative;display:inline-block;margin-bottom:28px;">
+    <img src="/FAB.GAMES_LOGO.png" alt="fab.games" id="fabLogo" style="width:clamp(160px,28vw,320px);display:block;animation:fadeUp 0.8s 0.2s ease both,logoRock 4s 1.2s ease-in-out infinite;">
+    <div id="heartsContainer" style="position:absolute;inset:0;pointer-events:none;overflow:visible;"></div>
+  </div>
+  <!-- SCROLLING GAME CARDS STRIP -->
+  <div id="cardStrip" style="width:100vw;overflow:hidden;margin:0 0 28px;position:relative;left:50%;transform:translateX(-50%);">
+    <div id="cardTrack" style="display:flex;gap:22px;width:max-content;animation:scrollCards 45s linear infinite;padding:4px 0;">
+    </div>
+  </div>
+  <style>
+  @keyframes scrollCards{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
+  #cardStrip:hover #cardTrack{animation-play-state:paused;}
+  .strip-card{width:270px;height:180px;border-radius:12px;overflow:hidden;flex-shrink:0;opacity:0.3;cursor:pointer;animation:cardRock 3s ease-in-out infinite;}
+  .strip-card:nth-child(even){animation-delay:-1.5s;}
+  .strip-card:nth-child(3n){animation-delay:-0.8s;}
+  .strip-card:hover{opacity:1;animation-play-state:paused;transform:scale(1.06);}
+  @keyframes cardRock{0%,100%{transform:rotate(-1.5deg);}50%{transform:rotate(1.5deg);}}
+  .strip-card img{width:100%;height:100%;object-fit:cover;display:block;}
+  </style>
+  <script>
+  (function(){
+    const track=document.getElementById('cardTrack');
+    if(!track)return;
+    let html='';
+    for(let loop=0;loop<2;loop++)
+      for(let i=1;i<=19;i++)
+        html+=`<div class="strip-card" ><img src="/${i}S.jpg" alt="Game ${i}" loading="lazy"></div>`;
+    track.innerHTML=html;
+  })();
+  </script>
+
+  <div class="hero-badge">Games · Family · World · Fun</div>
+  <div class="hero-title">The World's Most <span>Fabulous</span></div>
+  <div class="hero-title-games">Games</div>
+  <p class="hero-sub">Fun, addictive games for the whole family — from anywhere in the world. Something new every single month.</p>
+  <div class="hero-btns">
+    <a href="/join" class="btn-secondary">🎁 Start Free Month</a>
+    <a href="/join?tab=paid" class="btn-primary">Subscribe $4.99 / month</a>
+  </div>
+
+</div>
+
+<!-- GAMES SECTION -->
+<section id="games">
+  <div class="games-grid" id="gamesGrid"></div>
+</section>
+<!-- PRICING -->
+<section id="pricing" style="text-align:center;">
+  <div class="section-badge">— Simple Pricing</div>
+  <h2 class="section-title">One Price.<br><em>Everything</em> Included.</h2>
+  <p class="section-sub" style="margin:0 auto 60px;">One full month free — no credit card, just your email. Then $4.99/month for everything, forever. Less than a coffee.</p>
+  <div class="divider"></div>
+  <div class="pricing-wrap">
+    <div class="price-card">
+      <div class="price-tier">Free — One Full Month</div>
+      <div class="price-amount"><span></span>Free<small style="font-size:14px;"> for 30 days</small></div>
+      <p class="price-desc">Every game. No credit card. No catch. Just your email so we can remind you when your month is up!</p>
+      <ul class="price-features">
+        <li class="active">Every game — all of them</li>
+        
+        <li class="active">Global leaderboards</li>
+        <li class="active">No credit card needed</li>
+        <li class="active">Just your email</li>
+        <li class="active">Reminder when month ends</li>
+      </ul>
+      <a href="/join" class="btn-secondary" style="width:100%;text-align:center;display:block;">🎁 Start Free Month →</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-featured-badge">After Your Free Month</div>
+      <div class="price-tier">Premium — Keep Everything</div>
+      <div class="price-amount" style="background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+        <span>$</span>4.99<small>/mo</small>
+      </div>
+      <p class="price-desc">Love it? Keep everything for less than a coffee a month. New games added every month.</p>
+      <ul class="price-features">
+        <li class="active">Every game — always</li>
+        
+        <li class="active">New games every month</li>
+        
+        <li class="active">Global leaderboards</li>
+        <li class="active">Cancel anytime — no fuss</li>
+      </ul>
+      <a href="/join?tab=paid" class="btn-primary" style="width:100%;text-align:center;display:block;">Subscribe $4.99 / month →</a>
+    </div>
+  </div>
+</section>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">fab.games</div>
+  <div class="footer-tagline">"The world's most fabulous games"</div>
+  <div class="footer-links">
+    <a href="#games">Games</a>
+    <a href="/join">Join Free</a>
+    <a href="/about">About</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/contact">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 fab.games — All rights reserved</div>
+</footer>
+<script src="/games.js"></script></script>
+<script>
+// ── CURSOR ────────────────────────────────────────
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.width='16px';cursor.style.height='16px';
+    ring.style.width='60px';ring.style.height='60px';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.width='8px';cursor.style.height='8px';
+    ring.style.width='36px';ring.style.height='36px';
+  });
+});
+// ── NAV SCROLL ────────────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>60);
+});
+// ── VIDEO STRIP — auto-built from GAMES array ─────────────
+(function(){
+  const track = document.getElementById('videoTrack');
+  function makeVid(g){
+    const vidId = g.id || (g.href||'').replace(/\//g,'');
+    const v = document.createElement('video');
+    v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
+    v.setAttribute('preload','auto');
+    v.onerror = function(){ this.style.display='none'; };
+    const src = document.createElement('source');
+    src.src = '/'+vidId+'_video.mp4';
+    src.type = 'video/mp4';
+    v.appendChild(src);
+    // Force play as soon as possible — don't wait for browser autoplay queue
+    v.addEventListener('canplay', function(){ v.play().catch(function(){}); }, {once:true});
+    return v;
+  }
+  // Build one set, then duplicate it for seamless loop
+  GAMES.forEach(g => track.appendChild(makeVid(g)));
+  GAMES.forEach(g => track.appendChild(makeVid(g)));
+})();
+// ── GAMES DATA ────────────────────────────────────
+window.deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  window.deferredPrompt = e;
+});
+
+const grid=document.getElementById('gamesGrid');
+GAMES.forEach(function(g,i){
+  const card=document.createElement('a');
+  card.href=g.href;
+  card.className='game-card';
+  card.style.textDecoration='none';
+  const bg=document.createElement('div');
+  bg.className='game-card-bg';
+  bg.style.background=g.color||'rgba(201,168,76,0.1)';
+  if(g.featured){
+    bg.style.cssText='display:flex;align-items:center;justify-content:center;background:'+(g.color||'')+';width:100%;height:100%;position:absolute;inset:0;font-size:0;';
+    bg.innerHTML='<svg width="60" height="60" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><g stroke="#c9a96e" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"><path d="M110 155 C108 140 104 120 100 100" stroke-width="1.2"/><path d="M110 155 C112 138 116 118 122 98" stroke-width="1.2"/><path d="M110 155 C110 138 110 118 110 96" stroke-width="1.1"/><circle cx="110" cy="78" r="18" fill="rgba(201,169,110,0.1)" stroke-width="0.9"/><circle cx="96" cy="108" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/><circle cx="108" cy="108" r="7" fill="rgba(201,169,110,0.1)" stroke-width="0.7"/></g></svg>';
+  } else {
+    bg.textContent=g.emoji||'🎮';
+  }
+  const badge=document.createElement('div');
+  badge.className='live-badge';
+  badge.textContent='✦ Live';
+  const overlay=document.createElement('div');
+  overlay.className='game-card-overlay';
+  const cat=document.createElement('div');
+  cat.className='game-card-cat';
+  cat.textContent=g.cat||'';
+  const ttl=document.createElement('div');
+  ttl.className='game-card-title';
+  ttl.textContent=g.title;
+  ttl.style.animationDelay=(Math.random()*3)+'s';
+  const dsc=document.createElement('div');
+  dsc.className='game-card-desc';
+  dsc.textContent=g.desc||'';
+  const btn=document.createElement('div');
+  btn.className='play-btn';
+  btn.innerHTML='<span>▶ Play Now</span>';
+  const dl=document.createElement('button');
+  dl.className='game-dl-btn';
+  dl.innerHTML='⊕ Add to Home Screen';
+  dl.onclick=function(e){
+    e.preventDefault();e.stopPropagation();
+    if(window.deferredPrompt){
+      window.deferredPrompt.prompt();
+      window.deferredPrompt.userChoice.then(function(r){
+        if(r.outcome==='accepted'){dl.innerHTML='✓ Added!!';dl.style.color='rgba(74,222,128,0.8)';}
+        window.deferredPrompt=null;
+      });
+    } else {
+      const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+      dl.innerHTML=isIOS?'⎋ Tap Share → Add to Home Screen':'✓ Use browser menu → Install app';
+      setTimeout(()=>{dl.innerHTML='⊕ Add to Home Screen';},3200);
+    }
+  };
+  overlay.appendChild(cat);
+  overlay.appendChild(ttl);
+  overlay.appendChild(dsc);
+  overlay.appendChild(btn);
+  overlay.appendChild(dl);
+
+  const shareBtn=document.createElement('button');
+  shareBtn.className='game-share-btn';
+  shareBtn.innerHTML='⤴ Share This Game';
+  shareBtn.onclick=function(e){
+    e.preventDefault();e.stopPropagation();
+    const shareUrl=location.origin+g.href;
+    const shareData={
+      title:g.title+' — fab.games',
+      text:'Check out '+g.title+' on fab.games!! '+(g.desc||''),
+      url:shareUrl
+    };
+    if(navigator.share){
+      navigator.share(shareData).catch(()=>{});
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(function(){
+        shareBtn.innerHTML='✓ Link Copied!!';
+        setTimeout(()=>{shareBtn.innerHTML='⤴ Share This Game';},2000);
+      }).catch(function(){
+        shareBtn.innerHTML='✓ '+shareUrl;
+        setTimeout(()=>{shareBtn.innerHTML='⤴ Share This Game';},3000);
+      });
+    }
+  };
+  overlay.appendChild(shareBtn);
+// Video background
+  const vid=document.createElement('video');
+  vid.muted=true;vid.loop=true;vid.playsInline=true;
+  vid.setAttribute('autoplay','');
+  // First 6 cards preload fully; rest preload metadata to stay fast
+  vid.setAttribute('preload', i < 6 ? 'auto' : 'metadata');
+  vid.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;z-index:0;';
+  const vidId=g.id||(g.href||'').replace(/\//g,'');
+  vid.innerHTML='<source src="/'+vidId+'_video.mp4" type="video/mp4">';
+  // Show on first frame — don't wait for full buffer
+  vid.addEventListener('canplay',function(){
+    this.style.opacity='1';
+    bg.style.opacity='0.18';
+    bg.style.zIndex='1';
+  },{once:true});
+  // Force play as soon as card enters viewport
+  const cardObserver=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        vid.play().catch(function(){});
+        cardObserver.disconnect();
+      }
+    });
+  },{threshold:0.1});
+  cardObserver.observe(card);
+    card.appendChild(vid);
+  card.appendChild(bg);
+  card.appendChild(badge);
+  card.appendChild(overlay);
+  grid.appendChild(card);
+});
+// ── FLOATING HEARTS ───────────────────────────────
+const heartsContainer=document.getElementById('heartsContainer');
+const heartColors=['❤️','🧡','💛','💚','💙','💜','🩷','🩵','🤍'];
+function spawnHeart(){
+  const h=document.createElement('span');
+  h.className='heart';
+  h.textContent=heartColors[Math.floor(Math.random()*heartColors.length)];
+  const logo=document.getElementById('fabLogo');
+  const w=logo.offsetWidth;
+  const ht=logo.offsetHeight;
+  // random position across the logo
+  h.style.left=(Math.random()*w)+'px';
+  h.style.top=(Math.random()*ht*0.6+ht*0.2)+'px';
+  const dur=(1.8+Math.random()*1.4).toFixed(2)+'s';
+  const opacity=(0.25+Math.random()*0.35).toFixed(2);
+  h.style.setProperty('--hd',dur);
+  h.style.setProperty('--ho',opacity);
+  heartsContainer.appendChild(h);
+  setTimeout(()=>h.remove(), parseFloat(dur)*1000);
+}
+// Start hearts after logo fades in
+setTimeout(()=>{
+  spawnHeart();
+  setInterval(spawnHeart, 600);
+}, 1400);
+// ── SMOOTH SCROLL ─────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(r=>console.log('[fab.games] SW ready'))
+      .catch(e=>console.log('[fab.games] SW error',e));
+  });
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Show "My Account" link if logged in
+(async function(){
+  try{
+    const res = await fetch('/api/config');
+    const cfg = await res.json();
+    const sb = window.supabase.createClient(cfg.supabase_url, cfg.supabase_anon_key);
+    const{data:{session}}=await sb.auth.getSession();
+    if(session){
+      document.getElementById('signInLi').style.display='none';
+      document.getElementById('accountLi').style.display='';
+    }
+  }catch(e){console.log('Account check:',e);}
+})();
+</script>
+<script>
+// ── PILLAR HEARTS ─────────────────────────────────
+(function(){
+  var hearts=['❤️','🧡','💛','💚','💙','💜','🩷','🩵','💖','💗'];
+  document.querySelectorAll('.pillar').forEach(function(pillar,i){
+    setTimeout(function(){
+      function spawn(){
+        var container=pillar.querySelector('.p-hearts');
+        if(!container)return;
+        var h=document.createElement('span');
+        h.className='p-heart';
+        h.textContent=hearts[Math.floor(Math.random()*hearts.length)];
+        h.style.left=(10+Math.random()*70)+'%';
+        h.style.top='20%';
+        var dur=(1.2+Math.random()*0.8).toFixed(2)+'s';
+        var opa=(0.25+Math.random()*0.35).toFixed(2);
+        h.style.setProperty('--phd',dur);
+        h.style.setProperty('--pho',opa);
+        container.appendChild(h);
+        setTimeout(function(){h.remove();},parseFloat(dur)*1000);
+      }
+      spawn();
+      setInterval(spawn,900);
+    },1000+i*350);
+  });
+})();
+</script>
+</body>
+</html>
