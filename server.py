@@ -451,7 +451,39 @@ def jigsaw():
     return serve_game('jigsaw.html')
 @app.route('/<path:filename>')
 def static_files(filename):
-    return send_from_directory('.', filename)
+    # Universal safety net: ANY .html file request that isn't one of the
+    # known utility/account pages automatically gets the free-preview
+    # timer injected — even if a future game's route is added without
+    # remembering to use serve_game() directly. Non-game utility pages
+    # (login, join, account, etc.) are explicitly excluded since they
+    # already have their own dedicated routes above, but this catches
+    # them too just in case, so they're never accidentally timer-gated.
+    NON_GAME_PAGES = {
+        'index.html','join.html','play.html','success.html','login.html',
+        'account.html','fab_account.html','reset_password.html','reset-password.html',
+        'about.html','privacy.html','terms.html','contact.html',
+    }
+
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    exact_path = os.path.join(base_dir, filename)
+
+    # If the exact file exists (games.js, images, css, an explicit .html
+    # request, etc.) serve it the normal way — or with the timer if it's
+    # an un-excluded .html file.
+    if os.path.isfile(exact_path):
+        if filename.endswith('.html') and filename not in NON_GAME_PAGES:
+            return serve_game(filename)
+        return send_from_directory('.', filename)
+
+    # Otherwise, try it as a clean-URL game: does "<name>.html" exist?
+    # This means a BRAND NEW game needs NO route added here at all —
+    # just add its entry to games.js (with href:'/new-game') and upload
+    # new-game.html, and it works immediately, timer included.
+    html_guess = filename + '.html'
+    if html_guess not in NON_GAME_PAGES and os.path.isfile(os.path.join(base_dir, html_guess)):
+        return serve_game(html_guess)
+
+    return send_from_directory('.', filename)  # will 404 naturally if truly missing
 
 @app.route('/donut')
 def donut():
