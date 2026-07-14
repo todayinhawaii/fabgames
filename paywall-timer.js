@@ -48,11 +48,12 @@
       #__paywallBox .__pwEmoji{font-size:48px;margin-bottom:16px;}
       #__paywallBox h2{font-size:24px;font-weight:700;margin-bottom:12px;color:#ffd700;}
       #__paywallBox p{font-size:15px;color:rgba(240,239,232,0.7);line-height:1.7;margin-bottom:26px;}
-      #__paywallBox a{
+      #__paywallBox button{
         display:inline-block;padding:15px 36px;border-radius:10px;
         background:linear-gradient(135deg,#ffd700,#c9a84c);color:#000;
-        font-weight:700;text-decoration:none;font-size:14px;
+        font-weight:700;font-size:14px;border:none;cursor:pointer;
         letter-spacing:1px;text-transform:uppercase;
+        font-family:Inter,Arial,sans-serif;
       }
     `;
     document.head.appendChild(style);
@@ -88,9 +89,30 @@
         '<div class="__pwEmoji">🎮</div>' +
         '<h2>Time is up!</h2>' +
         '<p>Loving it so far? Sign up free to keep playing this game and unlock every game on fab.games — no credit card needed for your first 30 days.</p>' +
-        '<a href="'+JOIN_URL+'">Sign Up Free →</a>' +
+        '<button id="__pwSignupBtn" type="button">Sign Up Free →</button>' +
       '</div>';
     document.body.appendChild(overlay);
+
+    // Many games attach their own aggressive document-level touch/click
+    // handlers to control gameplay. Block ALL of them from ever seeing
+    // interactions with our overlay, in both the capture and bubble
+    // phases, then force navigation ourselves rather than trusting a
+    // plain link's default behavior (which some games' preventDefault()
+    // calls can silently swallow on touch devices).
+    const blockEvents = ['click','mousedown','mouseup','touchstart','touchend','touchmove','pointerdown','pointerup'];
+    blockEvents.forEach(function(evt){
+      overlay.addEventListener(evt, function(e){ e.stopPropagation(); }, true);
+      overlay.addEventListener(evt, function(e){ e.stopPropagation(); }, false);
+    });
+
+    const goToJoin = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      window.location.href = JOIN_URL;
+    };
+    const btn = document.getElementById('__pwSignupBtn');
+    btn.addEventListener('click', goToJoin, true);
+    btn.addEventListener('touchend', goToJoin, true);
   }
 
   function startCountdown(){
@@ -131,7 +153,22 @@
       // unlimited access to everyone if something's misconfigured.
     }
 
-    // Not a member (or check failed) — start the visible free trial countdown
+    // Not a member (or check failed). Before starting a fresh countdown,
+    // check whether this browser has already used its free preview for
+    // THIS game recently — otherwise someone could just hit refresh
+    // endlessly for unlimited free 60-second chunks. This is a soft
+    // deterrent (clearing browser data or using incognito still bypasses
+    // it), not a hard security wall — but it stops the easy, casual case.
+    const storageKey = 'pw_trial_' + location.pathname;
+    const lastTrial = localStorage.getItem(storageKey);
+    const oneDayMs = 24*60*60*1000;
+    if(lastTrial && (Date.now() - parseInt(lastTrial,10)) < oneDayMs){
+      showPaywallOverlay(); // already used today's preview — straight to sign-up prompt
+      return;
+    }
+    localStorage.setItem(storageKey, Date.now().toString());
+
+    // Start the visible free trial countdown
     startCountdown();
   }
 
