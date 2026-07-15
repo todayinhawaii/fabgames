@@ -1,11 +1,37 @@
 import os
 import json
+import time
 import stripe
 import urllib.request
 import urllib.parse
+from collections import defaultdict
 from datetime import datetime, timedelta
 from flask import Flask, send_from_directory, request, jsonify
 app = Flask(__name__)
+
+# ── SIMPLE SIGNUP RATE LIMITING ────────────────────
+# Prevents spam/bot signups by capping attempts per IP address. Simple
+# in-memory tracking — resets if the server restarts, which is a fine
+# trade-off at current scale (no extra dependencies needed).
+_signup_attempts = defaultdict(list)
+RATE_LIMIT_MAX = 5
+RATE_LIMIT_WINDOW = 600  # 10 minutes
+
+def check_rate_limit(ip):
+    now = time.time()
+    attempts = _signup_attempts[ip]
+    attempts[:] = [t for t in attempts if now - t < RATE_LIMIT_WINDOW]
+    if len(attempts) >= RATE_LIMIT_MAX:
+        return False
+    attempts.append(now)
+    return True
+
+def get_client_ip():
+    forwarded = request.headers.get('X-Forwarded-For', '')
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+    return request.remote_addr
+
 # Stripe config
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
@@ -136,6 +162,8 @@ def get_plan():
 # ── FREE TRIAL SIGNUP ────────────────────────────
 @app.route('/api/free-trial', methods=['POST'])
 def free_trial():
+    if not check_rate_limit(get_client_ip()):
+        return jsonify({'ok': False, 'msg': 'Too many signup attempts. Please wait a few minutes and try again.'})
     data = request.get_json()
     email    = data.get('email', '').strip().lower()
     name     = data.get('name', '').strip()
