@@ -429,8 +429,30 @@ window.addEventListener('load', function(){
       'https://xbzeakoypdyslnnriaef.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiemVha295cGR5c2xubnJpYWVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDI5MzIsImV4cCI6MjA5NjIxODkzMn0.-pS2FE-Q-_EetM5ONbJycZWFm336wJ-z4MTOGCdA1LE'
     );
-    sbClient.auth.getSession().then(({data:{session}})=>{
-      if(session) window.location.href='/play';
+    sbClient.auth.getSession().then(async ({data:{session}})=>{
+      if(!session) return; // not logged in — normal, stay on /join
+
+      // IMPORTANT: only redirect to /play if they actually already have
+      // an active fab plan. Blindly redirecting whenever ANY session
+      // exists caused an infinite bounce loop with /play (which redirects
+      // BACK to /join if the plan doesn't check out) — e.g. someone
+      // logged in but who only has a jigsaw-only plan, or whose payment
+      // never completed.
+      try{
+        const planRes = await fetch('/api/get-plan?email='+encodeURIComponent(session.user.email));
+        const planData = await planRes.json();
+        const now = new Date();
+        const hasRightPlan = planData.ok && (planData.plan==='fab' || planData.plan==='bundle');
+        const isActive = planData.ok && (
+          planData.subscription_status==='active' ||
+          planData.plan==='free_trial' ||
+          (planData.trial_end && new Date(planData.trial_end) > now)
+        );
+        if(hasRightPlan && isActive){
+          window.location.href='/play';
+        }
+        // otherwise: stay right here on /join so they can pick/complete a plan
+      }catch(e){ console.log('Plan check error:', e.message||e); }
     });
   }catch(e){ console.log('Supabase init error:', e); }
 });
