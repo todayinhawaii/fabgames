@@ -513,6 +513,13 @@ async function startSignup(){
     });
     const regData = await regRes.json();
 
+    if(!regData.ok){
+      showMsg(regData.msg || 'Something went wrong creating your account.');
+      btn.disabled = false;
+      btn.textContent = '🎁 Start My Free Month →';
+      return;
+    }
+
     // Step 1b — Sign in client-side so a REAL session exists in this browser.
     // Without this, fab.games' own /play page still works (via a simpler
     // "paid" flag), but jigsaw.games has no session to recognize at all,
