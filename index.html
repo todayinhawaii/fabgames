@@ -98,6 +98,14 @@ nav.scrolled{
   color:var(--gold) !important;
   transition:all 0.2s !important;
 }
+.nav-crosslink{
+  display:none;padding:9px 18px;border-radius:8px;
+  background:linear-gradient(135deg,#ffd700,#c9a84c);
+  color:#000 !important;font-size:11px;font-weight:800;letter-spacing:1px;
+  text-decoration:none;white-space:nowrap;transition:transform 0.15s;
+  text-transform:uppercase;
+}
+.nav-crosslink:hover{transform:translateY(-1px);}
 .nav-cta:hover{
   background:rgba(201,168,76,0.1) !important;
   border-color:var(--gold) !important;
@@ -734,6 +742,7 @@ footer{
     <li><a href="/about">About</a></li>
     <li id="signInLi"><a href="/login">Sign In</a></li>
     <li id="accountLi" style="display:none;"><a href="/account">My Account</a></li>
+    <li id="jigsawCrossLi" style="display:none;"><a id="jigsawCrossLink" class="nav-crosslink" href="#">🧩 jigsaw.games →</a></li>
     <li><a href="/join?tab=paid" class="nav-cta">Join · $5.99</a></li>
   </ul>
   <button class="nav-mobile-btn">☰</button>
@@ -1095,9 +1104,9 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-// Show "My Account" link if logged in
+// Show "My Account" link and jigsaw.games cross-link if logged in
 (async function(){
   try{
     const res = await fetch('/api/config');
@@ -1107,6 +1116,16 @@ if('serviceWorker' in navigator){
     if(session){
       document.getElementById('signInLi').style.display='none';
       document.getElementById('accountLi').style.display='';
+
+      const crossLi = document.getElementById('jigsawCrossLi');
+      const crossLink = document.getElementById('jigsawCrossLink');
+      crossLi.style.display='';
+      crossLink.onclick = function(e){
+        e.preventDefault();
+        const at = encodeURIComponent(session.access_token);
+        const rt = encodeURIComponent(session.refresh_token);
+        window.location.href = 'https://www.jigsaw.games/#fab_at='+at+'&fab_rt='+rt;
+      };
     }
   }catch(e){console.log('Account check:',e);}
 })();
