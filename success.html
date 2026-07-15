@@ -46,13 +46,13 @@ p{font-size:16px;color:var(--muted);max-width:440px;line-height:1.8;margin-botto
 <div class="logo">fab.games</div>
 <div class="emoji">🎉</div>
 
-<div id="bundleBadge" style="display:none;" class="bundle-badge">🧩 Bundle Unlocked</div>
+<div class="bundle-badge">🎮🧩 Full Access Unlocked</div>
 <h1>You're <em>In!</em></h1>
-<p id="welcomeMsg">Welcome to fab.games Premium! Every game, every tool — all yours. Let's play!</p>
+<p id="welcomeMsg">Welcome! You now have full access to both fab.games AND jigsaw.games — every game, every puzzle, all yours!</p>
 
 <div class="btn-row">
   <a href="/play" class="btn btn-fab">Play fab.games →</a>
-  <a href="#" id="jigsawBtn" class="btn btn-jigsaw" style="display:none;">Play jigsaw.games →</a>
+  <a href="#" id="jigsawBtn" class="btn btn-jigsaw">Play jigsaw.games →</a>
 </div>
 
 <script>
@@ -72,18 +72,11 @@ if(params.get('session_id')){
   localStorage.setItem('fabPremium','true');
 }
 
-// ── BUNDLE-AWARE WELCOME ───────────────────────────
+// ── SET UP THE JIGSAW.GAMES CROSS-LINK ─────────────
+// One membership now covers both sites, so every new member gets this
+// link, always — no more checking which plan they picked.
 (async function(){
-  const plan = params.get('plan');
-  if(plan !== 'bundle') return; // single-site plan — default messaging above is correct
-
-  document.getElementById('bundleBadge').style.display = 'inline-block';
-  document.getElementById('welcomeMsg').textContent =
-    "Congratulations! You're now able to play fab.games AND jigsaw.games — every game, every puzzle, all yours!";
-
   const jigsawBtn = document.getElementById('jigsawBtn');
-  jigsawBtn.style.display = 'inline-block';
-  jigsawBtn.textContent = 'Play jigsaw.games →';
   jigsawBtn.href = 'https://www.jigsaw.games/';
 
   // If a live session already exists in this browser, hand it off so

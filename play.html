@@ -298,10 +298,6 @@ for(let i=0;i<80;i++){
   sw.appendChild(s);
 }
 
-// Welcome name
-const n=localStorage.getItem('fabName')||'Player';
-document.getElementById('welcomeName').textContent=n.split(' ')[0];
-
 // Games
 
 
@@ -385,6 +381,19 @@ GAMES.forEach(function(g,i){
     const cfg = await cfgRes.json();
     const sbClient = window.supabase.createClient(cfg.supabase_url, cfg.supabase_anon_key);
 
+    // If arriving from jigsaw.games' cross-link button, the URL hash
+    // carries a short-lived access/refresh token pair. Use it to
+    // establish a real session here too, before the normal session
+    // check below runs.
+    const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const jAt = hashParams.get('jigsaw_at');
+    const jRt = hashParams.get('jigsaw_rt');
+    if(jAt && jRt){
+      try{ await sbClient.auth.setSession({access_token: jAt, refresh_token: jRt}); }
+      catch(e){ console.log('Jigsaw hand-off error:', e.message||e); }
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+
     const {data:{session}} = await sbClient.auth.getSession();
 
     if(!session){
@@ -392,11 +401,17 @@ GAMES.forEach(function(g,i){
       return;
     }
 
-    // CRITICAL: must actually have paid for fab.games specifically —
-    // either the 'fab' single-site plan or the 'bundle' plan. Being
-    // logged in and "active" isn't enough on its own, since a
-    // jigsaw.games-only subscriber's account is also "active" — just
-    // not for THIS site.
+    // Welcome name — read reliably from the session itself (always
+    // available immediately, whether they just signed up or logged in),
+    // rather than localStorage's 'fabName', which only gets set by the
+    // login page and could still be empty on someone's very first visit
+    // right after signing up, showing a generic "Player" placeholder.
+    const displayName = session.user.user_metadata?.name || session.user.email.split('@')[0];
+    document.getElementById('welcomeName').textContent = displayName.split(' ')[0];
+
+    // SIMPLIFIED: one membership now covers both sites, so we just check
+    // whether the account is active/trialing at all — no more per-plan
+    // gating logic needed.
     let planData = null;
     try{
       const planRes = await fetch('/api/get-plan?email='+encodeURIComponent(session.user.email));
@@ -404,31 +419,28 @@ GAMES.forEach(function(g,i){
     }catch(e){ console.log('Plan lookup error:', e.message||e); }
 
     const now = new Date();
-    const hasRightPlan = planData && planData.ok && (planData.plan==='fab' || planData.plan==='bundle');
-    const isActive = planData && (
+    const isActive = planData && planData.ok && (
       planData.subscription_status==='active' ||
       planData.plan==='free_trial' ||
       (planData.trial_end && new Date(planData.trial_end) > now)
     );
 
-    if(!hasRightPlan || !isActive){
-      window.location.href = '/join'; // logged in, but wrong plan or expired — send to upgrade
+    if(!isActive){
+      window.location.href = '/join'; // logged in, but no active membership — send to join
       return;
     }
 
     localStorage.setItem('fabEmail', session.user.email);
 
-    // Show the jigsaw.games cross-link only for bundle subscribers
-    if(planData.plan === 'bundle'){
-      const link = document.getElementById('jigsawCrossLink');
-      link.style.display = 'inline-block';
-      link.onclick = function(e){
-        e.preventDefault();
-        const at = encodeURIComponent(session.access_token);
-        const rt = encodeURIComponent(session.refresh_token);
-        window.location.href = 'https://www.jigsaw.games/#fab_at='+at+'&fab_rt='+rt;
-      };
-    }
+    // Every active member now gets both sites — always show the cross-link
+    const link = document.getElementById('jigsawCrossLink');
+    link.style.display = 'inline-block';
+    link.onclick = function(e){
+      e.preventDefault();
+      const at = encodeURIComponent(session.access_token);
+      const rt = encodeURIComponent(session.refresh_token);
+      window.location.href = 'https://www.jigsaw.games/#fab_at='+at+'&fab_rt='+rt;
+    };
 
     // Sign Out
     document.getElementById('signOutBtn').onclick = async function(){
