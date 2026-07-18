@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Music in Space — fab.games</title>
+<style>
+  :root{
+    --void1:#0a0118; --void2:#1a0a35; --void3:#2d1050;
+    --glow:#ffd76a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+  html,body{
+    width:100%;height:100%;overflow:hidden;background:#05010f;
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    touch-action:none;overscroll-behavior:none;
+  }
+  #stage{position:fixed;inset:0;}
+  canvas{display:block;width:100%;height:100%;}
+
+  #veil{
+    position:fixed;inset:0;z-index:50;
+    background:radial-gradient(ellipse at 50% 40%, var(--void3), var(--void1) 75%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:32px;
+    transition:opacity 0.9s ease, visibility 0.9s;
+  }
+  #veil.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+  #veil h1{
+    font-size:clamp(28px,7vw,46px);font-weight:800;
+    background:linear-gradient(135deg,#ffe08a,#ff8fd6,#8fd7ff);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    letter-spacing:0.02em;margin-bottom:14px;
+  }
+  #veil p{color:rgba(255,255,255,0.65);font-size:clamp(13px,3.2vw,16px);line-height:1.8;max-width:360px;margin-bottom:8px;}
+  #veil .tap{
+    margin-top:28px;padding:16px 40px;border-radius:999px;border:none;
+    background:linear-gradient(135deg,#ffe08a,#ffb36a);color:#2a1200;
+    font-size:15px;font-weight:800;letter-spacing:0.04em;cursor:pointer;
+    box-shadow:0 8px 30px rgba(255,180,100,0.35);
+  }
+  #veil .hint{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:22px;}
+
+  #hud{
+    position:fixed;top:0;left:0;right:0;z-index:20;
+    display:flex;justify-content:space-between;align-items:flex-start;
+    padding:18px 18px 0;pointer-events:none;
+  }
+  #home{
+    pointer-events:auto;text-decoration:none;
+    font-size:12px;font-weight:700;letter-spacing:0.06em;color:rgba(255,255,255,0.7);
+    background:rgba(255,255,255,0.08);backdrop-filter:blur(6px);
+    padding:9px 16px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);
+  }
+  #speedWrap{
+    display:flex;flex-direction:column;align-items:flex-end;gap:6px;opacity:0;transition:opacity 0.6s;
+  }
+  #speedWrap.show{opacity:1;}
+  #speedLabel{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+  #speedBar{width:90px;height:5px;border-radius:3px;background:rgba(255,255,255,0.12);overflow:hidden;}
+  #speedFill{height:100%;width:30%;background:linear-gradient(90deg,#8fd7ff,#ff8fd6,#ffe08a);border-radius:3px;transition:width 0.25s ease;}
+
+  #popCount{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    z-index:20;font-size:12px;letter-spacing:0.08em;color:rgba(255,255,255,0.35);
+    opacity:0;transition:opacity 0.6s;pointer-events:none;
+  }
+  #popCount.show{opacity:1;}
+
+  #controlDock{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+    z-index:25;opacity:0;pointer-events:none;transition:opacity 0.5s;
+  }
+  #controlDock.show{opacity:1;pointer-events:auto;}
+
+  #controlRow{
+    display:flex;flex-direction:row;align-items:center;gap:34px;
+  }
+
+  #pauseBtn{
+    flex-shrink:0;width:86px;height:86px;border-radius:50%;
+    border:6px solid rgba(255,255,255,0.4);
+    outline:4px solid rgba(0,0,0,0.35);
+    outline-offset:-2px;
+    font-family:'Segoe UI',system-ui,sans-serif;
+    font-size:15px;font-weight:900;letter-spacing:0.06em;color:#fff;
+    text-shadow:0 2px 5px rgba(0,0,0,0.6);
+    cursor:pointer;transition:transform 0.08s;
+  }
+  #pauseBtn:active{ transform:translateY(4px); }
+  #pauseBtn.stop{
+    background:radial-gradient(circle at 35% 26%, #ffbcbc, #e21f1f 50%, #6b0000 100%);
+    box-shadow:
+      inset 0 5px 8px rgba(255,255,255,0.6),
+      inset 0 -14px 18px rgba(0,0,0,0.45),
+      inset 0 0 0 3px rgba(0,0,0,0.25),
+      0 9px 0 #4a0000, 0 13px 26px rgba(0,0,0,0.55);
+    animation: vegasPulseRed 2.4s ease-in-out infinite;
+  }
+  #pauseBtn.go{
+    background:radial-gradient(circle at 35% 26%, #c2ffc7, #22c55e 50%, #084a20 100%);
+    box-shadow:
+      inset 0 5px 8px rgba(255,255,255,0.6),
+      inset 0 -14px 18px rgba(0,0,0,0.45),
+      inset 0 0 0 3px rgba(0,0,0,0.25),
+      0 9px 0 #043016, 0 13px 26px rgba(0,0,0,0.55);
+    animation: vegasPulseGreen 2.4s ease-in-out infinite;
+  }
+  @keyframes vegasPulseRed{
+    0%,100%{ box-shadow: inset 0 5px 8px rgba(255,255,255,0.6), inset 0 -14px 18px rgba(0,0,0,0.45), inset 0 0 0 3px rgba(0,0,0,0.25), 0 9px 0 #4a0000, 0 13px 26px rgba(0,0,0,0.55), 0 0 0 0 rgba(255,40,40,0); }
+    50%{ box-shadow: inset 0 5px 8px rgba(255,255,255,0.6), inset 0 -14px 18px rgba(0,0,0,0.45), inset 0 0 0 3px rgba(0,0,0,0.25), 0 9px 0 #4a0000, 0 13px 26px rgba(0,0,0,0.55), 0 0 34px 10px rgba(255,40,40,0.65); }
+  }
+  @keyframes vegasPulseGreen{
+    0%,100%{ box-shadow: inset 0 5px 8px rgba(255,255,255,0.6), inset 0 -14px 18px rgba(0,0,0,0.45), inset 0 0 0 3px rgba(0,0,0,0.25), 0 9px 0 #043016, 0 13px 26px rgba(0,0,0,0.55), 0 0 0 0 rgba(40,255,90,0); }
+    50%{ box-shadow: inset 0 5px 8px rgba(255,255,255,0.6), inset 0 -14px 18px rgba(0,0,0,0.45), inset 0 0 0 3px rgba(0,0,0,0.25), 0 9px 0 #043016, 0 13px 26px rgba(0,0,0,0.55), 0 0 34px 10px rgba(40,255,90,0.65); }
+  }
+
+  .sliderWrap{
+    width:126px;text-align:center;flex-shrink:0;
+    background:linear-gradient(160deg, rgba(40,18,60,0.75), rgba(20,10,35,0.75));
+    border:2px solid rgba(255,215,120,0.45);border-radius:30px;
+    padding:12px 14px 14px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.1), 0 0 14px rgba(255,215,120,0.12);
+    outline:none;
+  }
+  .slider-label{
+    font-size:13.5px;letter-spacing:0.08em;color:#ffe08a;font-weight:800;
+    margin-bottom:10px;text-shadow:0 0 8px rgba(255,215,120,0.5);
+  }
+  #speedSlider, #sizeSlider{
+    -webkit-appearance:none;appearance:none;
+    width:100%;height:8px;border-radius:6px;
+    background:linear-gradient(90deg,#3a1a52,#6a2f8a);
+    outline:none;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    box-shadow:inset 0 2px 4px rgba(0,0,0,0.5), 0 0 8px rgba(180,100,255,0.3);
+  }
+  #speedSlider:focus, #sizeSlider:focus{ outline:none; }
+  #speedSlider::-webkit-slider-thumb, #sizeSlider::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:24px;height:24px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff3c4, #ffd76a 55%, #a8720f 100%);
+    border:2px solid rgba(255,255,255,0.5);
+    box-shadow:0 3px 0 #7a4d0a, 0 5px 10px rgba(0,0,0,0.5), 0 0 14px 4px rgba(255,215,100,0.5);
+    cursor:pointer;
+  }
+  #speedSlider::-moz-range-thumb, #sizeSlider::-moz-range-thumb{
+    width:24px;height:24px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff3c4, #ffd76a 55%, #a8720f 100%);
+    border:2px solid rgba(255,255,255,0.5);
+    box-shadow:0 3px 0 #7a4d0a, 0 5px 10px rgba(0,0,0,0.5), 0 0 14px 4px rgba(255,215,100,0.5);
+    cursor:pointer;
+  }
+  #speedSlider::-moz-range-track, #sizeSlider::-moz-range-track{
+    height:8px;border-radius:6px;
+    background:linear-gradient(90deg,#3a1a52,#6a2f8a);
+  }
+</style>
+</head>
+<body>
+
+<div id="stage"><canvas id="c"></canvas></div>
+
+<div id="hud">
+  <a id="home" href="/play">← Home</a>
+  <div id="speedWrap">
+    <div id="speedLabel">Glide Speed</div>
+    <div id="speedBar"><div id="speedFill"></div></div>
+  </div>
+</div>
+
+<div id="popCount">buttons touched: <span id="popNum">0</span></div>
+<div id="controlDock">
+  <div id="controlRow">
+    <div class="sliderWrap">
+      <div class="slider-label">SIZE — <span id="sizePct">100%</span></div>
+      <input type="range" id="sizeSlider" min="50" max="200" value="100">
+    </div>
+    <button id="pauseBtn" class="stop">STOP</button>
+    <div class="sliderWrap">
+      <div class="slider-label">SPEED — <span id="speedPct">100%</span></div>
+      <input type="range" id="speedSlider" min="5" max="100" value="100">
+    </div>
+  </div>
+</div>
+
+<div id="veil">
+  <h1>Music in Space</h1>
+  <p>Drift through an endless tunnel of glowing button pills. Drag to steer, press or swipe to pop them. Arrow keys steer, space jumps, hold X to blast forward. Pinch or scroll to change speed. No score, no rush — just the ride. 🎧</p>
+  <p class="hint" style="margin-top:2px;">Headphones recommended</p>
+  <button class="tap" id="startBtn">Begin the Glide →</button>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, CX, CY;
+function resize(){
+  W = canvas.width = window.innerWidth * (window.devicePixelRatio||1);
+  H = canvas.height = window.innerHeight * (window.devicePixelRatio||1);
+  canvas.style.width = window.innerWidth+'px';
+  canvas.style.height = window.innerHeight+'px';
+  CX = W/2; CY = H/2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ── AUDIO: soft procedural pops, no external assets ──
+let actx = null;
+function ensureAudio(){
+  if(!actx){
+    try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  }
+  if(actx && actx.state === 'suspended') actx.resume();
+}
+// pleasant pentatonic-ish frequency set so overlapping pops stay harmonious
+const NOTES = [392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 987.77];
+function playPop(pitchIndex, vel){
+  if(!actx) return;
+  const t0 = actx.currentTime;
+  const freq = NOTES[((pitchIndex%NOTES.length)+NOTES.length)%NOTES.length];
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  const filt = actx.createBiquadFilter();
+  filt.type = 'lowpass';
+  filt.frequency.value = 2600;
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  osc.frequency.exponentialRampToValueAtTime(freq*1.4, t0+0.05);
+  const vol = 0.05 + 0.05*(vel||0.5);
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(vol, t0+0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0+0.22);
+  osc.connect(filt); filt.connect(gain); gain.connect(actx.destination);
+  osc.start(t0); osc.stop(t0+0.25);
+}
+
+// ── COLOR PALETTE — soft candy-glow tones ──
+const PALETTE = [
+  '#ff8fd6','#8fd7ff','#ffe08a','#a6ff9e','#ff9e9e',
+  '#c39bff','#7affe0','#ffbf6b','#f6ff8f','#9ec9ff'
+];
+const WORDS = ['LOVE','HAPPY','FUN','TRUTH','KIND','JOY','CALM','HOPE','GLOW','SHINE','SMILE','PLAY','WOW','GOOD','NICE','SWEET','COOL','YES'];
+// warm 2-octave pentatonic scale for the harp — always sounds pleasant together
+const HARP_SCALE = [261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25,783.99,880.00];
+
+// ── TUNNEL SETUP ──
+const RING_SPACING = 130;      // distance between rings along the tube
+const NUM_RINGS = 14;          // active rings at once
+const BUTTONS_PER_RING = 18;   // wraps around the circle (walls/ceiling/floor)
+const TUBE_RADIUS = 230;
+const FOCAL = 260;
+const NEAR = 40;                // camera plane
+const FAR = RING_SPACING * NUM_RINGS + NEAR;
+const TRIGGER_Z = 170;          // ring "pops" when it crosses this depth
+
+function randRadiusJitter(){ return (Math.random()-0.5)*36; }
+
+function makeRing(zBase){
+  const buttons = [];
+  const rot = Math.random()*Math.PI*2; // rotate each ring so pattern feels organic
+  for(let i=0;i<BUTTONS_PER_RING;i++){
+    const angle = rot + (i/BUTTONS_PER_RING)*Math.PI*2;
+    buttons.push({
+      angle,
+      radius: TUBE_RADIUS + randRadiusJitter(),
+      color: PALETTE[(Math.random()*PALETTE.length)|0],
+      word: WORDS[(Math.random()*WORDS.length)|0],
+      note: HARP_SCALE[Math.floor((angle/(Math.PI*2))*HARP_SCALE.length) % HARP_SCALE.length],
+      lit: 0,          // 0..1 ambient glow amount (from ring wave)
+      pressAnim: 0,    // 1→0 during the squish-in / spring-back-out animation
+      size: 36 + Math.random()*17,
+      wobble: Math.random()*Math.PI*2
+    });
+  }
+  return { z: zBase, buttons, triggered:false };
+}
+
+let rings = [];
+function initTunnel(){
+  rings = [];
+  for(let i=0;i<NUM_RINGS;i++){
+    rings.push(makeRing(NEAR + i*RING_SPACING + 50));
+  }
+}
+initTunnel();
+
+// ── STATE ──
+let speed = 1.8;              // world units per frame (forward glide)
+const SPEED_MIN_REF = 0.68, SPEED_MAX_REF = 4.6, SPEED_BASE_REF = 1.8;
+let speedMultiplier = 1.0; // 0.05 to 1.0, controlled by the retro speed slider
+let sizeMultiplier = 1.0;  // 0.5 to 2.0, controlled by the retro size slider
+function SPEED_MIN(){ return SPEED_MIN_REF * speedMultiplier; }
+function SPEED_MAX(){ return SPEED_MAX_REF * speedMultiplier; }
+function SPEED_BASE(){ return SPEED_BASE_REF * speedMultiplier; }
+let steerX = 0, steerY = 0;         // current (eased) steering offset
+let targetX = 0, targetY = 0;       // pointer-driven target offset
+let popTotal = 0;
+let jumping = false, jumpTime = 0, jumpOffset = 0;
+let boosting = false;
+let paused = false;
+let particles = [];
+let shockwaves = [];
+const JUMP_DURATION = 30, JUMP_HEIGHT = 100;
+const keys = {};
+let started = false;
+let t = 0;
+
+// ── POINTER / TOUCH CONTROLS ──
+let dragging = false;
+let lastPointer = null;
+
+function setTargetFromClientXY(cx, cy){
+  const nx = (cx / window.innerWidth  - 0.5) * 2; // -1..1
+  const ny = (cy / window.innerHeight - 0.5) * 2;
+  targetX = Math.max(-1, Math.min(1, nx)) * (TUBE_RADIUS*0.62);
+  targetY = Math.max(-1, Math.min(1, ny)) * (TUBE_RADIUS*0.62);
+}
+
+
+canvas.addEventListener('mousedown', e=>{
+  dragging = true; ensureAudio();
+  setTargetFromClientXY(e.clientX, e.clientY);
+  tryPopAt(e.clientX, e.clientY);
+});
+window.addEventListener('mousemove', e=>{
+  if(dragging){
+    setTargetFromClientXY(e.clientX, e.clientY);
+    tryPopAt(e.clientX, e.clientY);
+  }
+});
+window.addEventListener('mouseup', ()=>{
+  dragging=false;
+});
+canvas.addEventListener('wheel', e=>{
+  e.preventDefault();
+  speed = Math.max(SPEED_MIN(), Math.min(SPEED_MAX(), speed - e.deltaY*0.01));
+}, {passive:false});
+
+// ── KEYBOARD: arrows steer, space jumps ──
+window.addEventListener('keydown', e=>{
+  if(!started) return;
+  if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key) || e.code==='Space'){
+    e.preventDefault();
+  }
+  keys[e.key] = true;
+  if((e.key===' ' || e.code==='Space') && !jumping){
+    jumping = true; jumpTime = 0;
+  }
+  if(e.key.toLowerCase()==='x') boosting = true;
+});
+window.addEventListener('keyup', e=>{
+  keys[e.key] = false;
+  if(e.key.toLowerCase()==='x') boosting = false;
+});
+
+let pinchStartDist = null;
+let pinchStartSpeed = speed;
+
+function touchDist(t0,t1){
+  const dx=t0.clientX-t1.clientX, dy=t0.clientY-t1.clientY;
+  return Math.sqrt(dx*dx+dy*dy);
+}
+
+canvas.addEventListener('touchstart', e=>{
+  ensureAudio();
+  // Every finger that touches down immediately pokes whatever's under it —
+  // this is what makes pressing several buttons at once feel satisfying.
+  for(let i=0;i<e.touches.length;i++){
+    tryPopAt(e.touches[i].clientX, e.touches[i].clientY);
+  }
+  if(e.touches.length === 1){
+    dragging = true;
+    setTargetFromClientXY(e.touches[0].clientX, e.touches[0].clientY);
+  } else if(e.touches.length >= 2){
+    pinchStartDist = touchDist(e.touches[0], e.touches[1]);
+    pinchStartSpeed = speed;
+  }
+}, {passive:true});
+
+canvas.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  if(e.touches.length === 1 && dragging){
+    setTargetFromClientXY(e.touches[0].clientX, e.touches[0].clientY);
+    tryPopAt(e.touches[0].clientX, e.touches[0].clientY);
+  } else if(e.touches.length >= 2 && pinchStartDist){
+    const d = touchDist(e.touches[0], e.touches[1]);
+    const ratio = d / pinchStartDist;
+    speed = Math.max(SPEED_MIN(), Math.min(SPEED_MAX(), pinchStartSpeed * ratio));
+    // still let each finger pop whatever it's currently sliding over
+    for(let i=0;i<e.touches.length;i++){
+      tryPopAt(e.touches[i].clientX, e.touches[i].clientY);
+    }
+  }
+}, {passive:false});
+
+canvas.addEventListener('touchend', e=>{
+  if(e.touches.length < 2) pinchStartDist = null;
+  if(e.touches.length === 0) dragging = false;
+}, {passive:true});
+
+// gentle speed drift back toward a comfortable baseline when not actively pinching
+function relaxSpeed(){
+  if(pinchStartDist === null){
+    speed += (SPEED_BASE() - speed) * 0.006;
+  }
+}
+
+// ── PROJECTION ──
+function proj(worldX, worldY, z){
+  const scale = FOCAL / Math.max(z, 1);
+  return { x: CX + worldX*scale, y: CY + worldY*scale, scale };
+}
+
+let popNumEl = document.getElementById('popNum');
+let speedFillEl = document.getElementById('speedFill');
+let speedWrapEl = document.getElementById('speedWrap');
+let popCountEl = document.getElementById('popCount');
+
+let stars = [], bgParticles = [];
+function initSpaceBG(){
+  stars = [];
+  for(let i=0;i<90;i++){
+    stars.push({
+      x: Math.random()*W, y: Math.random()*H,
+      size: 0.6 + Math.random()*1.6,
+      phase: Math.random()*Math.PI*2,
+      speed: 0.01 + Math.random()*0.02
+    });
+  }
+  bgParticles = [];
+  for(let i=0;i<40;i++){
+    bgParticles.push({
+      x: Math.random()*W, y: Math.random()*H,
+      size: 0.8 + Math.random()*1.8,
+      vx: (Math.random()-0.5)*0.15, vy: (Math.random()-0.5)*0.15,
+      alpha: 0.15 + Math.random()*0.35
+    });
+  }
+}
+initSpaceBG();
+window.addEventListener('resize', initSpaceBG);
+
+function drawSpaceBG(){
+  // twinkling stars
+  for(const s of stars){
+    const tw = 0.5 + 0.5*Math.sin(t*s.speed + s.phase);
+    ctx.fillStyle = `rgba(255,255,255,${0.25+0.55*tw})`;
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.size*(window.devicePixelRatio||1), 0, Math.PI*2); ctx.fill();
+  }
+  // slow floating dust particles
+  for(const p of bgParticles){
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0) p.x=W; if(p.x>W) p.x=0;
+    if(p.y<0) p.y=H; if(p.y>H) p.y=0;
+    ctx.fillStyle = `rgba(200,180,255,${p.alpha})`;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size*(window.devicePixelRatio||1), 0, Math.PI*2); ctx.fill();
+  }
+}
+
+function drawBackground(){
+  // deep glowing void with subtle pulsing radial light down the tube
+  const g = ctx.createRadialGradient(CX, CY, 0, CX, CY, Math.max(W,H)*0.65);
+  const pulse = 0.5 + 0.5*Math.sin(t*0.0012);
+  // beams boosted 15% stronger than the original glow
+  g.addColorStop(0, `rgba(60,20,90,${(0.55+0.15*pulse)*1.15})`);
+  g.addColorStop(0.55, 'rgba(20,8,40,0.9)');
+  g.addColorStop(1, '#05010f');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+
+  drawSpaceBG();
+
+  // rotating light-ray beams radiating from the vanishing point —
+  // fewer, softer and blurred, with a thinner secondary set woven
+  // in between them for extra depth without feeling sharp/busy
+  const dpr = window.devicePixelRatio||1;
+  const beams = 4;
+  const rot = t*0.00025;
+  ctx.save();
+  ctx.filter = `blur(${7*dpr}px)`;
+
+  for(let i=0;i<beams;i++){
+    const ang = rot + (i/beams)*Math.PI*2;
+    const len = Math.max(W,H)*0.85;
+    const grad = ctx.createLinearGradient(CX, CY, CX+Math.cos(ang)*len, CY+Math.sin(ang)*len);
+    grad.addColorStop(0, `rgba(255,220,160,${0.12})`);
+    grad.addColorStop(1, 'rgba(255,220,160,0)');
+    ctx.save();
+    ctx.translate(CX,CY);
+    ctx.rotate(ang);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(len, -len*0.045);
+    ctx.lineTo(len,  len*0.045);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // thinner, dimmer beams woven in between the main ones
+  ctx.filter = `blur(${9*dpr}px)`;
+  for(let i=0;i<beams;i++){
+    const ang = rot + ((i+0.5)/beams)*Math.PI*2;
+    const len = Math.max(W,H)*0.85;
+    const grad = ctx.createLinearGradient(CX, CY, CX+Math.cos(ang)*len, CY+Math.sin(ang)*len);
+    grad.addColorStop(0, `rgba(200,180,255,${0.055})`);
+    grad.addColorStop(1, 'rgba(200,180,255,0)');
+    ctx.save();
+    ctx.translate(CX,CY);
+    ctx.rotate(ang);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(len, -len*0.018);
+    ctx.lineTo(len,  len*0.018);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.filter = 'none';
+  ctx.restore();
+}
+
+function drawRing(ring){
+  const dpr = window.devicePixelRatio||1;
+  const effSteerY = steerY - jumpOffset;
+  for(const b of ring.buttons){
+    const wob = Math.sin(t*0.003 + b.wobble) * 4;
+    const wx = Math.cos(b.angle) * (b.radius+wob) - steerX;
+    const wy = Math.sin(b.angle) * (b.radius+wob) - effSteerY;
+    const p = proj(wx*dpr, wy*dpr, ring.z*dpr);
+    if(p.scale <= 0) continue;
+    const size = b.size * sizeMultiplier * p.scale * dpr;
+    if(size < 1.2) continue;
+
+    const litAmt = b.lit;
+    const baseAlpha = Math.min(1, p.scale*3.2);
+
+    // ── squish-in / spring-back-out press animation ──
+    let pressScale = 1;
+    if(b.pressAnim > 0){
+      if(b.pressAnim === 1){ spawnSparkle(p.x, p.y, b.color, size); spawnShockwave(p.x, p.y, b.color, size); }
+      const progress = 1 - b.pressAnim;
+      if(progress < 0.35){
+        pressScale = 1 - (progress/0.35)*0.45;
+      } else {
+        const p2 = (progress-0.35)/0.65;
+        pressScale = 0.55 + p2*0.45 + Math.sin(p2*Math.PI)*0.22*(1-p2);
+      }
+      b.pressAnim = Math.max(0, b.pressAnim - 0.05);
+    }
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    const ambientPop = 1 + litAmt*0.35;
+    ctx.scale(ambientPop*pressScale, ambientPop*pressScale);
+
+    // soft ambient glow when a whole ring wave passes
+    if(litAmt > 0.02){
+      const glow = ctx.createRadialGradient(0,0,0, 0,0,size*2.2);
+      glow.addColorStop(0, hexToRgba(b.color, 0.5*litAmt*baseAlpha));
+      glow.addColorStop(1, hexToRgba(b.color, 0));
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(0,0,size*2.2,0,Math.PI*2); ctx.fill();
+    }
+    // bright flash halo the instant a button is actually pressed
+    if(b.pressAnim > 0){
+      const glow = ctx.createRadialGradient(0,0,0, 0,0,size*2.6);
+      glow.addColorStop(0, hexToRgba('#ffffff', 0.45*b.pressAnim*baseAlpha));
+      glow.addColorStop(1, hexToRgba(b.color, 0));
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(0,0,size*2.6,0,Math.PI*2); ctx.fill();
+    }
+
+    // pill button body — always bright and colorful, never dark
+    const rw = size, rh = size*0.62;
+    ctx.beginPath();
+    roundRect(ctx, -rw/2, -rh/2, rw, rh, rh/2);
+    ctx.fillStyle = hexToRgba(b.color, baseAlpha);
+    ctx.fill();
+    ctx.lineWidth = Math.max(1, size*0.05);
+    ctx.strokeStyle = hexToRgba('#ffffff', 0.35*baseAlpha);
+    ctx.stroke();
+
+    // word label, only when the pill is big enough to actually read
+    if(size > 26){
+      ctx.fillStyle = hexToRgba('#241033', 0.85*baseAlpha);
+      ctx.font = `800 ${Math.max(9, size*0.24)}px 'Segoe UI', system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(b.word, 0, size*0.01);
+    }
+
+    ctx.restore();
+
+    if(litAmt > 0) b.lit = Math.max(0, litAmt - 0.018);
+  }
+}
+
+// Satisfying burst-and-vanish for a pressed button
+
+function spawnShockwave(x, y, color, size){
+  shockwaves.push({ x, y, color, life: 1, maxR: size*2.4 });
+}
+function updateAndDrawShockwaves(){
+  for(let i=shockwaves.length-1;i>=0;i--){
+    const s = shockwaves[i];
+    s.life -= 0.05;
+    if(s.life <= 0){ shockwaves.splice(i,1); continue; }
+    const r = s.maxR * (1 - s.life);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = hexToRgba(s.color, s.life*0.7);
+    ctx.lineWidth = Math.max(1, r*0.06);
+    ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+// ── FIREWORK SPARKLE BURST — plays on every pop ──
+function spawnSparkle(x, y, color, size){
+  const N = 12 + Math.floor(Math.random()*8);
+  for(let i=0;i<N;i++){
+    const ang = Math.random()*Math.PI*2;
+    const spd = (0.6 + Math.random()*1.8) * (size*0.07);
+    particles.push({
+      x, y,
+      vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd,
+      life: 1,
+      color: Math.random()<0.5 ? color : '#ffffff',
+      sz: 1.5 + Math.random()*2.8
+    });
+  }
+}
+function updateAndDrawParticles(){
+  for(let i=particles.length-1;i>=0;i--){
+    const pt = particles[i];
+    pt.x += pt.vx; pt.y += pt.vy;
+    pt.vy += 0.035; // gentle droop, like real fireworks embers
+    pt.vx *= 0.98; pt.vy *= 0.98;
+    pt.life -= 0.032;
+    if(pt.life <= 0){ particles.splice(i,1); continue; }
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = hexToRgba(pt.color, pt.life);
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.sz, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function hexToRgba(hex, a){
+  const n = parseInt(hex.slice(1),16);
+  const r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  return `rgba(${r},${g},${b},${a})`;
+}
+function shade(hex, amt){
+  const n = parseInt(hex.slice(1),16);
+  let r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  r = Math.max(0,Math.min(255, r + 255*amt));
+  g = Math.max(0,Math.min(255, g + 255*amt));
+  b = Math.max(0,Math.min(255, b + 255*amt));
+  return `rgb(${r|0},${g|0},${b|0})`;
+}
+
+// ── PRESS TO POP: a direct tap/click makes the nearest button vanish ──
+function tryPopAt(clientX, clientY){
+  const dpr = window.devicePixelRatio||1;
+  const px = clientX*dpr, py = clientY*dpr;
+  const effSteerY = steerY - jumpOffset;
+  for(const ring of rings){
+    if(ring.z < NEAR-10) continue; // just needs to be in front of the camera
+    for(const b of ring.buttons){
+      if(b.pressAnim > 0) continue; // already mid squish/bounce — let it finish
+      const wob = Math.sin(t*0.003 + b.wobble) * 4;
+      const wx = Math.cos(b.angle) * (b.radius+wob) - steerX;
+      const wy = Math.sin(b.angle) * (b.radius+wob) - effSteerY;
+      const p = proj(wx*dpr, wy*dpr, ring.z*dpr);
+      if(p.scale <= 0) continue;
+      const size = b.size * sizeMultiplier * p.scale * dpr;
+      const dist = Math.hypot(p.x-px, p.y-py);
+      // distant buttons render tiny, so give them a generous minimum tap
+      // target — this is also what lets a press near the far vanishing
+      // point catch dozens of overlapping distant buttons at once.
+      const hitRadius = Math.max(34*dpr, size*0.95);
+      if(dist < hitRadius){
+        popButton(b);
+      }
+    }
+  }
+}
+
+function popButton(b){
+  if(b.pressAnim > 0) return;
+  b.pressAnim = 1;
+  popTotal++;
+  popNumEl.textContent = popTotal;
+  playHarp(b.note, 0.4 + Math.random()*0.4);
+}
+
+// Gentle, comforting harp pluck — plays whenever a pill is popped.
+// Rapidly popping several in a row (a swipe, or holding across many)
+// naturally plays a little run of harp notes, almost like strumming.
+function playHarp(freq, vel){
+  if(!actx) return;
+  const t0 = actx.currentTime;
+  const vol = (0.16 + 0.12*(vel||0.5)) * 0.9;
+
+  const osc1 = actx.createOscillator();
+  osc1.type = 'triangle';
+  osc1.frequency.value = freq;
+  const g1 = actx.createGain();
+  g1.gain.setValueAtTime(0.0001, t0);
+  g1.gain.exponentialRampToValueAtTime(vol, t0+0.008);
+  g1.gain.exponentialRampToValueAtTime(0.0001, t0+1.1);
+  osc1.connect(g1);
+
+  // soft shimmer overtone, gently detuned, gives it that harp-string glow
+  const osc2 = actx.createOscillator();
+  osc2.type = 'sine';
+  osc2.frequency.value = freq*2.01;
+  const g2 = actx.createGain();
+  g2.gain.setValueAtTime(0.0001, t0);
+  g2.gain.exponentialRampToValueAtTime(vol*0.22, t0+0.006);
+  g2.gain.exponentialRampToValueAtTime(0.0001, t0+0.6);
+  osc2.connect(g2);
+
+  // warm lowpass that closes gradually, like a string naturally damping
+  const filt = actx.createBiquadFilter();
+  filt.type = 'lowpass';
+  filt.frequency.setValueAtTime(3200, t0);
+  filt.frequency.exponentialRampToValueAtTime(900, t0+1.0);
+  filt.Q.value = 0.7;
+
+  g1.connect(filt); g2.connect(filt);
+  filt.connect(actx.destination);
+
+  osc1.start(t0); osc1.stop(t0+1.2);
+  osc2.start(t0); osc2.stop(t0+0.7);
+}
+
+function triggerRing(ring){
+  ring.triggered = true;
+  ring.buttons.forEach((b,i)=>{
+    setTimeout(()=>{
+      b.lit = 1;
+    }, (i / ring.buttons.length) * 90);
+  });
+}
+
+function updateTunnel(){
+  for(const ring of rings){
+    ring.z -= speed;
+    if(!ring.triggered && ring.z < TRIGGER_Z){
+      triggerRing(ring);
+    }
+  }
+  // recycle rings that pass behind the camera
+  rings.sort((a,b)=>a.z-b.z);
+  while(rings.length && rings[0].z < NEAR - 30){
+    rings.shift();
+    const maxZ = rings.length ? rings[rings.length-1].z : NEAR;
+    rings.push(makeRing(maxZ + RING_SPACING));
+  }
+}
+
+function loop(){
+  t += 16;
+  if(started && !paused){
+    const KEY_STEP = 6, MAXOFF = TUBE_RADIUS*0.62;
+    if(keys['ArrowLeft'])  targetX = Math.max(-MAXOFF, targetX - KEY_STEP);
+    if(keys['ArrowRight']) targetX = Math.min(MAXOFF,  targetX + KEY_STEP);
+    if(keys['ArrowUp'])    targetY = Math.max(-MAXOFF, targetY - KEY_STEP);
+    if(keys['ArrowDown'])  targetY = Math.min(MAXOFF,  targetY + KEY_STEP);
+
+    if(jumping){
+      jumpTime++;
+      const progress = Math.min(1, jumpTime/JUMP_DURATION);
+      jumpOffset = Math.sin(progress*Math.PI) * JUMP_HEIGHT;
+      if(jumpTime >= JUMP_DURATION){ jumping=false; jumpOffset=0; }
+    }
+
+    steerX += (targetX - steerX) * 0.09;
+    steerY += (targetY - steerY) * 0.09;
+    if(boosting){
+      speed = Math.min(SPEED_MAX(), speed + (SPEED_MAX() - speed) * 0.15);
+    } else {
+      relaxSpeed();
+    }
+    updateTunnel();
+  }
+  drawBackground();
+  const sorted = [...rings].sort((a,b)=>b.z-a.z); // far to near
+  for(const ring of sorted) drawRing(ring);
+  updateAndDrawShockwaves();
+  updateAndDrawParticles();
+
+  if(started){
+    const pct = (speed - SPEED_MIN())/(SPEED_MAX()-SPEED_MIN());
+    speedFillEl.style.width = (18 + pct*82) + '%';
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  ensureAudio();
+  started = true;
+  document.getElementById('veil').classList.add('hidden');
+  speedWrapEl.classList.add('show');
+  document.getElementById('controlDock').classList.add('show');
+  popCountEl.classList.add('show');
+});
+
+// Generate the chasing marquee bulbs around the STOP/GO button
+// Retro speed slider — 5% (super slow) up to 100% (current full pace)
+const speedSliderEl = document.getElementById('speedSlider');
+const speedPctEl = document.getElementById('speedPct');
+speedSliderEl.addEventListener('input', ()=>{
+  const newMult = Math.max(0.05, Math.min(1, speedSliderEl.value/100));
+  if(speedMultiplier > 0) speed = speed * (newMult/speedMultiplier);
+  speedMultiplier = newMult;
+  speedPctEl.textContent = Math.round(newMult*100) + '%';
+});
+
+const sizeSliderEl = document.getElementById('sizeSlider');
+const sizePctEl = document.getElementById('sizePct');
+sizeSliderEl.addEventListener('input', ()=>{
+  sizeMultiplier = sizeSliderEl.value/100;
+  sizePctEl.textContent = sizeSliderEl.value + '%';
+});
+
+document.getElementById('pauseBtn').addEventListener('click', function(){
+  paused = !paused;
+  if(paused){
+    this.className = 'go';
+    this.textContent = 'GO';
+  } else {
+    this.className = 'stop';
+    this.textContent = 'STOP';
+  }
+});
+
+// prevent iOS bounce / pinch-zoom on the page itself
+document.addEventListener('gesturestart', e=>e.preventDefault());
+document.addEventListener('touchmove', e=>{ if(e.scale && e.scale!==1) e.preventDefault(); }, {passive:false});
+
+})();
+</script>
+</body>
+</html>
