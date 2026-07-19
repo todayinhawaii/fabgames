@@ -182,4 +182,8 @@ const GAMES=[
    desc:'Spin the wheel, guess the letters and solve the mystery phrase to win big! BANKRUPT wipes your cash! Buy vowels, solve early and rack up the highest score across 3 rounds!!',
    color:'rgba(255,215,0,0.15)',href:'/mystery-phrase'},
 
+  {id:'music-in-space',emoji:'🎵',cat:'ASMR · Relaxation',title:'Music in Space',
+   desc:'Drift through an endless tunnel of glowing button pills in deep space, popping gentle harp notes as you go. Drag to steer, adjust speed and size, and play your own comforting tune. No score, just the ride. 🎧',
+   color:'rgba(255,143,214,0.15)',href:'/music-in-space'},
+
 ];
