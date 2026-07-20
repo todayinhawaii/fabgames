@@ -697,7 +697,7 @@
     magBtn.blur(); // so a later spacebar press scrolls the page instead of re-clicking this button
   });
 
-  function updateLens(e, frame, img) {
+  function updateLens(e, frame, img, isTouch) {
     if (!magnifyMode) return;
     lastMouseEvent = e;
     lastFrame = frame;
@@ -707,7 +707,9 @@
     const relY = (e.clientY - rect.top) / rect.height;
     lens.style.display = 'block';
     lens.style.left = (e.clientX - LENS_SIZE/2) + 'px';
-    lens.style.top = (e.clientY - LENS_SIZE/2) + 'px';
+    // On touch, lift the lens above the fingertip so the finger doesn't block the view of it
+    const touchLift = isTouch ? LENS_SIZE/2 + 60 : 0;
+    lens.style.top = (e.clientY - LENS_SIZE/2 - touchLift) + 'px';
     const bgW = rect.width * zoom;
     const bgH = rect.height * zoom;
     lens.style.backgroundImage = 'url(' + img.src + ')';
@@ -717,14 +719,34 @@
 
   // Re-render the lens using the last known cursor position (called on scroll,
   // since the frame moves under a stationary cursor during scrolling).
+  let lastWasTouch = false;
   function refreshLens() {
     if (!magnifyMode || !lastMouseEvent || !lastFrame || lens.style.display === 'none') return;
-    updateLens(lastMouseEvent, lastFrame, lastImg);
+    updateLens(lastMouseEvent, lastFrame, lastImg, lastWasTouch);
   }
 
   [[frameA, imgA],[frameB, imgB]].forEach(([frame, img]) => {
-    frame.addEventListener('mousemove', (e) => updateLens(e, frame, img));
+    frame.addEventListener('mousemove', (e) => { lastWasTouch = false; updateLens(e, frame, img, false); });
     frame.addEventListener('mouseleave', () => { lens.style.display = 'none'; });
+
+    // Touch equivalent: mousemove only fires once per tap on touch devices,
+    // so without this the lens would appear once and then stay frozen in place.
+    frame.addEventListener('touchstart', (e) => {
+      if (!magnifyMode) return;
+      const t = e.touches[0];
+      lastWasTouch = true;
+      updateLens(t, frame, img, true);
+    }, { passive: true });
+    frame.addEventListener('touchmove', (e) => {
+      if (!magnifyMode) return;
+      const t = e.touches[0];
+      lastWasTouch = true;
+      updateLens(t, frame, img, true);
+      // no preventDefault: keeps normal page scrolling and pinch-zoom working on mobile
+    }, { passive: true });
+    frame.addEventListener('touchend', () => { lens.style.display = 'none'; });
+    frame.addEventListener('touchcancel', () => { lens.style.display = 'none'; });
+
     // Wheel now scrolls the page normally (no preventDefault) so trackpad
     // scrolling moves smoothly between Scene A and Scene B even in magnify mode.
   });
