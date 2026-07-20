@@ -86,6 +86,9 @@ nav{
 #choiceGrid{
   display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:360px;margin-bottom:10px;
 }
+@media(max-width:600px){
+  #choiceGrid{ max-width:306px; gap:12px; }
+}
 .swatch-btn{
   aspect-ratio:1/0.8;border-radius:18px;border:none;cursor:pointer;
   box-shadow:0 6px 0 rgba(58,46,44,0.22), 0 8px 14px rgba(0,0,0,0.1);
