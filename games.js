@@ -190,4 +190,8 @@ const GAMES=[
    desc:'Study a beautiful pastel shade, then find it again among ten close look-alikes! A retro 1960s memory game with hundreds of possible tones — how sharp is your eye for color?',
    color:'rgba(197,180,227,0.15)',href:'/color-match'},
 
+  {id:'spot-the-difference-kitchen',emoji:'🔍',cat:'Puzzle · Observation',title:'Spot the Difference: Grandma\'s Kitchen',
+   desc:'Two cozy kitchen scenes look identical — but 12 sneaky differences are hiding between them! Use the built-in magnifier to zoom in close, rack up sparkly Vegas-style celebrations for every correct find, and see how fast you can spot them all!!',
+   color:'rgba(135,206,250,0.15)',href:'/spot-the-difference-kitchen'},
+
 ];
