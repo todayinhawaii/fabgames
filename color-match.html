@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Color Match — fab.games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#faf3e6; --ink:#3a2e2c;
+  --pink:#f4a9b8; --mint:#a8dcc6; --butter:#f6d886; --lav:#c5b4e3; --sky:#9ecbe0; --coral:#f2967f;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Quicksand',sans-serif;background:var(--cream);touch-action:none;}
+#stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;}
+
+/* retro sunburst backdrop */
+#stage::before{
+  content:'';position:fixed;inset:-20%;z-index:0;
+  background:
+    repeating-conic-gradient(from 0deg, rgba(244,169,184,0.10) 0deg 10deg, transparent 10deg 20deg);
+  animation:spin 120s linear infinite;
+}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+nav{
+  position:relative;z-index:2;width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;
+}
+.nav-logo{font-family:'Boogaloo',cursive;font-size:24px;letter-spacing:0.03em;color:var(--ink);}
+.nav-home{
+  font-family:'Quicksand',sans-serif;font-weight:700;font-size:13px;color:var(--ink);
+  text-decoration:none;background:rgba(255,255,255,0.6);padding:8px 16px;border-radius:20px;
+  border:2px solid rgba(58,46,44,0.15);
+}
+
+.wrap{position:relative;z-index:2;flex:1;width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;padding:10px 20px 30px;overflow-y:auto;}
+
+.title-btn{
+  display:inline-flex;gap:2px;align-items:center;justify-content:center;
+  font-family:'Boogaloo',cursive;font-size:clamp(24px,6.5vw,36px);letter-spacing:0.02em;
+  background:#fff;border:3px solid rgba(58,46,44,0.15);border-radius:999px;
+  padding:12px 28px;margin-bottom:10px;cursor:default;
+  box-shadow:0 6px 0 rgba(58,46,44,0.15), 0 10px 18px rgba(58,46,44,0.12);
+}
+.title-btn .letter{display:inline-block;}
+.title-btn .space{width:0.35em;}
+.subtitle{font-size:13px;color:rgba(58,46,44,0.6);text-align:center;margin-bottom:18px;font-weight:600;}
+
+.scorebar{
+  display:flex;gap:14px;margin-bottom:16px;
+}
+.scorepill{
+  background:rgba(255,255,255,0.7);border:2px solid rgba(58,46,44,0.15);border-radius:20px;
+  padding:8px 18px;font-weight:700;font-size:13px;color:var(--ink);
+}
+.scorepill span{font-family:'Boogaloo',cursive;font-size:17px;margin-left:4px;}
+
+/* ── STUDY PHASE ── */
+#studyCard{
+  width:100%;max-width:829px;background:#fff;border-radius:28px;
+  padding:64px 53px 73px;text-align:center;
+  box-shadow:0 12px 0 rgba(58,46,44,0.12), 0 18px 30px rgba(58,46,44,0.15);
+  border:3px solid rgba(58,46,44,0.12);
+}
+.study-label{font-family:'Boogaloo',cursive;font-size:18px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(58,46,44,0.55);margin-bottom:14px;}
+#studySwatch{
+  width:100%;aspect-ratio:1/0.75;border-radius:20px;margin-bottom:18px;
+  box-shadow:inset 0 0 0 6px rgba(255,255,255,0.5), 0 8px 20px rgba(0,0,0,0.15);
+  transition:background 0.3s;
+}
+.study-hint{font-size:15.6px;color:rgba(58,46,44,0.55);margin-bottom:20px;line-height:1.6;font-weight:600;}
+.retro-btn{
+  display:inline-block;padding:16px 38px;border:none;border-radius:999px;
+  font-family:'Boogaloo',cursive;font-size:22.8px;letter-spacing:0.03em;color:var(--ink);
+  cursor:pointer;background:var(--butter);
+  box-shadow:0 6px 0 rgba(58,46,44,0.25);
+  transition:transform 0.08s;
+}
+.retro-btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(58,46,44,0.25);}
+
+/* ── CHOICE PHASE ── */
+#choiceScreen{display:none;width:100%;flex-direction:column;align-items:center;}
+.choice-label{font-family:'Boogaloo',cursive;font-size:16px;color:var(--ink);text-align:center;margin-bottom:16px;}
+#choiceGrid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:360px;margin-bottom:10px;
+}
+.swatch-btn{
+  aspect-ratio:1/0.8;border-radius:18px;border:none;cursor:pointer;
+  box-shadow:0 6px 0 rgba(58,46,44,0.22), 0 8px 14px rgba(0,0,0,0.1);
+  transition:transform 0.08s, box-shadow 0.08s;
+  position:relative;
+}
+.swatch-btn:active, .swatch-btn.pressed{
+  transform:translateY(6px);
+}
+.swatch-btn.correct-reveal{
+  outline:5px solid #4caf6d;outline-offset:3px;
+  position:relative;
+  box-shadow:0 0 30px 6px rgba(76,175,109,0.6);
+}
+.correct-tone-label{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Boogaloo',cursive;font-size:22.5px;letter-spacing:0.05em;color:#fff;
+  text-shadow:0 2px 3px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,1);
+  border-radius:16px;
+  opacity:0;animation:flashLabel 5s ease-in-out;pointer-events:none;
+}
+@keyframes flashLabel{
+  0%{opacity:0;} 15%{opacity:1;} 75%{opacity:1;} 100%{opacity:0;}
+}
+.swatch-btn.correct-reveal::before,
+.swatch-btn.correct-reveal::after{
+  content:'';position:absolute;inset:0;border-radius:18px;
+  border:3px solid #6ee89a;pointer-events:none;
+  animation:radiateWave 1.3s ease-out infinite;
+}
+.swatch-btn.correct-reveal::after{ animation-delay:0.5s; }
+@keyframes radiateWave{
+  0%{ transform:scale(1); opacity:0.9; }
+  100%{ transform:scale(1.45); opacity:0; }
+}
+.swatch-btn.wrong-reveal{outline:5px solid #e2685c;outline-offset:3px;}
+.swatch-btn:disabled{cursor:default;}
+
+#feedback{
+  min-height:36px;font-family:'Boogaloo',cursive;font-size:20px;text-align:center;
+  color:var(--ink);margin-top:10px;opacity:0;transition:opacity 0.25s;
+}
+#feedback.show{opacity:1;}
+
+.streak-note{font-size:12px;color:rgba(58,46,44,0.5);margin-top:6px;font-weight:600;text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <nav>
+    <div class="nav-logo">🎨 Color Match</div>
+    <a href="/play" class="nav-home">🏠 Home</a>
+  </nav>
+
+  <div class="wrap">
+    <button class="title-btn" id="titleBtn"></button>
+    <div class="subtitle">Memorize the shade. Find it again!</div>
+
+    <div class="scorebar">
+      <div class="scorepill">SCORE <span id="scoreVal">0</span></div>
+      <div class="scorepill">STREAK <span id="streakVal">0</span></div>
+    </div>
+
+    <div id="studyScreen">
+      <div id="studyCard">
+        <div class="study-label">Study This Shade</div>
+        <div id="studySwatch"></div>
+        <div class="study-hint">Take a moment to really look at it — the exact tone, how light or muted it is.</div>
+        <button class="retro-btn" id="readyBtn">I'm Ready! →</button>
+      </div>
+    </div>
+
+    <div id="choiceScreen">
+      <div class="choice-label">Which one was it?</div>
+      <div id="choiceGrid"></div>
+      <div id="feedback"></div>
+      <div class="streak-note" id="roundNote">Round 1</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let score = 0, streak = 0, round = 0;
+let targetColor = null;
+let locked = false;
+
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+function randomTarget(){
+  // roughly 1 in 5 rounds uses a grey/neutral tone instead of a pastel —
+  // together with the fully random hue/saturation/lightness ranges below,
+  // this gives hundreds upon hundreds of distinct possible tones overall
+  const isNeutral = Math.random() < 0.2;
+  if(isNeutral){
+    return {
+      h: Math.floor(Math.random()*360),
+      s: 3 + Math.random()*9,
+      l: 45 + Math.random()*40
+    };
+  }
+  return {
+    h: Math.floor(Math.random()*360),
+    s: 35 + Math.random()*25,
+    l: 65 + Math.random()*15
+  };
+}
+
+function hslStr(c){ return `hsl(${c.h.toFixed(1)},${c.s.toFixed(1)}%,${c.l.toFixed(1)}%)`; }
+
+function colorDist(a,b){
+  // rough perceptual-ish distance for avoiding near-duplicate decoys
+  let dh = Math.abs(a.h-b.h); if(dh>180) dh = 360-dh;
+  return Math.sqrt(dh*dh + (a.s-b.s)*(a.s-b.s)*0.6 + (a.l-b.l)*(a.l-b.l)*0.8);
+}
+
+function makeChoices(target){
+  // difficulty ramps up with round — decoys get closer to the target
+  const t = Math.min(round, 16);
+  const spreadH = 42 - t*2.0;   // 42 → ~10
+  const spreadS = 20 - t*0.9;   // 20 → ~5.6
+  const spreadL = 14 - t*0.6;   // 14 → ~4.4
+
+  const list = [{ ...target, isTarget:true }];
+
+  let attempts = 0;
+  while(list.length < 10 && attempts < 500){
+    attempts++;
+    const c = {
+      h: (target.h + (Math.random()-0.5)*2*spreadH + 360) % 360,
+      s: clamp(target.s + (Math.random()-0.5)*2*spreadS, 18, 82),
+      l: clamp(target.l + (Math.random()-0.5)*2*spreadL, 52, 90),
+      isTarget:false
+    };
+    // keep decoys reasonably distinct from each other and from the target
+    const tooClose = list.some(existing => colorDist(existing, c) < 3.5);
+    if(!tooClose) list.push(c);
+  }
+  while(list.length < 10){
+    list.push({ ...target, h:(target.h+ (list.length*7))%360, isTarget:false });
+  }
+
+  // shuffle
+  for(let i=list.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [list[i],list[j]] = [list[j],list[i]];
+  }
+  return list;
+}
+
+function addLabel(btn, html, isCorrect){
+  const label = document.createElement('div');
+  label.className = 'correct-tone-label' + (isCorrect ? '' : ' wrong-tone-label');
+  label.innerHTML = html;
+  btn.appendChild(label);
+}
+
+function startRound(){
+  round++;
+  locked = false;
+  targetColor = randomTarget();
+  document.getElementById('studySwatch').style.background = hslStr(targetColor);
+  document.getElementById('roundNote').textContent = 'Round ' + round;
+  document.getElementById('feedback').className = '';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('studyScreen').style.display = 'flex';
+  document.getElementById('studyScreen').style.flexDirection = 'column';
+  document.getElementById('studyScreen').style.alignItems = 'center';
+  document.getElementById('choiceScreen').style.display = 'none';
+}
+
+let currentTargetBtn = null;
+
+function showChoices(){
+  const choices = makeChoices(targetColor);
+  const grid = document.getElementById('choiceGrid');
+  grid.innerHTML = '';
+  currentTargetBtn = null;
+  choices.forEach(c=>{
+    const btn = document.createElement('button');
+    btn.className = 'swatch-btn';
+    btn.style.background = hslStr(c);
+    btn.addEventListener('click', ()=> pick(btn, c));
+    if(c.isTarget) currentTargetBtn = btn;
+    grid.appendChild(btn);
+  });
+  document.getElementById('studyScreen').style.display = 'none';
+  document.getElementById('choiceScreen').style.display = 'flex';
+  document.getElementById('choiceScreen').style.flexDirection = 'column';
+  document.getElementById('choiceScreen').style.alignItems = 'center';
+}
+
+function pick(btn, c){
+  if(locked) return;
+  locked = true;
+  btn.classList.add('pressed');
+
+  const allBtns = document.querySelectorAll('.swatch-btn');
+  allBtns.forEach(b=> b.disabled = true);
+
+  const fb = document.getElementById('feedback');
+
+  if(c.isTarget){
+    score++; streak++;
+    btn.classList.add('correct-reveal');
+    addLabel(btn, 'Correct!', true);
+    fb.textContent = 'Correct!';
+  } else {
+    streak = 0;
+    btn.classList.add('wrong-reveal');
+    addLabel(btn, 'OOPS<br>Wrong<br>Choice', false);
+    // reveal the real one too, using the reliable reference from showChoices —
+    // not a fragile style-string comparison, which could silently never match
+    if(currentTargetBtn){
+      currentTargetBtn.classList.add('correct-reveal');
+      currentTargetBtn.classList.add('pressed');
+      addLabel(currentTargetBtn, 'Correct!', true);
+    }
+    fb.innerHTML = 'OOPS<br>Wrong<br>Choice';
+  }
+
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = streak;
+  fb.className = 'show';
+
+  setTimeout(startRound, 5000);
+}
+
+document.getElementById('readyBtn').addEventListener('click', showChoices);
+
+(function buildTitle(){
+  const letterColors = ['var(--pink)','var(--mint)','var(--butter)','var(--lav)','var(--sky)','var(--coral)'];
+  const text = 'COLOR MATCH';
+  const btn = document.getElementById('titleBtn');
+  let ci = 0;
+  text.split('').forEach(ch=>{
+    if(ch === ' '){
+      const sp = document.createElement('span');
+      sp.className = 'space';
+      btn.appendChild(sp);
+    } else {
+      const span = document.createElement('span');
+      span.className = 'letter';
+      span.textContent = ch;
+      span.style.color = letterColors[ci % letterColors.length];
+      span.style.textShadow = '0 2px 0 rgba(58,46,44,0.25)';
+      btn.appendChild(span);
+      ci++;
+    }
+  });
+})();
+
+startRound();
+</script>
+</body>
+</html>
