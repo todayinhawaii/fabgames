@@ -186,4 +186,8 @@ const GAMES=[
    desc:'Drift through an endless tunnel of glowing button pills in deep space, popping gentle harp notes as you go. Drag to steer, adjust speed and size, and play your own comforting tune. No score, just the ride. 🎧',
    color:'rgba(255,143,214,0.15)',href:'/music-in-space'},
 
+  {id:'color-match',emoji:'🎨',cat:'Memory · Puzzle',title:'Color Match',
+   desc:'Study a beautiful pastel shade, then find it again among ten close look-alikes! A retro 1960s memory game with hundreds of possible tones — how sharp is your eye for color?',
+   color:'rgba(197,180,227,0.15)',href:'/color-match'},
+
 ];
