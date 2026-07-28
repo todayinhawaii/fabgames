@@ -42,23 +42,7 @@ body::before{
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
   pointer-events:none;z-index:1000;opacity:0.4;
 }
-/* ── CUSTOM CURSOR ── */
-*{cursor:none !important;}
-.cursor{
-  position:fixed;width:8px;height:8px;
-  background:var(--gold);border-radius:50%;
-  pointer-events:none;z-index:9999;
-  transform:translate(-50%,-50%);
-  transition:width 0.2s,height 0.2s,background 0.2s;
-  mix-blend-mode:difference;
-}
-.cursor-ring{
-  position:fixed;width:36px;height:36px;
-  border:1px solid rgba(201,168,76,0.5);
-  border-radius:50%;pointer-events:none;z-index:9998;
-  transform:translate(-50%,-50%);
-  transition:all 0.15s ease;
-}
+/* ── CUSTOM CURSOR (removed — was causing navigation complaints, restored native cursor) ── */
 /* ── NAV ── */
 nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
@@ -731,9 +715,8 @@ footer{
 </script>
 </head>
 <body>
-<!-- Custom cursor -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
+<!-- Custom cursor removed — using native browser cursor now -->
+
 <!-- NAV -->
 <nav id="mainNav">
   <div class="nav-logo">fab.games</div>
@@ -892,32 +875,9 @@ footer{
   </div>
   <div class="footer-copy">© 2026 fab.games — All rights reserved</div>
 </footer>
-<script src="/games.js"></script></script>
+<script src="/games.js"></script>
 <script>
-// ── CURSOR ────────────────────────────────────────
-const cursor=document.getElementById('cursor');
-const ring=document.getElementById('cursorRing');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{
-  mx=e.clientX;my=e.clientY;
-  cursor.style.left=mx+'px';cursor.style.top=my+'px';
-});
-function animRing(){
-  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
-  ring.style.left=rx+'px';ring.style.top=ry+'px';
-  requestAnimationFrame(animRing);
-}
-animRing();
-document.querySelectorAll('a,button').forEach(el=>{
-  el.addEventListener('mouseenter',()=>{
-    cursor.style.width='16px';cursor.style.height='16px';
-    ring.style.width='60px';ring.style.height='60px';
-  });
-  el.addEventListener('mouseleave',()=>{
-    cursor.style.width='8px';cursor.style.height='8px';
-    ring.style.width='36px';ring.style.height='36px';
-  });
-});
+// ── CURSOR: removed custom cursor system (native browser cursor restored) ──
 // ── NAV SCROLL ────────────────────────────────────
 window.addEventListener('scroll',()=>{
   document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>60);
